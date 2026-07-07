@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:43</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:59</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7006,71 +7006,147 @@ function runAuctionOptimizer() {
     const hoursInMonth = getHoursInMonth(yearMonth);
 
     // Get forward prices
-    const srcFwd = getForwardPrice(source, yearMonth);
-    const dstFwd = getForwardPrice(dest, yearMonth);
+    const srcFwd = getForwardPrice(source, yearMonth) || 80.0;
+    const dstFwd = getForwardPrice(dest, yearMonth) || 85.0;
+    const fwdSpread = dstFwd - srcFwd;
 
     // Get historical profiles for shaping
+    const targetMonth = parseInt(yearMonth.split('-')[1]);
     const srcHistorical = getHistoricalPricesForMonth(source, yearMonth);
     const dstHistorical = getHistoricalPricesForMonth(dest, yearMonth);
 
-    // Shape forward prices to hourly
-    const srcHourly = shapeForwardToHourly(srcFwd || 80, srcHistorical);
-    const dstHourly = shapeForwardToHourly(dstFwd || 80, dstHistorical);
+    // 1. Direct Spread Shaping
+    // Match by date and calculate hourly spreads
+    const hourlySpreadsSum = Array(24).fill(0);
+    let matchedDaysCount = 0;
+    const dataSrc = historicalData[source] || {};
+    const dataDst = historicalData[dest] || {};
 
-    // Compute hourly spreads with solar filter
-    const spreads = [];
-    const isSolarHour = [];
-    for (let h = 0; h < 24; h++) {
-        const rawSpread = dstHourly[h] - srcHourly[h];
-        // Solar filter: hours 10-15, if avg historical spread < 1 => zero out
-        let avgHistSpread = 0;
-        if (srcHistorical.length > 0 && dstHistorical.length > 0) {
-            let srcH = srcHistorical.reduce((s, d) => s + (d[h] || 0), 0) / srcHistorical.length;
-            let dstH = dstHistorical.reduce((s, d) => s + (d[h] || 0), 0) / dstHistorical.length;
-            avgHistSpread = dstH - srcH;
+    Object.keys(dataSrc).forEach(dateStr => {
+        const d = new Date(dateStr);
+        if (d.getMonth() + 1 === targetMonth && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
+            const srcPrices = dataSrc[dateStr].prices;
+            const dstPrices = dataDst[dateStr].prices;
+            for (let h = 0; h < 24; h++) {
+                hourlySpreadsSum[h] += (dstPrices[h] - srcPrices[h]);
+            }
+            matchedDaysCount++;
         }
-        const solar = (h >= 10 && h <= 15) && avgHistSpread < 1.0;
+    });
+
+    const avgHourlySpreads = Array(24).fill(0);
+    if (matchedDaysCount > 0) {
+        for (let h = 0; h < 24; h++) {
+            avgHourlySpreads[h] = hourlySpreadsSum[h] / matchedDaysCount;
+        }
+    } else {
+        // Fallback spread shape
+        for (let h = 0; h < 24; h++) avgHourlySpreads[h] = fwdSpread;
+    }
+
+    const meanSpreadProfile = avgHourlySpreads.reduce((a, b) => a + b, 0) / 24;
+    const shapedSpreads = Array(24).fill(0);
+    const isSolarHour = [];
+
+    for (let h = 0; h < 24; h++) {
+        // Scale spread profile to forward spread expectation
+        let scaledSpread = fwdSpread;
+        if (Math.abs(meanSpreadProfile) > 0.1) {
+            scaledSpread = fwdSpread * (avgHourlySpreads[h] / meanSpreadProfile);
+        } else {
+            scaledSpread = fwdSpread;
+        }
+        
+        // Solar filter: hours 10-15, if average historical spread < 1.0 €/MWh => zero out
+        const solar = (h >= 10 && h <= 15) && avgHourlySpreads[h] < 1.0;
         isSolarHour.push(solar);
-        spreads.push(solar ? 0 : Math.max(0, rawSpread));
+        shapedSpreads[h] = solar ? 0 : Math.max(0, scaledSpread);
     }
 
     // E[V] = average of positive spreads across all hours in month
-    const ev = spreads.reduce((s, v) => s + v, 0) / 24;
+    const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
 
-    // REMIT deduction
+    // 2. Dynamic REMIT / Curtailment calculation (using local month or historical same-month backup)
     const [y, m] = yearMonth.split('-').map(Number);
-    const monthOutages = (cableOutagesData || []).filter(r => {
+    let monthOutages = (cableOutagesData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        // Timezone-safe parse of YYYY-MM-DD
         const parts = r.trade_date.split('-');
         if (parts.length < 2) return false;
         const ty = parseInt(parts[0]);
         const tm = parseInt(parts[1]);
         return ty === y && tm === m;
     });
-    let remitDeduction = 0;
-    if (monthOutages.length > 0 && ev > 0) {
-        const avgCurtailment = monthOutages.reduce((s, r) => {
+
+    let avgCurtailmentRate = 0;
+    if (monthOutages.length > 0) {
+        avgCurtailmentRate = monthOutages.reduce((s, r) => {
             const orig = parseFloat(r.original_capacity) || 0;
             const rem = parseFloat(r.remaining_capacity) || 0;
             return s + (orig > 0 ? (orig - rem) / orig : 0);
         }, 0) / monthOutages.length;
-        remitDeduction = ev * avgCurtailment;
+    } else {
+        // Fallback: Check historical curtailment rate for same calendar month in prior years
+        const historicalSameMonthOutages = (cableOutagesData || []).filter(r => {
+            if (r.corridor_code !== corridor) return false;
+            const parts = r.trade_date.split('-');
+            if (parts.length < 2) return false;
+            const tm = parseInt(parts[1]);
+            return tm === targetMonth;
+        });
+        if (historicalSameMonthOutages.length > 0) {
+            avgCurtailmentRate = historicalSameMonthOutages.reduce((s, r) => {
+                const orig = parseFloat(r.original_capacity) || 0;
+                const rem = parseFloat(r.remaining_capacity) || 0;
+                return s + (orig > 0 ? (orig - rem) / orig : 0);
+            }, 0) / historicalSameMonthOutages.length;
+        }
     }
+    const remitDeduction = ev * avgCurtailmentRate;
 
-    // Fuel/Carbon deduction
+    // 3. Thermal Generation Cost / Fuel Signal
     const targetStart = yearMonth + '-01';
     const ttfEntries = (auctionFwdData.ttf && auctionFwdData.ttf.spot) ? auctionFwdData.ttf.spot : (auctionFwdData.ttf || []);
     const euaEntries = (auctionFwdData.eua && auctionFwdData.eua.spot) ? auctionFwdData.eua.spot : (auctionFwdData.eua || []);
     const ttfEntry = Array.isArray(ttfEntries) ? ttfEntries.find(e => e.delivery_start === targetStart) : null;
     const euaEntry = Array.isArray(euaEntries) ? euaEntries.find(e => e.delivery_start === targetStart) : null;
-    const ttfPrice = ttfEntry ? ttfEntry.price : 0;
-    const euaPrice = euaEntry ? euaEntry.price : 0;
-    const fuelSignal = (ttfPrice / 10) * 0.45 + euaPrice * 0.12;
-    const fuelDeduction = fuelSignal > 20 ? Math.min(ev * 0.15, (fuelSignal - 20) * 0.03) : 0;
+    const ttfPrice = ttfEntry ? ttfEntry.price : 35.0;
+    const euaPrice = euaEntry ? euaEntry.price : 70.0;
+    
+    // Proper thermal CCGT cost estimation
+    const gasMarginalCost = (ttfPrice / 0.52) + (euaPrice * 0.36);
+    const fuelDeduction = gasMarginalCost > srcFwd ? Math.min(ev * 0.15, (gasMarginalCost - srcFwd) * 0.05) : 0;
 
-    // Final bid
-    const finalBid = Math.max(0.01, ev - remitDeduction - fuelDeduction - riskMargin);
+    // 4. Expected Profit Optimization using Historical Clearing Prices
+    const historicalClearing = (cablesLongData || []).filter(r => {
+        if (r.corridor_code !== corridor) return false;
+        const d = new Date(r.start_date);
+        return d.getMonth() + 1 === targetMonth && r.price != null;
+    }).map(r => parseFloat(r.price));
+
+    let recommendedRiskMargin = riskMargin;
+    if (historicalClearing.length >= 2) {
+        // Find bid price between €0.01 and E[V] that maximizes Expected Profit
+        let bestBid = 0.01;
+        let maxExpectedProfit = 0;
+        const step = 0.05;
+        for (let b = 0.01; b < ev; b += step) {
+            // Empirically count win probability: fraction of past clearing prices <= b
+            const winCount = historicalClearing.filter(p => p <= b).length;
+            const pWin = winCount / historicalClearing.length;
+            const expectedProfit = pWin * (ev - remitDeduction - fuelDeduction - b);
+            if (expectedProfit > maxExpectedProfit) {
+                maxExpectedProfit = expectedProfit;
+                bestBid = b;
+            }
+        }
+        if (bestBid > 0.01) {
+            // Align the input margin with this optimal bid target
+            recommendedRiskMargin = Math.max(0.1, (ev - remitDeduction - fuelDeduction - bestBid));
+        }
+    }
+
+    // Final bid calculations
+    const finalBid = Math.max(0.01, ev - remitDeduction - fuelDeduction - recommendedRiskMargin);
     const totalExposure = bidMw * hoursInMonth;
     const liability = finalBid * totalExposure;
 
