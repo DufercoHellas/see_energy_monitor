@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:16</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:24</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -193,7 +193,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
             <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
             <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
-            <button class="tablinks" onclick="openTab(event, 'CableAuctions')">🏷️ Cable Auctions</button>
             <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
         </div>
         
@@ -808,6 +807,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
                 <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
                 <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CablesLongTerm')">⏳ Long-Term Cables</button>
+                <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
                 <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
             </div>
 
@@ -894,7 +894,83 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
 
-            <!-- Sub-Tab 3: Cable Outages -->
+            <!-- Sub-Tab 3: Cable Auctions Optimizer -->
+            <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
+                        <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <label style="font-size:13px; font-weight:600; color:#374151;">Corridor:</label>
+                        <select id="auction_corridor" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
+                        <label style="font-size:13px; font-weight:600; color:#374151;">Month:</label>
+                        <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
+                        <label style="font-size:13px; font-weight:600; color:#374151;">Volume (MW):</label>
+                        <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                        <label style="font-size:13px; font-weight:600; color:#374151;">Risk Margin (€/MW):</label>
+                        <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                    </div>
+                </div>
+
+                <!-- KPI Cards Row -->
+                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px;">
+                    <div class="chart-wrapper" style="padding:20px; margin:0;">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
+                        <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
+                        <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
+                    </div>
+                    <div class="chart-wrapper" style="padding:20px; margin:0;">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
+                        <div id="kpi_ev" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
+                        <div style="font-size:12px; color:#6b7280; margin-top:6px;">/MWh shaped</div>
+                    </div>
+                    <div class="chart-wrapper" style="padding:20px; margin:0;">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Total Exposure</div>
+                        <div id="kpi_exposure" style="font-size:32px; font-weight:700; color:#d97706; line-height:1;">—</div>
+                        <div id="kpi_exposure_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">MWh</div>
+                    </div>
+                    <div class="chart-wrapper" style="padding:20px; margin:0;">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Financial Liability</div>
+                        <div id="kpi_liability" style="font-size:32px; font-weight:700; color:#7c3aed; line-height:1;">—</div>
+                        <div style="font-size:12px; color:#6b7280; margin-top:6px;">at bid price</div>
+                    </div>
+                </div>
+
+                <!-- Main Content: 2 columns -->
+                <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
+                    <div class="chart-wrapper" style="margin:0;">
+                        <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
+                        <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread (Destination − Source) by hour. Gray = solar suppression zone (10:00–15:00).</p>
+                        <div id="auction_spread_chart" style="width:100%; height:280px;"></div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div class="chart-wrapper" style="margin:0;">
+                            <h4 style="margin-top:0;">Fundamental Adjustments</h4>
+                            <div id="auction_adjustments" style="font-size:13px;"></div>
+                        </div>
+                        <div class="chart-wrapper" style="margin:0;">
+                            <h4 style="margin-top:0;">Forward Curve Context</h4>
+                            <div id="auction_fwd_chart" style="width:100%; height:180px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom: Historical Clearing + Active Outages -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                    <div class="chart-wrapper" style="margin:0;">
+                        <h4 style="margin-top:0;">Historical Clearing Prices</h4>
+                        <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
+                        <div id="auction_clearing_chart" style="width:100%; height:200px;"></div>
+                    </div>
+                    <div class="chart-wrapper" style="margin:0;">
+                        <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
+                        <div id="auction_outages_table"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Tab 4: Cable Outages -->
             <div id="CableOutages" class="inner-cables-tabcontent" style="display:none;">
                 <h2>Cable Capacity Outages & Curtailments</h2>
                 <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
@@ -1290,83 +1366,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         </div>
 
-        <div id="CableAuctions" class="tabcontent">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-                <div>
-                    <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
-                    <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
-                </div>
-                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                    <label style="font-size:13px; font-weight:600; color:#374151;">Corridor:</label>
-                    <select id="auction_corridor" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                    <label style="font-size:13px; font-weight:600; color:#374151;">Month:</label>
-                    <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                    <label style="font-size:13px; font-weight:600; color:#374151;">Volume (MW):</label>
-                    <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                    <label style="font-size:13px; font-weight:600; color:#374151;">Risk Margin (€/MW):</label>
-                    <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                </div>
-            </div>
-
-            <!-- KPI Cards Row -->
-            <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px;">
-                <div class="chart-wrapper" style="padding:20px; margin:0;">
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
-                    <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
-                    <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
-                </div>
-                <div class="chart-wrapper" style="padding:20px; margin:0;">
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
-                    <div id="kpi_ev" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
-                    <div style="font-size:12px; color:#6b7280; margin-top:6px;">/MWh shaped</div>
-                </div>
-                <div class="chart-wrapper" style="padding:20px; margin:0;">
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Total Exposure</div>
-                    <div id="kpi_exposure" style="font-size:32px; font-weight:700; color:#d97706; line-height:1;">—</div>
-                    <div id="kpi_exposure_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">MWh</div>
-                </div>
-                <div class="chart-wrapper" style="padding:20px; margin:0;">
-                    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Financial Liability</div>
-                    <div id="kpi_liability" style="font-size:32px; font-weight:700; color:#7c3aed; line-height:1;">—</div>
-                    <div style="font-size:12px; color:#6b7280; margin-top:6px;">at bid price</div>
-                </div>
-            </div>
-
-            <!-- Main Content: 2 columns -->
-            <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
-                <!-- Left: Spread Shape Chart -->
-                <div class="chart-wrapper" style="margin:0;">
-                    <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
-                    <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread (Destination − Source) by hour. Gray = solar suppression zone (10:00–15:00).</p>
-                    <div id="auction_spread_chart" style="width:100%; height:280px;"></div>
-                </div>
-                <!-- Right: Adjustments + Forward Curve -->
-                <div style="display:flex; flex-direction:column; gap:16px;">
-                    <div class="chart-wrapper" style="margin:0;">
-                        <h4 style="margin-top:0;">Fundamental Adjustments</h4>
-                        <div id="auction_adjustments" style="font-size:13px;"></div>
-                    </div>
-                    <div class="chart-wrapper" style="margin:0;">
-                        <h4 style="margin-top:0;">Forward Curve Context</h4>
-                        <div id="auction_fwd_chart" style="width:100%; height:180px;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Bottom: Historical Clearing + Active Outages -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                <div class="chart-wrapper" style="margin:0;">
-                    <h4 style="margin-top:0;">Historical Clearing Prices</h4>
-                    <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
-                    <div id="auction_clearing_chart" style="width:100%; height:200px;"></div>
-                </div>
-                <div class="chart-wrapper" style="margin:0;">
-                    <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
-                    <div id="auction_outages_table"></div>
-                </div>
-            </div>
-        </div>
-
+        <!-- Sub-Tab 4: Cable Auctions Optimizer (inside Cables tab) -->
+        <!-- NOTE: This div is injected inside Cables tab via JS to avoid nesting issues -->
     </div>
     </div>
         <script>
@@ -3928,6 +3929,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 } else if (subTabId === "CableOutages") {
                     initCableOutagesSelectors();
                     toggleOutagesGridView('matrix');
+                } else if (subTabId === "CableAuctionsPanel" && !auctionTabInitialized) {
+                    auctionTabInitialized = true;
+                    initAuctionTab();
+                } else if (subTabId === "CableAuctionsPanel") {
+                    // Re-trigger resize so Plotly charts render correctly
+                    window.dispatchEvent(new Event('resize'));
                 }
                 window.dispatchEvent(new Event('resize'));
             }
