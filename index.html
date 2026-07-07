@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 16:06</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 16:16</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -948,6 +948,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
                         <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread (Destination − Source) by hour. Gray = solar suppression zone (10:00–15:00).</p>
                         <div id="auction_spread_chart" style="width:100%; height:280px;"></div>
+                        <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:16px;">
                         <div class="chart-wrapper" style="margin:0;">
@@ -7054,36 +7055,252 @@ function runAuctionOptimizer() {
     const fwdSpread = dstFwd - srcFwd;
 
     // Get historical profiles for shaping
-    const targetMonth = productType === 'Monthly' ? parseInt(periodValue.split('-')[1]) : null;
+    const [pYear, pMonth] = periodValue.split('-').map(Number);
+    let precYear = pYear;
+    let precMonth = pMonth - 1;
+    if (precMonth === 0) {
+        precMonth = 12;
+        precYear = pYear - 1;
+    }
     
     // 1. Direct Spread Shaping
     const hourlySpreadsSum = Array(24).fill(0);
     let matchedDaysCount = 0;
     const dataSrc = historicalData[source] || {};
     const dataDst = historicalData[dest] || {};
-    let minDate = null;
-    let maxDate = null;
+    const matchedPeriods = new Set();
 
     Object.keys(dataSrc).forEach(dateStr => {
-        const d = new Date(dateStr);
-        const match = productType === 'Yearly' || (d.getMonth() + 1 === targetMonth);
-        if (match && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
+        const parts = dateStr.split('-');
+        if (parts.length < 3) return;
+        const dYear = parseInt(parts[0]);
+        const dMonth = parseInt(parts[1]);
+        
+        let isMatch = false;
+        if (productType === 'Yearly') {
+            isMatch = (dYear < pYear);
+        } else {
+            const isPrevYearSameMonth = (dYear < pYear && dMonth === pMonth);
+            const isPrecedingMonth = (dYear === precYear && dMonth === precMonth);
+            isMatch = isPrevYearSameMonth || isPrecedingMonth;
+        }
+
+        if (isMatch && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
             const srcPrices = dataSrc[dateStr].prices;
             const dstPrices = dataDst[dateStr].prices;
             for (let h = 0; h < 24; h++) {
                 hourlySpreadsSum[h] += (dstPrices[h] - srcPrices[h]);
             }
             matchedDaysCount++;
-            if (!minDate || dateStr < minDate) minDate = dateStr;
-            if (!maxDate || dateStr > maxDate) maxDate = dateStr;
+            if (productType === 'Yearly') {
+                matchedPeriods.add(parts[0]);
+            } else {
+                matchedPeriods.add(`${parts[0]}-${parts[1]}`);
+            }
         }
     });
 
     // Update the subtitle with matched date range
     const subtitleEl = document.getElementById('auction_spread_subtitle');
     if (subtitleEl) {
-        if (matchedDaysCount > 0 && minDate && maxDate) {
-            subtitleEl.textContent = `Shaped forward spread based on historical profile (matched ${minDate} to ${maxDate}). Gray = solar suppression zone.`;
+        if (matchedDaysCount > 0) {
+            const sortedPeriods = Array.from(matchedPeriods).sort();
+            subtitleEl.textContent = `Shaped forward spread based on historical profile (matched periods: ${sortedPeriods.join(', ')}). Gray = solar suppression zone.`;
+        } else {
+            subtitleEl.textContent = `Shaped forward spread. No matching historical days found.`;
+        }
+    }
+
+    const avgHourlySpreads = Array(24).fill(0);
+    if (matchedDaysCount > 0) {
+        for (let h = 0; h < 24; h++) {
+            avgHourlySpreads[h] = hourlySpreadsSum[h] / matchedDaysCount;
+        }
+    } else {
+        for (let h = 0; h < 24; h++) avgHourlySpreads[h] = fwdSpread;
+    }
+
+    const meanSpreadProfile = avgHourlySpreads.reduce((a, b) => a + b, 0) / 24;
+    const shapedSpreads = Array(24).fill(0);
+    const isSolarHour = [];
+
+    for (let h = 0; h < 24; h++) {
+        let scaledSpread = fwdSpread;
+        if (Math.abs(meanSpreadProfile) > 0.1) {
+            scaledSpread = fwdSpread * (avgHourlySpreads[h] / meanSpreadProfile);
+        } else {
+            scaledSpread = fwdSpread;
+        }
+        
+        const solar = (h >= 10 && h <= 15) && avgHourlySpreads[h] < 1.0;
+        isSolarHour.push(solar);
+        shapedSpreads[h] = solar ? 0 : Math.max(0, scaledSpread);
+    }
+
+    const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
+
+    // 2. Dynamic REMIT / Curtailment calculation
+    let avgCurtailmentRate = 0;
+    if (productType === 'Monthly') {
+        const [y, m] = periodValue.split('-').map(Number);
+        let monthOutages = (cableOutagesData || []).filter(r => {
+            if (r.corridor_code !== corridor) return false;
+            const parts = r.trade_date.split('-');
+            if (parts.length < 2) return false;
+            const ty = parseInt(parts[0]);
+            const tm = parseInt(parts[1]);
+            return ty === y && tm === m;
+        });
+
+        if (monthOutages.length > 0) {
+            avgCurtailmentRate = monthOutages.reduce((s, r) => {
+                const orig = parseFloat(r.original_capacity) || 0;
+                const rem = parseFloat(r.remaining_capacity) || 0;
+                return s + (orig > 0 ? (orig - rem) / orig : 0);
+            }, 0) / monthOutages.length;
+        } else {
+            const historicalSameMonthOutages = (cableOutagesData || []).filter(r => {
+                if (r.corridor_code !== corridor) return false;
+                const parts = r.trade_date.split('-');
+                if (parts.length < 2) return false;
+                const tm = parseInt(parts[1]);
+                return tm === targetMonth;
+            });
+            if (historicalSameMonthOutages.length > 0) {
+                avgCurtailmentRate = historicalSameMonthOutages.reduce((s, r) => {
+                    const orig = parseFloat(r.original_capacity) || 0;
+                    const rem = parseFloat(r.remaining_capacity) || 0;
+                    return s + (orig > 0 ? (orig - rem) / orig : 0);
+                }, 0) / historicalSameMonthOutages.length;
+            }
+        }
+    } else {
+        const historicalOutages = (cableOutagesData || []).filter(r => r.corridor_code === corridor);
+        if (historicalOutages.length > 0) {
+            avgCurtailmentRate = historicalOutages.reduce((s, r) => {
+                const orig = parseFloat(r.original_capacity) || 0;
+                const rem = parseFloat(r.remaining_capacity) || 0;
+                return s + (orig > 0 ? (orig - rem) / orig : 0);
+            }, 0) / historicalOutages.length;
+        }
+    }
+    const remitDeduction = ev * avgCurtailmentRate;
+
+    // 3. Fuel Signal
+    const targetStart = productType === 'Yearly' ? `${periodValue}-01-01` : `${periodValue}-01`;
+    const ttfEntries = (auctionFwdData.ttf && auctionFwdData.ttf.spot) ? auctionFwdData.ttf.spot : (auctionFwdData.ttf || []);
+    const euaEntries = (auctionFwdData.eua && auctionFwdData.eua.spot) ? auctionFwdData.eua.spot : (auctionFwdData.eua || []);
+    const ttfEntry = Array.isArray(ttfEntries) ? ttfEntries.find(e => e.delivery_start === targetStart) : null;
+    const euaEntry = Array.isArray(euaEntries) ? euaEntries.find(e => e.delivery_start === targetStart) : null;
+    const ttfPrice = ttfEntry ? ttfEntry.price : 35.0;
+    const euaPrice = euaEntry ? euaEntry.price : 70.0;
+    
+    const gasMarginalCost = (ttfPrice / 0.52) + (euaPrice * 0.36);
+    const fuelDeduction = gasMarginalCost > srcFwd ? Math.min(ev * 0.15, (gasMarginalCost - srcFwd) * 0.05) : 0;
+
+    // 4. Expected Profit Optimization using Historical Clearing Prices
+    const historicalClearing = (cablesLongData || []).filter(r => {
+        if (r.corridor_code !== corridor) return false;
+        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
+                          (productType === 'Monthly' && r.product === 'Monthly');
+        if (!prodMatch) return false;
+
+        if (productType === 'Monthly') {
+            const d = new Date(r.start_date);
+            return d.getMonth() + 1 === targetMonth && r.price != null;
+        }
+        return r.price != null;
+    }).map(r => parseFloat(r.price));
+
+    let recommendedRiskMargin = riskMargin;
+    if (historicalClearing.length >= 2) {
+        let bestBid = 0.01;
+        let maxExpectedProfit = 0;
+        const step = 0.05;
+        for (let b = 0; b < ev; b += step) {
+            const winCount = historicalClearing.filter(p => p <= b).length;
+            const pWin = winCount / historicalClearing.length;
+            const expectedProfit = pWin * (ev - remitDeduction - fuelDeduction - b);
+            if (expectedProfit > maxExpectedProfit) {
+                maxExpectedProfit = expectedProfit;
+                bestBid = b;
+            }
+        }
+        if (bestBid > 0.01) {
+            recommendedRiskMargin = Math.max(0.1, (ev - remitDeduction - fuelDeduction - bestBid));
+        }
+    }
+
+    const finalBid = Math.max(0.01, ev - remitDeduction - fuelDeduction - recommendedRiskMargin);
+    const totalExposure = bidMw * hoursInPeriod;
+    const liability = finalBid * totalExposure;
+
+    // Update KPI cards
+    document.getElementById('kpi_bid').textContent = '€' + finalBid.toFixed(2);
+    document.getElementById('kpi_bid_sub').textContent = `/MW · ${periodValue}`;
+    document.getElementById('kpi_ev').textContent = '€' + ev.toFixed(2);
+    document.getElementById('kpi_exposure').textContent = totalExposure.toLocaleString();
+    document.getElementById('kpi_exposure_sub').textContent = `MWh (${bidMw}MW × ${hoursInPeriod}h)`;
+    document.getElementById('kpi_liability').textContent = '€' + liability.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
+
+    // Adjustments panel
+    const adjHtml = [
+        { label: 'Base E[V]', value: ev, sign: '+', color: '#059669' },
+        { label: 'REMIT Curtailment', value: remitDeduction, sign: '−', color: '#dc2626' },
+        { label: 'Fuel/Carbon Spread', value: fuelDeduction, sign: '−', color: '#dc2626' },
+        { label: 'Risk Margin', value: riskMargin, sign: '−', color: '#d97706' },
+    ].map(row => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f3f4f6;">
+            <span style="color:#374151; font-weight:500;">${row.label}</span>
+            <span style="font-weight:700; color:${row.color};">${row.sign}€${row.value.toFixed(2)} /MWh</span>
+        </div>
+    `).join('') + `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; margin-top:4px; border-top:2px solid #e5e7eb;">
+            <span style="color:#111827; font-weight:700; font-size:14px;">FINAL BID</span>
+            <span style="font-weight:700; color:#059669; font-size:18px;">€${finalBid.toFixed(2)} /MW</span>
+        </div>
+        <div style="font-size:11px; color:#9ca3af; margin-top:4px;">TTF: €${ttfPrice.toFixed(1)}/MWh · EUA: €${euaPrice.toFixed(1)}/t</div>
+    `;
+    document.getElementById('auction_adjustments').innerHTML = adjHtml;
+
+    // Spread Shape Chart
+    const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
+    const barColors = shapedSpreads.map((v, h) => isSolarHour[h] ? '#d1d5db' : (v > finalBid ? '#059669' : '#6ee7b7'));
+    Plotly.newPlot('auction_spread_chart', [
+        { type: 'bar', x: hours, y: shapedSpreads, marker: { color: barColors }, name: 'Shaped Spread' },
+        { type: 'scatter', x: hours, y: Array(24).fill(finalBid), mode: 'lines',
+        const dMonth = parseInt(parts[1]);
+        
+        let isMatch = false;
+        if (productType === 'Yearly') {
+            isMatch = (dYear < pYear);
+        } else {
+            const isPrevYearSameMonth = (dYear < pYear && dMonth === pMonth);
+            const isPrecedingMonth = (dYear === precYear && dMonth === precMonth);
+            isMatch = isPrevYearSameMonth || isPrecedingMonth;
+        }
+
+        if (isMatch && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
+            const srcPrices = dataSrc[dateStr].prices;
+            const dstPrices = dataDst[dateStr].prices;
+            for (let h = 0; h < 24; h++) {
+                hourlySpreadsSum[h] += (dstPrices[h] - srcPrices[h]);
+            }
+            matchedDaysCount++;
+            if (productType === 'Yearly') {
+                matchedPeriods.add(parts[0]);
+            } else {
+                matchedPeriods.add(`${parts[0]}-${parts[1]}`);
+            }
+        }
+    });
+
+    // Update the subtitle with matched date range
+    const subtitleEl = document.getElementById('auction_spread_subtitle');
+    if (subtitleEl) {
+        if (matchedDaysCount > 0) {
+            const sortedPeriods = Array.from(matchedPeriods).sort();
+            subtitleEl.textContent = `Shaped forward spread based on historical profile (matched periods: ${sortedPeriods.join(', ')}). Gray = solar suppression zone.`;
         } else {
             subtitleEl.textContent = `Shaped forward spread. No matching historical days found.`;
         }
@@ -7260,6 +7477,7 @@ function runAuctionOptimizer() {
     renderAuctionFwdChart(source, dest, corridor, productType, periodValue);
     renderAuctionClearingChart(corridor, periodValue, productType);
     renderAuctionOutagesTable(corridor, periodValue, productType);
+    renderAuctionBacktestTable(corridor, periodValue, productType);
 }
 
 function renderAuctionFwdChart(source, dest, corridor, productType, periodValue) {
@@ -7365,6 +7583,108 @@ function renderAuctionOutagesTable(corridor, periodValue, productType) {
         </tr></thead>
         <tbody>${rows}</tbody>
     </table></div>`;
+}
+
+function renderAuctionBacktestTable(corridor, periodValue, productType) {
+    const { source, dest } = getCorridorCountries(corridor);
+    const targetMonthStr = productType === 'Monthly' ? periodValue.split('-')[1] : null;
+
+    // Filter cables_long for this corridor and product type
+    const historicalAuctions = (cablesLongData || []).filter(r => {
+        if (r.corridor_code !== corridor) return false;
+        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
+                          (productType === 'Monthly' && r.product === 'Monthly');
+        if (!prodMatch) return false;
+        
+        if (productType === 'Monthly') {
+            const parts = r.start_date.split(' ')[0].split('-');
+            return parts[1] === targetMonthStr;
+        }
+        return true;
+    });
+
+    const container = document.getElementById('auction_backtest_table_container');
+    if (!container) return;
+
+    if (!historicalAuctions.length) {
+        container.innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:10px 0;text-align:center;">No historical auctions found for backtesting.</p>';
+        return;
+    }
+
+    // Sort by start_date descending
+    historicalAuctions.sort((a, b) => b.start_date.localeCompare(a.start_date));
+
+    let html = `
+        <h4 style="margin-top:16px; margin-bottom:8px; font-weight: 700; color: #1e293b;">Historical Realized Margins (Backtest)</h4>
+        <div style="overflow-y:auto; max-height:220px; border:1px solid #e2e8f0; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+            <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left; background: white;">
+                <thead>
+                    <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                        <th style="padding:8px 10px; font-weight:600; color:#475569;">Period</th>
+                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Clearing Price</th>
+                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Avg Spot Spread</th>
+                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Net Margin</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    historicalAuctions.forEach(auc => {
+        const startDayStr = auc.start_date.split(' ')[0]; // "YYYY-MM-DD"
+        const periodPrefix = productType === 'Monthly' ? startDayStr.substring(0, 7) : startDayStr.substring(0, 4);
+        
+        // Calculate average spot spread for this period from historicalData
+        let totalSpread = 0;
+        let countHours = 0;
+        const dataSrc = historicalData[source] || {};
+        const dataDst = historicalData[dest] || {};
+
+        Object.keys(dataSrc).forEach(dateStr => {
+            if (dateStr.startsWith(periodPrefix)) {
+                if (dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
+                    const srcPrices = dataSrc[dateStr].prices;
+                    const dstPrices = dataDst[dateStr].prices;
+                    for (let h = 0; h < 24; h++) {
+                        if (srcPrices[h] !== undefined && dstPrices[h] !== undefined) {
+                            totalSpread += (dstPrices[h] - srcPrices[h]);
+                            countHours++;
+                        }
+                    }
+                }
+            }
+        });
+
+        const clearingPrice = parseFloat(auc.price);
+        const hasSpot = countHours > 0;
+        const avgSpread = hasSpot ? (totalSpread / countHours) : null;
+        const netMargin = hasSpot ? (avgSpread - clearingPrice) : null;
+
+        const dispPeriod = productType === 'Monthly' 
+            ? new Date(startDayStr).toLocaleString('en-US', { month: 'short', year: 'numeric' })
+            : periodPrefix;
+
+        const clearingDisp = `€${clearingPrice.toFixed(2)}`;
+        const spreadDisp = hasSpot ? `€${avgSpread.toFixed(2)}` : 'N/A';
+        const marginColor = netMargin >= 0 ? '#059669' : '#dc2626';
+        const marginDisp = hasSpot ? `<span style="color:${marginColor}; font-weight:600;">€${netMargin.toFixed(2)}</span>` : 'N/A';
+
+        html += `
+            <tr style="border-bottom:1px solid #f1f5f9; hover: {background-color: #f8fafc;}">
+                <td style="padding:8px 10px; color:#334155; font-weight:500;">${dispPeriod}</td>
+                <td style="padding:8px 10px; text-align:right; color:#334155;">${clearingDisp}</td>
+                <td style="padding:8px 10px; text-align:right; color:#334155;">${spreadDisp}</td>
+                <td style="padding:8px 10px; text-align:right;">${marginDisp}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    container.innerHTML = html;
 }
 
         </script>
