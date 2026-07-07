@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 16:31</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 16:54</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7100,7 +7100,7 @@ function runAuctionOptimizer() {
 
     const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
 
-    // 2. Dynamic REMIT / Curtailment calculation
+    // 2. Dynamic REMIT / Curtailment calculation (only using active outages for the selected period)
     let avgCurtailmentRate = 0;
     if (productType === 'Monthly') {
         let monthOutages = (cableOutagesData || []).filter(r => {
@@ -7118,30 +7118,22 @@ function runAuctionOptimizer() {
                 const rem = parseFloat(r.remaining_capacity) || 0;
                 return s + (orig > 0 ? (orig - rem) / orig : 0);
             }, 0) / monthOutages.length;
-        } else {
-            const historicalSameMonthOutages = (cableOutagesData || []).filter(r => {
-                if (r.corridor_code !== corridor) return false;
-                const parts = r.trade_date.split('-');
-                if (parts.length < 2) return false;
-                const tm = parseInt(parts[1]);
-                return tm === pMonth;
-            });
-            if (historicalSameMonthOutages.length > 0) {
-                avgCurtailmentRate = historicalSameMonthOutages.reduce((s, r) => {
-                    const orig = parseFloat(r.original_capacity) || 0;
-                    const rem = parseFloat(r.remaining_capacity) || 0;
-                    return s + (orig > 0 ? (orig - rem) / orig : 0);
-                }, 0) / historicalSameMonthOutages.length;
-            }
         }
     } else {
-        const historicalOutages = (cableOutagesData || []).filter(r => r.corridor_code === corridor);
-        if (historicalOutages.length > 0) {
-            avgCurtailmentRate = historicalOutages.reduce((s, r) => {
+        let yearOutages = (cableOutagesData || []).filter(r => {
+            if (r.corridor_code !== corridor) return false;
+            const parts = r.trade_date.split('-');
+            if (parts.length < 1) return false;
+            const ty = parseInt(parts[0]);
+            return ty === pYear;
+        });
+
+        if (yearOutages.length > 0) {
+            avgCurtailmentRate = yearOutages.reduce((s, r) => {
                 const orig = parseFloat(r.original_capacity) || 0;
                 const rem = parseFloat(r.remaining_capacity) || 0;
                 return s + (orig > 0 ? (orig - rem) / orig : 0);
-            }, 0) / historicalOutages.length;
+            }, 0) / yearOutages.length;
         }
     }
     const remitDeduction = ev * avgCurtailmentRate;
