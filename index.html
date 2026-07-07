@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:24</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 14:43</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6925,7 +6925,9 @@ function initAuctionTab() {
     const now = new Date();
     for (let i = 1; i <= 12; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-        const val = d.toISOString().slice(0, 7); // YYYY-MM
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const val = `${y}-${m}`; // Timezone-safe YYYY-MM
         const label = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
         months.push(`<option value="${val}">${label}</option>`);
     }
@@ -7039,8 +7041,12 @@ function runAuctionOptimizer() {
     const [y, m] = yearMonth.split('-').map(Number);
     const monthOutages = (cableOutagesData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        const d = new Date(r.trade_date);
-        return d.getFullYear() === y && d.getMonth() + 1 === m;
+        // Timezone-safe parse of YYYY-MM-DD
+        const parts = r.trade_date.split('-');
+        if (parts.length < 2) return false;
+        const ty = parseInt(parts[0]);
+        const tm = parseInt(parts[1]);
+        return ty === y && tm === m;
     });
     let remitDeduction = 0;
     if (monthOutages.length > 0 && ev > 0) {
@@ -7178,8 +7184,11 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
     const [y, m] = yearMonth.split('-').map(Number);
     const outages = (cableOutagesData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        const d = new Date(r.trade_date);
-        return d.getFullYear() === y && d.getMonth() + 1 === m;
+        const parts = r.trade_date.split('-');
+        if (parts.length < 2) return false;
+        const ty = parseInt(parts[0]);
+        const tm = parseInt(parts[1]);
+        return ty === y && tm === m;
     });
     const el = document.getElementById('auction_outages_table');
     if (!outages.length) {
