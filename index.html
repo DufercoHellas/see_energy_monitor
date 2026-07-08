@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 11:05</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 11:13</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7535,13 +7535,25 @@ function renderAuctionFwdChart(source, dest, corridor, productType, periodValue)
     const rawSrcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
     const rawDstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
     
-    // Filter to show only 1 year ahead
+    // Filter to show only 1 year ahead and starting from next month/year
+    const now = new Date();
+    let startLimitStr = "";
+    if (productType === 'Yearly') {
+        const nextYear = now.getFullYear() + 1;
+        startLimitStr = `${nextYear}-01-01`;
+    } else {
+        const nextMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        startLimitStr = `${nextMonthObj.getFullYear()}-${String(nextMonthObj.getMonth() + 1).padStart(2, '0')}-01`;
+    }
+
     const limitDate = new Date();
     limitDate.setFullYear(limitDate.getFullYear() + 1);
     const limitDateStr = limitDate.toISOString().split('T')[0];
     
-    const srcData = rawSrcData.filter(e => e.delivery_start <= limitDateStr);
-    const dstData = rawDstData.filter(e => e.delivery_start <= limitDateStr);
+    const srcData = rawSrcData.filter(e => e.delivery_start >= startLimitStr && e.delivery_start <= limitDateStr)
+        .sort((a, b) => a.delivery_start.localeCompare(b.delivery_start));
+    const dstData = rawDstData.filter(e => e.delivery_start >= startLimitStr && e.delivery_start <= limitDateStr)
+        .sort((a, b) => a.delivery_start.localeCompare(b.delivery_start));
     
     const traces = [];
     if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ` (${srcKey} proxy)` : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
