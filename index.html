@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:28</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:37</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7603,12 +7603,12 @@ function renderEUMap() {
 
     // Ensure GeoJSON is loaded before plotting
     if (!cachedBiddingZonesGeoJSON) {
-        fetch('bidding_zones.geojson')
+        fetch('data/bidding_zones.geojson')
             .then(res => {
-                if (!res.ok) throw new Error("Local copy not found, fetching fallback");
+                if (!res.ok) throw new Error("Data copy not found, fetching fallback");
                 return res.json();
             })
-            .catch(() => fetch('data/bidding_zones.geojson').then(res => res.json()))
+            .catch(() => fetch('bidding_zones.geojson').then(res => res.json()))
             .catch(() => fetch('https://raw.githubusercontent.com/electricitymaps/electricitymaps-contrib/master/geo/world.geojson').then(res => res.json()))
             .then(geojson => {
                 cachedBiddingZonesGeoJSON = geojson;
@@ -7860,6 +7860,11 @@ function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
 }
 
 function renderEUMapCountryDetail(dataKey, date) {
+    if (!date) {
+        const dateInput = document.getElementById('eumap_date');
+        date = dateInput ? dateInput.value : null;
+    }
+    if (!date) return;
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
     const entry = historicalData?.[dataKey]?.[date];
 
