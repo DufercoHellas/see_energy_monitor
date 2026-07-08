@@ -5,6 +5,7 @@
         <meta name="description" content="ENTSO-E generation outages and forecast residuals dashboard for SEE countries.">
         <title>SEE Energy Dashboard — ENTSO-E Outages & Residuals</title>
         <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -163,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:37</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:44</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7440,14 +7441,27 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         statusEl.innerHTML = `Loading energy data \u2014 <strong>${loaded}\u202f/\u202f${total}</strong> files\u2026 <span style="color:#94a3b8;font-size:11px;">(${label})</span>`;
                     };
 
-                    const fetchJSON = (url) => fetch(url).then(r => r.json());
+                    const fetchJSON = (url) => {
+                        if (url.includes('.gz')) {
+                            return fetch(url)
+                                .then(r => {
+                                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                                    return r.arrayBuffer();
+                                })
+                                .then(buf => {
+                                    const decompressed = pako.ungzip(new Uint8Array(buf), { to: 'string' });
+                                    return JSON.parse(decompressed);
+                                });
+                        }
+                        return fetch(url).then(r => r.json());
+                    };
                     const t = cacheBust;
 
                     // Fire all requests simultaneously
                     const [hist, out, cab, cabL, cabO, fwd, cabAll] = await Promise.all([
-                        fetchJSON(`data/historical.json?t=${t}`).then(d  => { tick('historical');         return d;  }),
+                        fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d;  }),
                         fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d;  }),
-                        fetchJSON(`data/cables.json?t=${t}`).then(d      => { tick('cables daily');       return d;  }),
+                        fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d;  }),
                         fetchJSON(`data/cables_long.json?t=${t}`).then(d => { tick('cables long-term');   return d;  }),
                         fetchJSON(`data/cable_outages.json?t=${t}`).then(d => { tick('cable curtailments'); return d; }),
                         fetchJSON(`data/auction_fwd.json?t=${t}`).then(d => { tick('forward curves');    return d;  }).catch(() => { tick('forward curves'); return {}; }),
