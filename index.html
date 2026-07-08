@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:29</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:35</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -3583,6 +3583,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             let currentDetailsCardMode = 'target';
             let auctionFwdData = {};
             let auctionTabInitialized = false;
+            let allCorridorsData = [];
 
             const OPTIMIZED_WEIGHTS = {
                 "HighSolar_Long": {
@@ -6866,6 +6867,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     statusEl.innerText = "Loading long-term cable allocations...";
                     const cabL = await fetch('data/cables_long.json').then(r => r.json());
                     
+                    statusEl.innerText = "Loading all active corridors...";
+                    let cabAll = [];
+                    try {
+                        cabAll = await fetch('data/all_corridors.json').then(r => r.json());
+                    } catch (errCorr) {
+                        console.warn("Could not load all_corridors.json, will fallback to cablesLongData:", errCorr);
+                    }
+                    
                     statusEl.innerText = "Loading cable curtailments...";
                     const cabO = await fetch('data/cable_outages.json').then(r => r.json());
 
@@ -6874,6 +6883,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     cablesData = cab;
                     cablesLongData = cabL;
                     cableOutagesData = cabO;
+                    allCorridorsData = cabAll;
 
                     // Load auction forward curve data (non-blocking, best-effort)
                     fetch('data/auction_fwd.json').then(r => r.json()).then(d => { auctionFwdData = d; }).catch(() => { auctionFwdData = {}; });
@@ -6938,14 +6948,22 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
 let selectedAuctionCorridor = "";
 
+function getAuctionCorridorsList() {
+    if (allCorridorsData && allCorridorsData.length > 0) {
+        return allCorridorsData;
+    }
+    return [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+}
+
 function initAuctionTab() {
     // Populate country selector in auction panel
     const countrySel = document.getElementById('auction_country_filter');
     if (countrySel) {
+        const sourceCorrs = getAuctionCorridorsList();
         const countries = new Set();
-        (cablesLongData || []).forEach(r => {
-            if (r.corridor_code) {
-                r.corridor_code.split('-').forEach(c => countries.add(c.trim()));
+        sourceCorrs.forEach(cCode => {
+            if (cCode) {
+                cCode.split('-').forEach(c => countries.add(c.trim()));
             }
         });
         const sortedCountries = [...countries].sort();
@@ -6959,7 +6977,7 @@ function initAuctionTab() {
     if (prodSel) prodSel.value = 'Monthly';
 
     // Set default selected corridor if not set
-    const corridors = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+    const corridors = getAuctionCorridorsList();
     if (corridors.length > 0 && !selectedAuctionCorridor) {
         selectedAuctionCorridor = corridors[0];
     }
@@ -6973,11 +6991,12 @@ function onAuctionCountryFilterChange() {
     const corridorsListDiv = document.getElementById('auction_corridors_list');
     if (!corridorsListDiv) return;
 
+    const sourceCorrs = getAuctionCorridorsList();
     const uniqueCorrs = new Set();
-    (cablesLongData || []).forEach(item => {
-        if (item.corridor_code) {
-            if (countryFilter === 'ALL' || item.corridor_code.split('-').includes(countryFilter)) {
-                uniqueCorrs.add(item.corridor_code);
+    sourceCorrs.forEach(item => {
+        if (item) {
+            if (countryFilter === 'ALL' || item.split('-').includes(countryFilter)) {
+                uniqueCorrs.add(item);
             }
         }
     });
@@ -7008,11 +7027,12 @@ function selectAuctionCorridor(corr) {
     const countryFilter = document.getElementById('auction_country_filter')?.value || 'ALL';
     const corridorsListDiv = document.getElementById('auction_corridors_list');
     if (corridorsListDiv) {
+        const sourceCorrs = getAuctionCorridorsList();
         const uniqueCorrs = new Set();
-        (cablesLongData || []).forEach(item => {
-            if (item.corridor_code) {
-                if (countryFilter === 'ALL' || item.corridor_code.split('-').includes(countryFilter)) {
-                    uniqueCorrs.add(item.corridor_code);
+        sourceCorrs.forEach(item => {
+            if (item) {
+                if (countryFilter === 'ALL' || item.split('-').includes(countryFilter)) {
+                    uniqueCorrs.add(item);
                 }
             }
         });
@@ -7032,12 +7052,11 @@ function selectAuctionCorridor(corr) {
 }
 
 function onAuctionProductTypeChange() {
-    const prodSel = document.getElementById('auction_product_type');
+    const productType = document.getElementById('auction_product_type')?.value || 'Monthly';
     const monthSel = document.getElementById('auction_month');
     const dateLabel = document.getElementById('auction_date_label');
-    if (!prodSel || !monthSel) return;
+    if (!monthSel) return;
 
-    const productType = prodSel.value;
     const options = [];
     const now = new Date();
 
@@ -7073,15 +7092,31 @@ function onAuctionProductTypeChange() {
             const label = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
             options.push(`<option value="${val}">${label}</option>`);
         });
+        monthSel.innerHTML = options.join('');
+
+        // Auto pick the next month
+        const nextMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const nextMonthVal = `${nextMonthObj.getFullYear()}-${String(nextMonthObj.getMonth() + 1).padStart(2, '0')}`;
+        if (sortedMonths.includes(nextMonthVal)) {
+            monthSel.value = nextMonthVal;
+        }
     } else {
         if (dateLabel) dateLabel.textContent = 'Year:';
         const currentYear = now.getFullYear();
+        const sortedYears = [];
         for (let i = 0; i <= 2; i++) {
             const y = currentYear + i;
+            sortedYears.push(String(y));
             options.push(`<option value="${String(y)}">${y}</option>`);
         }
+        monthSel.innerHTML = options.join('');
+
+        // Auto pick the next year
+        const nextYearVal = String(now.getFullYear() + 1);
+        if (sortedYears.includes(nextYearVal)) {
+            monthSel.value = nextYearVal;
+        }
     }
-    monthSel.innerHTML = options.join('');
     runAuctionOptimizer();
 }
 
@@ -7407,8 +7442,8 @@ function renderAuctionFwdChart(source, dest, corridor, productType, periodValue)
     const srcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
     const dstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
     const traces = [];
-    if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ' (RS proxy)' : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
-    if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (dstKey !== dest ? ' (RS proxy)' : ' Fwd'), line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
+    if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ` (${srcKey} proxy)` : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
+    if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (dstKey !== dest ? ` (${dstKey} proxy)` : ' Fwd'), line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
     
     if (traces.length === 0) {
         document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:100px;">No forward curves available</div>';
@@ -7425,50 +7460,97 @@ function renderAuctionFwdChart(source, dest, corridor, productType, periodValue)
 }
 
 function renderAuctionClearingChart(corridor, periodValue, productType) {
-    const [pYear, pMonth] = productType === 'Monthly' ? periodValue.split('-').map(Number) : [parseInt(periodValue), 1];
-    const historical = (cablesLongData || []).filter(r => {
-        if (r.corridor_code !== corridor) return false;
-        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
-                          (productType === 'Monthly' && r.product === 'Monthly');
-        if (!prodMatch) return false;
+    const historical = (cablesLongData || []).filter(r => r.corridor_code === corridor && r.price != null);
 
-        if (productType === 'Monthly') {
-            if (!r.start_date) return false;
-            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
-            if (!match) return false;
-            const y = parseInt(match[1]);
-            const m = parseInt(match[2]) - 1;
-            const d = parseInt(match[3]);
-            const timePart = r.start_date.split(' ')[1] || "00:00";
-            const [hr, min] = timePart.split(':').map(Number);
-            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-            return (dateObj.getUTCMonth() + 1) === pMonth && r.price != null;
-        }
-        return r.price != null;
-    });
-    if (!historical.length) {
-        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical clearing data for this corridor and product type.</p>';
+    const parseDateHelper = (dateStr) => {
+        if (!dateStr) return new Date();
+        const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!match) return new Date(dateStr);
+        const y = parseInt(match[1]);
+        const m = parseInt(match[2]) - 1;
+        const d = parseInt(match[3]);
+        const timePart = dateStr.split(' ')[1] || "00:00";
+        const [hr, min] = timePart.split(':').map(Number);
+        const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+        dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+        return dateObj;
+    };
+
+    const monthlyRecords = historical.filter(r => r.product === 'Monthly')
+        .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
+        .sort((a, b) => a.date - b.date);
+
+    const yearlyRecords = historical.filter(r => r.product === 'Yearly')
+        .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
+        .sort((a, b) => a.date - b.date);
+
+    if (!monthlyRecords.length && !yearlyRecords.length) {
+        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical clearing data for this corridor.</p>';
         return;
     }
-    const labelX = historical.map(r => {
-        const d = new Date(r.start_date);
-        return d.getFullYear();
-    });
-    const prices = historical.map(r => parseFloat(r.price));
+
+    const traces = [];
+    const allDates = [];
+
+    if (monthlyRecords.length > 0) {
+        const xVal = monthlyRecords.map(r => r.date.toISOString().split('T')[0]);
+        const yVal = monthlyRecords.map(r => r.price);
+        monthlyRecords.forEach(r => allDates.push(r.date));
+        traces.push({
+            type: 'scatter',
+            x: xVal,
+            y: yVal,
+            mode: 'lines+markers',
+            marker: { color: '#6366f1', size: 6 },
+            line: { color: '#6366f1', width: 2 },
+            name: 'Monthly Clearing'
+        });
+    }
+
+    if (yearlyRecords.length > 0) {
+        const xVal = [];
+        const yVal = [];
+        yearlyRecords.forEach(r => {
+            allDates.push(r.date);
+            const startYearStr = `${r.date.getUTCFullYear()}-01-01`;
+            const endYearStr = `${r.date.getUTCFullYear()}-12-31`;
+            xVal.push(startYearStr, endYearStr);
+            yVal.push(r.price, r.price);
+        });
+        traces.push({
+            type: 'scatter',
+            x: xVal,
+            y: yVal,
+            mode: 'lines+markers',
+            marker: { color: '#ec4899', size: 6, symbol: 'square' },
+            line: { color: '#ec4899', width: 2 },
+            name: 'Yearly Clearing'
+        });
+    }
+
     const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
-    Plotly.newPlot('auction_clearing_chart', [
-        { type:'scatter', x: labelX, y: prices, mode:'lines+markers',
-          marker:{color:'#6366f1', size:10}, line:{color:'#6366f1',width:2}, name:'Clearing Price' },
-        { type:'scatter', x:[Math.min(...labelX), Math.max(...labelX)], y:[finalBid,finalBid],
-          mode:'lines', line:{color:'#059669',dash:'dash',width:2}, name:'Our Bid' }
-    ], {
-        margin:{t:5,r:10,b:40,l:50},
-        paper_bgcolor:'white', plot_bgcolor:'white',
-        yaxis:{title:'€/MW', gridcolor:'#f3f4f6', tickfont:{size:11}},
-        xaxis:{tickformat:'d', tickfont:{size:11}},
-        legend:{orientation:'h', y:-0.3, font:{size:11}}
-    }, {responsive:true, displayModeBar:false});
+    if (!isNaN(finalBid) && allDates.length > 0) {
+        const minDate = new Date(Math.min(...allDates));
+        const maxDate = new Date(Math.max(...allDates));
+        traces.push({
+            type: 'scatter',
+            x: [minDate.toISOString().split('T')[0], maxDate.toISOString().split('T')[0]],
+            y: [finalBid, finalBid],
+            mode: 'lines',
+            line: { color: '#059669', dash: 'dash', width: 2 },
+            name: 'Our Bid'
+        });
+    }
+
+    Plotly.newPlot('auction_clearing_chart', traces, {
+        margin: { t: 5, r: 10, b: 40, l: 50 },
+        paper_bgcolor: 'white',
+        plot_bgcolor: 'white',
+        yaxis: { title: '€/MW', gridcolor: '#f3f4f6', tickfont: { size: 11 } },
+        xaxis: { type: 'date', tickfont: { size: 11 } },
+        legend: { orientation: 'h', y: -0.25, font: { size: 11 } },
+        showlegend: true
+    }, { responsive: true, displayModeBar: false });
 }
 
 function renderAuctionOutagesTable(corridor, periodValue, productType) {
