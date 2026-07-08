@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:44</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:50</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7451,6 +7451,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 .then(buf => {
                                     const decompressed = pako.ungzip(new Uint8Array(buf), { to: 'string' });
                                     return JSON.parse(decompressed);
+                                })
+                                .catch(err => {
+                                    // Fallback to loading uncompressed .json if .gz fails (e.g. locally via file:// scheme CORS)
+                                    console.warn(`Gzip fetch failed for ${url}, falling back to uncompressed:`, err);
+                                    const fallbackUrl = url.replace('.json.gz', '.json');
+                                    return fetch(fallbackUrl).then(r => r.json());
                                 });
                         }
                         return fetch(url).then(r => r.json());
