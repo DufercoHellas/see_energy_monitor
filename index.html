@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:47</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:59</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -1177,12 +1177,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
             <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
                 <!-- Plotly Map container -->
-                <div style="flex: 3; min-width: 520px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div style="flex: 1.8; min-width: 480px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div id="eumap_container" style="width: 100%; height: 560px;"></div>
                 </div>
 
                 <!-- Country detail panel -->
-                <div id="eumap_detail_panel" style="flex: 1; min-width: 280px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
                     <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
                         <span style="font-size:48px;">&#128506;&#65039;</span>
                         <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
@@ -7073,6 +7073,53 @@ function renderEUMap() {
     const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
     const noDataLoc  = [], noDataText = [], noDataCustom = [];
 
+    // Scatter labels arrays
+    const labelLats = [];
+    const labelLons = [];
+    const labelTexts = [];
+
+    // Realistic central coordinates for labels (Lat, Lon) for Europe
+    const EU_LABEL_COORDS = {
+        'AUT': [47.5162, 14.5501],
+        'BGR': [42.7339, 25.4858],
+        'HRV': [45.1             , 15.2],
+        'CZE': [49.8175, 15.473],
+        'DEU': [51.1657, 10.4515],
+        'GRC': [39.0742, 21.8243],
+        'HUN': [47.1625, 19.5033],
+        'ITA': [41.8719, 12.5674],
+        'ROU': [45.9432, 24.9668],
+        'SRB': [44.0165, 21.0059],
+        'SVK': [48.669, 19.699],
+        'SVN': [46.1512, 14.9955],
+        'ALB': [41.1533, 20.1683],
+        'MKD': [41.6086, 21.7453],
+        'MNE': [42.7087, 19.3744],
+        'BIH': [43.9159, 17.6791],
+        'TUR': [38.9637, 35.2433],
+        'CHE': [46.8182, 8.2275],
+        'FRA': [46.2276, 2.2137],
+        'ESP': [40.4637, -3.7492],
+        'PRT': [39.3999, -8.2245],
+        'GBR': [55.3781, -3.436],
+        'IRL': [53.4129, -8.2439],
+        'BEL': [50.5039, 4.4699],
+        'NLD': [52.1326, 5.2913],
+        'POL': [51.9194, 19.1451],
+        'DNK': [56.2639, 9.5018],
+        'SWE': [60.1282, 18.6435],
+        'NOR': [60.472, 8.4689],
+        'FIN': [61.9241, 25.7482],
+        'EST': [58.5953, 25.0136],
+        'LVA': [56.8796, 24.6032],
+        'LTU': [55.1694, 23.8813],
+        'UKR': [48.3794, 31.1656],
+        'BLR': [53.7098, 27.9534]
+    };
+
+    // Add extra countries to label locations if they aren't in EU_MAP_DATA_TO_ISO3 but are in layout
+    const ALL_ISO3 = { ...EU_MAP_DATA_TO_ISO3, 'FR': 'FRA', 'ES': 'ESP', 'PT': 'PRT', 'GB': 'GBR', 'IE': 'IRL', 'BE': 'BEL', 'NL': 'NLD', 'PL': 'POL', 'DK': 'DNK', 'SE': 'SWE', 'NO': 'NOR', 'FI': 'FIN', 'EE': 'EST', 'LV': 'LVA', 'LT': 'LTU', 'UA': 'UKR', 'BY': 'BLR' };
+
     for (let i = 0; i < locations.length; i++) {
         if (z[i] > 0) {
             withDataLoc.push(locations[i]);
@@ -7083,6 +7130,22 @@ function renderEUMap() {
             noDataLoc.push(locations[i]);
             noDataText.push(text[i]);
             noDataCustom.push(customdata[i]);
+        }
+    }
+
+    // Populate scatter coordinates for text labels
+    for (const [key, iso3] of Object.entries(ALL_ISO3)) {
+        if (EU_LABEL_COORDS[iso3]) {
+            const coords = EU_LABEL_COORDS[iso3];
+            labelLats.push(coords[0]);
+            labelLons.push(coords[1]);
+            
+            // Check if we have data for this country key (e.g. key could be 'DE_LU' or 'FR')
+            const entry = historicalData?.[key]?.[selectedDate];
+            const price = (entry && entry.average_price && entry.average_price > 0) ? entry.average_price : null;
+            const code = key === 'DE_LU' ? 'DE' : key;
+            const labelStr = price !== null ? `${code}\n${price.toFixed(1)}€` : `${code}\nNo data`;
+            labelTexts.push(labelStr);
         }
     }
 
@@ -7129,6 +7192,23 @@ function renderEUMap() {
         marker: { line: { color: '#ffffff', width: 1.5 } }
     };
 
+    // Scattergeo trace for static country text labels
+    const traceLabels = {
+        type: 'scattergeo',
+        locationmode: 'ISO-3',
+        lat: labelLats,
+        lon: labelLons,
+        mode: 'text',
+        text: labelTexts,
+        textfont: {
+            family: 'Inter, Arial, sans-serif',
+            size: 9,
+            weight: 'bold',
+            color: '#1e293b'
+        },
+        hoverinfo: 'skip'
+    };
+
     const layout = {
         geo: {
             scope: 'europe',
@@ -7144,9 +7224,10 @@ function renderEUMap() {
             coastlinecolor: '#ffffff',
             showframe: false,
             projection: { type: 'natural earth' },
-            lonaxis: { range: [-12, 45] },
-            lataxis: { range: [34, 72] },
-            bgcolor: 'rgba(0,0,0,0)'
+            lonaxis: { range: [-12, 42] },
+            lataxis: { range: [35, 70] },
+            bgcolor: 'rgba(0,0,0,0)',
+            fixedrange: true // DISABLE ZOOM & PAN
         },
         margin: { t: 0, b: 0, l: 0, r: 0 },
         paper_bgcolor: 'rgba(0,0,0,0)',
@@ -7163,7 +7244,7 @@ function renderEUMap() {
         responsive: true
     };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceNoData], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (!pt || !pt.customdata) return;
@@ -7244,6 +7325,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         type: 'bar',
         x: hours,
         y: prices,
+        name: 'Spot Price',
         marker: { color: colors, line: { color: 'rgba(0,0,0,0.08)', width: 0.5 } },
         hovertemplate: '<b>%{x}</b><br>%{y:.2f} \u20ac/MWh<extra></extra>',
         text: prices.map(p => p.toFixed(0)),
@@ -7257,9 +7339,11 @@ function renderEUMapCountryDetail(dataKey, date) {
         hoverinfo: 'skip',
         showlegend: false
     }], {
-        margin: { t: 10, b: 50, l: 50, r: 10 },
+        margin: { t: 10, b: 60, l: 50, r: 10 },
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)',
+        showlegend: false
+    },
         xaxis: {
             tickfont: { size: 9, family: 'Inter,sans-serif' },
             gridcolor: '#f1f5f9',
