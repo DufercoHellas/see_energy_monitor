@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:31</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:40</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6901,50 +6901,43 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 const statusEl = document.getElementById("loading_status");
                 try {
                     const cacheBust = Date.now();
-                    statusEl.innerText = "Loading historical analogues...";
-                    const hist = await fetch(`data/historical.json?t=${cacheBust}`).then(r => r.json());
-                    
-                    statusEl.innerText = "Loading generator outages...";
-                    const out = await fetch(`data/outages.json?t=${cacheBust}`).then(r => r.json());
-                    
-                    statusEl.innerText = "Loading cable daily matrices...";
-                    const cab = await fetch(`data/cables.json?t=${cacheBust}`).then(r => r.json());
-                    
-                    statusEl.innerText = "Loading long-term cable allocations...";
-                    const cabL = await fetch(`data/cables_long.json?t=${cacheBust}`).then(r => r.json());
-                    
-                    statusEl.innerText = "Loading all active corridors...";
-                    let cabAll = [];
-                    try {
-                        cabAll = await fetch(`data/all_corridors.json?t=${cacheBust}`).then(r => r.json());
-                    } catch (errCorr) {
-                        console.warn("Could not load all_corridors.json, will fallback to cablesLongData:", errCorr);
-                    }
-                    
-                    statusEl.innerText = "Loading cable curtailments...";
-                    const cabO = await fetch(`data/cable_outages.json?t=${cacheBust}`).then(r => r.json());
+                    let loaded = 0;
+                    const total = 7;
+                    const tick = (label) => {
+                        loaded++;
+                        statusEl.innerHTML = `Loading energy data \u2014 <strong>${loaded}\u202f/\u202f${total}</strong> files\u2026 <span style="color:#94a3b8;font-size:11px;">(${label})</span>`;
+                    };
 
-                    historicalData = hist;
-                    outagesData = out;
-                    cablesData = cab;
-                    cablesLongData = cabL;
+                    const fetchJSON = (url) => fetch(url).then(r => r.json());
+                    const t = cacheBust;
+
+                    // Fire all requests simultaneously
+                    const [hist, out, cab, cabL, cabO, fwd, cabAll] = await Promise.all([
+                        fetchJSON(`data/historical.json?t=${t}`).then(d  => { tick('historical');         return d;  }),
+                        fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d;  }),
+                        fetchJSON(`data/cables.json?t=${t}`).then(d      => { tick('cables daily');       return d;  }),
+                        fetchJSON(`data/cables_long.json?t=${t}`).then(d => { tick('cables long-term');   return d;  }),
+                        fetchJSON(`data/cable_outages.json?t=${t}`).then(d => { tick('cable curtailments'); return d; }),
+                        fetchJSON(`data/auction_fwd.json?t=${t}`).then(d => { tick('forward curves');    return d;  }).catch(() => { tick('forward curves'); return {}; }),
+                        fetchJSON(`data/all_corridors.json?t=${t}`).then(d => { tick('corridors');       return d;  }).catch(() => { tick('corridors');       return []; })
+                    ]);
+
+                    historicalData   = hist;
+                    outagesData      = out;
+                    cablesData       = cab;
+                    cablesLongData   = cabL;
                     cableOutagesData = cabO;
-                    allCorridorsData = cabAll;
+                    auctionFwdData   = fwd  || {};
+                    allCorridorsData = cabAll || [];
 
-                    statusEl.innerText = "Loading forward curve context...";
-                    try {
-                        auctionFwdData = await fetch(`data/auction_fwd.json?t=${cacheBust}`).then(r => r.json());
-                    } catch (errFwd) {
-                        console.warn("Could not load auction_fwd.json:", errFwd);
-                        auctionFwdData = {};
-                    }
+                    statusEl.innerText = "Initialising dashboard...";
 
                     // Initialize dropdowns & UI components
                     const countrySelect = document.getElementById("analogue_country");
                     if (countrySelect && typeof countries !== 'undefined') {
                         countrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
                     }
-                    
+
                     initCablesMatrix();
                     initLongCablesSelectors();
                     applyOptimizedWeights();
