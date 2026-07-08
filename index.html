@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 09:54</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:29</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -3968,7 +3968,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             function shouldExcludeCorridor(corr) {
                 if (!corr) return true;
                 const parts = corr.split('-');
-                return parts.some(p => ['FR', 'TR', 'CH'].includes(p.trim().toUpperCase()));
+                return parts.some(p => ['TR', 'CH'].includes(p.trim().toUpperCase()));
             }
 
             function onMatrixCountryChange() {
@@ -7100,7 +7100,8 @@ function getHoursInPeriod(periodValue, productType) {
 function getForwardPrice(country, periodValue, productType) {
     const countryMap = {
         'GR': 'GR', 'BG': 'BG', 'RO': 'RO', 'HU': 'HU',
-        'RS': 'RS', 'IT': 'IT',
+        'RS': 'RS', 'IT': 'IT', 'DE': 'DE', 'DE_LU': 'DE',
+        'AT': 'AT', 'FR': 'FR', 'SK': 'SK', 'CZ': 'CZ',
         'AL': 'XK', 'XK': 'AL' // Only XK and AL can be proxies to each other
     };
     const mapped = countryMap[country];
