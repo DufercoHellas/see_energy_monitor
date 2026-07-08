@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:48</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 11:02</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -966,6 +966,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
                         <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread (Destination − Source) by hour. Gray = solar suppression zone (10:00–15:00).</p>
                         <div id="auction_spread_chart" style="width:100%; height:280px;"></div>
+                        <div id="historical_profile_toggles_container" style="margin-top: 8px; margin-bottom: 12px;"></div>
                         <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:16px;">
@@ -7121,6 +7122,21 @@ function onAuctionProductTypeChange() {
     runAuctionOptimizer();
 }
 
+let activeHistoricalPeriods = new Set();
+let historicalTogglesInitializedFor = "";
+
+function getFwdDataKey(country) {
+    if (auctionFwdData[country] && auctionFwdData[country].baseload && auctionFwdData[country].baseload.length > 0) {
+        return country;
+    }
+    const proxyMap = { 'AL': 'XK', 'XK': 'AL' };
+    const proxy = proxyMap[country];
+    if (proxy && auctionFwdData[proxy] && auctionFwdData[proxy].baseload && auctionFwdData[proxy].baseload.length > 0) {
+        return proxy;
+    }
+    return null;
+}
+
 function getHoursInPeriod(periodValue, productType) {
     if (productType === 'Monthly') {
         const [y, m] = periodValue.split('-').map(Number);
@@ -7134,15 +7150,9 @@ function getHoursInPeriod(periodValue, productType) {
 }
 
 function getForwardPrice(country, periodValue, productType) {
-    const countryMap = {
-        'GR': 'GR', 'BG': 'BG', 'RO': 'RO', 'HU': 'HU',
-        'RS': 'RS', 'IT': 'IT', 'DE': 'DE', 'DE_LU': 'DE',
-        'AT': 'AT', 'FR': 'FR', 'SK': 'SK', 'CZ': 'CZ',
-        'AL': 'XK', 'XK': 'AL' // Only XK and AL can be proxies to each other
-    };
-    const mapped = countryMap[country];
-    if (!mapped) return null;
-    const fwdCountry = auctionFwdData[mapped];
+    const key = getFwdDataKey(country);
+    if (!key) return null;
+    const fwdCountry = auctionFwdData[key];
     if (!fwdCountry || !fwdCountry.baseload) return null;
     
     const targetStart = productType === 'Yearly' ? `${periodValue}-01-01` : `${periodValue}-01`;
@@ -7156,13 +7166,106 @@ function getCorridorCountries(corridor) {
     return { source: 'GR', dest: 'BG' };
 }
 
-function runAuctionOptimizer() {
+function renderHistoricalPeriodToggles(periodValue, productType) {
+    const key = `${periodValue}_${productType}`;
+    if (historicalTogglesInitializedFor === key) return;
+    
+    historicalTogglesInitializedFor = key;
+    activeHistoricalPeriods.clear();
+    
+    const container = document.getElementById('historical_profile_toggles_container');
+    if (!container) return;
+    
+    const candidatePeriods = [];
+    
+    if (productType === 'Monthly') {
+        const [pYear, pMonth] = periodValue.split('-').map(Number);
+        
+        // 1. Preceding month
+        let precYear = pYear;
+        let precMonth = pMonth - 1;
+        if (precMonth === 0) {
+            precMonth = 12;
+            precYear = pYear - 1;
+        }
+        const precKey = `${precYear}-${String(precMonth).padStart(2, '0')}`;
+        candidatePeriods.push({ key: precKey, label: `Preceding Month (${precKey})`, defaultActive: true });
+        
+        // 2. Same month of previous years (up to 5 years ago)
+        for (let yOffset = 1; yOffset <= 5; yOffset++) {
+            const prevYear = pYear - yOffset;
+            const key = `${prevYear}-${String(pMonth).padStart(2, '0')}`;
+            if (prevYear >= 2021) {
+                candidatePeriods.push({
+                    key: key,
+                    label: `${yOffset} Yr Ago (${key})`,
+                    defaultActive: yOffset === 1
+                });
+            }
+        }
+    } else {
+        const pYear = parseInt(periodValue);
+        for (let yOffset = 1; yOffset <= 5; yOffset++) {
+            const prevYear = pYear - yOffset;
+            if (prevYear >= 2021) {
+                candidatePeriods.push({
+                    key: String(prevYear),
+                    label: `${yOffset} Yr Ago (${prevYear})`,
+                    defaultActive: yOffset === 1
+                });
+            }
+        }
+    }
+    
+    // Initialize default active set
+    candidatePeriods.forEach(p => {
+        if (p.defaultActive) activeHistoricalPeriods.add(p.key);
+    });
+    
+    // Build pills HTML
+    let html = `<div style="font-size:11px; font-weight:700; color:#475569; margin-bottom:6px;">Select Historical Profiles:</div>`;
+    html += `<div style="display:flex; flex-wrap:wrap; gap:6px;">`;
+    candidatePeriods.forEach(p => {
+        const isActive = activeHistoricalPeriods.has(p.key);
+        const bg = isActive ? "#312e81" : "#f1f5f9";
+        const color = isActive ? "#ffffff" : "#475569";
+        const border = isActive ? "1px solid #312e81" : "1px solid #cbd5e1";
+        
+        html += `<span onclick="toggleHistoricalPeriod('${p.key}')" id="toggle_hist_${p.key}" style="background:${bg}; color:${color}; border:${border}; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; user-select:none; transition:all 0.15s;">${p.label}</span>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+}
+
+function toggleHistoricalPeriod(key) {
+    const el = document.getElementById(`toggle_hist_${key}`);
+    if (!el) return;
+    
+    if (activeHistoricalPeriods.has(key)) {
+        activeHistoricalPeriods.delete(key);
+        el.style.background = "#f1f5f9";
+        el.style.color = "#475569";
+        el.style.borderColor = "#cbd5e1";
+    } else {
+        activeHistoricalPeriods.add(key);
+        el.style.background = "#312e81";
+        el.style.color = "#ffffff";
+        el.style.borderColor = "#312e81";
+    }
+    runAuctionOptimizer(true);
+}
+
+function runAuctionOptimizer(keepToggles = false) {
     const corridor = selectedAuctionCorridor;
     const productType = document.getElementById('auction_product_type')?.value || 'Monthly';
     const periodValue = document.getElementById('auction_month')?.value;
     const bidMw = parseFloat(document.getElementById('auction_mw')?.value) || 1;
     const riskMargin = parseFloat(document.getElementById('auction_margin')?.value) || 1.0;
     if (!corridor || !periodValue) return;
+
+    if (!keepToggles) {
+        renderHistoricalPeriodToggles(periodValue, productType);
+    }
 
     const { source, dest } = getCorridorCountries(corridor);
     const hoursInPeriod = getHoursInPeriod(periodValue, productType);
@@ -7193,8 +7296,8 @@ function runAuctionOptimizer() {
             </div>
         `;
 
-        document.getElementById('auction_spread_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:200px;">Missing forward pricing data</div>';
-        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:100px;">Missing forward pricing data</div>';
+        document.getElementById('auction_spread_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:280px; border:1px dashed #e2e8f0; border-radius:8px; background:#fafafa;">⚠️ Shape chart unavailable due to missing forward curve data</div>';
+        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:180px; border:1px dashed #e2e8f0; border-radius:8px; background:#fafafa;">⚠️ Forward curve context unavailable</div>';
         
         renderAuctionClearingChart(corridor, periodValue, productType);
         renderAuctionOutagesTable(corridor, periodValue, productType);
@@ -7204,16 +7307,7 @@ function runAuctionOptimizer() {
 
     const fwdSpread = dstFwd - srcFwd;
 
-    // Get historical profiles for shaping
-    const [pYear, pMonth] = productType === 'Monthly' ? periodValue.split('-').map(Number) : [parseInt(periodValue), 1];
-    let precYear = pYear;
-    let precMonth = pMonth - 1;
-    if (precMonth === 0) {
-        precMonth = 12;
-        precYear = pYear - 1;
-    }
-    
-    // 1. Direct Spread Shaping
+    // Direct Spread Shaping
     const hourlySpreadsSum = Array(24).fill(0);
     let matchedDaysCount = 0;
     const dataSrc = historicalData[source] || {};
@@ -7228,11 +7322,10 @@ function runAuctionOptimizer() {
         
         let isMatch = false;
         if (productType === 'Yearly') {
-            isMatch = (dYear < pYear);
+            isMatch = activeHistoricalPeriods.has(String(dYear));
         } else {
-            const isPrevYearSameMonth = (dYear < pYear && dMonth === pMonth);
-            const isPrecedingMonth = (dYear === precYear && dMonth === precMonth);
-            isMatch = isPrevYearSameMonth || isPrecedingMonth;
+            const currentPeriodKey = `${dYear}-${String(dMonth).padStart(2, '0')}`;
+            isMatch = activeHistoricalPeriods.has(currentPeriodKey);
         }
 
         if (isMatch && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
@@ -7436,9 +7529,8 @@ function runAuctionOptimizer() {
 }
 
 function renderAuctionFwdChart(source, dest, corridor, productType, periodValue) {
-    const countryMap = {'AL':'XK','XK':'AL'}; // Only XK and AL are proxies to each other
-    const srcKey = countryMap[source] || (auctionFwdData[source] ? source : null);
-    const dstKey = countryMap[dest] || (auctionFwdData[dest] ? dest : null);
+    const srcKey = getFwdDataKey(source);
+    const dstKey = getFwdDataKey(dest);
     const curveField = 'baseload'; 
     const rawSrcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
     const rawDstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
@@ -7486,6 +7578,9 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
         return dateObj;
     };
 
+    const now = new Date();
+    const filterStartYear = 2024;
+
     // Deduplicate monthly records by delivery month (YYYY-MM)
     const uniqueMonthlyMap = new Map();
     historical.filter(r => r.product === 'Monthly').forEach(r => {
@@ -7498,6 +7593,7 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
     });
     const monthlyRecords = Array.from(uniqueMonthlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
+        .filter(r => r.date.getUTCFullYear() >= filterStartYear && r.date <= now)
         .sort((a, b) => a.date - b.date);
 
     // Deduplicate yearly records by delivery year (YYYY)
@@ -7511,6 +7607,7 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
     });
     const yearlyRecords = Array.from(uniqueYearlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
+        .filter(r => r.date.getUTCFullYear() >= filterStartYear && r.date.getUTCFullYear() <= now.getFullYear())
         .sort((a, b) => a.date - b.date);
 
     if (!monthlyRecords.length && !yearlyRecords.length) {
