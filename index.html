@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 09:39</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 09:42</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6944,18 +6944,38 @@ function onAuctionProductTypeChange() {
 
     if (productType === 'Monthly') {
         if (dateLabel) dateLabel.textContent = 'Month:';
-        // Next 12 months
-        for (let i = 1; i <= 12; i++) {
+        const uniqueMonths = new Set();
+        (cablesLongData || []).forEach(r => {
+            if (r.product === 'Monthly' && r.start_date) {
+                const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                if (match) {
+                    const y = parseInt(match[1]);
+                    const m = parseInt(match[2]) - 1;
+                    const d = parseInt(match[3]);
+                    const timePart = r.start_date.split(' ')[1] || "00:00";
+                    const [hr, min] = timePart.split(':').map(Number);
+                    const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+                    dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+                    const val = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}`;
+                    uniqueMonths.add(val);
+                }
+            }
+        });
+        for (let i = 0; i <= 12; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             const y = d.getFullYear();
             const m = String(d.getMonth() + 1).padStart(2, '0');
-            const val = `${y}-${m}`;
+            uniqueMonths.add(`${y}-${m}`);
+        }
+        const sortedMonths = [...uniqueMonths].sort().reverse();
+        sortedMonths.forEach(val => {
+            const [y, m] = val.split('-');
+            const d = new Date(parseInt(y), parseInt(m) - 1, 1);
             const label = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
             options.push(`<option value="${val}">${label}</option>`);
-        }
+        });
     } else {
         if (dateLabel) dateLabel.textContent = 'Year:';
-        // Current year and next 2 years
         const currentYear = now.getFullYear();
         for (let i = 0; i <= 2; i++) {
             const y = currentYear + i;
@@ -7158,8 +7178,17 @@ function runAuctionOptimizer() {
         if (!prodMatch) return false;
 
         if (productType === 'Monthly') {
-            const d = new Date(r.start_date);
-            return d.getMonth() + 1 === pMonth && r.price != null;
+            if (!r.start_date) return false;
+            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!match) return false;
+            const y = parseInt(match[1]);
+            const m = parseInt(match[2]) - 1;
+            const d = parseInt(match[3]);
+            const timePart = r.start_date.split(' ')[1] || "00:00";
+            const [hr, min] = timePart.split(':').map(Number);
+            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+            return (dateObj.getUTCMonth() + 1) === pMonth && r.price != null;
         }
         return r.price != null;
     }).map(r => parseFloat(r.price));
@@ -7266,8 +7295,17 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
         if (!prodMatch) return false;
 
         if (productType === 'Monthly') {
-            const d = new Date(r.start_date);
-            return d.getMonth() + 1 === pMonth && r.price != null;
+            if (!r.start_date) return false;
+            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!match) return false;
+            const y = parseInt(match[1]);
+            const m = parseInt(match[2]) - 1;
+            const d = parseInt(match[3]);
+            const timePart = r.start_date.split(' ')[1] || "00:00";
+            const [hr, min] = timePart.split(':').map(Number);
+            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+            return (dateObj.getUTCMonth() + 1) === pMonth && r.price != null;
         }
         return r.price != null;
     });
@@ -7354,8 +7392,17 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
         if (!prodMatch) return false;
         
         if (productType === 'Monthly') {
-            const parts = r.start_date.split(' ')[0].split('-');
-            return parseInt(parts[1]) === pMonth;
+            if (!r.start_date) return false;
+            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (!match) return false;
+            const y = parseInt(match[1]);
+            const m = parseInt(match[2]) - 1;
+            const d = parseInt(match[3]);
+            const timePart = r.start_date.split(' ')[1] || "00:00";
+            const [hr, min] = timePart.split(':').map(Number);
+            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+            return (dateObj.getUTCMonth() + 1) === pMonth;
         }
         return true;
     });
