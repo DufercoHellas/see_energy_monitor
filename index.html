@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:35</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 10:48</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6855,28 +6855,29 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             async function initDashboardData() {
                 const statusEl = document.getElementById("loading_status");
                 try {
+                    const cacheBust = Date.now();
                     statusEl.innerText = "Loading historical analogues...";
-                    const hist = await fetch('data/historical.json').then(r => r.json());
+                    const hist = await fetch(`data/historical.json?t=${cacheBust}`).then(r => r.json());
                     
                     statusEl.innerText = "Loading generator outages...";
-                    const out = await fetch('data/outages.json').then(r => r.json());
+                    const out = await fetch(`data/outages.json?t=${cacheBust}`).then(r => r.json());
                     
                     statusEl.innerText = "Loading cable daily matrices...";
-                    const cab = await fetch('data/cables.json').then(r => r.json());
+                    const cab = await fetch(`data/cables.json?t=${cacheBust}`).then(r => r.json());
                     
                     statusEl.innerText = "Loading long-term cable allocations...";
-                    const cabL = await fetch('data/cables_long.json').then(r => r.json());
+                    const cabL = await fetch(`data/cables_long.json?t=${cacheBust}`).then(r => r.json());
                     
                     statusEl.innerText = "Loading all active corridors...";
                     let cabAll = [];
                     try {
-                        cabAll = await fetch('data/all_corridors.json').then(r => r.json());
+                        cabAll = await fetch(`data/all_corridors.json?t=${cacheBust}`).then(r => r.json());
                     } catch (errCorr) {
                         console.warn("Could not load all_corridors.json, will fallback to cablesLongData:", errCorr);
                     }
                     
                     statusEl.innerText = "Loading cable curtailments...";
-                    const cabO = await fetch('data/cable_outages.json').then(r => r.json());
+                    const cabO = await fetch(`data/cable_outages.json?t=${cacheBust}`).then(r => r.json());
 
                     historicalData = hist;
                     outagesData = out;
@@ -6886,7 +6887,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     allCorridorsData = cabAll;
 
                     // Load auction forward curve data (non-blocking, best-effort)
-                    fetch('data/auction_fwd.json').then(r => r.json()).then(d => { auctionFwdData = d; }).catch(() => { auctionFwdData = {}; });
+                    fetch(`data/auction_fwd.json?t=${cacheBust}`).then(r => r.json()).then(d => { auctionFwdData = d; }).catch(() => { auctionFwdData = {}; });
 
                     // Initialize dropdowns & UI components
                     const countrySelect = document.getElementById("analogue_country");
@@ -7439,8 +7440,17 @@ function renderAuctionFwdChart(source, dest, corridor, productType, periodValue)
     const srcKey = countryMap[source] || (auctionFwdData[source] ? source : null);
     const dstKey = countryMap[dest] || (auctionFwdData[dest] ? dest : null);
     const curveField = 'baseload'; 
-    const srcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
-    const dstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
+    const rawSrcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
+    const rawDstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
+    
+    // Filter to show only 1 year ahead
+    const limitDate = new Date();
+    limitDate.setFullYear(limitDate.getFullYear() + 1);
+    const limitDateStr = limitDate.toISOString().split('T')[0];
+    
+    const srcData = rawSrcData.filter(e => e.delivery_start <= limitDateStr);
+    const dstData = rawDstData.filter(e => e.delivery_start <= limitDateStr);
+    
     const traces = [];
     if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ` (${srcKey} proxy)` : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
     if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (dstKey !== dest ? ` (${dstKey} proxy)` : ' Fwd'), line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
@@ -7476,16 +7486,35 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
         return dateObj;
     };
 
-    const monthlyRecords = historical.filter(r => r.product === 'Monthly')
+    // Deduplicate monthly records by delivery month (YYYY-MM)
+    const uniqueMonthlyMap = new Map();
+    historical.filter(r => r.product === 'Monthly').forEach(r => {
+        const dateObj = parseDateHelper(r.start_date);
+        const key = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}`;
+        // Keep the latest record if duplicate exist
+        if (!uniqueMonthlyMap.has(key) || parseDateHelper(uniqueMonthlyMap.get(key).start_date) < dateObj) {
+            uniqueMonthlyMap.set(key, r);
+        }
+    });
+    const monthlyRecords = Array.from(uniqueMonthlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
         .sort((a, b) => a.date - b.date);
 
-    const yearlyRecords = historical.filter(r => r.product === 'Yearly')
+    // Deduplicate yearly records by delivery year (YYYY)
+    const uniqueYearlyMap = new Map();
+    historical.filter(r => r.product === 'Yearly').forEach(r => {
+        const dateObj = parseDateHelper(r.start_date);
+        const key = String(dateObj.getUTCFullYear());
+        if (!uniqueYearlyMap.has(key) || parseDateHelper(uniqueYearlyMap.get(key).start_date) < dateObj) {
+            uniqueYearlyMap.set(key, r);
+        }
+    });
+    const yearlyRecords = Array.from(uniqueYearlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
         .sort((a, b) => a.date - b.date);
 
     if (!monthlyRecords.length && !yearlyRecords.length) {
-        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical clearing data for this corridor.</p>';
+        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;text-align:center;">No historical clearing data for this corridor.</p>';
         return;
     }
 
@@ -7600,16 +7629,47 @@ function renderAuctionOutagesTable(corridor, periodValue, productType) {
     </table></div>`;
 }
 
+function getAuctionDeliveryPeriod(dateStr, productType) {
+    if (!dateStr) return '';
+    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return dateStr.substring(0, 7);
+    const y = parseInt(match[1]);
+    const m = parseInt(match[2]) - 1;
+    const d = parseInt(match[3]);
+    const timePart = dateStr.split(' ')[1] || "00:00";
+    const [hr, min] = timePart.split(':').map(Number);
+    const dateObj = new Date(Date.UTC(y, m, d, hr, min));
+    dateObj.setUTCHours(dateObj.getUTCHours() + 4);
+    
+    if (productType === 'Monthly') {
+        const year = dateObj.getUTCFullYear();
+        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
+        return `${year}-${month}`;
+    } else {
+        return String(dateObj.getUTCFullYear());
+    }
+}
+
 function renderAuctionBacktestTable(corridor, periodValue, productType) {
     const { source, dest } = getCorridorCountries(corridor);
-    const [pYear, pMonth] = productType === 'Monthly' ? periodValue.split('-').map(Number) : [parseInt(periodValue), 1];
 
-    // Filter cables_long for this corridor and product type
-    const historicalAuctions = (cablesLongData || []).filter(r => {
-        if (r.corridor_code !== corridor) return false;
-        return (productType === 'Yearly' && r.product === 'Yearly') || 
-               (productType === 'Monthly' && r.product === 'Monthly');
+    // Filter and deduplicate on delivery period directly in front-end
+    const uniqueMap = new Map();
+    (cablesLongData || []).forEach(r => {
+        if (r.corridor_code !== corridor) return;
+        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
+                          (productType === 'Monthly' && r.product === 'Monthly');
+        if (!prodMatch) return;
+        if (r.price == null) return;
+        
+        const periodKey = getAuctionDeliveryPeriod(r.start_date, productType);
+        // Keep the record with the latest start_date (most recently run auction)
+        if (!uniqueMap.has(periodKey) || r.start_date.localeCompare(uniqueMap.get(periodKey).start_date) > 0) {
+            uniqueMap.set(periodKey, r);
+        }
     });
+
+    const historicalAuctions = Array.from(uniqueMap.values());
 
     const container = document.getElementById('auction_backtest_table_container');
     if (!container) return;
@@ -7619,8 +7679,12 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
         return;
     }
 
-    // Sort by start_date descending
-    historicalAuctions.sort((a, b) => b.start_date.localeCompare(a.start_date));
+    // Sort by delivery period descending
+    historicalAuctions.sort((a, b) => {
+        const keyA = getAuctionDeliveryPeriod(a.start_date, productType);
+        const keyB = getAuctionDeliveryPeriod(b.start_date, productType);
+        return keyB.localeCompare(keyA);
+    });
 
     let html = `
         <h4 style="margin-top:16px; margin-bottom:8px; font-weight: 700; color: #1e293b;">Historical Realized Margins (Backtest)</h4>
@@ -7638,8 +7702,7 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
     `;
 
     historicalAuctions.forEach(auc => {
-        const startDayStr = auc.start_date.split(' ')[0]; // "YYYY-MM-DD"
-        const periodPrefix = productType === 'Monthly' ? startDayStr.substring(0, 7) : startDayStr.substring(0, 4);
+        const periodKey = getAuctionDeliveryPeriod(auc.start_date, productType);
         
         // Calculate average spot spread for this period from historicalData
         let totalSpread = 0;
@@ -7648,7 +7711,7 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
         const dataDst = historicalData[dest] || {};
 
         Object.keys(dataSrc).forEach(dateStr => {
-            if (dateStr.startsWith(periodPrefix)) {
+            if (dateStr.startsWith(periodKey)) {
                 if (dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
                     const srcPrices = dataSrc[dateStr].prices;
                     const dstPrices = dataDst[dateStr].prices;
@@ -7667,9 +7730,12 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
         const avgSpread = hasSpot ? (totalSpread / countHours) : null;
         const netMargin = hasSpot ? (avgSpread - clearingPrice) : null;
 
-        const dispPeriod = productType === 'Monthly' 
-            ? new Date(startDayStr).toLocaleString('en-US', { month: 'short', year: 'numeric' })
-            : periodPrefix;
+        let dispPeriod = periodKey;
+        if (productType === 'Monthly') {
+            const [y, m] = periodKey.split('-');
+            const d = new Date(parseInt(y), parseInt(m) - 1, 1);
+            dispPeriod = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+        }
 
         const clearingDisp = `€${clearingPrice.toFixed(2)}`;
         const spreadDisp = hasSpot ? `€${avgSpread.toFixed(2)}` : 'N/A';
@@ -7678,8 +7744,8 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
 
         html += `
             <tr style="border-bottom:1px solid #f1f5f9; hover: {background-color: #f8fafc;}">
-                <td style="padding:8px 10px; color:#334155; font-weight:500;">${dispPeriod}</td>
-                <td style="padding:8px 10px; text-align:right; color:#334155;">${clearingDisp}</td>
+                <td style="padding:8px 10px; color:#475569; font-weight:500;">${dispPeriod}</td>
+                <td style="padding:8px 10px; text-align:right; color:#334155; font-weight:500;">${clearingDisp}</td>
                 <td style="padding:8px 10px; text-align:right; color:#334155;">${spreadDisp}</td>
                 <td style="padding:8px 10px; text-align:right;">${marginDisp}</td>
             </tr>
@@ -7691,7 +7757,6 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
             </table>
         </div>
     `;
-
     container.innerHTML = html;
 }
 
