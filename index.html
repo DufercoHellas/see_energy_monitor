@@ -163,11 +163,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 15:43</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 16:28</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:43</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:49</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
@@ -7601,22 +7601,61 @@ function renderEUMap() {
     document.getElementById('eumap_date_label').textContent =
         `${dy} ${months[parseInt(mo)-1]} ${yr} \u2014 Day-Ahead Spot Prices`;
 
-    // Build arrays for Plotly
-    const locations = [];   // ISO-3
-    const z = [];           // prices
-    const text = [];        // hover text
-    const customdata = [];  // data key for click handling
+    // Ensure GeoJSON is loaded before plotting
+    if (!cachedBiddingZonesGeoJSON) {
+        fetch('bidding_zones.geojson')
+            .then(res => {
+                if (!res.ok) throw new Error("Local copy not found, fetching fallback");
+                return res.json();
+            })
+            .catch(() => fetch('data/bidding_zones.geojson').then(res => res.json()))
+            .catch(() => fetch('https://raw.githubusercontent.com/electricitymaps/electricitymaps-contrib/master/geo/world.geojson').then(res => res.json()))
+            .then(geojson => {
+                cachedBiddingZonesGeoJSON = geojson;
+                drawPlotlyEUMap(selectedDate);
+            })
+            .catch(err => {
+                console.error("Failed to load bidding zones geojson:", err);
+                drawPlotlyEUMap(selectedDate, null);
+            });
+    } else {
+        drawPlotlyEUMap(selectedDate);
+    }
+}
+
+function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
+    const locations = [];
+    const z = [];
+    const text = [];
+    const customdata = [];
+
+    function getGeoJSONZoneName(dataKey, iso3) {
+        if (dataKey === 'DK1') return 'DK-DK1';
+        if (dataKey === 'DK2') return 'DK-DK2';
+        if (dataKey === 'SE1') return 'SE-SE1';
+        if (dataKey === 'SE2') return 'SE-SE2';
+        if (dataKey === 'SE3') return 'SE-SE3';
+        if (dataKey === 'SE4') return 'SE-SE4';
+        if (dataKey === 'NO1') return 'NO-NO1';
+        if (dataKey === 'NO2') return 'NO-NO2';
+        if (dataKey === 'NO3') return 'NO-NO3';
+        if (dataKey === 'NO4') return 'NO-NO4';
+        if (dataKey === 'NO5') return 'NO-NO5';
+        if (dataKey === 'IT') return 'IT-NO';
+        return dataKey;
+    }
 
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        if (iso3 === 'XKX') continue; // Skip Kosovo (not in Natural Earth)
+        if (iso3 === 'XKX') continue;
         const entry = historicalData?.[dataKey]?.[selectedDate];
         const price = (entry && entry.average_price && entry.average_price > 0)
             ? entry.average_price : null;
         const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
         const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
 
-        locations.push(iso3);
-        // Treat Turkey as no data (-1) on the map color coding to keep it neutral
+        const locId = geojson ? getGeoJSONZoneName(dataKey, iso3) : iso3;
+        locations.push(locId);
+
         z.push((price !== null && dataKey !== 'TR') ? price : -1);
         text.push(price !== null
             ? `<b>${name}</b><br>${price.toFixed(2)} ${symbol}/MWh`
@@ -7624,21 +7663,17 @@ function renderEUMap() {
         customdata.push(dataKey);
     }
 
-    // Exclude Turkey from min/max price boundaries for color scaling
     const validPrices = z.filter((v, idx) => v > 0);
     const minP = validPrices.length ? Math.min(...validPrices) : 50;
     const maxP = validPrices.length ? Math.max(...validPrices) : 300;
 
-    // Split into two traces: with data (colored) and no-data (grey)
     const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
     const noDataLoc  = [], noDataText = [], noDataCustom = [];
 
-    // Scatter labels arrays
     const labelLats = [];
     const labelLons = [];
     const labelTexts = [];
 
-    // Realistic central coordinates for labels (Lat, Lon) for Europe
     const EU_LABEL_COORDS = {
         'AUT': [47.5162, 14.5501],
         'BGR': [42.7339, 25.4858],
@@ -7668,17 +7703,17 @@ function renderEUMap() {
         'DNK': [56.2639, 9.5018],
         'SWE': [60.1282, 18.6435],
         'NOR': [60.472, 8.4689],
-        'DK1': [56.0, 8.5],
-        'DK2': [55.6, 11.5],
-        'NO1': [59.5, 9.5],
-        'NO2': [58.5, 6.5],
-        'NO3': [63.0, 10.0],
-        'NO4': [67.5, 14.5],
-        'NO5': [60.8, 5.5],
-        'SE1': [66.5, 20.0],
-        'SE2': [63.0, 16.5],
-        'SE3': [59.5, 15.0],
-        'SE4': [56.3, 14.5],
+        'DK1': [56.2, 8.8],
+        'DK2': [55.4, 11.7],
+        'NO1': [60.1, 10.2],
+        'NO2': [58.8, 7.2],
+        'NO3': [62.4, 10.4],
+        'NO4': [67.8, 15.2],
+        'NO5': [60.9, 6.2],
+        'SE1': [66.2, 19.5],
+        'SE2': [63.3, 16.2],
+        'SE3': [59.4, 14.2],
+        'SE4': [56.5, 14.2],
         'FIN': [61.9241, 25.7482],
         'EST': [58.5953, 25.0136],
         'LVA': [56.8796, 24.6032],
@@ -7687,12 +7722,10 @@ function renderEUMap() {
         'BLR': [53.7098, 27.9534]
     };
 
-    // Add extra countries to label locations if they aren't in EU_MAP_DATA_TO_ISO3 but are in layout
     const ALL_ISO3 = { ...EU_MAP_DATA_TO_ISO3, 'FR': 'FRA', 'ES': 'ESP', 'PT': 'PRT', 'GB': 'GBR', 'IE': 'IRL', 'BE': 'BEL', 'NL': 'NLD', 'PL': 'POL', 'DK': 'DNK', 'SE': 'SWE', 'NO': 'NOR', 'FIN': 'FIN', 'EE': 'EST', 'LV': 'LVA', 'LT': 'LTU', 'UA': 'UKR', 'BY': 'BLR' };
 
     for (let i = 0; i < locations.length; i++) {
-        // Turkey is forced to traceNoData to keep its color neutral
-        if (z[i] > 0 && locations[i] !== 'TUR') {
+        if (z[i] > 0 && customdata[i] !== 'TR') {
             withDataLoc.push(locations[i]);
             withDataZ.push(z[i]);
             withDataText.push(text[i]);
@@ -7704,7 +7737,6 @@ function renderEUMap() {
         }
     }
 
-    // Populate scatter coordinates for text labels
     for (const [key, iso3] of Object.entries(ALL_ISO3)) {
         const coordKey = EU_LABEL_COORDS[key] ? key : (EU_LABEL_COORDS[iso3] ? iso3 : null);
         if (coordKey) {
@@ -7712,7 +7744,6 @@ function renderEUMap() {
             labelLats.push(coords[0]);
             labelLons.push(coords[1]);
             
-            // Check if we have data for this country key (e.g. key could be 'DE_LU' or 'FR')
             const entry = historicalData?.[key]?.[selectedDate];
             const price = (entry && entry.average_price && entry.average_price > 0) ? entry.average_price : null;
             const code = key === 'DE_LU' ? 'DE' : key;
@@ -7724,7 +7755,9 @@ function renderEUMap() {
 
     const traceWithData = {
         type: 'choropleth',
-        locationmode: 'ISO-3',
+        geojson: geojson || undefined,
+        featureidkey: geojson ? 'properties.zoneName' : undefined,
+        locationmode: geojson ? undefined : 'ISO-3',
         locations: withDataLoc,
         z: withDataZ,
         text: withDataText,
@@ -7747,28 +7780,28 @@ function renderEUMap() {
             tickfont: { size: 11, family: 'Inter, sans-serif' },
             outlinewidth: 0
         },
-        marker: { line: { color: '#ffffff', width: 1.5 } }
+        marker: { line: { color: '#0f172a', width: 1.0 } }
     };
 
     const traceNoData = {
         type: 'choropleth',
-        locationmode: 'ISO-3',
+        geojson: geojson || undefined,
+        featureidkey: geojson ? 'properties.zoneName' : undefined,
+        locationmode: geojson ? undefined : 'ISO-3',
         locations: noDataLoc,
         z: noDataLoc.map(() => 0),
         text: noDataText,
         customdata: noDataCustom,
         hovertemplate: '%{text}<extra></extra>',
-        colorscale: [[0, '#d4dce8'], [1, '#d4dce8']],
+        colorscale: [[0, '#e2e8f0'], [1, '#e2e8f0']],
         showscale: false,
         zmin: 0,
         zmax: 1,
-        marker: { line: { color: '#ffffff', width: 1.5 } }
+        marker: { line: { color: '#cbd5e1', width: 0.8 } }
     };
 
-    // Scattergeo trace for static country text labels
     const traceLabels = {
         type: 'scattergeo',
-        locationmode: 'ISO-3',
         lat: labelLats,
         lon: labelLons,
         mode: 'text',
@@ -7786,21 +7819,20 @@ function renderEUMap() {
         geo: {
             scope: 'europe',
             showland: true,
-            landcolor: '#eef2f7',
+            landcolor: '#f8fafc',
             showocean: true,
-            oceancolor: '#c8d8ec',
+            oceancolor: '#cbd5e1',
             showlakes: true,
-            lakecolor: '#c8d8ec',
-            showcountries: true,
-            countrycolor: '#ffffff',
+            lakecolor: '#cbd5e1',
+            showcountries: false,
             showcoastlines: true,
-            coastlinecolor: '#ffffff',
+            coastlinecolor: '#94a3b8',
             showframe: false,
             projection: { type: 'natural earth' },
             lonaxis: { range: [-12, 42] },
             lataxis: { range: [35, 70] },
             bgcolor: 'rgba(0,0,0,0)',
-            fixedrange: true // DISABLE ZOOM & PAN
+            fixedrange: true
         },
         margin: { t: 0, b: 0, l: 0, r: 0 },
         paper_bgcolor: 'rgba(0,0,0,0)',
@@ -7820,9 +7852,9 @@ function renderEUMap() {
     Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
-            if (!pt || !pt.customdata) return;
-            const dataKey = pt.customdata;
-            renderEUMapCountryDetail(dataKey, selectedDate);
+            if (pt && pt.customdata) {
+                renderEUMapCountryDetail(pt.customdata, selectedDate);
+            }
         });
     });
 }
