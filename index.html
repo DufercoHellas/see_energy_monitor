@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 09:42</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 09:53</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -171,7 +171,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-07 08:02</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 06:46</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
@@ -901,20 +901,38 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
                         <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
                     </div>
-                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-                        <label style="font-size:13px; font-weight:600; color:#374151;">Corridor:</label>
-                        <select id="auction_corridor" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                        <label style="font-size:13px; font-weight:600; color:#374151;">Product:</label>
-                        <select id="auction_product_type" onchange="onAuctionProductTypeChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
-                            <option value="Monthly">Monthly</option>
-                            <option value="Yearly">Yearly</option>
-                        </select>
-                        <label id="auction_date_label" style="font-size:13px; font-weight:600; color:#374151;">Month:</label>
-                        <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                        <label style="font-size:13px; font-weight:600; color:#374151;">Volume (MW):</label>
-                        <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                        <label style="font-size:13px; font-weight:600; color:#374151;">Risk Margin (€/MW):</label>
-                        <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:7px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                    <div style="display:flex; flex-direction:column; gap:12px; width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;">
+                        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width: 150px;">
+                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Country</label>
+                                <select id="auction_country_filter" onchange="onAuctionCountryFilterChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
+                                    <option value="ALL">All Countries</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:120px;">
+                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Product</label>
+                                <select id="auction_product_type" onchange="onAuctionProductTypeChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:140px;">
+                                <label id="auction_date_label" style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Month</label>
+                                <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:80px;">
+                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Volume (MW)</label>
+                                <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:4px; min-width:100px;">
+                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Risk Margin (€)</label>
+                                <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid #e2e8f0; padding-top:10px;">
+                            <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom: 2px;">Corridor</label>
+                            <div id="auction_corridors_list" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; min-height: 32px;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -6918,18 +6936,99 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 // CABLE AUCTIONS TAB — BIDDING OPTIMIZER
 // ============================================================
 
+let selectedAuctionCorridor = "";
+
 function initAuctionTab() {
-    // Populate corridor selector from cablesLongData
-    const corridorSel = document.getElementById('auction_corridor');
-    if (!corridorSel) return;
-    const corridors = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
-    corridorSel.innerHTML = corridors.map(c => `<option value="${c}">${c}</option>`).join('');
+    // Populate country selector in auction panel
+    const countrySel = document.getElementById('auction_country_filter');
+    if (countrySel) {
+        const countries = new Set();
+        (cablesLongData || []).forEach(r => {
+            if (r.corridor_code) {
+                r.corridor_code.split('-').forEach(c => countries.add(c.trim()));
+            }
+        });
+        const sortedCountries = [...countries].sort();
+        countrySel.innerHTML = '<option value="ALL">All Countries</option>' + 
+            sortedCountries.map(c => `<option value="${c}">${c}</option>`).join('');
+        countrySel.value = 'ALL';
+    }
 
     // Set default product type to Monthly
     const prodSel = document.getElementById('auction_product_type');
     if (prodSel) prodSel.value = 'Monthly';
 
+    // Set default selected corridor if not set
+    const corridors = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+    if (corridors.length > 0 && !selectedAuctionCorridor) {
+        selectedAuctionCorridor = corridors[0];
+    }
+
+    onAuctionCountryFilterChange();
     onAuctionProductTypeChange();
+}
+
+function onAuctionCountryFilterChange() {
+    const countryFilter = document.getElementById('auction_country_filter')?.value || 'ALL';
+    const corridorsListDiv = document.getElementById('auction_corridors_list');
+    if (!corridorsListDiv) return;
+
+    const uniqueCorrs = new Set();
+    (cablesLongData || []).forEach(item => {
+        if (item.corridor_code) {
+            if (countryFilter === 'ALL' || item.corridor_code.split('-').includes(countryFilter)) {
+                uniqueCorrs.add(item.corridor_code);
+            }
+        }
+    });
+
+    const sortedCorridors = Array.from(uniqueCorrs).sort();
+    
+    // Ensure selected corridor is valid for this country filter
+    if (sortedCorridors.length > 0 && (!selectedAuctionCorridor || !sortedCorridors.includes(selectedAuctionCorridor))) {
+        selectedAuctionCorridor = sortedCorridors[0];
+    }
+
+    let cHtml = "";
+    sortedCorridors.forEach(c => {
+        const isSelected = selectedAuctionCorridor === c;
+        const bg = isSelected ? "#4338ca" : "#e0e7ff";
+        const color = isSelected ? "#ffffff" : "#4338ca";
+        const border = isSelected ? "1px solid #4338ca" : "1px solid #c7d2fe";
+        cHtml += `<span onclick="selectAuctionCorridor('${c}')" style="background:${bg};color:${color};border:${border};padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;user-select:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${c}</span>`;
+    });
+    corridorsListDiv.innerHTML = cHtml;
+
+    runAuctionOptimizer();
+}
+
+function selectAuctionCorridor(corr) {
+    selectedAuctionCorridor = corr;
+    
+    const countryFilter = document.getElementById('auction_country_filter')?.value || 'ALL';
+    const corridorsListDiv = document.getElementById('auction_corridors_list');
+    if (corridorsListDiv) {
+        const uniqueCorrs = new Set();
+        (cablesLongData || []).forEach(item => {
+            if (item.corridor_code) {
+                if (countryFilter === 'ALL' || item.corridor_code.split('-').includes(countryFilter)) {
+                    uniqueCorrs.add(item.corridor_code);
+                }
+            }
+        });
+        const sortedCorridors = Array.from(uniqueCorrs).sort();
+        let cHtml = "";
+        sortedCorridors.forEach(c => {
+            const isSelected = selectedAuctionCorridor === c;
+            const bg = isSelected ? "#4338ca" : "#e0e7ff";
+            const color = isSelected ? "#ffffff" : "#4338ca";
+            const border = isSelected ? "1px solid #4338ca" : "1px solid #c7d2fe";
+            cHtml += `<span onclick="selectAuctionCorridor('${c}')" style="background:${bg};color:${color};border:${border};padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;user-select:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${c}</span>`;
+        });
+        corridorsListDiv.innerHTML = cHtml;
+    }
+
+    runAuctionOptimizer();
 }
 
 function onAuctionProductTypeChange() {
@@ -7001,10 +7100,11 @@ function getHoursInPeriod(periodValue, productType) {
 function getForwardPrice(country, periodValue, productType) {
     const countryMap = {
         'GR': 'GR', 'BG': 'BG', 'RO': 'RO', 'HU': 'HU',
-        'RS': 'RS', 'IT': 'IT', 'MK': 'RS', 'AL': 'RS',
-        'ME': 'RS', 'XK': 'RS', 'SI': 'RS', 'HR': 'RS'
+        'RS': 'RS', 'IT': 'IT',
+        'AL': 'XK', 'XK': 'AL' // Only XK and AL can be proxies to each other
     };
-    const mapped = countryMap[country] || 'RS';
+    const mapped = countryMap[country];
+    if (!mapped) return null;
     const fwdCountry = auctionFwdData[mapped];
     if (!fwdCountry || !fwdCountry.baseload) return null;
     
@@ -7020,7 +7120,7 @@ function getCorridorCountries(corridor) {
 }
 
 function runAuctionOptimizer() {
-    const corridor = document.getElementById('auction_corridor')?.value;
+    const corridor = selectedAuctionCorridor;
     const productType = document.getElementById('auction_product_type')?.value || 'Monthly';
     const periodValue = document.getElementById('auction_month')?.value;
     const bidMw = parseFloat(document.getElementById('auction_mw')?.value) || 1;
@@ -7031,8 +7131,40 @@ function runAuctionOptimizer() {
     const hoursInPeriod = getHoursInPeriod(periodValue, productType);
 
     // Get forward prices
-    const srcFwd = getForwardPrice(source, periodValue, productType) || 80.0;
-    const dstFwd = getForwardPrice(dest, periodValue, productType) || 85.0;
+    const srcFwd = getForwardPrice(source, periodValue, productType);
+    const dstFwd = getForwardPrice(dest, periodValue, productType);
+
+    const missing = [];
+    if (srcFwd === null) missing.push(`${source} Forward Price`);
+    if (dstFwd === null) missing.push(`${dest} Forward Price`);
+
+    if (missing.length > 0) {
+        document.getElementById('kpi_bid').textContent = '—';
+        document.getElementById('kpi_bid_sub').textContent = 'Data Missing';
+        document.getElementById('kpi_ev').textContent = '—';
+        document.getElementById('kpi_exposure').textContent = '—';
+        document.getElementById('kpi_exposure_sub').textContent = '—';
+        document.getElementById('kpi_liability').textContent = '—';
+        
+        document.getElementById('auction_adjustments').innerHTML = `
+            <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 12px; margin-top: 10px; color: #991b1b; font-size: 13px;">
+                <strong>⚠️ Missing Forward Curve Data:</strong><br>
+                Unable to optimize bid because the following forward data is missing:<br>
+                <ul style="margin: 4px 0 0 16px; padding: 0;">
+                    ${missing.map(m => `<li>${m}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+
+        document.getElementById('auction_spread_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:200px;">Missing forward pricing data</div>';
+        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:100px;">Missing forward pricing data</div>';
+        
+        renderAuctionClearingChart(corridor, periodValue, productType);
+        renderAuctionOutagesTable(corridor, periodValue, productType);
+        renderAuctionBacktestTable(corridor, periodValue, productType);
+        return;
+    }
+
     const fwdSpread = dstFwd - srcFwd;
 
     // Get historical profiles for shaping
@@ -7267,15 +7399,20 @@ function runAuctionOptimizer() {
 }
 
 function renderAuctionFwdChart(source, dest, corridor, productType, periodValue) {
-    const countryMap = {'MK':'RS','AL':'RS','ME':'RS','XK':'RS','SI':'RS','HR':'RS'};
-    const srcKey = countryMap[source] || source;
-    const dstKey = countryMap[dest] || dest;
+    const countryMap = {'AL':'XK','XK':'AL'}; // Only XK and AL are proxies to each other
+    const srcKey = countryMap[source] || (auctionFwdData[source] ? source : null);
+    const dstKey = countryMap[dest] || (auctionFwdData[dest] ? dest : null);
     const curveField = 'baseload'; 
-    const srcData = auctionFwdData[srcKey]?.[curveField] || [];
-    const dstData = auctionFwdData[dstKey]?.[curveField] || [];
+    const srcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
+    const dstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
     const traces = [];
-    if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + ' Fwd', line:{color:'#4f46e5',width:2}, marker:{size:5} });
-    if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + ' proxy', line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
+    if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ' (RS proxy)' : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
+    if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (dstKey !== dest ? ' (RS proxy)' : ' Fwd'), line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
+    
+    if (traces.length === 0) {
+        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:100px;">No forward curves available</div>';
+        return;
+    }
     Plotly.newPlot('auction_fwd_chart', traces, {
         margin:{t:5,r:10,b:40,l:45},
         paper_bgcolor:'white', plot_bgcolor:'white',
@@ -7387,24 +7524,8 @@ function renderAuctionBacktestTable(corridor, periodValue, productType) {
     // Filter cables_long for this corridor and product type
     const historicalAuctions = (cablesLongData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
-                          (productType === 'Monthly' && r.product === 'Monthly');
-        if (!prodMatch) return false;
-        
-        if (productType === 'Monthly') {
-            if (!r.start_date) return false;
-            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
-            if (!match) return false;
-            const y = parseInt(match[1]);
-            const m = parseInt(match[2]) - 1;
-            const d = parseInt(match[3]);
-            const timePart = r.start_date.split(' ')[1] || "00:00";
-            const [hr, min] = timePart.split(':').map(Number);
-            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-            return (dateObj.getUTCMonth() + 1) === pMonth;
-        }
-        return true;
+        return (productType === 'Yearly' && r.product === 'Yearly') || 
+               (productType === 'Monthly' && r.product === 'Monthly');
     });
 
     const container = document.getElementById('auction_backtest_table_container');
