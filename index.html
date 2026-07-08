@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:20</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:31</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -1161,10 +1161,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 8px;">
                 <div>
                     <h2 style="margin:0;">EU Day-Ahead Spot Prices</h2>
-                    <p style="color:#6b7280;margin-top:6px;margin-bottom:0;font-size:14px;">Day-ahead market clearing prices by country — average €/MWh. Showing the latest available date (today or D+1 if published).</p>
+                    <p style="color:#6b7280;margin-top:6px;margin-bottom:0;font-size:14px;">Day-ahead market clearing prices by country &mdash; average &euro;/MWh. Click a country to see its 24h price profile.</p>
                 </div>
                 <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 18px;">
-                    <label for="eumap_date" style="font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap;">📅 Date:</label>
+                    <label for="eumap_date" style="font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap;">&#128197; Date:</label>
                     <input type="date" id="eumap_date" onchange="renderEUMap()" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 12px; font-family: 'Inter'; font-size: 14px; color: #0f172a; font-weight: 600; background: white; cursor: pointer;">
                     <button onclick="euMapSetLatest()" style="background: #4f46e5; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Latest</button>
                 </div>
@@ -1172,32 +1172,25 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
             <!-- Date badge -->
             <div id="eumap_date_badge" style="display:inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(79,70,229,0.25);">
-                <span>📅</span><span id="eumap_date_label">—</span>
+                <span>&#128197;</span><span id="eumap_date_label">&mdash;</span>
             </div>
 
             <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
-                <!-- Map container -->
-                <div style="flex: 3; min-width: 520px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); position: relative;">
-                    <div id="eumap_container" style="width: 100%; overflow: hidden; border-radius: 10px; background: #f0f4ff;">
-                        <!-- SVG map rendered by JS -->
-                    </div>
-                    <!-- Legend -->
-                    <div style="margin-top: 18px; display: flex; align-items: center; gap: 12px;">
-                        <span style="font-size: 12px; font-weight: 600; color: #6b7280;">€/MWh</span>
-                        <div id="eumap_legend" style="display: flex; align-items: center; gap: 0;"></div>
-                        <div style="display: flex; gap: 6px; font-size: 11px; color: #6b7280;">
-                            <span id="eumap_leg_min"></span>
-                            <span style="margin: 0 6px;">—</span>
-                            <span id="eumap_leg_max"></span>
-                        </div>
-                    </div>
+                <!-- Plotly Map container -->
+                <div style="flex: 3; min-width: 520px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <div id="eumap_container" style="width: 100%; height: 560px;"></div>
                 </div>
 
-                <!-- Country prices table -->
-                <div style="flex: 1; min-width: 240px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <h3 style="margin: 0 0 14px 0; font-size: 16px; color: #1e293b;">Country Prices</h3>
-                    <div id="eumap_table_container" style="max-height: 600px; overflow-y: auto;">
-                        <!-- Populated by JS -->
+                <!-- Country detail panel -->
+                <div id="eumap_detail_panel" style="flex: 1; min-width: 280px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
+                        <span style="font-size:48px;">&#128506;&#65039;</span>
+                        <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
+                    </div>
+                    <div id="eumap_detail_content" style="display:none;">
+                        <div id="eumap_detail_header" style="margin-bottom:14px;"></div>
+                        <div id="eumap_hourly_chart" style="width:100%; height:300px;"></div>
+                        <div id="eumap_hourly_stats" style="margin-top:12px;"></div>
                     </div>
                 </div>
             </div>
@@ -6971,109 +6964,46 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
 
 // =====================================================================
-// EU MAP TAB — Day-Ahead Spot Price Choropleth
+// EU MAP TAB — Day-Ahead Spot Price Choropleth (Plotly)
 // =====================================================================
 
-// Country code → data key mapping (historicalData keys)
-const EU_MAP_CODE_TO_DATA = {
-    'AT': 'AT',
-    'BG': 'BG',
-    'HR': 'HR',
-    'CZ': 'CZ',
-    'DE': 'DE_LU',
-    'GR': 'GR',
-    'HU': 'HU',
-    'IT': 'IT',
-    'RO': 'RO',
-    'RS': 'RS',
-    'SK': 'SK',
-    'SI': 'SI',
-    'AL': 'AL',
-    'MK': 'MK',
-    'ME': 'ME',
-    'XK': 'XK',
-    'BA': 'BA',
-    'TR': 'TR',
-    'CH': 'CH'
+// Maps our internal data keys to ISO-3 codes used by Plotly
+const EU_MAP_DATA_TO_ISO3 = {
+    'AT':    'AUT',
+    'BG':    'BGR',
+    'HR':    'HRV',
+    'CZ':    'CZE',
+    'DE_LU': 'DEU',
+    'GR':    'GRC',
+    'HU':    'HUN',
+    'IT':    'ITA',
+    'RO':    'ROU',
+    'RS':    'SRB',
+    'SK':    'SVK',
+    'SI':    'SVN',
+    'AL':    'ALB',
+    'MK':    'MKD',
+    'ME':    'MNE',
+    'BA':    'BIH',
+    'TR':    'TUR',
+    'CH':    'CHE',
+    'XK':    'XKX'   // Kosovo – may not render but included for completeness
 };
 
-// Country display names for the map labels
-const EU_MAP_COUNTRY_LABELS = {
-    'NO': 'Norway',       'FI': 'Finland',      'SE': 'Sweden',
-    'EE': 'Estonia',      'LV': 'Latvia',       'LT': 'Lithuania',
-    'BY': 'Belarus',      'PL': 'Poland',        'DK': 'Denmark',
-    'DE': 'Germany',      'BE': 'Belgium',       'CZ': 'Czech Rep.',
-    'SK': 'Slovakia',     'UA': 'Ukraine',       'FR': 'France',
-    'AT': 'Austria',      'HU': 'Hungary',       'RO': 'Romania',
-    'HR': 'Croatia',      'RS': 'Serbia',        'ME': 'Montenegro',
-    'BG': 'Bulgaria',     'AL': 'Albania',       'GR': 'Greece',
-    'MT': 'Malta',        'CY': 'Cyprus',        'TR': 'Turkey',
-    'PT': 'Portugal',     'ES': 'Spain',         'IT': 'Italy',
-    'IE': 'Ireland',      'GB': 'UK',            'NL': 'Netherlands',
-    'CH': 'Switzerland',  'SI': 'Slovenia',      'MK': 'N.Macedonia',
-    'XK': 'Kosovo',       'BA': 'Bosnia',        'LU': 'Luxembourg',
-    'MD': 'Moldova'
-};
+// Reverse: ISO3 -> data key
+const EU_MAP_ISO3_TO_DATA = {};
+for (const [dk, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+    EU_MAP_ISO3_TO_DATA[iso3] = dk;
+}
 
-// --- SVG Path data for each country (Mercator-like simplified paths) ---
-const EU_SVG_PATHS = {
-    'PT': 'M 118,390 L 135,375 L 140,355 L 145,330 L 138,310 L 125,305 L 110,320 L 105,345 L 108,370 Z',
-    'ES': 'M 135,375 L 165,368 L 200,375 L 235,365 L 258,368 L 268,350 L 262,325 L 245,305 L 220,295 L 195,290 L 165,295 L 145,310 L 140,330 L 145,355 Z',
-    'FR': 'M 165,368 L 200,375 L 240,368 L 268,350 L 278,320 L 272,295 L 252,278 L 225,272 L 200,278 L 175,285 L 160,298 L 158,320 L 160,350 Z',
-    'IE': 'M 118,228 L 135,220 L 142,235 L 138,255 L 122,260 L 112,248 Z',
-    'GB': 'M 148,195 L 165,185 L 178,198 L 182,218 L 175,238 L 168,250 L 155,255 L 145,248 L 138,235 L 142,215 Z M 152,262 L 162,258 L 168,270 L 158,278 L 148,272 Z',
-    'NL': 'M 245,208 L 260,200 L 272,210 L 268,228 L 252,232 L 242,222 Z',
-    'BE': 'M 242,228 L 258,232 L 270,228 L 278,240 L 268,252 L 248,255 L 238,245 L 238,235 Z',
-    'LU': 'M 268,252 L 278,248 L 282,258 L 276,265 L 266,262 Z',
-    'DE': 'M 268,228 L 295,215 L 318,218 L 335,232 L 338,252 L 325,265 L 308,272 L 285,268 L 272,260 L 268,245 L 270,232 Z',
-    'CH': 'M 268,268 L 285,262 L 305,265 L 312,278 L 302,288 L 278,290 L 265,282 Z',
-    'NO': 'M 245,65 L 275,48 L 318,40 L 355,52 L 370,80 L 355,108 L 330,125 L 305,138 L 278,148 L 258,162 L 248,178 L 240,158 L 248,135 L 245,108 L 248,85 Z',
-    'SE': 'M 305,80 L 335,68 L 360,75 L 372,100 L 365,128 L 348,155 L 328,172 L 308,182 L 290,172 L 278,155 L 290,138 L 312,122 L 328,108 L 318,88 Z',
-    'FI': 'M 355,58 L 385,52 L 418,55 L 440,78 L 448,108 L 435,135 L 415,155 L 390,165 L 368,165 L 352,152 L 348,128 L 362,108 L 372,85 Z',
-    'DK': 'M 278,182 L 295,175 L 308,182 L 308,198 L 295,205 L 278,205 L 272,198 Z M 290,165 L 305,158 L 312,165 L 308,175 L 295,178 L 286,172 Z',
-    'EE': 'M 375,158 L 395,152 L 415,155 L 418,168 L 405,175 L 382,178 L 372,170 Z',
-    'LV': 'M 372,178 L 395,175 L 418,178 L 420,192 L 408,200 L 385,202 L 368,196 Z',
-    'LT': 'M 365,198 L 388,200 L 415,198 L 420,212 L 410,222 L 390,225 L 365,220 L 358,210 Z',
-    'BY': 'M 395,205 L 422,198 L 448,205 L 460,222 L 455,245 L 440,258 L 415,262 L 392,255 L 378,238 L 378,220 Z',
-    'PL': 'M 325,218 L 358,212 L 388,215 L 408,225 L 415,245 L 408,265 L 388,272 L 360,275 L 335,270 L 318,255 L 318,238 L 322,225 Z',
-    'CZ': 'M 318,270 L 342,265 L 365,268 L 375,280 L 368,292 L 345,295 L 322,292 L 312,282 Z',
-    'AT': 'M 305,292 L 328,288 L 355,290 L 372,298 L 368,312 L 345,318 L 315,315 L 300,305 Z',
-    'SK': 'M 355,272 L 385,272 L 405,278 L 410,290 L 398,298 L 372,298 L 358,292 L 352,282 Z',
-    'HU': 'M 358,298 L 388,295 L 415,300 L 428,315 L 418,330 L 395,335 L 365,330 L 345,320 L 348,305 Z',
-    'UA': 'M 418,200 L 462,198 L 498,205 L 515,228 L 510,255 L 492,272 L 462,280 L 435,278 L 412,268 L 408,248 L 412,228 Z',
-    'MD': 'M 458,272 L 478,268 L 488,278 L 482,295 L 462,298 L 452,285 Z',
-    'RO': 'M 395,298 L 425,295 L 452,302 L 465,318 L 458,338 L 435,348 L 405,348 L 382,340 L 375,322 L 382,308 Z',
-    'SI': 'M 302,308 L 318,305 L 328,315 L 322,325 L 305,325 L 298,318 Z',
-    'HR': 'M 315,322 L 338,318 L 358,325 L 365,342 L 355,358 L 335,362 L 315,352 L 305,338 L 308,328 Z',
-    'BA': 'M 332,345 L 355,340 L 372,348 L 368,368 L 348,378 L 328,372 L 318,360 L 322,348 Z',
-    'RS': 'M 358,325 L 385,322 L 408,328 L 415,348 L 405,365 L 382,372 L 358,368 L 345,355 L 348,338 Z',
-    'ME': 'M 345,368 L 362,365 L 370,375 L 362,385 L 345,385 L 338,378 Z',
-    'XK': 'M 368,355 L 385,352 L 392,362 L 385,372 L 368,372 L 362,362 Z',
-    'MK': 'M 378,372 L 398,368 L 408,378 L 402,392 L 382,395 L 372,385 Z',
-    'AL': 'M 345,385 L 362,382 L 372,392 L 368,410 L 350,415 L 338,405 L 338,392 Z',
-    'BG': 'M 405,335 L 435,332 L 458,342 L 462,362 L 445,378 L 415,382 L 392,375 L 385,358 L 392,342 Z',
-    'GR': 'M 385,388 L 408,382 L 428,392 L 435,412 L 425,432 L 405,438 L 385,428 L 378,410 Z M 408,440 L 418,438 L 422,448 L 415,455 L 405,450 Z M 395,448 L 405,448 L 405,458 L 395,460 L 390,453 Z',
-    'IT': 'M 272,295 L 298,288 L 312,302 L 312,328 L 298,355 L 280,378 L 265,395 L 252,388 L 248,368 L 258,342 L 262,315 Z M 258,400 L 272,392 L 278,405 L 270,415 L 256,412 Z',
-    'MT': 'M 292,440 L 300,438 L 302,445 L 296,448 L 290,444 Z',
-    'CY': 'M 478,415 L 498,412 L 508,420 L 502,430 L 482,432 L 472,424 Z',
-    'TR': 'M 440,375 L 478,368 L 515,372 L 535,388 L 528,408 L 505,420 L 472,420 L 445,410 L 432,395 L 435,382 Z'
-};
-
-const EU_MAP_LABEL_POS = {
-    'PT': [118, 345],  'ES': [195, 340],  'FR': [218, 328],
-    'IE': [122, 242],  'GB': [158, 225],  'NL': [252, 218],
-    'BE': [254, 244],  'LU': [274, 258],  'DE': [298, 248],
-    'CH': [286, 278],  'AT': [332, 304],  'CZ': [340, 282],
-    'SK': [380, 285],  'HU': [385, 316],  'PL': [362, 245],
-    'NO': [290, 95],   'SE': [328, 118],  'FI': [398, 108],
-    'DK': [290, 192],  'EE': [394, 168],  'LV': [392, 190],
-    'LT': [388, 212],  'BY': [420, 232],  'UA': [460, 238],
-    'MD': [470, 282],  'RO': [420, 322],  'SI': [308, 316],
-    'HR': [330, 342],  'BA': [344, 360],  'RS': [382, 346],
-    'ME': [354, 378],  'XK': [378, 362],  'MK': [390, 382],
-    'AL': [352, 400],  'BG': [425, 356],  'GR': [408, 415],
-    'IT': [278, 348],  'MT': [294, 442],  'CY': [490, 422],
-    'TR': [484, 396]
+const EU_MAP_COUNTRY_NAMES = {
+    'AT': 'Austria',        'BG': 'Bulgaria',       'HR': 'Croatia',
+    'CZ': 'Czech Republic', 'DE_LU': 'Germany',     'GR': 'Greece',
+    'HU': 'Hungary',        'IT': 'Italy',           'RO': 'Romania',
+    'RS': 'Serbia',         'SK': 'Slovakia',        'SI': 'Slovenia',
+    'AL': 'Albania',        'MK': 'N. Macedonia',    'ME': 'Montenegro',
+    'BA': 'Bosnia',         'TR': 'Turkey',          'CH': 'Switzerland',
+    'XK': 'Kosovo'
 };
 
 let euMapInitialized = false;
@@ -7087,51 +7017,27 @@ function euMapGetLatestDate() {
     const sorted = Array.from(allDates).sort();
     for (let i = sorted.length - 1; i >= 0; i--) {
         const d = sorted[i];
-        let hasData = false;
-        for (const [key, cData] of Object.entries(EU_MAP_CODE_TO_DATA)) {
-            const entry = historicalData[cData]?.[d];
-            if (entry && entry.average_price && entry.average_price > 0) {
-                hasData = true;
-                break;
-            }
+        for (const dataKey of Object.keys(EU_MAP_DATA_TO_ISO3)) {
+            const entry = historicalData[dataKey]?.[d];
+            if (entry && entry.average_price && entry.average_price > 0) return d;
         }
-        if (hasData) return d;
     }
     return sorted[sorted.length - 1] || null;
+}
+
+function euMapSetLatest() {
+    const latest = euMapGetLatestDate();
+    if (latest) document.getElementById('eumap_date').value = latest;
+    renderEUMap();
 }
 
 function initEUMap() {
     if (!euMapInitialized) {
         const latest = euMapGetLatestDate();
-        if (latest) {
-            document.getElementById('eumap_date').value = latest;
-        }
+        if (latest) document.getElementById('eumap_date').value = latest;
         euMapInitialized = true;
     }
     renderEUMap();
-}
-
-function euMapSetLatest() {
-    const latest = euMapGetLatestDate();
-    if (latest) {
-        document.getElementById('eumap_date').value = latest;
-    }
-    renderEUMap();
-}
-
-function euMapPriceColor(price, minP, maxP) {
-    if (price === null || price === undefined || price <= 0) return '#e8ecf5';
-    const t = Math.max(0, Math.min(1, (price - minP) / Math.max(maxP - minP, 1)));
-    function lerp(a, b, t) { return Math.round(a + (b - a) * t); }
-    let r, g, b;
-    if (t < 0.5) {
-        const t2 = t * 2;
-        r = lerp(253, 232, t2); g = lerp(232, 132, t2); b = lerp(208, 26, t2);
-    } else {
-        const t2 = (t - 0.5) * 2;
-        r = lerp(232, 107, t2); g = lerp(132, 30, t2); b = lerp(26, 0, t2);
-    }
-    return `rgb(${r},${g},${b})`;
 }
 
 function renderEUMap() {
@@ -7139,1039 +7045,271 @@ function renderEUMap() {
     const selectedDate = dateInput ? dateInput.value : null;
     if (!selectedDate) return;
 
+    // Update date badge
     const [yr, mo, dy] = selectedDate.split('-');
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    document.getElementById('eumap_date_label').textContent = `${dy} ${months[parseInt(mo)-1]} ${yr} — Day-Ahead Spot Prices`;
+    document.getElementById('eumap_date_label').textContent =
+        `${dy} ${months[parseInt(mo)-1]} ${yr} \u2014 Day-Ahead Spot Prices`;
 
-    const priceMap = {};
-    for (const [svgCode, dataKey] of Object.entries(EU_MAP_CODE_TO_DATA)) {
+    // Build arrays for Plotly
+    const locations = [];   // ISO-3
+    const z = [];           // prices
+    const text = [];        // hover text
+    const customdata = [];  // data key for click handling
+
+    for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+        if (iso3 === 'XKX') continue; // Skip Kosovo (not in Natural Earth)
         const entry = historicalData?.[dataKey]?.[selectedDate];
-        const price = entry?.average_price;
-        priceMap[svgCode] = (price && price > 0) ? price : null;
+        const price = (entry && entry.average_price && entry.average_price > 0)
+            ? entry.average_price : null;
+        const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
+
+        locations.push(iso3);
+        z.push(price !== null ? price : -1);  // -1 = no data sentinel
+        text.push(price !== null
+            ? `<b>${name}</b><br>${price.toFixed(2)} \u20ac/MWh`
+            : `<b>${name}</b><br>No data`);
+        customdata.push(dataKey);
     }
 
-    const validPrices = Object.values(priceMap).filter(p => p !== null);
-    const minP = validPrices.length ? Math.min(...validPrices) : 0;
+    const validPrices = z.filter(v => v > 0);
+    const minP = validPrices.length ? Math.min(...validPrices) : 50;
     const maxP = validPrices.length ? Math.max(...validPrices) : 300;
 
-    const W = 560, H = 490;
-    let svgPaths = '', svgLabels = '';
+    // Split into two traces: with data (colored) and no-data (grey)
+    const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
+    const noDataLoc  = [], noDataText = [], noDataCustom = [];
 
-    for (const code of Object.keys(EU_SVG_PATHS)) {
-        const path = EU_SVG_PATHS[code];
-        const price = priceMap[code] ?? null;
-        const fill = euMapPriceColor(price, minP, maxP);
-        const label = EU_MAP_COUNTRY_LABELS[code] || code;
-        const labelPos = EU_MAP_LABEL_POS[code];
-        const titleText = `${label}: ${price !== null ? price.toFixed(1) + ' €/MWh' : 'No data'}`;
-
-        svgPaths += `<path id="eumap_path_${code}" d="${path}" fill="${fill}" stroke="#ffffff" stroke-width="1.2" style="cursor:pointer; transition: opacity 0.15s;"><title>${titleText}</title></path>\n`;
-
-        if (labelPos) {
-            const [lx, ly] = labelPos;
-            const priceLine = price !== null ? `${price.toFixed(1)} €` : 'No data';
-            svgLabels += `<text x="${lx}" y="${ly - 6}" text-anchor="middle" font-size="7.5" font-weight="700" fill="${price !== null ? '#ffffff' : '#8899bb'}" stroke="rgba(0,0,0,0.5)" stroke-width="2.5" stroke-linejoin="round">${label}</text>
-<text x="${lx}" y="${ly + 5}" text-anchor="middle" font-size="7" font-weight="600" fill="${price !== null ? '#ffffff' : '#8899bb'}" stroke="rgba(0,0,0,0.5)" stroke-width="2" stroke-linejoin="round">${priceLine}</text>\n`;
-        }
-    }
-
-    document.getElementById('eumap_container').innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#dde8f5" rx="10"/>${svgPaths}${svgLabels}</svg>`;
-    
-    document.querySelectorAll('[id^="eumap_path_"]').forEach(el => {
-        el.addEventListener('mouseenter', function() { this.style.opacity = '0.75'; });
-        el.addEventListener('mouseleave', function() { this.style.opacity = '1'; });
-    });
-
-    renderEUMapLegend(minP, maxP);
-    renderEUMapTable(priceMap, minP, maxP);
-}
-
-function renderEUMapLegend(minP, maxP) {
-    const legendEl = document.getElementById('eumap_legend');
-    let html = '';
-    for (let i = 0; i < 20; i++) {
-        const t = i / 19;
-        const price = minP + t * (maxP - minP);
-        html += `<div style="width:18px;height:16px;background:${euMapPriceColor(price, minP, maxP)};display:inline-block;"></div>`;
-    }
-    legendEl.innerHTML = html;
-    document.getElementById('eumap_leg_min').textContent = `${minP.toFixed(0)} €`;
-    document.getElementById('eumap_leg_max').textContent = `${maxP.toFixed(0)} €`;
-}
-
-function renderEUMapTable(priceMap, minP, maxP) {
-    const withData = [], noData = [];
-    for (const [svgCode, dataKey] of Object.entries(EU_MAP_CODE_TO_DATA)) {
-        const price = priceMap[svgCode];
-        const label = EU_MAP_COUNTRY_LABELS[svgCode] || svgCode;
-        if (price !== null) withData.push({ label, price });
-        else noData.push({ label, price: null });
-    }
-    withData.sort((a, b) => b.price - a.price);
-    noData.sort((a, b) => a.label.localeCompare(b.label));
-
-    let html = '<table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#f8fafc;"><th style="padding:7px 10px;text-align:left;border-bottom:2px solid #e2e8f0;">Country</th><th style="padding:7px 10px;text-align:right;border-bottom:2px solid #e2e8f0;">€/MWh</th></tr></thead><tbody>';
-    [...withData, ...noData].forEach(row => {
-        const dot = row.price !== null ? euMapPriceColor(row.price, minP, maxP) : '#cbd5e1';
-        html += `<tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 10px;display:flex;align-items:center;gap:7px;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${dot};"></span>${row.label}</td><td style="padding:6px 10px;text-align:right;font-weight:700;">${row.price !== null ? row.price.toFixed(2) : '<span style="color:#94a3b8;font-style:italic;">No data</span>'}</td></tr>`;
-    });
-    document.getElementById('eumap_table_container').innerHTML = html + '</tbody></table>';
-}
-
-            document.addEventListener("DOMContentLoaded", function() {
-                const today = new Date();
-                const start = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
-                const day2 = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
-                const end = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000);
-                
-                const formatD = (d) => {
-                    const y = d.getFullYear();
-                    const m = String(d.getMonth() + 1).padStart(2, '0');
-                    const day = String(d.getDate()).padStart(2, '0');
-                    return `${y}-${m}-${day}`;
-                };
-                
-                // Set Forecast Residuals default pickers
-                document.getElementById("res_date_1").value = formatD(start);
-                document.getElementById("res_date_2").value = formatD(day2);
-                document.getElementById("res_date_3").value = formatD(end);
-                // Date 4 & 5 remain empty by default
-                
-                // Set Generation Outages default pickers
-                document.getElementById("outages_start_date").value = formatD(start);
-                document.getElementById("outages_end_date").value = formatD(end);
-                
-                document.getElementById("analogue_date").value = formatD(start);
-                document.getElementById("analogue_date").addEventListener("change", () => applyOptimizedWeights());
-                
-                // Start asynchronous data fetch
-                initDashboardData();
-            });
-
-
-// ============================================================
-// CABLE AUCTIONS TAB — BIDDING OPTIMIZER
-// ============================================================
-
-let selectedAuctionCorridor = "";
-
-function getAuctionCorridorsList() {
-    if (allCorridorsData && allCorridorsData.length > 0) {
-        return allCorridorsData;
-    }
-    return [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
-}
-
-function initAuctionTab() {
-    // Populate country selector in auction panel
-    const countrySel = document.getElementById('auction_country_filter');
-    if (countrySel) {
-        const sourceCorrs = getAuctionCorridorsList();
-        const countries = new Set();
-        sourceCorrs.forEach(cCode => {
-            if (cCode) {
-                cCode.split('-').forEach(c => countries.add(c.trim()));
-            }
-        });
-        const sortedCountries = [...countries].sort();
-        countrySel.innerHTML = '<option value="ALL">All Countries</option>' + 
-            sortedCountries.map(c => `<option value="${c}">${c}</option>`).join('');
-        countrySel.value = 'ALL';
-    }
-
-    // Set default product type to Monthly
-    const prodSel = document.getElementById('auction_product_type');
-    if (prodSel) prodSel.value = 'Monthly';
-
-    // Set default selected corridor if not set
-    const corridors = getAuctionCorridorsList();
-    if (corridors.length > 0 && !selectedAuctionCorridor) {
-        selectedAuctionCorridor = corridors[0];
-    }
-
-    onAuctionCountryFilterChange();
-    onAuctionProductTypeChange();
-}
-
-function onAuctionCountryFilterChange() {
-    const countryFilter = document.getElementById('auction_country_filter')?.value || 'ALL';
-    const corridorsListDiv = document.getElementById('auction_corridors_list');
-    if (!corridorsListDiv) return;
-
-    const sourceCorrs = getAuctionCorridorsList();
-    const uniqueCorrs = new Set();
-    sourceCorrs.forEach(item => {
-        if (item) {
-            if (countryFilter === 'ALL' || item.split('-').includes(countryFilter)) {
-                uniqueCorrs.add(item);
-            }
-        }
-    });
-
-    const sortedCorridors = Array.from(uniqueCorrs).sort();
-    
-    // Ensure selected corridor is valid for this country filter
-    if (sortedCorridors.length > 0 && (!selectedAuctionCorridor || !sortedCorridors.includes(selectedAuctionCorridor))) {
-        selectedAuctionCorridor = sortedCorridors[0];
-    }
-
-    let cHtml = "";
-    sortedCorridors.forEach(c => {
-        const isSelected = selectedAuctionCorridor === c;
-        const bg = isSelected ? "#4338ca" : "#e0e7ff";
-        const color = isSelected ? "#ffffff" : "#4338ca";
-        const border = isSelected ? "1px solid #4338ca" : "1px solid #c7d2fe";
-        cHtml += `<span onclick="selectAuctionCorridor('${c}')" style="background:${bg};color:${color};border:${border};padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;user-select:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${c}</span>`;
-    });
-    corridorsListDiv.innerHTML = cHtml;
-
-    runAuctionOptimizer();
-}
-
-function selectAuctionCorridor(corr) {
-    selectedAuctionCorridor = corr;
-    
-    const countryFilter = document.getElementById('auction_country_filter')?.value || 'ALL';
-    const corridorsListDiv = document.getElementById('auction_corridors_list');
-    if (corridorsListDiv) {
-        const sourceCorrs = getAuctionCorridorsList();
-        const uniqueCorrs = new Set();
-        sourceCorrs.forEach(item => {
-            if (item) {
-                if (countryFilter === 'ALL' || item.split('-').includes(countryFilter)) {
-                    uniqueCorrs.add(item);
-                }
-            }
-        });
-        const sortedCorridors = Array.from(uniqueCorrs).sort();
-        let cHtml = "";
-        sortedCorridors.forEach(c => {
-            const isSelected = selectedAuctionCorridor === c;
-            const bg = isSelected ? "#4338ca" : "#e0e7ff";
-            const color = isSelected ? "#ffffff" : "#4338ca";
-            const border = isSelected ? "1px solid #4338ca" : "1px solid #c7d2fe";
-            cHtml += `<span onclick="selectAuctionCorridor('${c}')" style="background:${bg};color:${color};border:${border};padding:5px 10px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;transition:all 0.2s;user-select:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${c}</span>`;
-        });
-        corridorsListDiv.innerHTML = cHtml;
-    }
-
-    runAuctionOptimizer();
-}
-
-function onAuctionProductTypeChange() {
-    const productType = document.getElementById('auction_product_type')?.value || 'Monthly';
-    const monthSel = document.getElementById('auction_month');
-    const dateLabel = document.getElementById('auction_date_label');
-    if (!monthSel) return;
-
-    const options = [];
-    const now = new Date();
-
-    if (productType === 'Monthly') {
-        if (dateLabel) dateLabel.textContent = 'Month:';
-        const uniqueMonths = new Set();
-        (cablesLongData || []).forEach(r => {
-            if (r.product === 'Monthly' && r.start_date) {
-                const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                if (match) {
-                    const y = parseInt(match[1]);
-                    const m = parseInt(match[2]) - 1;
-                    const d = parseInt(match[3]);
-                    const timePart = r.start_date.split(' ')[1] || "00:00";
-                    const [hr, min] = timePart.split(':').map(Number);
-                    const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-                    dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-                    const val = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}`;
-                    uniqueMonths.add(val);
-                }
-            }
-        });
-        for (let i = 0; i <= 12; i++) {
-            const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-            const y = d.getFullYear();
-            const m = String(d.getMonth() + 1).padStart(2, '0');
-            uniqueMonths.add(`${y}-${m}`);
-        }
-        const sortedMonths = [...uniqueMonths].sort().reverse();
-        sortedMonths.forEach(val => {
-            const [y, m] = val.split('-');
-            const d = new Date(parseInt(y), parseInt(m) - 1, 1);
-            const label = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
-            options.push(`<option value="${val}">${label}</option>`);
-        });
-        monthSel.innerHTML = options.join('');
-
-        // Auto pick the next month
-        const nextMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        const nextMonthVal = `${nextMonthObj.getFullYear()}-${String(nextMonthObj.getMonth() + 1).padStart(2, '0')}`;
-        if (sortedMonths.includes(nextMonthVal)) {
-            monthSel.value = nextMonthVal;
-        }
-    } else {
-        if (dateLabel) dateLabel.textContent = 'Year:';
-        const currentYear = now.getFullYear();
-        const sortedYears = [];
-        for (let i = 0; i <= 2; i++) {
-            const y = currentYear + i;
-            sortedYears.push(String(y));
-            options.push(`<option value="${String(y)}">${y}</option>`);
-        }
-        monthSel.innerHTML = options.join('');
-
-        // Auto pick the next year
-        const nextYearVal = String(now.getFullYear() + 1);
-        if (sortedYears.includes(nextYearVal)) {
-            monthSel.value = nextYearVal;
-        }
-    }
-    runAuctionOptimizer();
-}
-
-let activeHistoricalPeriods = new Set();
-let historicalTogglesInitializedFor = "";
-
-function getFwdDataKey(country) {
-    if (auctionFwdData[country] && auctionFwdData[country].baseload && auctionFwdData[country].baseload.length > 0) {
-        return country;
-    }
-    const proxyMap = { 'AL': 'XK', 'XK': 'AL' };
-    const proxy = proxyMap[country];
-    if (proxy && auctionFwdData[proxy] && auctionFwdData[proxy].baseload && auctionFwdData[proxy].baseload.length > 0) {
-        return proxy;
-    }
-    return null;
-}
-
-function getHoursInPeriod(periodValue, productType) {
-    if (productType === 'Monthly') {
-        const [y, m] = periodValue.split('-').map(Number);
-        const days = new Date(y, m, 0).getDate();
-        return days * 24;
-    } else {
-        const y = parseInt(periodValue);
-        const isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
-        return isLeap ? 8784 : 8760;
-    }
-}
-
-function getForwardPrice(country, periodValue, productType) {
-    const key = getFwdDataKey(country);
-    if (!key) return null;
-    const fwdCountry = auctionFwdData[key];
-    if (!fwdCountry || !fwdCountry.baseload) return null;
-    
-    const targetStart = productType === 'Yearly' ? `${periodValue}-01-01` : `${periodValue}-01`;
-    const entry = fwdCountry.baseload.find(e => e.delivery_start === targetStart);
-    return entry ? entry.price : null;
-}
-
-function getCorridorCountries(corridor) {
-    const parts = corridor.split('-');
-    if (parts.length >= 2) return { source: parts[0], dest: parts[1] };
-    return { source: 'GR', dest: 'BG' };
-}
-
-function renderHistoricalPeriodToggles(periodValue, productType) {
-    const key = `${periodValue}_${productType}`;
-    if (historicalTogglesInitializedFor === key) return;
-    
-    historicalTogglesInitializedFor = key;
-    activeHistoricalPeriods.clear();
-    
-    const container = document.getElementById('historical_profile_toggles_container');
-    if (!container) return;
-    
-    const candidatePeriods = [];
-    
-    if (productType === 'Monthly') {
-        const [pYear, pMonth] = periodValue.split('-').map(Number);
-        
-        // 1. Preceding month
-        let precYear = pYear;
-        let precMonth = pMonth - 1;
-        if (precMonth === 0) {
-            precMonth = 12;
-            precYear = pYear - 1;
-        }
-        const precKey = `${precYear}-${String(precMonth).padStart(2, '0')}`;
-        candidatePeriods.push({ key: precKey, label: `Preceding Month (${precKey})`, defaultActive: true });
-        
-        // 2. Same month of previous years (up to 5 years ago)
-        for (let yOffset = 1; yOffset <= 5; yOffset++) {
-            const prevYear = pYear - yOffset;
-            const key = `${prevYear}-${String(pMonth).padStart(2, '0')}`;
-            if (prevYear >= 2021) {
-                candidatePeriods.push({
-                    key: key,
-                    label: `${yOffset} Yr Ago (${key})`,
-                    defaultActive: yOffset === 1
-                });
-            }
-        }
-    } else {
-        const pYear = parseInt(periodValue);
-        for (let yOffset = 1; yOffset <= 5; yOffset++) {
-            const prevYear = pYear - yOffset;
-            if (prevYear >= 2021) {
-                candidatePeriods.push({
-                    key: String(prevYear),
-                    label: `${yOffset} Yr Ago (${prevYear})`,
-                    defaultActive: yOffset === 1
-                });
-            }
-        }
-    }
-    
-    // Initialize default active set
-    candidatePeriods.forEach(p => {
-        if (p.defaultActive) activeHistoricalPeriods.add(p.key);
-    });
-    
-    // Build pills HTML
-    let html = `<div style="font-size:11px; font-weight:700; color:#475569; margin-bottom:6px;">Select Historical Profiles:</div>`;
-    html += `<div style="display:flex; flex-wrap:wrap; gap:6px;">`;
-    candidatePeriods.forEach(p => {
-        const isActive = activeHistoricalPeriods.has(p.key);
-        const bg = isActive ? "#312e81" : "#f1f5f9";
-        const color = isActive ? "#ffffff" : "#475569";
-        const border = isActive ? "1px solid #312e81" : "1px solid #cbd5e1";
-        
-        html += `<span onclick="toggleHistoricalPeriod('${p.key}')" id="toggle_hist_${p.key}" style="background:${bg}; color:${color}; border:${border}; padding:4px 8px; border-radius:12px; font-size:11px; font-weight:600; cursor:pointer; user-select:none; transition:all 0.15s;">${p.label}</span>`;
-    });
-    html += `</div>`;
-    container.innerHTML = html;
-}
-
-function toggleHistoricalPeriod(key) {
-    const el = document.getElementById(`toggle_hist_${key}`);
-    if (!el) return;
-    
-    if (activeHistoricalPeriods.has(key)) {
-        activeHistoricalPeriods.delete(key);
-        el.style.background = "#f1f5f9";
-        el.style.color = "#475569";
-        el.style.borderColor = "#cbd5e1";
-    } else {
-        activeHistoricalPeriods.add(key);
-        el.style.background = "#312e81";
-        el.style.color = "#ffffff";
-        el.style.borderColor = "#312e81";
-    }
-    runAuctionOptimizer(true);
-}
-
-function runAuctionOptimizer(keepToggles = false) {
-    const corridor = selectedAuctionCorridor;
-    const productType = document.getElementById('auction_product_type')?.value || 'Monthly';
-    const periodValue = document.getElementById('auction_month')?.value;
-    const bidMw = parseFloat(document.getElementById('auction_mw')?.value) || 1;
-    const riskMargin = parseFloat(document.getElementById('auction_margin')?.value) || 1.0;
-    if (!corridor || !periodValue) return;
-
-    if (!keepToggles) {
-        renderHistoricalPeriodToggles(periodValue, productType);
-    }
-
-    const { source, dest } = getCorridorCountries(corridor);
-    const hoursInPeriod = getHoursInPeriod(periodValue, productType);
-
-    // Get forward prices
-    const srcFwd = getForwardPrice(source, periodValue, productType);
-    const dstFwd = getForwardPrice(dest, periodValue, productType);
-
-    const missing = [];
-    if (srcFwd === null) missing.push(`${source} Forward Price`);
-    if (dstFwd === null) missing.push(`${dest} Forward Price`);
-
-    if (missing.length > 0) {
-        document.getElementById('kpi_bid').textContent = '—';
-        document.getElementById('kpi_bid_sub').textContent = 'Data Missing';
-        document.getElementById('kpi_ev').textContent = '—';
-        document.getElementById('kpi_exposure').textContent = '—';
-        document.getElementById('kpi_exposure_sub').textContent = '—';
-        document.getElementById('kpi_liability').textContent = '—';
-        
-        document.getElementById('auction_adjustments').innerHTML = `
-            <div style="background: #fef2f2; border: 1px solid #fee2e2; border-radius: 8px; padding: 12px; margin-top: 10px; color: #991b1b; font-size: 13px;">
-                <strong>⚠️ Missing Forward Curve Data:</strong><br>
-                Unable to optimize bid because the following forward data is missing:<br>
-                <ul style="margin: 4px 0 0 16px; padding: 0;">
-                    ${missing.map(m => `<li>${m}</li>`).join('')}
-                </ul>
-            </div>
-        `;
-
-        document.getElementById('auction_spread_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:280px; border:1px dashed #e2e8f0; border-radius:8px; background:#fafafa;">⚠️ Shape chart unavailable due to missing forward curve data</div>';
-        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:180px; border:1px dashed #e2e8f0; border-radius:8px; background:#fafafa;">⚠️ Forward curve context unavailable</div>';
-        
-        renderAuctionClearingChart(corridor, periodValue, productType);
-        renderAuctionOutagesTable(corridor, periodValue, productType);
-        renderAuctionBacktestTable(corridor, periodValue, productType);
-        return;
-    }
-
-    const fwdSpread = dstFwd - srcFwd;
-
-    // Direct Spread Shaping
-    const hourlySpreadsSum = Array(24).fill(0);
-    let matchedDaysCount = 0;
-    const dataSrc = historicalData[source] || {};
-    const dataDst = historicalData[dest] || {};
-    const matchedPeriods = new Set();
-
-    Object.keys(dataSrc).forEach(dateStr => {
-        const parts = dateStr.split('-');
-        if (parts.length < 3) return;
-        const dYear = parseInt(parts[0]);
-        const dMonth = parseInt(parts[1]);
-        
-        let isMatch = false;
-        if (productType === 'Yearly') {
-            isMatch = activeHistoricalPeriods.has(String(dYear));
+    for (let i = 0; i < locations.length; i++) {
+        if (z[i] > 0) {
+            withDataLoc.push(locations[i]);
+            withDataZ.push(z[i]);
+            withDataText.push(text[i]);
+            withDataCustom.push(customdata[i]);
         } else {
-            const currentPeriodKey = `${dYear}-${String(dMonth).padStart(2, '0')}`;
-            isMatch = activeHistoricalPeriods.has(currentPeriodKey);
-        }
-
-        if (isMatch && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
-            const srcPrices = dataSrc[dateStr].prices;
-            const dstPrices = dataDst[dateStr].prices;
-            for (let h = 0; h < 24; h++) {
-                hourlySpreadsSum[h] += (dstPrices[h] - srcPrices[h]);
-            }
-            matchedDaysCount++;
-            if (productType === 'Yearly') {
-                matchedPeriods.add(parts[0]);
-            } else {
-                matchedPeriods.add(`${parts[0]}-${parts[1]}`);
-            }
-        }
-    });
-
-    // Update the subtitle with matched date range
-    const subtitleEl = document.getElementById('auction_spread_subtitle');
-    if (subtitleEl) {
-        if (matchedDaysCount > 0) {
-            const sortedPeriods = Array.from(matchedPeriods).sort();
-            subtitleEl.textContent = `Shaped forward spread based on historical profile (matched periods: ${sortedPeriods.join(', ')}). Gray = solar suppression zone.`;
-        } else {
-            subtitleEl.textContent = `Shaped forward spread. No matching historical days found.`;
+            noDataLoc.push(locations[i]);
+            noDataText.push(text[i]);
+            noDataCustom.push(customdata[i]);
         }
     }
 
-    const avgHourlySpreads = Array(24).fill(0);
-    if (matchedDaysCount > 0) {
-        for (let h = 0; h < 24; h++) {
-            avgHourlySpreads[h] = hourlySpreadsSum[h] / matchedDaysCount;
-        }
-    } else {
-        for (let h = 0; h < 24; h++) avgHourlySpreads[h] = fwdSpread;
-    }
-
-    const meanSpreadProfile = avgHourlySpreads.reduce((a, b) => a + b, 0) / 24;
-    const shapedSpreads = Array(24).fill(0);
-    const isSolarHour = [];
-
-    for (let h = 0; h < 24; h++) {
-        let scaledSpread = fwdSpread;
-        if (Math.abs(meanSpreadProfile) > 0.1) {
-            scaledSpread = fwdSpread * (avgHourlySpreads[h] / meanSpreadProfile);
-        } else {
-            scaledSpread = fwdSpread;
-        }
-        
-        const solar = (h >= 10 && h <= 15) && avgHourlySpreads[h] < 1.0;
-        isSolarHour.push(solar);
-        shapedSpreads[h] = solar ? 0 : Math.max(0, scaledSpread);
-    }
-
-    const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
-
-    // 2. Dynamic REMIT / Curtailment calculation (only using active outages for the selected period)
-    let avgCurtailmentRate = 0;
-    if (productType === 'Monthly') {
-        let monthOutages = (cableOutagesData || []).filter(r => {
-            if (r.corridor_code !== corridor) return false;
-            const parts = r.trade_date.split('-');
-            if (parts.length < 2) return false;
-            const ty = parseInt(parts[0]);
-            const tm = parseInt(parts[1]);
-            return ty === pYear && tm === pMonth;
-        });
-
-        if (monthOutages.length > 0) {
-            avgCurtailmentRate = monthOutages.reduce((s, r) => {
-                const orig = parseFloat(r.original_capacity) || 0;
-                const rem = parseFloat(r.remaining_capacity) || 0;
-                return s + (orig > 0 ? (orig - rem) / orig : 0);
-            }, 0) / hoursInPeriod;
-        }
-    } else {
-        let yearOutages = (cableOutagesData || []).filter(r => {
-            if (r.corridor_code !== corridor) return false;
-            const parts = r.trade_date.split('-');
-            if (parts.length < 1) return false;
-            const ty = parseInt(parts[0]);
-            return ty === pYear;
-        });
-
-        if (yearOutages.length > 0) {
-            avgCurtailmentRate = yearOutages.reduce((s, r) => {
-                const orig = parseFloat(r.original_capacity) || 0;
-                const rem = parseFloat(r.remaining_capacity) || 0;
-                return s + (orig > 0 ? (orig - rem) / orig : 0);
-            }, 0) / hoursInPeriod;
-        }
-    }
-    const remitDeduction = ev * avgCurtailmentRate;
-
-    // 3. Fuel Signal
-    const targetStart = productType === 'Yearly' ? `${periodValue}-01-01` : `${periodValue}-01`;
-    const ttfEntries = (auctionFwdData.ttf && auctionFwdData.ttf.spot) ? auctionFwdData.ttf.spot : (auctionFwdData.ttf || []);
-    const euaEntries = (auctionFwdData.eua && auctionFwdData.eua.spot) ? auctionFwdData.eua.spot : (auctionFwdData.eua || []);
-    const ttfEntry = Array.isArray(ttfEntries) ? ttfEntries.find(e => e.delivery_start === targetStart) : null;
-    const euaEntry = Array.isArray(euaEntries) ? euaEntries.find(e => e.delivery_start === targetStart) : null;
-    const ttfPrice = ttfEntry ? ttfEntry.price : 35.0;
-    const euaPrice = euaEntry ? euaEntry.price : 70.0;
-    
-    const gasMarginalCost = (ttfPrice / 0.52) + (euaPrice * 0.36);
-    const fuelDeduction = gasMarginalCost > srcFwd ? Math.min(ev * 0.15, (gasMarginalCost - srcFwd) * 0.05) : 0;
-
-    // 4. Expected Profit Optimization using Historical Clearing Prices
-    const historicalClearing = (cablesLongData || []).filter(r => {
-        if (r.corridor_code !== corridor) return false;
-        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
-                          (productType === 'Monthly' && r.product === 'Monthly');
-        if (!prodMatch) return false;
-
-        if (productType === 'Monthly') {
-            if (!r.start_date) return false;
-            const match = r.start_date.match(/^(\d{4})-(\d{2})-(\d{2})/);
-            if (!match) return false;
-            const y = parseInt(match[1]);
-            const m = parseInt(match[2]) - 1;
-            const d = parseInt(match[3]);
-            const timePart = r.start_date.split(' ')[1] || "00:00";
-            const [hr, min] = timePart.split(':').map(Number);
-            const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-            dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-            return (dateObj.getUTCMonth() + 1) === pMonth && r.price != null;
-        }
-        return r.price != null;
-    }).map(r => parseFloat(r.price));
-
-    let recommendedRiskMargin = riskMargin;
-    if (historicalClearing.length >= 2) {
-        let bestBid = 0.01;
-        let maxExpectedProfit = 0;
-        const step = 0.05;
-        for (let b = 0.01; b < ev; b += step) {
-            const winCount = historicalClearing.filter(p => p <= b).length;
-            const pWin = winCount / historicalClearing.length;
-            const expectedProfit = pWin * (ev - remitDeduction - fuelDeduction - b);
-            if (expectedProfit > maxExpectedProfit) {
-                maxExpectedProfit = expectedProfit;
-                bestBid = b;
-            }
-        }
-        if (bestBid > 0.01) {
-            recommendedRiskMargin = Math.max(0.1, (ev - remitDeduction - fuelDeduction - bestBid));
-        }
-    }
-
-    const finalBid = Math.max(0.01, ev - remitDeduction - fuelDeduction - recommendedRiskMargin);
-    const totalExposure = bidMw * hoursInPeriod;
-    const liability = finalBid * totalExposure;
-
-    // Update KPI cards
-    document.getElementById('kpi_bid').textContent = '€' + finalBid.toFixed(2);
-    document.getElementById('kpi_bid_sub').textContent = `/MW · ${periodValue}`;
-    document.getElementById('kpi_ev').textContent = '€' + ev.toFixed(2);
-    document.getElementById('kpi_exposure').textContent = totalExposure.toLocaleString();
-    document.getElementById('kpi_exposure_sub').textContent = `MWh (${bidMw}MW × ${hoursInPeriod}h)`;
-    document.getElementById('kpi_liability').textContent = '€' + liability.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
-
-    // Adjustments panel
-    const adjHtml = [
-        { label: 'Base E[V]', value: ev, sign: '+', color: '#059669' },
-        { label: 'REMIT Curtailment', value: remitDeduction, sign: '−', color: '#dc2626' },
-        { label: 'Fuel/Carbon Spread', value: fuelDeduction, sign: '−', color: '#dc2626' },
-        { label: 'Risk Margin', value: riskMargin, sign: '−', color: '#d97706' },
-    ].map(row => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f3f4f6;">
-            <span style="color:#374151; font-weight:500;">${row.label}</span>
-            <span style="font-weight:700; color:${row.color};">${row.sign}€${row.value.toFixed(2)} /MWh</span>
-        </div>
-    `).join('') + `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; margin-top:4px; border-top:2px solid #e5e7eb;">
-            <span style="color:#111827; font-weight:700; font-size:14px;">FINAL BID</span>
-            <span style="font-weight:700; color:#059669; font-size:18px;">€${finalBid.toFixed(2)} /MW</span>
-        </div>
-        <div style="font-size:11px; color:#9ca3af; margin-top:4px;">TTF: €${ttfPrice.toFixed(1)}/MWh · EUA: €${euaPrice.toFixed(1)}/t</div>
-    `;
-    document.getElementById('auction_adjustments').innerHTML = adjHtml;
-
-    // Spread Shape Chart
-    const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
-    const barColors = shapedSpreads.map((v, h) => isSolarHour[h] ? '#d1d5db' : (v > finalBid ? '#059669' : '#6ee7b7'));
-    Plotly.newPlot('auction_spread_chart', [
-        { type: 'bar', x: hours, y: shapedSpreads, marker: { color: barColors }, name: 'Shaped Spread' },
-        { type: 'scatter', x: hours, y: Array(24).fill(finalBid), mode: 'lines',
-          line: { color: '#4f46e5', dash: 'dash', width: 2 }, name: 'Bid Level' }
-    ], {
-        margin: { t: 10, r: 10, b: 40, l: 45 },
-        paper_bgcolor: 'white', plot_bgcolor: 'white',
-        yaxis: { title: '€/MWh', gridcolor: '#f3f4f6', tickfont: {size: 11} },
-        xaxis: { tickfont: {size: 10}, tickangle: -45 },
-        legend: { orientation: 'h', y: -0.25, font: {size: 11} },
-        showlegend: true
-    }, { responsive: true, displayModeBar: false });
-
-    renderAuctionFwdChart(source, dest, corridor, productType, periodValue);
-    renderAuctionClearingChart(corridor, periodValue, productType);
-    renderAuctionOutagesTable(corridor, periodValue, productType);
-    renderAuctionBacktestTable(corridor, periodValue, productType);
-}
-
-function renderAuctionFwdChart(source, dest, corridor, productType, periodValue) {
-    const srcKey = getFwdDataKey(source);
-    const dstKey = getFwdDataKey(dest);
-    const curveField = 'baseload'; 
-    const rawSrcData = srcKey ? (auctionFwdData[srcKey]?.[curveField] || []) : [];
-    const rawDstData = dstKey ? (auctionFwdData[dstKey]?.[curveField] || []) : [];
-    
-    // Filter to show only 1 year ahead and starting from next month/year
-    const now = new Date();
-    let startLimitStr = "";
-    if (productType === 'Yearly') {
-        const nextYear = now.getFullYear() + 1;
-        startLimitStr = `${nextYear}-01-01`;
-    } else {
-        const nextMonthObj = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-        startLimitStr = `${nextMonthObj.getFullYear()}-${String(nextMonthObj.getMonth() + 1).padStart(2, '0')}-01`;
-    }
-
-    const limitDate = new Date();
-    limitDate.setFullYear(limitDate.getFullYear() + 1);
-    const limitDateStr = limitDate.toISOString().split('T')[0];
-    
-    const srcData = rawSrcData.filter(e => e.delivery_start >= startLimitStr && e.delivery_start <= limitDateStr)
-        .sort((a, b) => a.delivery_start.localeCompare(b.delivery_start));
-    const dstData = rawDstData.filter(e => e.delivery_start >= startLimitStr && e.delivery_start <= limitDateStr)
-        .sort((a, b) => a.delivery_start.localeCompare(b.delivery_start));
-    
-    const traces = [];
-    if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + (srcKey !== source ? ` (${srcKey} proxy)` : ' Fwd'), line:{color:'#4f46e5',width:2}, marker:{size:5} });
-    if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (dstKey !== dest ? ` (${dstKey} proxy)` : ' Fwd'), line:{color:'#f97316',width:2,dash:'dot'}, marker:{size:5} });
-    
-    if (traces.length === 0) {
-        document.getElementById('auction_fwd_chart').innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#9ca3af; font-size:13px; min-height:100px;">No forward curves available</div>';
-        return;
-    }
-    Plotly.newPlot('auction_fwd_chart', traces, {
-        margin:{t:5,r:10,b:40,l:45},
-        paper_bgcolor:'white', plot_bgcolor:'white',
-        yaxis:{gridcolor:'#f3f4f6', tickfont:{size:10}, ticksuffix:'€'},
-        xaxis:{tickfont:{size:10}},
-        legend:{orientation:'h', y:-0.3, font:{size:10}},
-        showlegend: traces.length > 1
-    }, {responsive:true, displayModeBar:false});
-}
-
-function renderAuctionClearingChart(corridor, periodValue, productType) {
-    const historical = (cablesLongData || []).filter(r => r.corridor_code === corridor && r.price != null);
-
-    const parseDateHelper = (dateStr) => {
-        if (!dateStr) return new Date();
-        const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        if (!match) return new Date(dateStr);
-        const y = parseInt(match[1]);
-        const m = parseInt(match[2]) - 1;
-        const d = parseInt(match[3]);
-        const timePart = dateStr.split(' ')[1] || "00:00";
-        const [hr, min] = timePart.split(':').map(Number);
-        const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-        dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-        return dateObj;
+    const traceWithData = {
+        type: 'choropleth',
+        locationmode: 'ISO-3',
+        locations: withDataLoc,
+        z: withDataZ,
+        text: withDataText,
+        customdata: withDataCustom,
+        hovertemplate: '%{text}<extra></extra>',
+        colorscale: [
+            [0.0,  '#fde8d0'],
+            [0.25, '#f4b577'],
+            [0.5,  '#e8841a'],
+            [0.75, '#c4500a'],
+            [1.0,  '#6b1e00']
+        ],
+        zmin: minP,
+        zmax: maxP,
+        colorbar: {
+            title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } },
+            thickness: 14,
+            len: 0.6,
+            x: 1.01,
+            tickfont: { size: 11, family: 'Inter, sans-serif' },
+            outlinewidth: 0
+        },
+        marker: { line: { color: '#ffffff', width: 1.5 } }
     };
 
-    const now = new Date();
-    const filterStartYear = 2024;
+    const traceNoData = {
+        type: 'choropleth',
+        locationmode: 'ISO-3',
+        locations: noDataLoc,
+        z: noDataLoc.map(() => 0),
+        text: noDataText,
+        customdata: noDataCustom,
+        hovertemplate: '%{text}<extra></extra>',
+        colorscale: [[0, '#d4dce8'], [1, '#d4dce8']],
+        showscale: false,
+        zmin: 0,
+        zmax: 1,
+        marker: { line: { color: '#ffffff', width: 1.5 } }
+    };
 
-    // Deduplicate monthly records by delivery month (YYYY-MM)
-    const uniqueMonthlyMap = new Map();
-    historical.filter(r => r.product === 'Monthly').forEach(r => {
-        const dateObj = parseDateHelper(r.start_date);
-        const key = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, '0')}`;
-        // Keep the latest record if duplicate exist
-        if (!uniqueMonthlyMap.has(key) || parseDateHelper(uniqueMonthlyMap.get(key).start_date) < dateObj) {
-            uniqueMonthlyMap.set(key, r);
+    const layout = {
+        geo: {
+            scope: 'europe',
+            showland: true,
+            landcolor: '#eef2f7',
+            showocean: true,
+            oceancolor: '#c8d8ec',
+            showlakes: true,
+            lakecolor: '#c8d8ec',
+            showcountries: true,
+            countrycolor: '#ffffff',
+            showcoastlines: true,
+            coastlinecolor: '#ffffff',
+            showframe: false,
+            projection: { type: 'natural earth' },
+            lonaxis: { range: [-12, 45] },
+            lataxis: { range: [34, 72] },
+            bgcolor: 'rgba(0,0,0,0)'
+        },
+        margin: { t: 0, b: 0, l: 0, r: 0 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        hoverlabel: {
+            bgcolor: '#1e293b',
+            font: { color: '#ffffff', size: 13, family: 'Inter, sans-serif' },
+            bordercolor: '#334155'
         }
-    });
-    const monthlyRecords = Array.from(uniqueMonthlyMap.values())
-        .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
-        .filter(r => r.date.getFullYear() >= filterStartYear && r.date.getTime() <= now.getTime())
-        .sort((a, b) => a.date - b.date);
+    };
 
-    // Deduplicate yearly records by delivery year (YYYY)
-    const uniqueYearlyMap = new Map();
-    historical.filter(r => r.product === 'Yearly').forEach(r => {
-        const dateObj = parseDateHelper(r.start_date);
-        const key = String(dateObj.getUTCFullYear());
-        if (!uniqueYearlyMap.has(key) || parseDateHelper(uniqueYearlyMap.get(key).start_date) < dateObj) {
-            uniqueYearlyMap.set(key, r);
-        }
-    });
-    const yearlyRecords = Array.from(uniqueYearlyMap.values())
-        .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
-        .filter(r => r.date.getFullYear() >= filterStartYear && r.date.getFullYear() <= now.getFullYear())
-        .sort((a, b) => a.date - b.date);
+    const config = {
+        displayModeBar: false,
+        responsive: true
+    };
 
-    if (!monthlyRecords.length && !yearlyRecords.length) {
-        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;text-align:center;">No historical clearing data for this corridor.</p>';
+    Plotly.newPlot('eumap_container', [traceWithData, traceNoData], layout, config).then(gd => {
+        gd.on('plotly_click', function(data) {
+            const pt = data.points[0];
+            if (!pt || !pt.customdata) return;
+            const dataKey = pt.customdata;
+            renderEUMapCountryDetail(dataKey, selectedDate);
+        });
+    });
+}
+
+function renderEUMapCountryDetail(dataKey, date) {
+    const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
+    const entry = historicalData?.[dataKey]?.[date];
+
+    const placeholder = document.getElementById('eumap_detail_placeholder');
+    const content     = document.getElementById('eumap_detail_content');
+    placeholder.style.display = 'none';
+    content.style.display = 'block';
+
+    const [yr, mo, dy] = date.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dateStr = `${dy} ${months[parseInt(mo)-1]} ${yr}`;
+
+    if (!entry || !entry.prices || entry.prices.length === 0 ||
+        entry.prices.every(p => !p && p !== 0)) {
+        document.getElementById('eumap_detail_header').innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <span style="font-size:20px;font-weight:800;color:#1e293b;">${name}</span>
+                <span style="background:#e2e8f0;color:#64748b;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">${dataKey}</span>
+            </div>
+            <div style="font-size:12px;color:#94a3b8;">${dateStr}</div>`;
+        document.getElementById('eumap_hourly_chart').innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:8px;color:#94a3b8;">
+                <span style="font-size:32px;">📭</span>
+                <span style="font-size:13px;font-weight:600;">No hourly data available</span>
+            </div>`;
+        document.getElementById('eumap_hourly_stats').innerHTML = '';
         return;
     }
 
-    const traces = [];
-    const allDates = [];
+    const prices = entry.prices;
+    const avgP   = entry.average_price || (prices.reduce((a, b) => a + (b || 0), 0) / prices.length);
+    const maxHr  = Math.max(...prices);
+    const minHr  = Math.min(...prices);
+    const peakHr = prices.indexOf(maxHr);
+    const valHr  = prices.indexOf(minHr);
 
-    if (monthlyRecords.length > 0) {
-        const xVal = monthlyRecords.map(r => r.date.toISOString().split('T')[0]);
-        const yVal = monthlyRecords.map(r => r.price);
-        monthlyRecords.forEach(r => allDates.push(r.date));
-        traces.push({
-            type: 'scatter',
-            x: xVal,
-            y: yVal,
-            mode: 'lines+markers',
-            marker: { color: '#6366f1', size: 6 },
-            line: { color: '#6366f1', width: 2 },
-            name: 'Monthly Clearing'
-        });
+    // Color each bar by its price relative to range
+    function barColor(p) {
+        if (maxHr === minHr) return '#e8841a';
+        const t = (p - minHr) / (maxHr - minHr);
+        const r = Math.round(253 + t * (107 - 253));
+        const g = Math.round(232 + t * (30 - 232));
+        const b = Math.round(208 + t * (0 - 208));
+        return `rgb(${r},${g},${b})`;
     }
 
-    if (yearlyRecords.length > 0) {
-        const xVal = [];
-        const yVal = [];
-        yearlyRecords.forEach(r => {
-            allDates.push(r.date);
-            const startYearStr = `${r.date.getUTCFullYear()}-01-01`;
-            const endYearStr = `${r.date.getUTCFullYear()}-12-31`;
-            xVal.push(startYearStr, endYearStr);
-            yVal.push(r.price, r.price);
-        });
-        traces.push({
-            type: 'scatter',
-            x: xVal,
-            y: yVal,
-            mode: 'lines+markers',
-            marker: { color: '#ec4899', size: 6, symbol: 'square' },
-            line: { color: '#ec4899', width: 2 },
-            name: 'Yearly Clearing'
-        });
-    }
+    const colors = prices.map(p => barColor(p || 0));
 
-    const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
-    if (!isNaN(finalBid) && allDates.length > 0) {
-        const minDate = new Date(Math.min(...allDates));
-        const maxDate = new Date(Math.max(...allDates));
-        traces.push({
-            type: 'scatter',
-            x: [minDate.toISOString().split('T')[0], maxDate.toISOString().split('T')[0]],
-            y: [finalBid, finalBid],
-            mode: 'lines',
-            line: { color: '#059669', dash: 'dash', width: 2 },
-            name: 'Our Bid'
-        });
-    }
+    // Header
+    document.getElementById('eumap_detail_header').innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+            <div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-size:18px;font-weight:800;color:#1e293b;">${name}</span>
+                    <span style="background:#ede9fe;color:#6d28d9;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${dataKey}</span>
+                </div>
+                <div style="font-size:12px;color:#64748b;margin-top:2px;">${dateStr}</div>
+            </div>
+            <div style="background:linear-gradient(135deg,#4f46e5,#3b82f6);color:white;border-radius:10px;padding:8px 14px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;opacity:0.85;letter-spacing:0.5px;">AVG</div>
+                <div style="font-size:18px;font-weight:800;">${avgP.toFixed(1)} <span style="font-size:11px;">\u20ac/MWh</span></div>
+            </div>
+        </div>`;
 
-    Plotly.newPlot('auction_clearing_chart', traces, {
-        margin: { t: 5, r: 10, b: 40, l: 50 },
-        paper_bgcolor: 'white',
-        plot_bgcolor: 'white',
-        yaxis: { title: '€/MW', gridcolor: '#f3f4f6', tickfont: { size: 11 } },
-        xaxis: { type: 'date', tickfont: { size: 11 } },
-        legend: { orientation: 'h', y: -0.25, font: { size: 11 } },
-        showlegend: true
-    }, { responsive: true, displayModeBar: false });
-}
+    // Plotly bar chart
+    const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
+    Plotly.newPlot('eumap_hourly_chart', [{
+        type: 'bar',
+        x: hours,
+        y: prices,
+        marker: { color: colors, line: { color: 'rgba(0,0,0,0.08)', width: 0.5 } },
+        hovertemplate: '<b>%{x}</b><br>%{y:.2f} \u20ac/MWh<extra></extra>',
+        text: prices.map(p => p.toFixed(0)),
+        textposition: 'none'
+    }, {
+        type: 'scatter',
+        mode: 'lines',
+        x: hours,
+        y: prices,
+        line: { color: '#4f46e5', width: 2, dash: 'dot' },
+        hoverinfo: 'skip',
+        showlegend: false
+    }], {
+        margin: { t: 10, b: 50, l: 50, r: 10 },
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)',
+        xaxis: {
+            tickfont: { size: 9, family: 'Inter,sans-serif' },
+            gridcolor: '#f1f5f9',
+            tickangle: -45
+        },
+        yaxis: {
+            title: { text: '\u20ac/MWh', font: { size: 10, family: 'Inter,sans-serif' } },
+            tickfont: { size: 10, family: 'Inter,sans-serif' },
+            gridcolor: '#f1f5f9',
+            zeroline: false
+        },
+        hoverlabel: {
+            bgcolor: '#1e293b',
+            font: { color: '#ffffff', size: 12, family: 'Inter, sans-serif' },
+            bordercolor: '#334155'
+        },
+        shapes: [{
+            type: 'line',
+            x0: hours[0], x1: hours[23],
+            y0: avgP, y1: avgP,
+            line: { color: '#10b981', width: 1.5, dash: 'dash' }
+        }]
+    }, { displayModeBar: false, responsive: true });
 
-function renderAuctionOutagesTable(corridor, periodValue, productType) {
-    let outages = [];
-    if (productType === 'Monthly') {
-        const [y, m] = periodValue.split('-').map(Number);
-        outages = (cableOutagesData || []).filter(r => {
-            if (r.corridor_code !== corridor) return false;
-            const parts = r.trade_date.split('-');
-            if (parts.length < 2) return false;
-            const ty = parseInt(parts[0]);
-            const tm = parseInt(parts[1]);
-            return ty === y && tm === m;
-        });
-    } else {
-        const targetYear = parseInt(periodValue);
-        outages = (cableOutagesData || []).filter(r => {
-            if (r.corridor_code !== corridor) return false;
-            const parts = r.trade_date.split('-');
-            if (parts.length < 1) return false;
-            return parseInt(parts[0]) === targetYear;
-        });
-    }
-    const el = document.getElementById('auction_outages_table');
-    if (!outages.length) {
-        el.innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:8px 0;">No cable outages recorded for this corridor and period.</p>';
-        return;
-    }
-    const rows = outages.slice(0, 15).map(r => {
-        const orig = parseFloat(r.original_capacity) || 0;
-        const rem = parseFloat(r.remaining_capacity) || 0;
-        const reduction = orig - rem;
-        const pct = orig > 0 ? ((reduction / orig) * 100).toFixed(0) : '0';
-        return `<tr>
-            <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;color:#374151;">${r.trade_date} H${String(r.position).padStart(2,'0')}</td>
-            <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;text-align:right;">${orig.toFixed(0)} MW</td>
-            <td style="padding:8px 10px;border-bottom:1px solid #f3f4f6;text-align:right;color:#dc2626;font-weight:600;">−${reduction.toFixed(0)} MW (${pct}%)</td>
-        </tr>`;
-    }).join('');
-    el.innerHTML = `<div style="overflow-y:auto;max-height:200px;"><table style="width:100%;border-collapse:collapse;font-size:12px;">
-        <thead><tr style="background:#f8fafc;">
-            <th style="padding:8px 10px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid #e5e7eb;">Period</th>
-            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#475569;border-bottom:1px solid #e5e7eb;">Original Cap.</th>
-            <th style="padding:8px 10px;text-align:right;font-weight:600;color:#475569;border-bottom:1px solid #e5e7eb;">Reduction</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-    </table></div>`;
-}
-
-function getAuctionDeliveryPeriod(dateStr, productType) {
-    if (!dateStr) return '';
-    const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (!match) return dateStr.substring(0, 7);
-    const y = parseInt(match[1]);
-    const m = parseInt(match[2]) - 1;
-    const d = parseInt(match[3]);
-    const timePart = dateStr.split(' ')[1] || "00:00";
-    const [hr, min] = timePart.split(':').map(Number);
-    const dateObj = new Date(Date.UTC(y, m, d, hr, min));
-    dateObj.setUTCHours(dateObj.getUTCHours() + 4);
-    
-    if (productType === 'Monthly') {
-        const year = dateObj.getUTCFullYear();
-        const month = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
-        return `${year}-${month}`;
-    } else {
-        return String(dateObj.getUTCFullYear());
-    }
-}
-
-function renderAuctionBacktestTable(corridor, periodValue, productType) {
-    const { source, dest } = getCorridorCountries(corridor);
-
-    // Filter and deduplicate on delivery period directly in front-end
-    const uniqueMap = new Map();
-    (cablesLongData || []).forEach(r => {
-        if (r.corridor_code !== corridor) return;
-        const prodMatch = (productType === 'Yearly' && r.product === 'Yearly') || 
-                          (productType === 'Monthly' && r.product === 'Monthly');
-        if (!prodMatch) return;
-        if (r.price == null) return;
-        
-        const periodKey = getAuctionDeliveryPeriod(r.start_date, productType);
-        // Keep the record with the latest start_date (most recently run auction)
-        if (!uniqueMap.has(periodKey) || r.start_date.localeCompare(uniqueMap.get(periodKey).start_date) > 0) {
-            uniqueMap.set(periodKey, r);
-        }
-    });
-
-    const historicalAuctions = Array.from(uniqueMap.values());
-
-    const container = document.getElementById('auction_backtest_table_container');
-    if (!container) return;
-
-    if (!historicalAuctions.length) {
-        container.innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:10px 0;text-align:center;">No historical auctions found for backtesting.</p>';
-        return;
-    }
-
-    // Sort by delivery period descending
-    historicalAuctions.sort((a, b) => {
-        const keyA = getAuctionDeliveryPeriod(a.start_date, productType);
-        const keyB = getAuctionDeliveryPeriod(b.start_date, productType);
-        return keyB.localeCompare(keyA);
-    });
-
-    let html = `
-        <h4 style="margin-top:16px; margin-bottom:8px; font-weight: 700; color: #1e293b;">Historical Realized Margins (Backtest)</h4>
-        <div style="overflow-y:auto; max-height:220px; border:1px solid #e2e8f0; border-radius:8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-            <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:left; background: white;">
-                <thead>
-                    <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
-                        <th style="padding:8px 10px; font-weight:600; color:#475569;">Period</th>
-                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Clearing Price</th>
-                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Avg Spot Spread</th>
-                        <th style="padding:8px 10px; font-weight:600; color:#475569; text-align:right;">Net Margin</th>
-                    </tr>
-                </thead>
-                <tbody>
-    `;
-
-    historicalAuctions.forEach(auc => {
-        const periodKey = getAuctionDeliveryPeriod(auc.start_date, productType);
-        
-        // Calculate average spot spread for this period from historicalData
-        let totalSpread = 0;
-        let countHours = 0;
-        const dataSrc = historicalData[source] || {};
-        const dataDst = historicalData[dest] || {};
-
-        Object.keys(dataSrc).forEach(dateStr => {
-            if (dateStr.startsWith(periodKey)) {
-                if (dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
-                    const srcPrices = dataSrc[dateStr].prices;
-                    const dstPrices = dataDst[dateStr].prices;
-                    for (let h = 0; h < 24; h++) {
-                        if (srcPrices[h] !== undefined && dstPrices[h] !== undefined) {
-                            totalSpread += (dstPrices[h] - srcPrices[h]);
-                            countHours++;
-                        }
-                    }
-                }
-            }
-        });
-
-        const clearingPrice = parseFloat(auc.price);
-        const hasSpot = countHours > 0;
-        const avgSpread = hasSpot ? (totalSpread / countHours) : null;
-        const netMargin = hasSpot ? (avgSpread - clearingPrice) : null;
-
-        let dispPeriod = periodKey;
-        if (productType === 'Monthly') {
-            const [y, m] = periodKey.split('-');
-            const d = new Date(parseInt(y), parseInt(m) - 1, 1);
-            dispPeriod = d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
-        }
-
-        const clearingDisp = `€${clearingPrice.toFixed(2)}`;
-        const spreadDisp = hasSpot ? `€${avgSpread.toFixed(2)}` : 'N/A';
-        const marginColor = netMargin >= 0 ? '#059669' : '#dc2626';
-        const marginDisp = hasSpot ? `<span style="color:${marginColor}; font-weight:600;">€${netMargin.toFixed(2)}</span>` : 'N/A';
-
-        html += `
-            <tr style="border-bottom:1px solid #f1f5f9; hover: {background-color: #f8fafc;}">
-                <td style="padding:8px 10px; color:#475569; font-weight:500;">${dispPeriod}</td>
-                <td style="padding:8px 10px; text-align:right; color:#334155; font-weight:500;">${clearingDisp}</td>
-                <td style="padding:8px 10px; text-align:right; color:#334155;">${spreadDisp}</td>
-                <td style="padding:8px 10px; text-align:right;">${marginDisp}</td>
-            </tr>
-        `;
-    });
-
-    html += `
-                </tbody>
-            </table>
-        </div>
-    `;
-    container.innerHTML = html;
+    // Stats row
+    document.getElementById('eumap_hourly_stats').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:#16a34a;letter-spacing:0.4px;">VALLEY</div>
+                <div style="font-size:15px;font-weight:800;color:#15803d;">${minHr.toFixed(1)}</div>
+                <div style="font-size:10px;color:#4ade80;">Hr ${String(valHr).padStart(2,'0')}</div>
+            </div>
+            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:#2563eb;letter-spacing:0.4px;">AVERAGE</div>
+                <div style="font-size:15px;font-weight:800;color:#1d4ed8;">${avgP.toFixed(1)}</div>
+                <div style="font-size:10px;color:#93c5fd;">\u20ac/MWh</div>
+            </div>
+            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:#c2410c;letter-spacing:0.4px;">PEAK</div>
+                <div style="font-size:15px;font-weight:800;color:#9a3412;">${maxHr.toFixed(1)}</div>
+                <div style="font-size:10px;color:#fb923c;">Hr ${String(peakHr).padStart(2,'0')}</div>
+            </div>
+        </div>`;
 }
 
         </script>
