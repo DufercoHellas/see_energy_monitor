@@ -163,7 +163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 11:13</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-08 12:05</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6887,8 +6887,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     cableOutagesData = cabO;
                     allCorridorsData = cabAll;
 
-                    // Load auction forward curve data (non-blocking, best-effort)
-                    fetch(`data/auction_fwd.json?t=${cacheBust}`).then(r => r.json()).then(d => { auctionFwdData = d; }).catch(() => { auctionFwdData = {}; });
+                    statusEl.innerText = "Loading forward curve context...";
+                    try {
+                        auctionFwdData = await fetch(`data/auction_fwd.json?t=${cacheBust}`).then(r => r.json());
+                    } catch (errFwd) {
+                        console.warn("Could not load auction_fwd.json:", errFwd);
+                        auctionFwdData = {};
+                    }
 
                     // Initialize dropdowns & UI components
                     const countrySelect = document.getElementById("analogue_country");
@@ -7605,7 +7610,7 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
     });
     const monthlyRecords = Array.from(uniqueMonthlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
-        .filter(r => r.date.getUTCFullYear() >= filterStartYear && r.date <= now)
+        .filter(r => r.date.getFullYear() >= filterStartYear && r.date.getTime() <= now.getTime())
         .sort((a, b) => a.date - b.date);
 
     // Deduplicate yearly records by delivery year (YYYY)
@@ -7619,7 +7624,7 @@ function renderAuctionClearingChart(corridor, periodValue, productType) {
     });
     const yearlyRecords = Array.from(uniqueYearlyMap.values())
         .map(r => ({ date: parseDateHelper(r.start_date), price: parseFloat(r.price) }))
-        .filter(r => r.date.getUTCFullYear() >= filterStartYear && r.date.getUTCFullYear() <= now.getFullYear())
+        .filter(r => r.date.getFullYear() >= filterStartYear && r.date.getFullYear() <= now.getFullYear())
         .sort((a, b) => a.date - b.date);
 
     if (!monthlyRecords.length && !yearlyRecords.length) {
