@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 13:13</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 13:21</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7591,7 +7591,7 @@ function euMapGetLatestDate() {
         const d = sorted[i];
         for (const dataKey of Object.keys(EU_MAP_DATA_TO_ISO3)) {
             const entry = historicalData[dataKey]?.[d];
-            if (entry && entry.average_price && entry.average_price > 0) return d;
+            if (entry && entry.average_price != null && entry.average_price >= 0) return d;
         }
     }
     return sorted[sorted.length - 1] || null;
@@ -7681,7 +7681,7 @@ function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
         if (iso3 === 'XKX') continue;
         const entry = historicalData?.[dataKey]?.[selectedDate];
-        const price = (entry && entry.average_price && entry.average_price > 0)
+        const price = (entry && entry.average_price != null && entry.average_price >= 0)
             ? entry.average_price : null;
         const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
         const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
@@ -7758,7 +7758,7 @@ function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
     const ALL_ISO3 = { ...EU_MAP_DATA_TO_ISO3, 'FR': 'FRA', 'ES': 'ESP', 'PT': 'PRT', 'GB': 'GBR', 'IE': 'IRL', 'BE': 'BEL', 'NL': 'NLD', 'PL': 'POL', 'DK': 'DNK', 'SE': 'SWE', 'NO': 'NOR', 'FIN': 'FIN', 'EE': 'EST', 'LV': 'LVA', 'LT': 'LTU', 'UA': 'UKR', 'BY': 'BLR' };
 
     for (let i = 0; i < locations.length; i++) {
-        if (z[i] > 0 && customdata[i] !== 'TR') {
+        if (z[i] >= 0 && customdata[i] !== 'TR') {
             withDataLoc.push(locations[i]);
             withDataZ.push(z[i]);
             withDataText.push(text[i]);
@@ -7778,7 +7778,7 @@ function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
             labelLons.push(coords[1]);
             
             const entry = historicalData?.[key]?.[selectedDate];
-            const price = (entry && entry.average_price && entry.average_price > 0) ? entry.average_price : null;
+            const price = (entry && entry.average_price != null && entry.average_price >= 0) ? entry.average_price : null;
             const code = key === 'DE_LU' ? 'DE' : key;
             const symbol = key === 'TR' ? 'TL' : '€';
             const labelStr = price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\nNo data`;
