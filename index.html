@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 13:21</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 13:30</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7582,11 +7582,13 @@ let euMapInitialized = false;
 
 function euMapGetLatestDate() {
     if (!historicalData || Object.keys(historicalData).length === 0) return null;
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
     const allDates = new Set();
     for (const cData of Object.values(historicalData)) {
         Object.keys(cData).forEach(d => allDates.add(d));
     }
-    const sorted = Array.from(allDates).sort();
+    const sorted = Array.from(allDates).sort().filter(d => d <= todayStr);
     for (let i = sorted.length - 1; i >= 0; i--) {
         const d = sorted[i];
         for (const dataKey of Object.keys(EU_MAP_DATA_TO_ISO3)) {
@@ -7594,7 +7596,7 @@ function euMapGetLatestDate() {
             if (entry && entry.average_price != null && entry.average_price >= 0) return d;
         }
     }
-    return sorted[sorted.length - 1] || null;
+    return sorted.length ? sorted[sorted.length - 1] : null;
 }
 
 function euMapSetLatest() {
@@ -7696,7 +7698,7 @@ function drawPlotlyEUMap(selectedDate, geojson = cachedBiddingZonesGeoJSON) {
         customdata.push(dataKey);
     }
 
-    const validPrices = z.filter((v, idx) => v > 0);
+    const validPrices = z.filter((v, idx) => v >= 0);
     const minP = validPrices.length ? Math.min(...validPrices) : 50;
     const maxP = validPrices.length ? Math.max(...validPrices) : 300;
 
