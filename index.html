@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 11:13</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 12:06</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7626,11 +7626,21 @@ function renderEUMap() {
     if (!cachedBiddingZonesGeoJSON) {
         fetch('data/bidding_zones.geojson')
             .then(res => {
-                if (!res.ok) throw new Error("Data copy not found, fetching fallback");
+                if (!res.ok) throw new Error("1");
                 return res.json();
             })
-            .catch(() => fetch('bidding_zones.geojson').then(res => res.json()))
-            .catch(() => fetch('https://raw.githubusercontent.com/DufercoHellas/see_energy_monitor/main/data/bidding_zones.geojson').then(res => res.json()))
+            .catch(() => {
+                return fetch('bidding_zones.geojson').then(res => {
+                    if (!res.ok) throw new Error("2");
+                    return res.json();
+                });
+            })
+            .catch(() => {
+                return fetch('https://raw.githubusercontent.com/DufercoHellas/see_energy_monitor/main/data/bidding_zones.geojson').then(res => {
+                    if (!res.ok) throw new Error("3");
+                    return res.json();
+                });
+            })
             .then(geojson => {
                 cachedBiddingZonesGeoJSON = geojson;
                 drawPlotlyEUMap(selectedDate);
