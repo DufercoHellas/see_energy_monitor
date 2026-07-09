@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 15:22</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 15:30</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7740,14 +7740,9 @@ function drawPlotlyEUMap(selectedDate) {
         colorscale: [[0,'#e2e8f0'],[1,'#e2e8f0']], showscale: false, zmin: 0, zmax: 1,
         marker: { line: { color: '#cbd5e1', width: 1.0 } }
     };
-    const traceLabelsOutline = {
-        type: 'scattergeo', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 15, weight: '900', color: '#ffffff' },
-        hoverinfo: 'skip'
-    };
     const traceLabels = {
         type: 'scattergeo', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 12, weight: '900', color: '#0f172a' },
+        textfont: { family: 'Inter, Arial, sans-serif', size: 13, weight: '800', color: '#0f172a' },
         hoverinfo: 'skip'
     };
     const layout = {
@@ -7767,7 +7762,7 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabelsOutline, traceLabels], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (pt && pt.customdata) renderEUMapCountryDetail(pt.customdata, selectedDate);
