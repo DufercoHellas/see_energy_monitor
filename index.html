@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 14:22</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 14:30</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7624,37 +7624,49 @@ function renderEUMap() {
     document.getElementById('eumap_date_label').textContent =
         `${dy} ${months[parseInt(mo)-1]} ${yr} \u2014 Day-Ahead Spot Prices`;
 
-    drawPlotlyEUMap(selectedDate);
+    if (!window.__biddingZonesGeoJSON) {
+        fetch('data/bidding_zones.geojson')
+            .then(r => { if (!r.ok) throw Error(); return r.json(); })
+            .then(gj => { window.__biddingZonesGeoJSON = gj; drawPlotlyEUMap(selectedDate, gj); })
+            .catch(() => drawPlotlyEUMap(selectedDate, null));
+    } else {
+        drawPlotlyEUMap(selectedDate, window.__biddingZonesGeoJSON);
+    }
 }
 
-function drawPlotlyEUMap(selectedDate) {
-    const iso3Groups = {};
+function getGeoJSONZoneName(dataKey) {
+    const zoneMap = {
+        'DK1': 'DK-DK1', 'DK2': 'DK-DK2',
+        'SE1': 'SE-SE1', 'SE2': 'SE-SE2', 'SE3': 'SE-SE3', 'SE4': 'SE-SE4',
+        'NO1': 'NO-NO1', 'NO2': 'NO-NO2', 'NO3': 'NO-NO3', 'NO4': 'NO-NO4', 'NO5': 'NO-NO5',
+        'IT': 'IT-NO', 'DE_LU': 'DE'
+    };
+    return zoneMap[dataKey] || dataKey;
+}
+
+function drawPlotlyEUMap(selectedDate, geojson) {
+    const useGeoJSON = !!geojson;
+    const locations = [], z = [], text = [], customdata = [];
+
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
         if (iso3 === 'XKX') continue;
-        if (!iso3Groups[iso3]) iso3Groups[iso3] = [];
-        iso3Groups[iso3].push(dataKey);
-    }
+        const entry = historicalData?.[dataKey]?.[selectedDate];
+        const price = (entry && entry.average_price != null && entry.average_price > 0)
+            ? entry.average_price : null;
+        const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
+        const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
 
-    const locations = [], z = [], text = [], customdata = [];
-    for (const [iso3, dataKeys] of Object.entries(iso3Groups)) {
-        let sum = 0, count = 0, name = iso3, repKey = dataKeys[0];
-        for (const dk of dataKeys) {
-            const entry = historicalData?.[dk]?.[selectedDate];
-            const price = (entry && entry.average_price != null && entry.average_price >= 0) ? entry.average_price : null;
-            if (price !== null) { sum += price; count++; }
-            if (EU_MAP_COUNTRY_NAMES[dk]) name = EU_MAP_COUNTRY_NAMES[dk];
-        }
-        const avg = count > 0 ? sum / count : null;
-        const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
-        locations.push(iso3);
-        if (avg !== null && repKey !== 'TR') {
-            z.push(avg);
-            text.push(`<b>${name}</b><br>${avg.toFixed(2)} ${symbol}/MWh`);
+        const locId = useGeoJSON ? getGeoJSONZoneName(dataKey) : iso3;
+        locations.push(locId);
+
+        if (price !== null && dataKey !== 'TR') {
+            z.push(price);
+            text.push(`<b>${name}</b><br>${price.toFixed(2)} ${symbol}/MWh`);
         } else {
             z.push(-1);
             text.push(`<b>${name}</b><br>No data`);
         }
-        customdata.push(repKey);
+        customdata.push(dataKey);
     }
 
     const validPrices = z.filter(v => v > 0);
@@ -7664,7 +7676,7 @@ function drawPlotlyEUMap(selectedDate) {
     const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
     const noDataLoc = [], noDataText = [], noDataCustom = [];
     for (let i = 0; i < locations.length; i++) {
-        if (z[i] >= 0 && customdata[i] !== 'TR') {
+        if (z[i] > 0 && customdata[i] !== 'TR') {
             withDataLoc.push(locations[i]); withDataZ.push(z[i]); withDataText.push(text[i]); withDataCustom.push(customdata[i]);
         } else {
             noDataLoc.push(locations[i]); noDataText.push(text[i]); noDataCustom.push(customdata[i]);
@@ -7682,24 +7694,33 @@ function drawPlotlyEUMap(selectedDate) {
         'IRL': [53.4129, -8.2439], 'BEL': [50.5039, 4.4699], 'NLD': [52.1326, 5.2913],
         'POL': [51.9194, 19.1451], 'DNK': [56.2639, 9.5018], 'SWE': [60.1282, 18.6435],
         'NOR': [60.472, 8.4689], 'FIN': [61.9241, 25.7482], 'EST': [58.5953, 25.0136],
-        'LVA': [56.8796, 24.6032], 'LTU': [55.1694, 23.8813]
+        'LVA': [56.8796, 24.6032], 'LTU': [55.1694, 23.8813],
+        'DK1': [56.2, 8.8], 'DK2': [55.4, 11.7],
+        'NO1': [60.1, 10.2], 'NO2': [58.8, 7.2], 'NO3': [62.4, 10.4], 'NO4': [67.8, 15.2], 'NO5': [60.9, 6.2],
+        'SE1': [66.2, 19.5], 'SE2': [63.3, 16.2], 'SE3': [59.4, 14.2], 'SE4': [56.5, 14.2]
     };
 
     const labelLats = [], labelLons = [], labelTexts = [];
-    for (const [key, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        const ck = EU_LABEL_COORDS[key] ? key : (EU_LABEL_COORDS[iso3] ? iso3 : null);
-        if (!ck || iso3Groups[iso3]?.length > 1) continue;
+    for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+        if (iso3 === 'XKX') continue;
+        const entry = historicalData?.[dataKey]?.[selectedDate];
+        const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
+        const code = dataKey === 'DE_LU' ? 'DE' : dataKey;
+        const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
+        const ck = EU_LABEL_COORDS[dataKey] ? dataKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
+        if (!ck) continue;
+        const isSubZone = dataKey.length === 3 && /^\d$/.test(dataKey[2]);
+        if (!useGeoJSON && isSubZone) continue;
         const coords = EU_LABEL_COORDS[ck];
         labelLats.push(coords[0]); labelLons.push(coords[1]);
-        const entry = historicalData?.[key]?.[selectedDate];
-        const price = (entry && entry.average_price != null && entry.average_price >= 0) ? entry.average_price : null;
-        const code = key === 'DE_LU' ? 'DE' : key;
-        const symbol = key === 'TR' ? 'TL' : '\u20ac';
-        labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\nNo data`);
+        labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
     }
 
     const traceWithData = {
-        type: 'choropleth', locationmode: 'ISO-3',
+        type: 'choropleth',
+        geojson: useGeoJSON ? geojson : undefined,
+        featureidkey: useGeoJSON ? 'properties.zoneName' : undefined,
+        locationmode: useGeoJSON ? undefined : 'ISO-3',
         locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
         hovertemplate: '%{text}<extra></extra>',
         colorscale: [[0.0,'#fee5d9'],[0.25,'#fcae91'],[0.5,'#fb6a4a'],[0.75,'#de2d26'],[1.0,'#a50f15']],
@@ -7708,7 +7729,10 @@ function drawPlotlyEUMap(selectedDate) {
         marker: { line: { color: '#0f172a', width: 1.0 } }
     };
     const traceNoData = {
-        type: 'choropleth', locationmode: 'ISO-3',
+        type: 'choropleth',
+        geojson: useGeoJSON ? geojson : undefined,
+        featureidkey: useGeoJSON ? 'properties.zoneName' : undefined,
+        locationmode: useGeoJSON ? undefined : 'ISO-3',
         locations: noDataLoc, z: noDataLoc.map(() => 0), text: noDataText, customdata: noDataCustom,
         hovertemplate: '%{text}<extra></extra>',
         colorscale: [[0,'#e2e8f0'],[1,'#e2e8f0']], showscale: false, zmin: 0, zmax: 1,
@@ -7721,10 +7745,12 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const layout = {
         geo: {
-            scope: 'europe', showland: true, landcolor: '#f8fafc',
+            scope: 'europe',
+            fitbounds: useGeoJSON ? 'locations' : false,
+            showland: true, landcolor: '#f8fafc',
             showocean: true, oceancolor: '#cbd5e1',
             showlakes: true, lakecolor: '#cbd5e1',
-            showcountries: true, showcoastlines: true, coastlinecolor: '#94a3b8',
+            showcountries: !useGeoJSON, showcoastlines: true, coastlinecolor: '#94a3b8',
             showframe: false,
             projection: { type: 'natural earth' },
             lonaxis: { range: [-12, 42] }, lataxis: { range: [35, 70] },
