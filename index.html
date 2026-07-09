@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 14:54</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 15:05</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -7648,41 +7648,6 @@ function drawPlotlyEUMap(selectedDate, geojson) {
     const useGeoJSON = !!geojson;
     const locations = [], z = [], text = [], customdata = [];
 
-    for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        if (iso3 === 'XKX') continue;
-        const entry = historicalData?.[dataKey]?.[selectedDate];
-        const price = (entry && entry.average_price != null && entry.average_price > 0)
-            ? entry.average_price : null;
-        const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
-        const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
-
-        const locId = useGeoJSON ? getGeoJSONZoneName(dataKey) : iso3;
-        locations.push(locId);
-
-        if (price !== null && dataKey !== 'TR') {
-            z.push(price);
-            text.push(`<b>${name}</b><br>${price.toFixed(2)} ${symbol}/MWh`);
-        } else {
-            z.push(-1);
-            text.push(`<b>${name}</b><br>No data`);
-        }
-        customdata.push(dataKey);
-    }
-
-    const validPrices = z.filter(v => v > 0);
-    const minP = validPrices.length ? Math.min(...validPrices) : 50;
-    const maxP = validPrices.length ? Math.max(...validPrices) : 300;
-
-    const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
-    const noDataLoc = [], noDataText = [], noDataCustom = [];
-    for (let i = 0; i < locations.length; i++) {
-        if (z[i] > 0 && customdata[i] !== 'TR') {
-            withDataLoc.push(locations[i]); withDataZ.push(z[i]); withDataText.push(text[i]); withDataCustom.push(customdata[i]);
-        } else {
-            noDataLoc.push(locations[i]); noDataText.push(text[i]); noDataCustom.push(customdata[i]);
-        }
-    }
-
     const EU_LABEL_COORDS = {
         'AUT': [47.5162, 14.5501], 'BGR': [42.7339, 25.4858], 'HRV': [45.1, 15.2],
         'CZE': [49.8175, 15.473], 'DEU': [51.1657, 10.4515], 'GRC': [39.0742, 21.8243],
@@ -7701,19 +7666,79 @@ function drawPlotlyEUMap(selectedDate, geojson) {
     };
 
     const labelLats = [], labelLons = [], labelTexts = [];
-    for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        if (iso3 === 'XKX') continue;
-        const entry = historicalData?.[dataKey]?.[selectedDate];
-        const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
-        const code = dataKey === 'DE_LU' ? 'DE' : dataKey;
-        const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
-        const ck = EU_LABEL_COORDS[dataKey] ? dataKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
-        if (!ck) continue;
-        const isSubZone = dataKey.length === 3 && /^\d$/.test(dataKey[2]);
-        if (!useGeoJSON && isSubZone) continue;
-        const coords = EU_LABEL_COORDS[ck];
-        labelLats.push(coords[0]); labelLons.push(coords[1]);
-        labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
+
+    if (useGeoJSON) {
+        // GeoJSON path: each dataKey maps to its own GeoJSON feature
+        for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+            if (iso3 === 'XKX') continue;
+            const entry = historicalData?.[dataKey]?.[selectedDate];
+            const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
+            const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
+            const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
+            const locId = getGeoJSONZoneName(dataKey);
+            locations.push(locId);
+            if (price !== null && dataKey !== 'TR') { z.push(price); text.push(`<b>${name}</b><br>${price.toFixed(2)} ${symbol}/MWh`); }
+            else { z.push(-1); text.push(`<b>${name}</b><br>No data`); }
+            customdata.push(dataKey);
+            // Label for this dataKey
+            const code = dataKey === 'DE_LU' ? 'DE' : dataKey;
+            const ck = EU_LABEL_COORDS[dataKey] ? dataKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
+            if (ck) {
+                const coords = EU_LABEL_COORDS[ck];
+                labelLats.push(coords[0]); labelLons.push(coords[1]);
+                labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
+            }
+        }
+    } else {
+        // ISO-3 path: group sub-zones by country, average their prices
+        const groups = {};
+        for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+            if (iso3 === 'XKX') continue;
+            if (!groups[iso3]) groups[iso3] = [];
+            groups[iso3].push(dataKey);
+        }
+        for (const [iso3, dataKeys] of Object.entries(groups)) {
+            let sum = 0, count = 0, name = iso3, repKey = dataKeys[0];
+            for (const dk of dataKeys) {
+                const entry = historicalData?.[dk]?.[selectedDate];
+                const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
+                if (price !== null) { sum += price; count++; }
+                if (EU_MAP_COUNTRY_NAMES[dk]) name = EU_MAP_COUNTRY_NAMES[dk];
+            }
+            const avg = count > 0 ? sum / count : null;
+            const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
+            locations.push(iso3);
+            if (avg !== null && repKey !== 'TR') { z.push(avg); text.push(`<b>${name}</b><br>${avg.toFixed(2)} ${symbol}/MWh`); }
+            else { z.push(-1); text.push(`<b>${name}</b><br>No data`); }
+            customdata.push(repKey);
+        }
+        // Labels: one per ISO-3 country, no sub-zone labels
+        for (const [iso3, dataKeys] of Object.entries(groups)) {
+            const repKey = dataKeys[0];
+            const entry = historicalData?.[repKey]?.[selectedDate];
+            const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
+            const code = repKey === 'DE_LU' ? 'DE' : repKey;
+            const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
+            const ck = EU_LABEL_COORDS[repKey] ? repKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
+            if (!ck) continue;
+            const coords = EU_LABEL_COORDS[ck];
+            labelLats.push(coords[0]); labelLons.push(coords[1]);
+            labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
+        }
+    }
+
+    const validPrices = z.filter(v => v > 0);
+    const minP = validPrices.length ? Math.min(...validPrices) : 50;
+    const maxP = validPrices.length ? Math.max(...validPrices) : 300;
+
+    const withDataLoc = [], withDataZ = [], withDataText = [], withDataCustom = [];
+    const noDataLoc = [], noDataText = [], noDataCustom = [];
+    for (let i = 0; i < locations.length; i++) {
+        if (z[i] > 0 && customdata[i] !== 'TR') {
+            withDataLoc.push(locations[i]); withDataZ.push(z[i]); withDataText.push(text[i]); withDataCustom.push(customdata[i]);
+        } else {
+            noDataLoc.push(locations[i]); noDataText.push(text[i]); noDataCustom.push(customdata[i]);
+        }
     }
 
     const traceWithData = {
