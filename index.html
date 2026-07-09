@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 12:39</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-09 13:13</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -4163,6 +4163,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             let auctionTabInitialized = false;
             let allCorridorsData = [];
             let cachedBiddingZonesGeoJSON = null;
+            let selectedAuctionCorridor = "";
 
             const OPTIMIZED_WEIGHTS = {
                 "HighSolar_Long": {
@@ -8070,11 +8071,19 @@ function renderEUMapCountryDetail(dataKey, date) {
 // ============================================================
 
 function initAuctionTab() {
-    // Populate corridor selector from cablesLongData
-    const corridorSel = document.getElementById('auction_corridor');
-    if (!corridorSel) return;
-    const corridors = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
-    corridorSel.innerHTML = corridors.map(c => `<option value="${c}">${c}</option>`).join('');
+    const countrySel = document.getElementById('auction_country_filter');
+    const corridorsList = document.getElementById('auction_corridors_list');
+    if (!countrySel || !corridorsList) return;
+
+    const allCorrs = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+    const allCountries = new Set();
+    allCorrs.forEach(c => {
+        const parts = c.split('-');
+        parts.forEach(p => { if (p) allCountries.add(p); });
+    });
+    const sortedCountries = [...allCountries].sort();
+    countrySel.innerHTML = '<option value="ALL">All Countries</option>'
+        + sortedCountries.map(c => `<option value="${c}">${c}</option>`).join('');
 
     // Populate month selector: next 12 months
     const monthSel = document.getElementById('auction_month');
@@ -8084,11 +8093,53 @@ function initAuctionTab() {
         const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, '0');
-        const val = `${y}-${m}`; // Timezone-safe YYYY-MM
+        const val = `${y}-${m}`;
         const label = d.toLocaleString('en-GB', { month: 'long', year: 'numeric' });
         months.push(`<option value="${val}">${label}</option>`);
     }
     monthSel.innerHTML = months.join('');
+
+    renderAuctionCorridors('ALL');
+    runAuctionOptimizer();
+}
+
+function renderAuctionCorridors(countryFilter) {
+    const container = document.getElementById('auction_corridors_list');
+    if (!container) return;
+    const allCorrs = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+    const filtered = countryFilter === 'ALL'
+        ? allCorrs
+        : allCorrs.filter(c => c.split('-').includes(countryFilter));
+
+    container.innerHTML = filtered.map(c => {
+        const active = c === selectedAuctionCorridor ? ' active' : '';
+        return `<button class="auction-corridor-tag${active}" data-corridor="${c}" style="padding:6px 14px;border-radius:6px;border:1px solid #d1d5db;background:${c === selectedAuctionCorridor ? '#4f46e5' : '#fff'};color:${c === selectedAuctionCorridor ? '#fff' : '#374151'};font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter';">${c}</button>`;
+    }).join('');
+
+    container.querySelectorAll('.auction-corridor-tag').forEach(btn => {
+        btn.addEventListener('click', function() {
+            selectedAuctionCorridor = this.dataset.corridor;
+            renderAuctionCorridors(document.getElementById('auction_country_filter').value);
+            runAuctionOptimizer();
+        });
+    });
+
+    if (!selectedAuctionCorridor && filtered.length > 0) {
+        selectedAuctionCorridor = filtered[0];
+        renderAuctionCorridors(countryFilter);
+    }
+}
+
+function onAuctionCountryFilterChange() {
+    const country = document.getElementById('auction_country_filter').value;
+    selectedAuctionCorridor = "";
+    renderAuctionCorridors(country);
+}
+
+function onAuctionProductTypeChange() {
+    const label = document.getElementById('auction_date_label');
+    const product = document.getElementById('auction_product_type').value;
+    if (label) label.textContent = product === 'Yearly' ? 'Year' : 'Month';
     runAuctionOptimizer();
 }
 
@@ -8153,7 +8204,7 @@ function getCorridorCountries(corridor) {
 }
 
 function runAuctionOptimizer() {
-    const corridor = document.getElementById('auction_corridor')?.value;
+    const corridor = selectedAuctionCorridor;
     const yearMonth = document.getElementById('auction_month')?.value;
     const bidMw = parseFloat(document.getElementById('auction_mw')?.value) || 1;
     const riskMargin = parseFloat(document.getElementById('auction_margin')?.value) || 1.0;
