@@ -8490,10 +8490,9 @@ function runAuctionOptimizer() {
 }
 
 function renderAuctionFwdChart(source, dest, corridor) {
-    const proxyCountries = new Set(['AL','XK','MK','BA','ME']);
     const countryProxySrc = {'AL':'XK'};
-    const isProxySrc = proxyCountries.has(source);
-    const isProxyDst = proxyCountries.has(dest);
+    const isProxySrc = !!countryProxySrc[source];
+    const isProxyDst = !!countryProxySrc[dest];
     const srcKey = countryProxySrc[source] || source;
     const dstKey = countryProxySrc[dest] || dest;
     const srcAll = auctionFwdData[srcKey]?.baseload || [];
