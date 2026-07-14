@@ -8183,17 +8183,24 @@ function initAuctionTab() {
 function renderAuctionCorridors(countryFilter) {
     const container = document.getElementById('auction_corridors_list');
     if (!container) return;
-    const allCorrs = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
 
-    // Determine which corridors have daily cable price data
+    // Master list: all corridors from DB (corridors table)
+    const masterCorrs = (allCorridorsData || []).filter(c => {
+        const parts = c.split('-');
+        return parts.length >= 2;
+    }).sort();
+
+    // Corridors with daily cable data
     const dailyCorridors = new Set((cablesData || []).map(r => r.corridor_code));
+    // Corridors with long-term (monthly/yearly) data
+    const longCorridors = new Set((cablesLongData || []).map(r => r.corridor_code));
 
     const filtered = countryFilter === 'ALL'
-        ? allCorrs
-        : allCorrs.filter(c => c.split('-').includes(countryFilter));
+        ? masterCorrs
+        : masterCorrs.filter(c => c.split('-').includes(countryFilter));
 
     const withDaily = filtered.filter(c => dailyCorridors.has(c));
-    const withoutDaily = filtered.filter(c => !dailyCorridors.has(c));
+    const longOnly = filtered.filter(c => !dailyCorridors.has(c) && longCorridors.has(c));
 
     const btn = (c) => {
         const active = c === selectedAuctionCorridor;
@@ -8204,8 +8211,8 @@ function renderAuctionCorridors(countryFilter) {
     if (withDaily.length) {
         html += `<div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">✅ Daily Cables</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${withDaily.map(btn).join('')}</div>`;
     }
-    if (withoutDaily.length) {
-        html += `<div style="font-size:10px;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">⚠️ No Daily Cables</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${withoutDaily.map(btn).join('')}</div>`;
+    if (longOnly.length) {
+        html += `<div style="font-size:10px;font-weight:700;color:#d97706;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">📅 Long-term Only</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${longOnly.map(btn).join('')}</div>`;
     }
     container.innerHTML = html;
 
