@@ -1368,7 +1368,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     <div class="chart-wrapper" style="margin:0;">
                         <h4 style="margin-top:0;">Historical Clearing Prices</h4>
                         <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
-                        <div id="auction_clearing_chart" style="width:100%; height:200px;"></div>
+                        <div id="auction_clearing_chart" style="width:100%; height:350px;"></div>
                     </div>
                     <div class="chart-wrapper" style="margin:0;">
                         <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
@@ -8532,16 +8532,16 @@ function renderAuctionClearingChart(corridor, yearMonth) {
     const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
     const traces = [
         { type:'scatter', x: labels, y: prices, mode:'lines+markers',
-          marker:{color:'#6366f1', size:10}, line:{color:'#6366f1',width:2}, name:'Monthly Clearing Price' },
+          marker:{color:'#6366f1', size:12, line:{color:'#fff',width:2}}, line:{color:'#6366f1',width:2}, name:'Monthly Clearing Price' },
     ];
     if (dailyAvgPrices.some(v => v !== null)) {
         traces.push({ type:'scatter', x: labels, y: dailyAvgPrices, mode:'lines+markers',
-          marker:{color:'#10b981', size:6}, line:{color:'#10b981',width:1.5,dash:'dot'}, name:'Avg Daily Cable Price' });
+          marker:{color:'#10b981', size:9, line:{color:'#fff',width:1.5}}, line:{color:'#10b981',width:1.5,dash:'dot'}, name:'Avg Daily Cable Price' });
     }
     traces.push({ type:'scatter', x:[labels[0], labels[labels.length-1]], y:[finalBid,finalBid],
           mode:'lines', line:{color:'#059669',dash:'dash',width:2}, name:'Our Bid' });
     Plotly.newPlot('auction_clearing_chart', traces, {
-        margin:{t:5,r:10,b:50,l:50},
+        margin:{t:10,r:10,b:50,l:55},
         paper_bgcolor:'white', plot_bgcolor:'white',
         yaxis:{title:'€/MW', gridcolor:'#f3f4f6', tickfont:{size:11}},
         xaxis:{tickfont:{size:10}, tickangle:-30},
