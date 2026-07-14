@@ -8502,8 +8502,8 @@ function renderAuctionFwdChart(source, dest, corridor) {
         const d = new Date(e.delivery_start);
         return d >= now && d <= sixMonths && e.delivery_start.endsWith('-01');
     });
-    const srcData = filterFwd(srcAll);
-    const dstData = filterFwd(dstAll);
+    const srcData = filterFwd(srcAll).sort((a,b) => a.delivery_start.localeCompare(b.delivery_start));
+    const dstData = filterFwd(dstAll).sort((a,b) => a.delivery_start.localeCompare(b.delivery_start));
     const traces = [];
     if (srcData.length) traces.push({ x: srcData.map(e=>e.delivery_start), y: srcData.map(e=>e.price), mode:'lines+markers', name: source + ' BL', line:{color:'#4f46e5',width:2}, marker:{size:5} });
     if (dstData.length) traces.push({ x: dstData.map(e=>e.delivery_start), y: dstData.map(e=>e.price), mode:'lines+markers', name: dest + (countryMap[dest] ? ' proxy' : ' BL'), line:{color:'#f97316',width:2,dash: countryMap[dest] ? 'dot' : 'solid'}, marker:{size:5} });
