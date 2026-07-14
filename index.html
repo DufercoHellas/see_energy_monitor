@@ -7433,36 +7433,35 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         }
                     });
 
-                    // Build outage notes section
-                    let outageLinesHtml = '';
+                    // Compute day-of-week for holiday warnings
+                    const targetDay = new Date(targetDate + 'T12:00:00').getDay();
+                    const isSunday = targetDay === 0;
+
+                    // Build separate card for cable outages
                     const outageEntries = Object.entries(outageSummary);
-                    if (outageEntries.length > 0) {
-                        outageLinesHtml = `<div style="margin-bottom:4px;">
-                            <div style="font-size:9px;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">⚡ Cable Outages</div>`;
-                        outageEntries.forEach(([cable, pct]) => {
-                            const col = pct === 0 ? '#b91c1c' : pct <= 30 ? '#dc2626' : '#d97706';
-                            const lbl = pct === 0 ? 'FULL OUTAGE' : `${pct}% capacity`;
-                            outageLinesHtml += `<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;"><span style="font-size:10px;font-weight:700;color:${col};">${cable}: ${lbl}</span></div>`;
-                        });
-                        outageLinesHtml += '</div>';
-                    }
+                    const outageCardHtml = outageEntries.length > 0
+                        ? `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 12px;">
+                            <div style="font-size:10px;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">⚡ Cable Outages</div>`
+                            + outageEntries.map(([cable, pct]) => {
+                                const col = pct === 0 ? '#b91c1c' : pct <= 30 ? '#dc2626' : '#d97706';
+                                const lbl = pct === 0 ? 'FULL OUTAGE' : `${pct}% capacity`;
+                                return `<div style="font-size:10px;font-weight:700;color:${col};">${cable}: ${lbl}</div>`;
+                            }).join('')
+                        + `</div>`
+                        : '';
 
-                    // Build holiday notes section
-                    let holidayLinesHtml = '';
-                    if (holidayNotes.length > 0) {
-                        holidayLinesHtml = `<div>
-                            <div style="font-size:9px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">🗓️ Holidays</div>`;
-                        holidayNotes.forEach(({ country, holiday }) => {
-                            holidayLinesHtml += `<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;"><span style="font-size:10px;font-weight:600;color:#92400e;"><span style="background:#fef3c7;padding:1px 4px;border-radius:3px;">${country}</span> ${holiday}</span></div>`;
-                        });
-                        holidayLinesHtml += '</div>';
-                    }
-
-                    const hasOutages = outageEntries.length > 0;
-                    const hasHolidays = holidayNotes.length > 0;
-                    const notesContent = hasOutages || hasHolidays
-                        ? outageLinesHtml + holidayLinesHtml
-                        : `<div style="font-size:10px;font-weight:600;color:#166534;">No outages · No holidays</div>`;
+                    // Build separate card for holidays with non-Sunday warning
+                    const holidayCardHtml = holidayNotes.length > 0
+                        ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;">
+                            <div style="font-size:10px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px;">🗓️ Holidays</div>`
+                            + holidayNotes.map(({ country, holiday }) =>
+                                `<div style="font-size:10px;font-weight:600;color:#92400e;"><span style="background:#fef3c7;padding:1px 4px;border-radius:3px;">${country}</span> ${holiday}</div>`
+                            ).join('')
+                            + (!isSunday
+                                ? `<div style="margin-top:4px;font-size:9px;font-weight:700;color:#dc2626;border-top:1px solid #fde68a;padding-top:4px;">⚠️ Non-Sunday holiday — may affect flows, extra care advised</div>`
+                                : '')
+                        + `</div>`
+                        : '';
 
                     const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:stretch;">
                         <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 14px;">
@@ -7485,9 +7484,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             <div style="font-size:9px;color:#4f46e5;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Corridors</div>
                             <div style="font-size:18px;font-weight:800;color:#4f46e5;">${effectiveCorridorList.length}</div>
                         </div>` : ''}
-                        <div style="background:${hasOutages?'#fffbeb':'#f0fdf4'};border:1px solid ${hasOutages?'#fde68a':'#bbf7d0'};border-radius:8px;padding:6px 14px;max-width:260px;">
-                            ${notesContent}
-                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+                        ${outageCardHtml}
+                        ${holidayCardHtml}
                     </div>`;
 
                     let allDetailTablesHtml = '';
@@ -7573,7 +7573,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </div>`;
                     });
 
-                    const toggleBtn = `<button onclick="toggleDetail('${cid}_details');this.textContent=document.getElementById('${cid}_details').style.display==='none'?'▼ Show hour details':'▲ Hide details';" style="width:100%;margin-top:10px;padding:8px 14px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:8px;font-size:12px;font-weight:700;color:#334155;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">▼ Show hour details</button>`;
+                    const toggleBtn = `<button onclick="toggleDetail('${cid}_details');const t=this;setTimeout(()=>{t.textContent=document.getElementById('${cid}_details').style.display==='none'?'📊 Show hour details':'📊 Hide details';},50);" style="width:100%;margin-top:12px;padding:10px 16px;background:linear-gradient(135deg,#4f46e5,#6366f1);border:none;border-radius:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(79,70,229,0.3);transition:box-shadow 0.15s,transform 0.1s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(79,70,229,0.45)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(79,70,229,0.3)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">📊 Show hour details</button>`;
 
                     const startIsEU = countryEU[group.start];
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
