@@ -8346,44 +8346,7 @@ function runAuctionOptimizer() {
     // E[V] = average of positive spreads across all hours in month
     const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
 
-    // 2. Dynamic REMIT / Curtailment calculation (using local month or historical same-month backup)
-    const [y, m] = yearMonth.split('-').map(Number);
-    let monthOutages = (cableOutagesData || []).filter(r => {
-        if (r.corridor_code !== corridor) return false;
-        const parts = r.trade_date.split('-');
-        if (parts.length < 2) return false;
-        const ty = parseInt(parts[0]);
-        const tm = parseInt(parts[1]);
-        return ty === y && tm === m;
-    });
-
-    let avgCurtailmentRate = 0;
-    if (monthOutages.length > 0) {
-        avgCurtailmentRate = monthOutages.reduce((s, r) => {
-            const orig = parseFloat(r.original_capacity) || 0;
-            const rem = parseFloat(r.remaining_capacity) || 0;
-            return s + (orig > 0 ? (orig - rem) / orig : 0);
-        }, 0) / monthOutages.length;
-    } else {
-        // Fallback: Check historical curtailment rate for same calendar month in prior years
-        const historicalSameMonthOutages = (cableOutagesData || []).filter(r => {
-            if (r.corridor_code !== corridor) return false;
-            const parts = r.trade_date.split('-');
-            if (parts.length < 2) return false;
-            const tm = parseInt(parts[1]);
-            return tm === targetMonth;
-        });
-        if (historicalSameMonthOutages.length > 0) {
-            avgCurtailmentRate = historicalSameMonthOutages.reduce((s, r) => {
-                const orig = parseFloat(r.original_capacity) || 0;
-                const rem = parseFloat(r.remaining_capacity) || 0;
-                return s + (orig > 0 ? (orig - rem) / orig : 0);
-            }, 0) / historicalSameMonthOutages.length;
-        }
-    }
-    const remitDeduction = ev * avgCurtailmentRate;
-
-    // 3. Thermal Generation Cost / Fuel Signal
+    // 2. Thermal Generation Cost / Fuel Signal
     const targetStart = yearMonth + '-01';
     const ttfEntries = (auctionFwdData.ttf && auctionFwdData.ttf.spot) ? auctionFwdData.ttf.spot : (auctionFwdData.ttf || []);
     const euaEntries = (auctionFwdData.eua && auctionFwdData.eua.spot) ? auctionFwdData.eua.spot : (auctionFwdData.eua || []);
@@ -8421,12 +8384,12 @@ function runAuctionOptimizer() {
         }
         if (bestBid > 0.01) {
             // Align the input margin with this optimal bid target
-            recommendedRiskMargin = Math.max(0.1, (ev - remitDeduction - fuelDeduction - bestBid));
+            recommendedRiskMargin = Math.max(0.1, (ev - fuelDeduction - bestBid));
         }
     }
 
     // Final bid calculations
-    const finalBid = Math.max(0.01, ev - remitDeduction - fuelDeduction - recommendedRiskMargin);
+    const finalBid = Math.max(0.01, ev - fuelDeduction - recommendedRiskMargin);
     const totalExposure = bidMw * hoursInMonth;
     const liability = finalBid * totalExposure;
 
@@ -8441,7 +8404,6 @@ function runAuctionOptimizer() {
     // Adjustments panel
     const adjHtml = [
         { label: 'Base E[V]', value: ev, sign: '+', color: '#059669' },
-        { label: 'REMIT Curtailment', value: remitDeduction, sign: '-', color: '#dc2626' },
         { label: 'Fuel/Carbon Spread', value: fuelDeduction, sign: '-', color: '#dc2626' },
         { label: 'Risk Margin', value: riskMargin, sign: '-', color: '#d97706' },
     ].map(row => `
@@ -8520,30 +8482,42 @@ function renderAuctionFwdChart(source, dest, corridor) {
 }
 
 function renderAuctionClearingChart(corridor, yearMonth) {
-    const targetMonth = parseInt(yearMonth.split('-')[1]);
+    const [targetYear, targetMonth] = yearMonth.split('-').map(Number);
+    let endYear = targetYear, endMonth = targetMonth - 1;
+    if (endMonth === 0) { endMonth = 12; endYear--; }
+    let startYear = endYear - 1, startMonth = endMonth;
+    const startStr = `${startYear}-${String(startMonth).padStart(2,'0')}-01`;
+    const endStr = `${endYear}-${String(endMonth).padStart(2,'0')}-31`;
+
     const historical = (cablesLongData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        const d = new Date(r.start_date);
-        return d.getMonth() + 1 === targetMonth && r.price != null;
-    });
+        if (r.product !== 'Monthly') return false;
+        const d = r.start_date.split(' ')[0];
+        return d >= startStr && d <= endStr && r.price != null;
+    }).sort((a, b) => a.start_date.localeCompare(b.start_date));
+
     if (!historical.length) {
-        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical clearing data for this corridor and month.</p>';
+        document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical monthly clearing data for this corridor in the past 12 months.</p>';
         return;
     }
-    const years = historical.map(r => new Date(r.start_date).getFullYear());
+    const labels = historical.map(r => {
+        const parts = r.start_date.split(' ')[0].split('-');
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return months[parseInt(parts[1])-1] + ' ' + parts[0];
+    });
     const prices = historical.map(r => parseFloat(r.price));
     const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
     Plotly.newPlot('auction_clearing_chart', [
-        { type:'scatter', x: years, y: prices, mode:'lines+markers',
+        { type:'scatter', x: labels, y: prices, mode:'lines+markers',
           marker:{color:'#6366f1', size:10}, line:{color:'#6366f1',width:2}, name:'Clearing Price' },
-        { type:'scatter', x:[Math.min(...years), Math.max(...years)], y:[finalBid,finalBid],
+        { type:'scatter', x:[labels[0], labels[labels.length-1]], y:[finalBid,finalBid],
           mode:'lines', line:{color:'#059669',dash:'dash',width:2}, name:'Our Bid' }
     ], {
-        margin:{t:5,r:10,b:40,l:50},
+        margin:{t:5,r:10,b:50,l:50},
         paper_bgcolor:'white', plot_bgcolor:'white',
         yaxis:{title:'€/MW', gridcolor:'#f3f4f6', tickfont:{size:11}},
-        xaxis:{tickformat:'d', tickfont:{size:11}},
-        legend:{orientation:'h', y:-0.3, font:{size:11}}
+        xaxis:{tickfont:{size:10}, tickangle:-30},
+        legend:{orientation:'h', y:-0.35, font:{size:11}}
     }, {responsive:true, displayModeBar:false});
 }
 
