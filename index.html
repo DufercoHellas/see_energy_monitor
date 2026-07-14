@@ -8376,7 +8376,7 @@ function runAuctionOptimizer() {
             // Empirically count win probability: fraction of past clearing prices <= b
             const winCount = historicalClearing.filter(p => p <= b).length;
             const pWin = winCount / historicalClearing.length;
-            const expectedProfit = pWin * (ev - remitDeduction - fuelDeduction - b);
+            const expectedProfit = pWin * (ev - fuelDeduction - b);
             if (expectedProfit > maxExpectedProfit) {
                 maxExpectedProfit = expectedProfit;
                 bestBid = b;
