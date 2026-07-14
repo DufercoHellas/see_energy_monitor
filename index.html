@@ -8372,7 +8372,7 @@ function runAuctionOptimizer() {
     }
 
     // E[V] = average of all hourly spreads (trader captures max(0, spread) each hour)
-    const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
+    let ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
 
     // 2. Thermal Generation Cost / Fuel Signal
     const targetStart = yearMonth + '-01';
@@ -8401,6 +8401,16 @@ function runAuctionOptimizer() {
         offered: parseFloat(r.offered_capacity) || 0
     }));
     const historicalClearing = historicalAuctions.map(r => r.price);
+
+    // Cap E[V] at the 90th percentile of historical clearing prices to prevent unrealistic inflation
+    const evUncapped = ev;
+    if (historicalClearing.length >= 3) {
+        const sorted = [...historicalClearing].sort((a, b) => a - b);
+        const p90 = sorted[Math.ceil(sorted.length * 0.9) - 1];
+        if (ev > p90) {
+            ev = p90;
+        }
+    }
 
     let recommendedRiskMargin = riskMargin;
     if (historicalClearing.length >= 2) {
@@ -8451,6 +8461,9 @@ function runAuctionOptimizer() {
         ? `at €${opt.bid.toFixed(2)} bid  •  ${historicalClearing.length} obs`
         : 'insufficient data';
     document.getElementById('kpi_ev').textContent = '€' + ev.toFixed(2);
+    document.getElementById('kpi_ev').title = evUncapped !== ev
+        ? `Capped from €${evUncapped.toFixed(2)} (90th pctl of historical: €${ev.toFixed(2)})`
+        : '';
     document.getElementById('kpi_exposure').textContent = totalExposure.toLocaleString();
     document.getElementById('kpi_exposure_sub').textContent = `MWh (${bidMw}MW • ${hoursInMonth}h)`;
     document.getElementById('kpi_liability').textContent = '€' + liability.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0});
