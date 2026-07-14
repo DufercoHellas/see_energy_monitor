@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-14 09:39</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-14 09:56</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -6947,6 +6947,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 const startIsEU = countryEU[start] || false;
                 const endIsEU = countryEU[end] || false;
                 if (!startIsEU && endIsEU) return false; // Non-EU -> EU
+                if (start === 'AL' || end === 'AL') return false; // Albania trading restrictions
                 return true;
             }
             const cbamCompliantPaths = allTopologyPaths.filter(isValidPathCBAM);
@@ -7006,6 +7007,31 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 const targetDate = document.getElementById("analogue_date").value;
                 const threshold = parseFloat(document.getElementById("arbitrage_min_spread").value) || 30.0;
 
+                function getDayAveragePrice(c, date) {
+                    const countryData = historicalData[c];
+                    if (!countryData) return 0.0;
+                    const dateData = countryData[date];
+                    if (!dateData) return 0.0;
+                    const prices = dateData.prices;
+                    if (!prices || prices.length === 0) return 0.0;
+                    const nonNull = prices.filter(p => p !== null && p !== undefined);
+                    if (nonNull.length === 0) return 0.0;
+                    const sum = nonNull.reduce((s, x) => s + x, 0);
+                    return sum / nonNull.length;
+                }
+
+                function getDayAveragePriceWithFallback(c, date) {
+                    let avg = getDayAveragePrice(c, date);
+                    if (avg === 0.0) {
+                        if (c === 'ME') avg = getDayAveragePrice('RS', date);
+                        else if (c === 'XK') avg = getDayAveragePrice('AL', date);
+                        else if (c === 'BA') avg = getDayAveragePrice('RS', date);
+                        else if (c === 'DE' && historicalData['DE_LU']) avg = getDayAveragePrice('DE_LU', date);
+                        else if (c === 'DE_LU' && historicalData['DE']) avg = getDayAveragePrice('DE', date);
+                    }
+                    return avg;
+                }
+
                 // Get solar state of target date (based on GR residuals/demand)
                 const country = "GR";
                 const targetData = historicalData[country]?.[targetDate];
@@ -7041,16 +7067,34 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         const start = path[0].to;
                         const end   = path[path.length - 1].to;
 
-                        // Check exclusions
-                        const pathCode = `${start}->${end}`;
-                        if (tradeExclusions && tradeExclusions[pathCode]) {
-                            const excludedHours = tradeExclusions[pathCode][simpleSolar] || [];
-                            if (excludedHours.includes(h)) {
-                                return; // skip this path due to exclusion rules
+                        // Check exclusions (Bypassed per instructions)
+
+                        // --- Robustness gate: ALL count matches must be individually net positive ---
+                        // Dynamically select top valid matches for this path
+                        const validMatches = [];
+                        for (let i = 0; i < currentTop7.length; i++) {
+                            const m = currentTop7[i];
+                            const avgStart = getDayAveragePriceWithFallback(start, m.date);
+                            const avgEnd = getDayAveragePriceWithFallback(end, m.date);
+                            if (avgStart <= 0.01 || avgEnd <= 0.01) {
+                                continue;
+                            }
+                            validMatches.push(m);
+                            if (validMatches.length === count) {
+                                break;
                             }
                         }
 
-                        // --- Robustness gate: ALL 3 matches must be individually net positive ---
+                        if (validMatches.length < count) {
+                            return; // skip this path/hour because we don't have enough valid matches
+                        }
+
+                        // Re-calculate weights dynamically for these valid matches
+                        const rawSimsLocal = validMatches.map(m => m.combined);
+                        const invSimsLocal = rawSimsLocal.map(s => 1.0 / Math.max(s, 1e-6));
+                        const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
+                        const matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
+
                         let allPositive = true;
                         let weightedGross  = 0.0;
                         let weightedCable  = 0.0;
@@ -7058,8 +7102,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         let weightedPEnd   = 0.0;
 
                         for (let i = 0; i < count; i++) {
-                            const md = matchDates[i];
-                            const w  = matchWeights[i];
+                            const md = validMatches[i].date;
+                            const w  = matchWeightsLocal[i];
 
                             const pSrc = getRealizedPriceWithFallback(start, h, md);
                             const pDst = getRealizedPriceWithFallback(end,   h, md);
