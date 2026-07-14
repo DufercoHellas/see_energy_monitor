@@ -8388,14 +8388,19 @@ function runAuctionOptimizer() {
     const fuelDeduction = gasMarginalCost > srcFwd ? Math.min(ev * 0.15, (gasMarginalCost - srcFwd) * 0.05) : 0;
 
     // 4. Expected Profit Optimization using Historical Clearing Prices
-    const historicalClearing = (cablesLongData || []).filter(r => {
+    const historicalAuctions = (cablesLongData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
         if (r.product !== 'Monthly') return false;
         if (r.price == null) return false;
         const endParts = r.end_date.split(' ')[0].split('-');
         const delivMonth = parseInt(endParts[1]);
         return delivMonth === targetMonth;
-    }).map(r => parseFloat(r.price));
+    }).map(r => ({
+        price: parseFloat(r.price),
+        allocated: parseFloat(r.allocated_capacity) || 0,
+        offered: parseFloat(r.offered_capacity) || 0
+    }));
+    const historicalClearing = historicalAuctions.map(r => r.price);
 
     let recommendedRiskMargin = riskMargin;
     if (historicalClearing.length >= 2) {
@@ -8470,64 +8475,54 @@ function runAuctionOptimizer() {
     `;
     document.getElementById('auction_adjustments').innerHTML = adjHtml;
 
-    // Bid Profit Curve + Clearing Distribution Chart (Plotly)
+    // Demand Curve Chart (JAO-style: Price vs cumulative MW)
     const bidCurveEl = document.getElementById('auction_bid_curve_chart');
-    if (bidSteps.length === 0) {
-        bidCurveEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:14px;font-weight:600;">Insufficient historical clearing data to compute bid curve.</div>';
+    if (historicalAuctions.length < 2) {
+        bidCurveEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:14px;font-weight:600;">Insufficient historical auction data to build demand curve.</div>';
     } else {
-        const sorted = [...historicalClearing].sort((a,b) => a-b);
-        const minP = sorted[0], maxP = sorted[sorted.length-1];
-        const q1 = sorted[Math.round(sorted.length * 0.25)];
-        const med = sorted[Math.round(sorted.length * 0.5)];
-        const q3 = sorted[Math.round(sorted.length * 0.75)];
-        const optBid = opt.bid, optProfit = opt.expProfit, optPWin = opt.pWin;
-        const statsNote =
-            `Min: €${minP.toFixed(2)}  •  Q1: €${q1.toFixed(2)}  •  Median: €${med.toFixed(2)}  •  Q3: €${q3.toFixed(2)}  •  Max: €${maxP.toFixed(2)}`;
+        const sortedDesc = [...historicalAuctions].sort((a, b) => b.price - a.price);
+        let cumMW = 0;
+        const demandCurve = sortedDesc.map(h => {
+            cumMW += h.allocated;
+            return { mw: cumMW, price: h.price };
+        });
+        const avgOffered = historicalAuctions.reduce((s, h) => s + h.offered, 0) / historicalAuctions.length;
+        const maxX = Math.max(cumMW, avgOffered) * 1.3;
 
+        const optBid = opt.bid, optProfit = opt.expProfit, optPWin = opt.pWin;
         Plotly.newPlot('auction_bid_curve_chart', [
-            { type:'histogram', x: historicalClearing,
-              histnorm:'probability', nbinsx: 20,
-              marker:{color:'rgba(99,102,241,0.12)', line:{color:'rgba(99,102,241,0.3)',width:1}},
-              name:'Clearing Price Distribution', yaxis:'y3',
-              hoverinfo:'x+text', text: historicalClearing.map(v => '€' + v.toFixed(2) + '/MW') },
-            { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.expProfit),
-              mode:'lines', name:'Expected Profit', line:{color:'#6366f1', width:2}, yaxis:'y' },
-            { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.pWin),
-              mode:'lines', name:'Win Probability', line:{color:'#10b981', dash:'dot', width:1.5}, yaxis:'y2' },
-            { type:'scatter', x:[optBid], y:[optProfit],
-              mode:'markers', name:'Optimal Bid',
-              marker:{color:'#ef4444', size:14, symbol:'star'}, yaxis:'y' },
-            { type:'scatter', x:[med, med], y:[0, 1],
-              mode:'lines', name:'Median',
-              line:{color:'#f59e0b', dash:'dash', width:1}, yaxis:'y',
-              showlegend: false },
-            { type:'scatter', x:[q1, q1], y:[0, 1],
-              mode:'lines', name:'Q1',
-              line:{color:'#94a3b8', dash:'dot', width:1}, yaxis:'y',
-              showlegend: false },
-            { type:'scatter', x:[q3, q3], y:[0, 1],
-              mode:'lines', name:'Q3',
-              line:{color:'#94a3b8', dash:'dot', width:1}, yaxis:'y',
-              showlegend: false }
+            { type:'scatter', x: demandCurve.map(p => p.mw), y: demandCurve.map(p => p.price),
+              mode:'lines+markers', name:'Historical Demand Curve',
+              line:{color:'#6366f1', width:2}, marker:{color:'#6366f1', size:8, line:{color:'#fff',width:1}},
+              hovertemplate:'%{x:.0f} MW @ €%{y:.2f}<extra></extra>' },
+            { type:'scatter', x:[avgOffered, avgOffered], y:[0, Math.max(...demandCurve.map(p => p.price)) * 1.1],
+              mode:'lines', name:'Available Capacity (ATC)',
+              line:{color:'#ef4444', dash:'dash', width:2} },
+            { type:'scatter', x:[0, maxX], y:[optBid, optBid],
+              mode:'lines', name:'Optimal Bid',
+              line:{color:'#10b981', dash:'dash', width:2} },
+            { type:'scatter', x:[avgOffered], y:[optBid],
+              mode:'markers', name:'Clearing Point',
+              marker:{color:'#ef4444', size:16, symbol:'x'},
+              hovertemplate:'Target: %{x:.0f} MW @ €%{y:.2f}<extra></extra>' }
         ], {
-            margin:{t:10,r:10,b:40,l:50},
+            margin:{t:10,r:10,b:50,l:55},
             paper_bgcolor:'white', plot_bgcolor:'white',
-            xaxis:{title:'Bid (€/MW)', tickfont:{size:10}},
-            yaxis:{title:'Expected Profit (€/MW)', gridcolor:'#f3f4f6', tickfont:{size:10}},
-            yaxis2:{title:'Win Prob.', overlaying:'y', side:'right', range:[0,1], tickfont:{size:10}, tickformat:'.0%'},
-            yaxis3:{overlaying:'y', side:'left', visible:false, range:[0,1]},
-            barmode:'overlay',
-            bargap:0.05,
+            xaxis:{title:'Cumulative Volume (MW)', tickfont:{size:10}, range:[0, maxX]},
+            yaxis:{title:'Price (€/MWh)', gridcolor:'#f3f4f6', tickfont:{size:10}},
             legend:{orientation:'h', y:-0.25, font:{size:10}},
             showlegend:true,
             annotations:[
-                { x: optBid, y: optProfit,
-                  text: `Optimal: €${optBid.toFixed(2)} | Win: ${(optPWin*100).toFixed(0)}%`,
-                  showarrow:true, arrowhead:1, ax:60, ay:-40,
+                { x: avgOffered, y: optBid,
+                  text: `Optimal: €${optBid.toFixed(2)}/MW at ${avgOffered.toFixed(0)} MW`,
+                  showarrow:true, arrowhead:1, ax:70, ay:-50,
                   font:{size:11, color:'#dc2626', weight:700} },
-                { x: 0.5, y: 1.08, xref:'paper', yref:'paper',
-                  text: statsNote, showarrow:false,
-                  font:{size:10, color:'#64748b'} }
+                { x: avgOffered, y: 0,
+                  text: `${avgOffered.toFixed(0)} MW`, showarrow:false,
+                  yshift:-12, font:{size:10, color:'#ef4444'} },
+                { x: 0, y: optBid,
+                  text: `€${optBid.toFixed(2)}`, showarrow:false,
+                  xshift:-8, font:{size:10, color:'#10b981'} }
             ]
         }, {responsive:true, displayModeBar:false});
     }
