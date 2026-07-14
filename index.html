@@ -8470,35 +8470,65 @@ function runAuctionOptimizer() {
     `;
     document.getElementById('auction_adjustments').innerHTML = adjHtml;
 
-    // Bid Profit Curve Chart (Plotly)
+    // Bid Profit Curve + Clearing Distribution Chart (Plotly)
     const bidCurveEl = document.getElementById('auction_bid_curve_chart');
     if (bidSteps.length === 0) {
         bidCurveEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:14px;font-weight:600;">Insufficient historical clearing data to compute bid curve.</div>';
     } else {
+        const sorted = [...historicalClearing].sort((a,b) => a-b);
+        const minP = sorted[0], maxP = sorted[sorted.length-1];
+        const q1 = sorted[Math.round(sorted.length * 0.25)];
+        const med = sorted[Math.round(sorted.length * 0.5)];
+        const q3 = sorted[Math.round(sorted.length * 0.75)];
         const optBid = opt.bid, optProfit = opt.expProfit, optPWin = opt.pWin;
+        const statsNote =
+            `Min: €${minP.toFixed(2)}  •  Q1: €${q1.toFixed(2)}  •  Median: €${med.toFixed(2)}  •  Q3: €${q3.toFixed(2)}  •  Max: €${maxP.toFixed(2)}`;
+
         Plotly.newPlot('auction_bid_curve_chart', [
+            { type:'histogram', x: historicalClearing,
+              histnorm:'probability', nbinsx: 20,
+              marker:{color:'rgba(99,102,241,0.12)', line:{color:'rgba(99,102,241,0.3)',width:1}},
+              name:'Clearing Price Distribution', yaxis:'y3',
+              hoverinfo:'x+text', text: historicalClearing.map(v => '€' + v.toFixed(2) + '/MW') },
             { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.expProfit),
               mode:'lines', name:'Expected Profit', line:{color:'#6366f1', width:2}, yaxis:'y' },
             { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.pWin),
               mode:'lines', name:'Win Probability', line:{color:'#10b981', dash:'dot', width:1.5}, yaxis:'y2' },
             { type:'scatter', x:[optBid], y:[optProfit],
-              mode:'markers+text', name:'Optimal Bid',
-              marker:{color:'#ef4444', size:14, symbol:'star'},
-              text:[`€${optBid.toFixed(2)}`], textposition:'top center', yaxis:'y' }
+              mode:'markers', name:'Optimal Bid',
+              marker:{color:'#ef4444', size:14, symbol:'star'}, yaxis:'y' },
+            { type:'scatter', x:[med, med], y:[0, 1],
+              mode:'lines', name:'Median',
+              line:{color:'#f59e0b', dash:'dash', width:1}, yaxis:'y',
+              showlegend: false },
+            { type:'scatter', x:[q1, q1], y:[0, 1],
+              mode:'lines', name:'Q1',
+              line:{color:'#94a3b8', dash:'dot', width:1}, yaxis:'y',
+              showlegend: false },
+            { type:'scatter', x:[q3, q3], y:[0, 1],
+              mode:'lines', name:'Q3',
+              line:{color:'#94a3b8', dash:'dot', width:1}, yaxis:'y',
+              showlegend: false }
         ], {
             margin:{t:10,r:10,b:40,l:50},
             paper_bgcolor:'white', plot_bgcolor:'white',
             xaxis:{title:'Bid (€/MW)', tickfont:{size:10}},
             yaxis:{title:'Expected Profit (€/MW)', gridcolor:'#f3f4f6', tickfont:{size:10}},
             yaxis2:{title:'Win Prob.', overlaying:'y', side:'right', range:[0,1], tickfont:{size:10}, tickformat:'.0%'},
-            legend:{orientation:'h', y:-0.3, font:{size:10}},
+            yaxis3:{overlaying:'y', side:'left', visible:false, range:[0,1]},
+            barmode:'overlay',
+            bargap:0.05,
+            legend:{orientation:'h', y:-0.25, font:{size:10}},
             showlegend:true,
-            annotations:[{
-                x: optBid, y: optProfit,
-                text: `Optimal: €${optBid.toFixed(2)} | Win: ${(optPWin*100).toFixed(0)}%`,
-                showarrow:true, arrowhead:1, ax:60, ay:-40,
-                font:{size:11, color:'#dc2626', weight:700}
-            }]
+            annotations:[
+                { x: optBid, y: optProfit,
+                  text: `Optimal: €${optBid.toFixed(2)} | Win: ${(optPWin*100).toFixed(0)}%`,
+                  showarrow:true, arrowhead:1, ax:60, ay:-40,
+                  font:{size:11, color:'#dc2626', weight:700} },
+                { x: 0.5, y: 1.08, xref:'paper', yref:'paper',
+                  text: statsNote, showarrow:false,
+                  font:{size:10, color:'#64748b'} }
+            ]
         }, {responsive:true, displayModeBar:false});
     }
 
