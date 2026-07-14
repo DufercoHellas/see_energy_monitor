@@ -7324,6 +7324,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         bestPathDesc = `${group.start} ➔ ${group.end} via ${bestHourEntry.routeName} (H${bestHourEntry.hour+1}: ${maxMargin.toFixed(2)} €/MWh)`;
                     }
 
+                    // Filter to only corridors that are best for at least one hour
+                    const bestCorridorKeys = new Set(Object.values(bestByHour).map(h => h.corridorKey));
+                    const effectiveCorridorList = corridorList.filter(cor => bestCorridorKeys.has(cor.routeKey));
+
                     const cid = `arb_card_${cardIdx++}`;
 
                     // --- Route header badges (start → ... → end) ---
@@ -7336,14 +7340,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     const arrow = `<span style="color:#94a3b8;font-size:16px;font-weight:700;margin:0 4px;">➔</span>`;
                     const headerBadges = mkBadge(group.start) + arrow + mkBadge(group.end);
 
-                    // --- Corridor tabs (one per unique sub-route) ---
+                    // --- Corridor tabs (only show routes that are best for ≥1 hour) ---
                     // Sort corridors: fewest hops first (direct route first), then alphabetical
-                    corridorList.sort((a, b) => a.path.length - b.path.length || a.routeName.localeCompare(b.routeName));
+                    effectiveCorridorList.sort((a, b) => a.path.length - b.path.length || a.routeName.localeCompare(b.routeName));
                     let corridorTabsHtml = '';
-                    if (corridorList.length > 1) {
+                    if (effectiveCorridorList.length > 1) {
                         corridorTabsHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center;">
                             <span style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-right:2px;">Corridors:</span>`;
-                        corridorList.forEach((cor, ci) => {
+                        effectiveCorridorList.forEach((cor, ci) => {
                             const isFirst = ci === 0;
                             // Build compact path label e.g. "Direct" or via-nodes
                             const hops = cor.path.length - 1; // number of legs
@@ -7351,7 +7355,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             const label = hops === 1 ? `Direct (${cor.path[0].to}➔${cor.path[cor.path.length-1].to})` :
                                           `via ${via.join('➔')}`;
                             corridorTabsHtml += `<button id="${cid}_tab_${ci}"
-                                onclick="selectCorridorTab('${cid}', ${ci}, ${corridorList.length})"
+                                onclick="selectCorridorTab('${cid}', ${ci}, ${effectiveCorridorList.length})"
                                 style="padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;
                                        background:${isFirst?'#1d4ed8':'#f8fafc'};color:${isFirst?'#fff':'#475569'};transition:all 0.15s;">${label}</button>`;
                         });
@@ -7364,8 +7368,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         const hr = bestByHour[hh];
                         if (hr) {
                             const bg = marginColour(hr.netMargin, '0.9');
-                            // Find the corridor that owns this best hour
-                            const ownerCor = corridorList.find(c => c.routeKey === hr.corridorKey);
+                            const ownerCor = effectiveCorridorList.find(c => c.routeKey === hr.corridorKey);
                             // Check outages
                             let hasOutage = false;
                             if (ownerCor) {
@@ -7381,7 +7384,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 }
                             }
                             const dot = hasOutage ? '<div style="width:4px;height:4px;background:#f97316;border-radius:50%;margin:0 auto 1px;"></div>' : '';
-                            hourBarHtml += `<div title="H${hh+1}: ${hr.netMargin.toFixed(1)} €/MWh (${hr.routeName})" style="flex:1;min-width:0;border-radius:4px;background:${bg};padding:2px 0;cursor:pointer;" onclick="toggleDetail('${cid}_body_all')">${dot}<div style="text-align:center;font-size:9px;font-weight:700;color:white;line-height:1.4;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${hh+1}</div></div>`;
+                            hourBarHtml += `<div title="H${hh+1}: ${hr.netMargin.toFixed(1)} €/MWh (${hr.routeName})" style="flex:1;min-width:0;border-radius:4px;background:${bg};padding:2px 0;cursor:pointer;" onclick="toggleDetail('${cid}_details')">${dot}<div style="text-align:center;font-size:9px;font-weight:700;color:white;line-height:1.4;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${hh+1}</div></div>`;
                         } else {
                             hourBarHtml += `<div title="H${hh+1}: no opportunity" style="flex:1;min-width:0;border-radius:4px;background:#f1f5f9;padding:2px 0;"><div style="text-align:center;font-size:9px;color:#cbd5e1;line-height:2.4;">${hh+1}</div></div>`;
                         }
@@ -7401,9 +7404,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     // --- Stat pills + Notes box ---
                     const accentCol = marginColour(maxMargin, null);
 
-                    // Collect all unique countries across all corridors in this group
                     const allRouteCountries = new Set();
-                    corridorList.forEach(cor => cor.path.forEach(p => allRouteCountries.add(p.to)));
+                    effectiveCorridorList.forEach(cor => cor.path.forEach(p => allRouteCountries.add(p.to)));
 
                     // Holiday notes: check each country for holidays on targetDate
                     const holidayNotes = [];
@@ -7412,9 +7414,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         hols.forEach(h => holidayNotes.push({ country: code, holiday: h }));
                     });
 
-                    // Outage notes: collect distinct cables with any outage across all hours
                     const outageSummary = {};
-                    corridorList.forEach(cor => {
+                    effectiveCorridorList.forEach(cor => {
                         for (let i = 1; i < cor.path.length; i++) {
                             const cable = cor.path[i].cable;
                             if (!cable) continue;
@@ -7432,24 +7433,35 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         }
                     });
 
-                    // Build notes box HTML
-                    let notesLines = [];
-                    Object.entries(outageSummary).forEach(([cable, pct]) => {
-                        const col = pct === 0 ? '#b91c1c' : pct <= 30 ? '#dc2626' : '#d97706';
-                        const lbl = pct === 0 ? 'FULL OUTAGE' : `${pct}% capacity`;
-                        notesLines.push(`<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;"><span style="font-size:10px;">⚡</span><span style="font-size:10px;font-weight:700;color:${col};">${cable}: ${lbl}</span></div>`);
-                    });
-                    holidayNotes.forEach(({ country, holiday }) => {
-                        notesLines.push(`<div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;"><span style="font-size:10px;">🗓️</span><span style="font-size:10px;font-weight:700;color:#92400e;"><span style="background:#fef3c7;padding:1px 4px;border-radius:3px;">${country}</span> ${holiday}</span></div>`);
-                    });
+                    // Build outage notes section
+                    let outageLinesHtml = '';
+                    const outageEntries = Object.entries(outageSummary);
+                    if (outageEntries.length > 0) {
+                        outageLinesHtml = `<div style="margin-bottom:4px;">
+                            <div style="font-size:9px;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">⚡ Cable Outages</div>`;
+                        outageEntries.forEach(([cable, pct]) => {
+                            const col = pct === 0 ? '#b91c1c' : pct <= 30 ? '#dc2626' : '#d97706';
+                            const lbl = pct === 0 ? 'FULL OUTAGE' : `${pct}% capacity`;
+                            outageLinesHtml += `<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;"><span style="font-size:10px;font-weight:700;color:${col};">${cable}: ${lbl}</span></div>`;
+                        });
+                        outageLinesHtml += '</div>';
+                    }
 
-                    const hasWarnings = notesLines.length > 0;
-                    const notesBg     = hasWarnings ? '#fffbeb' : '#f0fdf4';
-                    const notesBorder = hasWarnings ? '#fde68a' : '#bbf7d0';
-                    const notesIcon   = hasWarnings ? '⚠️' : '✅';
-                    const notesTitle  = hasWarnings ? 'Trade Notes' : 'Trade Notes';
-                    const notesContent = hasWarnings
-                        ? notesLines.join('')
+                    // Build holiday notes section
+                    let holidayLinesHtml = '';
+                    if (holidayNotes.length > 0) {
+                        holidayLinesHtml = `<div>
+                            <div style="font-size:9px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:3px;">🗓️ Holidays</div>`;
+                        holidayNotes.forEach(({ country, holiday }) => {
+                            holidayLinesHtml += `<div style="display:flex;align-items:center;gap:4px;margin-bottom:1px;"><span style="font-size:10px;font-weight:600;color:#92400e;"><span style="background:#fef3c7;padding:1px 4px;border-radius:3px;">${country}</span> ${holiday}</span></div>`;
+                        });
+                        holidayLinesHtml += '</div>';
+                    }
+
+                    const hasOutages = outageEntries.length > 0;
+                    const hasHolidays = holidayNotes.length > 0;
+                    const notesContent = hasOutages || hasHolidays
+                        ? outageLinesHtml + holidayLinesHtml
                         : `<div style="font-size:10px;font-weight:600;color:#166534;">No outages · No holidays</div>`;
 
                     const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:stretch;">
@@ -7469,19 +7481,17 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Best Hour</div>
                             <div style="font-size:18px;font-weight:800;color:#334155;">${bestHourEntry.hour+1}:00</div>
                         </div>
-                        ${corridorList.length > 1 ? `<div style="background:#f0f0ff;border:1px solid #c7d2fe;border-radius:8px;padding:6px 14px;">
+                        ${effectiveCorridorList.length > 1 ? `<div style="background:#f0f0ff;border:1px solid #c7d2fe;border-radius:8px;padding:6px 14px;">
                             <div style="font-size:9px;color:#4f46e5;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Corridors</div>
-                            <div style="font-size:18px;font-weight:800;color:#4f46e5;">${corridorList.length}</div>
+                            <div style="font-size:18px;font-weight:800;color:#4f46e5;">${effectiveCorridorList.length}</div>
                         </div>` : ''}
-                        <div style="background:${notesBg};border:1px solid ${notesBorder};border-radius:8px;padding:6px 14px;min-width:160px;flex:1;">
-                            <div style="font-size:9px;color:#78716c;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">${notesIcon} ${notesTitle}</div>
+                        <div style="background:${hasOutages?'#fffbeb':'#f0fdf4'};border:1px solid ${hasOutages?'#fde68a':'#bbf7d0'};border-radius:8px;padding:6px 14px;max-width:260px;">
                             ${notesContent}
                         </div>
                     </div>`;
 
-                    // --- Per-corridor detail tables ---
                     let allDetailTablesHtml = '';
-                    corridorList.forEach((cor, ci) => {
+                    effectiveCorridorList.forEach((cor, ci) => {
                         let rows = '';
                         cor.hours.sort((a,b) => a.hour - b.hour).forEach(res => {
                             const outageChips = [];
@@ -7563,10 +7573,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </div>`;
                     });
 
-                    const toggleBtn = `<button onclick="toggleDetail('${cid}_details');this.textContent=document.getElementById('${cid}_details').style.display==='none'?'▼ Show hour details':'▲ Hide details';" style="width:100%;margin-top:8px;padding:5px;background:none;border:1px solid #e2e8f0;border-radius:6px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;">▼ Show hour details</button>`;
+                    const toggleBtn = `<button onclick="toggleDetail('${cid}_details');this.textContent=document.getElementById('${cid}_details').style.display==='none'?'▼ Show hour details':'▲ Hide details';" style="width:100%;margin-top:10px;padding:8px 14px;background:#f1f5f9;border:1px solid #d1d5db;border-radius:8px;font-size:12px;font-weight:700;color:#334155;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f1f5f9'">▼ Show hour details</button>`;
 
+                    const startIsEU = countryEU[group.start];
+                    const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
                     cardsHtml += `
-                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
                             <div style="display:flex;align-items:center;gap:6px;">${headerBadges}</div>
                             <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;text-transform:uppercase;">Optimal Flow Route</span>
