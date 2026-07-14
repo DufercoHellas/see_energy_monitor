@@ -8268,14 +8268,15 @@ function shapeForwardToHourly(forwardPrice, historicalPrices) {
 }
 
 function getHistoricalPricesForMonth(country, yearMonth) {
-    // Returns array of daily 24-hour price arrays for the same calendar month across all years
     const targetMonth = parseInt(yearMonth.split('-')[1]);
     const data = historicalData[country];
     if (!data) return [];
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
     const result = [];
     Object.keys(data).forEach(dateStr => {
         const d = new Date(dateStr);
-        if (d.getMonth() + 1 === targetMonth && data[dateStr].prices) {
+        if (d.getMonth() + 1 === targetMonth && d >= twoYearsAgo && data[dateStr].prices) {
             result.push(data[dateStr].prices);
         }
     });
@@ -8313,60 +8314,54 @@ function runAuctionOptimizer() {
     const dstFwd = getForwardPrice(dest, yearMonth) || 85.0;
     const fwdSpread = dstFwd - srcFwd;
 
-    // Get historical profiles for shaping
+    // Get historical hourly spread shape (last 2 years, same calendar month)
     const targetMonth = parseInt(yearMonth.split('-')[1]);
-    const srcHistorical = getHistoricalPricesForMonth(source, yearMonth);
-    const dstHistorical = getHistoricalPricesForMonth(dest, yearMonth);
-
-    // 1. Direct Spread Shaping
-    // Match by date and calculate hourly spreads
-    const hourlySpreadsSum = Array(24).fill(0);
-    let matchedDaysCount = 0;
+    const spreadDays = [];
     const dataSrc = historicalData[source] || {};
     const dataDst = historicalData[dest] || {};
+    const twoYearsAgo = new Date();
+    twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2);
 
     Object.keys(dataSrc).forEach(dateStr => {
         const d = new Date(dateStr);
-        if (d.getMonth() + 1 === targetMonth && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
-            const srcPrices = dataSrc[dateStr].prices;
-            const dstPrices = dataDst[dateStr].prices;
-            for (let h = 0; h < 24; h++) {
-                hourlySpreadsSum[h] += (dstPrices[h] - srcPrices[h]);
-            }
-            matchedDaysCount++;
+        if (d >= twoYearsAgo && d.getMonth() + 1 === targetMonth && dataSrc[dateStr].prices && dataDst[dateStr]?.prices) {
+            const src = dataSrc[dateStr].prices;
+            const dst = dataDst[dateStr].prices;
+            const spread = Array(24).fill(0);
+            for (let h = 0; h < 24; h++) spread[h] = (dst[h] || 0) - (src[h] || 0);
+            spreadDays.push(spread);
         }
     });
 
+    // Compute average hourly spread profile
     const avgHourlySpreads = Array(24).fill(0);
-    if (matchedDaysCount > 0) {
+    if (spreadDays.length > 0) {
         for (let h = 0; h < 24; h++) {
-            avgHourlySpreads[h] = hourlySpreadsSum[h] / matchedDaysCount;
+            avgHourlySpreads[h] = spreadDays.reduce((s, day) => s + day[h], 0) / spreadDays.length;
         }
     } else {
-        // Fallback spread shape
         for (let h = 0; h < 24; h++) avgHourlySpreads[h] = fwdSpread;
     }
 
-    const meanSpreadProfile = avgHourlySpreads.reduce((a, b) => a + b, 0) / 24;
+    // Scale historical shape to match the forward spread
+    const meanProfile = avgHourlySpreads.reduce((a, b) => a + b, 0) / 24;
     const shapedSpreads = Array(24).fill(0);
     const isSolarHour = [];
+    const peakHours = avgHourlySpreads.slice(8, 20);
+    const avgPeakSpread = peakHours.reduce((s, v) => s + v, 0) / peakHours.length;
 
     for (let h = 0; h < 24; h++) {
-        // Scale spread profile to forward spread expectation
-        let scaledSpread = fwdSpread;
-        if (Math.abs(meanSpreadProfile) > 0.1) {
-            scaledSpread = fwdSpread * (avgHourlySpreads[h] / meanSpreadProfile);
-        } else {
-            scaledSpread = fwdSpread;
+        let scaled = fwdSpread;
+        if (Math.abs(meanProfile) > 0.1) {
+            scaled = fwdSpread * (avgHourlySpreads[h] / meanProfile);
         }
-        
-        // Solar filter: hours 10-15, if average historical spread < 1.0 ???/MWh => zero out
-        const solar = (h >= 10 && h <= 15) && avgHourlySpreads[h] < 1.0;
+        // Solar dip: if an hour's spread is < 20% of the peak average, it's solar-cannibalised
+        const solar = (h >= 9 && h <= 16) && avgPeakSpread > 1.0 && avgHourlySpreads[h] < avgPeakSpread * 0.2;
         isSolarHour.push(solar);
-        shapedSpreads[h] = solar ? 0 : Math.max(0, scaledSpread);
+        shapedSpreads[h] = solar ? 0 : Math.max(0, scaled);
     }
 
-    // E[V] = average of positive spreads across all hours in month
+    // E[V] = average of all hourly spreads (trader captures max(0, spread) each hour)
     const ev = shapedSpreads.reduce((s, v) => s + v, 0) / 24;
 
     // 2. Thermal Generation Cost / Fuel Signal
@@ -8385,8 +8380,11 @@ function runAuctionOptimizer() {
     // 4. Expected Profit Optimization using Historical Clearing Prices
     const historicalClearing = (cablesLongData || []).filter(r => {
         if (r.corridor_code !== corridor) return false;
-        const d = new Date(r.start_date);
-        return d.getMonth() + 1 === targetMonth && r.price != null;
+        if (r.product !== 'Monthly') return false;
+        if (r.price == null) return false;
+        const endParts = r.end_date.split(' ')[0].split('-');
+        const delivMonth = parseInt(endParts[1]);
+        return delivMonth === targetMonth;
     }).map(r => parseFloat(r.price));
 
     let recommendedRiskMargin = riskMargin;
