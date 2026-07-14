@@ -1319,11 +1319,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
 
                 <!-- KPI Cards Row -->
-                <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin-bottom:24px;">
+                <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
                     <div class="chart-wrapper" style="padding:20px; margin:0;">
                         <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
                         <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
                         <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
+                    </div>
+                    <div class="chart-wrapper" style="padding:20px; margin:0;">
+                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Win Probability</div>
+                        <div id="kpi_win_prob" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
+                        <div id="kpi_win_prob_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">at optimal bid</div>
                     </div>
                     <div class="chart-wrapper" style="padding:20px; margin:0;">
                         <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
@@ -1345,9 +1350,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <!-- Main Content: 2 columns -->
                 <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
                     <div class="chart-wrapper" style="margin:0;">
+                        <h4 style="margin-top:0;">Bid Profit Curve</h4>
+                        <p id="auction_bid_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Expected profit and win probability at each bid level. The optimal bid maximizes expected profit.</p>
+                        <div id="auction_bid_curve_chart" style="width:100%; height:300px;"></div>
+                    </div>
+                    <div class="chart-wrapper" style="margin:0; margin-top:16px;">
                         <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
-                        <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread (Destination − Source) by hour. Gray = solar suppression zone (10:00–15:00).</p>
-                        <div id="auction_spread_chart" style="width:100%; height:280px;"></div>
+                        <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread by hour. Gray = solar suppression. Used to compute E[V].</p>
+                        <div id="auction_spread_chart" style="width:100%; height:160px;"></div>
                         <div id="historical_profile_toggles_container" style="margin-top: 8px; margin-bottom: 12px;"></div>
                         <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
                     </div>
@@ -8414,9 +8424,27 @@ function runAuctionOptimizer() {
     const totalExposure = bidMw * hoursInMonth;
     const liability = finalBid * totalExposure;
 
+    // Compute bid profit curve
+    const bidSteps = [];
+    if (historicalClearing.length >= 2) {
+        for (let b = 0.01; b < ev; b += 0.05) {
+            const winCount = historicalClearing.filter(p => p <= b).length;
+            const pWin = winCount / historicalClearing.length;
+            const expProfit = pWin * (ev - fuelDeduction - b);
+            bidSteps.push({ bid: b, pWin, expProfit });
+        }
+    }
+    const opt = bidSteps.length > 0
+        ? bidSteps.reduce((best, s) => s.expProfit > best.expProfit ? s : best, { expProfit: -Infinity })
+        : { bid: 0, pWin: 0, expProfit: 0 };
+
     // Update KPI cards
     document.getElementById('kpi_bid').textContent = '€' + finalBid.toFixed(2);
     document.getElementById('kpi_bid_sub').textContent = `/MW • ${yearMonth}`;
+    document.getElementById('kpi_win_prob').textContent = historicalClearing.length >= 2 ? (opt.pWin * 100).toFixed(0) + '%' : '—';
+    document.getElementById('kpi_win_prob_sub').textContent = historicalClearing.length >= 2
+        ? `at €${opt.bid.toFixed(2)} bid  •  ${historicalClearing.length} obs`
+        : 'insufficient data';
     document.getElementById('kpi_ev').textContent = '€' + ev.toFixed(2);
     document.getElementById('kpi_exposure').textContent = totalExposure.toLocaleString();
     document.getElementById('kpi_exposure_sub').textContent = `MWh (${bidMw}MW • ${hoursInMonth}h)`;
@@ -8427,10 +8455,11 @@ function runAuctionOptimizer() {
         { label: 'Base E[V]', value: ev, sign: '+', color: '#059669' },
         { label: 'Fuel/Carbon Spread', value: fuelDeduction, sign: '-', color: '#dc2626' },
         { label: 'Risk Margin', value: riskMargin, sign: '-', color: '#d97706' },
+        ...(historicalClearing.length >= 2 ? [{ label: 'Historical Auctions', value: historicalClearing.length, sign: '', color: '#4f46e5', suffix: ' obs' }] : [])
     ].map(row => `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f3f4f6;">
             <span style="color:#374151; font-weight:500;">${row.label}</span>
-            <span style="font-weight:700; color:${row.color};">${row.sign}€${row.value.toFixed(2)} /MWh</span>
+            <span style="font-weight:700; color:${row.color};">${row.sign}${row.suffix ? row.value.toFixed(0) + row.suffix : '€' + row.value.toFixed(2) + ' /MWh'}</span>
         </div>
     `).join('') + `
         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; margin-top:4px; border-top:2px solid #e5e7eb;">
@@ -8441,6 +8470,38 @@ function runAuctionOptimizer() {
     `;
     document.getElementById('auction_adjustments').innerHTML = adjHtml;
 
+    // Bid Profit Curve Chart (Plotly)
+    const bidCurveEl = document.getElementById('auction_bid_curve_chart');
+    if (bidSteps.length === 0) {
+        bidCurveEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:14px;font-weight:600;">Insufficient historical clearing data to compute bid curve.</div>';
+    } else {
+        const optBid = opt.bid, optProfit = opt.expProfit, optPWin = opt.pWin;
+        Plotly.newPlot('auction_bid_curve_chart', [
+            { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.expProfit),
+              mode:'lines', name:'Expected Profit', line:{color:'#6366f1', width:2}, yaxis:'y' },
+            { type:'scatter', x: bidSteps.map(s => s.bid), y: bidSteps.map(s => s.pWin),
+              mode:'lines', name:'Win Probability', line:{color:'#10b981', dash:'dot', width:1.5}, yaxis:'y2' },
+            { type:'scatter', x:[optBid], y:[optProfit],
+              mode:'markers+text', name:'Optimal Bid',
+              marker:{color:'#ef4444', size:14, symbol:'star'},
+              text:[`€${optBid.toFixed(2)}`], textposition:'top center', yaxis:'y' }
+        ], {
+            margin:{t:10,r:10,b:40,l:50},
+            paper_bgcolor:'white', plot_bgcolor:'white',
+            xaxis:{title:'Bid (€/MW)', tickfont:{size:10}},
+            yaxis:{title:'Expected Profit (€/MW)', gridcolor:'#f3f4f6', tickfont:{size:10}},
+            yaxis2:{title:'Win Prob.', overlaying:'y', side:'right', range:[0,1], tickfont:{size:10}, tickformat:'.0%'},
+            legend:{orientation:'h', y:-0.3, font:{size:10}},
+            showlegend:true,
+            annotations:[{
+                x: optBid, y: optProfit,
+                text: `Optimal: €${optBid.toFixed(2)} | Win: ${(optPWin*100).toFixed(0)}%`,
+                showarrow:true, arrowhead:1, ax:60, ay:-40,
+                font:{size:11, color:'#dc2626', weight:700}
+            }]
+        }, {responsive:true, displayModeBar:false});
+    }
+
     // Spread Shape Chart (Plotly)
     const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
     const barColors = shapedSpreads.map((v, h) => isSolarHour[h] ? '#d1d5db' : (v > finalBid ? '#059669' : '#6ee7b7'));
@@ -8449,18 +8510,23 @@ function runAuctionOptimizer() {
         { type: 'scatter', x: hours, y: Array(24).fill(finalBid), mode: 'lines',
           line: { color: '#4f46e5', dash: 'dash', width: 2 }, name: 'Bid Level' }
     ], {
-        margin: { t: 10, r: 10, b: 40, l: 45 },
+        margin: { t: 5, r: 10, b: 35, l: 45 },
         paper_bgcolor: 'white', plot_bgcolor: 'white',
-        yaxis: { title: '€/MWh', gridcolor: '#f3f4f6', tickfont: {size: 11} },
-        xaxis: { tickfont: {size: 10}, tickangle: -45 },
-        legend: { orientation: 'h', y: -0.25, font: {size: 11} },
+        yaxis: { title: '€/MWh', gridcolor: '#f3f4f6', tickfont: {size: 10} },
+        xaxis: { tickfont: {size: 9}, tickangle: -45 },
+        legend: { orientation: 'h', y: -0.35, font: {size: 10} },
         showlegend: true,
         annotations: [{
             x: '12:00', y: Math.max(...shapedSpreads) * 0.5,
             text: 'Solar suppression', showarrow: false,
-            font: { size: 10, color: '#9ca3af' }
+            font: { size: 9, color: '#9ca3af' }
         }]
     }, { responsive: true, displayModeBar: false });
+
+    // Update subtitles
+    document.getElementById('auction_spread_subtitle').innerHTML =
+        `Shaped forward spread (${dest} − ${source}) by hour. Gray = solar suppression. ` +
+        `<strong style="color:#4f46e5;">EV: €${ev.toFixed(2)}/MWh</strong>`;
 
     // Forward Curve Chart (Plotly)
     renderAuctionFwdChart(source, dest, corridor);
