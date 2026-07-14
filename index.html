@@ -8486,26 +8486,33 @@ function renderAuctionClearingChart(corridor, yearMonth) {
     let endYear = targetYear, endMonth = targetMonth - 1;
     if (endMonth === 0) { endMonth = 12; endYear--; }
     let startYear = endYear - 1, startMonth = endMonth;
-    const startStr = `${startYear}-${String(startMonth).padStart(2,'0')}-01`;
-    const endStr = `${endYear}-${String(endMonth).padStart(2,'0')}-31`;
+    const startStr = `${startYear}-${String(startMonth).padStart(2,'0')}`;
+    const endStr = `${endYear}-${String(endMonth).padStart(2,'0')}`;
 
-    const historical = (cablesLongData || []).filter(r => {
-        if (r.corridor_code !== corridor) return false;
-        if (r.product !== 'Monthly') return false;
-        const d = r.start_date.split(' ')[0];
-        return d >= startStr && d <= endStr && r.price != null;
-    }).sort((a, b) => a.start_date.localeCompare(b.start_date));
+    const byDeliveryMonth = {};
+    (cablesLongData || []).forEach(r => {
+        if (r.corridor_code !== corridor) return;
+        if (r.product !== 'Monthly') return;
+        if (r.price == null) return;
+        const endParts = r.end_date.split(' ')[0].split('-');
+        const delivMonth = endParts[0] + '-' + endParts[1];
+        if (delivMonth < startStr || delivMonth > endStr) return;
+        if (!byDeliveryMonth[delivMonth] || r.start_date > byDeliveryMonth[delivMonth].start_date) {
+            byDeliveryMonth[delivMonth] = r;
+        }
+    });
 
-    if (!historical.length) {
+    const months = Object.keys(byDeliveryMonth).sort();
+    if (!months.length) {
         document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical monthly clearing data for this corridor in the past 12 months.</p>';
         return;
     }
-    const labels = historical.map(r => {
-        const parts = r.start_date.split(' ')[0].split('-');
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        return months[parseInt(parts[1])-1] + ' ' + parts[0];
+    const monthLabels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const labels = months.map(m => {
+        const p = m.split('-');
+        return monthLabels[parseInt(p[1])-1] + ' ' + p[0];
     });
-    const prices = historical.map(r => parseFloat(r.price));
+    const prices = months.map(m => parseFloat(byDeliveryMonth[m].price));
     const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
     Plotly.newPlot('auction_clearing_chart', [
         { type:'scatter', x: labels, y: prices, mode:'lines+markers',
