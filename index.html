@@ -1787,27 +1787,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     </div>
                 </div>
 
-                <!-- Table Container -->
-                <div class="table-container" style="max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
-                    <table id="arbitrage_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
-                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 10; box-shadow: 0 1px 0 0 #e2e8f0;">
-                            <tr>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569;">Optimal Flow Route</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: center;">Hour</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: right;">Start Price</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: right;">End Price</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: right;">Gross Spread</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: right;">Capacity Cost</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #475569; text-align: right;">Net Margin</th>
-                                <th style="padding: 12px 16px; font-weight: 600; color: #4e46e5; text-align: right;">Net Margin Realized</th>
-                            </tr>
-                        </thead>
-                        <tbody id="arbitrage_table_body">
-                            <tr>
-                                <td colspan="8" style="padding: 24px; text-align: center; color: #94a3b8;">No data available. Run match search first.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Route Cards Container -->
+                <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>
                 </div>
             </div>
 
@@ -7011,11 +6993,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             }
 
             function renderArbitragePanel() {
-                const tbody = document.getElementById("arbitrage_table_body");
-                if (!tbody) return;
+                const container = document.getElementById("arbitrage_cards_container");
+                if (!container) return;
 
                 if (!currentTop7 || currentTop7.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px; text-align: center; color: #94a3b8;">No data available. Run match search first.</td></tr>`;
+                    container.innerHTML = `<div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>`;
                     return;
                 }
 
@@ -7086,7 +7068,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 let profitableHoursCount = 0;
                 let maxSpreadVal = -999.0;
                 let bestPathDesc = "";
-                let tableHtml = "";
 
                 // 1. Gather all profitable paths for each hour first
                 const pathByHour = Array.from({length: 24}, () => []);
@@ -7241,102 +7222,205 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
                 const uniqueProfitableHours = new Set();
 
+                // Helper: margin → colour on green→amber→red scale
+                function marginColour(v, alpha) {
+                    if (v >= 20)  return alpha ? 'rgba(16,185,129,' + alpha + ')' : '#10b981';
+                    if (v >= 10)  return alpha ? 'rgba(34,197,94,'  + alpha + ')' : '#22c55e';
+                    if (v >= 5)   return alpha ? 'rgba(234,179,8,'  + alpha + ')' : '#eab308';
+                    return         alpha ? 'rgba(239,68,68,'  + alpha + ')' : '#ef4444';
+                }
+
+                // Build a unique card ID prefix for toggling
+                let cardIdx = 0;
+                let cardsHtml = '';
+
                 sortedGroups.forEach(group => {
-                    const numHours = group.hours.length;
-                    
-                    group.hours.forEach((res, resIdx) => {
-                        uniqueProfitableHours.add(res.hour);
-                        if (res.netMargin > maxSpreadVal) {
-                            maxSpreadVal = res.netMargin;
-                            bestPathDesc = `${group.routeName} (Hour ${res.hour+1}: ${res.netMargin.toFixed(2)} €/MWh net)`;
+                    group.hours.forEach(res => uniqueProfitableHours.add(res.hour));
+
+                    const maxMargin = Math.max(...group.hours.map(h => h.netMargin));
+                    const avgMargin = group.hours.reduce((s, h) => s + h.netMargin, 0) / group.hours.length;
+                    const bestHour  = group.hours.reduce((best, h) => h.netMargin > best.netMargin ? h : best, group.hours[0]);
+
+                    if (maxMargin > maxSpreadVal) {
+                        maxSpreadVal = maxMargin;
+                        bestPathDesc = `${group.routeName} (Hour ${bestHour.hour+1}: ${maxMargin.toFixed(2)} €/MWh net)`;
+                    }
+
+                    const cid = `arb_card_${cardIdx++}`;
+
+                    // --- Route badge strip ---
+                    const routeBadges = group.path.map(p => {
+                        const isEU = countryEU[p.to];
+                        const bg  = isEU ? '#dbeafe' : '#fee2e2';
+                        const col = isEU ? '#1d4ed8' : '#b91c1c';
+                        return `<span style="display:inline-block;padding:4px 10px;border-radius:6px;font-size:12px;font-weight:800;background:${bg};color:${col};letter-spacing:0.03em;">${p.to}</span>`;
+                    }).join(`<span style="color:#94a3b8;font-size:14px;font-weight:700;margin:0 4px;">➔</span>`);
+
+                    // --- 24-slot hour heat-map bar ---
+                    const hoursSet = {};
+                    group.hours.forEach(h => hoursSet[h.hour] = h);
+
+                    let hourBarHtml = '<div style="display:flex;gap:2px;margin:10px 0 4px 0;">';
+                    for (let hh = 0; hh < 24; hh++) {
+                        const hr = hoursSet[hh];
+                        if (hr) {
+                            const bg = marginColour(hr.netMargin, '0.85');
+                            // Check for outages this hour
+                            let hasOutage = false;
+                            for (let i = 1; i < group.path.length; i++) {
+                                const cable = group.path[i].cable;
+                                if (!cable) continue;
+                                const hourEntry = cableOutagesData.find(item =>
+                                    item.corridor_code === cable &&
+                                    item.trade_date === targetDate &&
+                                    item.position === (hh + 1)
+                                );
+                                if (hourEntry) { hasOutage = true; break; }
+                            }
+                            const outageDot = hasOutage ? '<div style="width:4px;height:4px;background:#f97316;border-radius:50%;margin:0 auto 1px;"></div>' : '';
+                            hourBarHtml += `<div title="Hour ${hh+1}: ${hr.netMargin.toFixed(1)} €/MWh" style="flex:1;min-width:0;border-radius:4px;background:${bg};padding:2px 0;cursor:pointer;" onclick="document.getElementById('${cid}_body').style.display=document.getElementById('${cid}_body').style.display==='none'?'table-row-group':'none';">
+                                ${outageDot}
+                                <div style="text-align:center;font-size:9px;font-weight:700;color:white;line-height:1.4;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${hh+1}</div>
+                            </div>`;
+                        } else {
+                            hourBarHtml += `<div title="Hour ${hh+1}: no opportunity" style="flex:1;min-width:0;border-radius:4px;background:#f1f5f9;padding:2px 0;">
+                                <div style="text-align:center;font-size:9px;color:#cbd5e1;line-height:2.4;">${hh+1}</div>
+                            </div>`;
                         }
+                    }
+                    hourBarHtml += '</div>';
+                    hourBarHtml += '<div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:6px;"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>24:00</span></div>';
 
-                         // Generate badge representation for the route (no warnings here anymore)
-                         const routeStr = group.path.map(p => {
-                             const isEU = countryEU[p.to];
-                             const badgeStyle = isEU ? 'background:#e0f2fe; color:#0369a1;' : 'background:#fee2e2; color:#b91c1c;';
-                             return `<span style="padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 700; ${badgeStyle}">${p.to}</span>`;
-                         }).join(" <span style='color:#94a3b8; font-weight:bold;'>➔</span> ");
+                    // --- Legend chips ---
+                    const legendHtml = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">
+                        <span style="font-size:10px;color:#64748b;font-weight:600;">Margin:</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;"><span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block;"></span>≥20 €</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;"><span style="width:10px;height:10px;border-radius:2px;background:#22c55e;display:inline-block;"></span>≥10 €</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;"><span style="width:10px;height:10px;border-radius:2px;background:#eab308;display:inline-block;"></span>≥5 €</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;"><span style="width:10px;height:10px;border-radius:2px;background:#ef4444;display:inline-block;"></span>&lt;5 €</span>
+                        <span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;"><span style="width:4px;height:4px;background:#f97316;border-radius:50%;display:inline-block;"></span>Cable outage</span>
+                    </div>`;
 
-                         // First column: Optimal Flow Route (rowspanned, no warnings)
-                         const routeCell = resIdx === 0 ? `<td style="padding: 12px 16px; border-bottom: 2px solid #cbd5e1; font-weight: 600; vertical-align: middle; background: #fff;" rowspan="${numHours}">${routeStr}</td>` : "";
+                    // --- Summary stat pills ---
+                    const accentCol = marginColour(maxMargin, null);
+                    const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;">
+                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 12px;">
+                            <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Max Margin</div>
+                            <div style="font-size:16px;font-weight:800;color:${accentCol};">${maxMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 12px;">
+                            <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Avg Margin</div>
+                            <div style="font-size:16px;font-weight:800;color:#334155;">${avgMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 12px;">
+                            <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Active Hours</div>
+                            <div style="font-size:16px;font-weight:800;color:#334155;">${group.hours.length} <span style="font-size:11px;font-weight:600;">/ 24</span></div>
+                        </div>
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 12px;">
+                            <div style="font-size:10px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Best Hour</div>
+                            <div style="font-size:16px;font-weight:800;color:#334155;">${bestHour.hour+1}:00 <span style="font-size:11px;font-weight:600;">hr</span></div>
+                        </div>
+                    </div>`;
 
-                         // Last row of each group gets a thicker border
-                         const borderStyle = resIdx === numHours - 1 ? 'border-bottom: 2px solid #cbd5e1;' : 'border-bottom: 1px solid #e2e8f0;';
-
-                         // Build per-hour outage warnings for this specific hour across all cable legs
-                         const hourOutageLines = [];
-                         for (let i = 1; i < group.path.length; i++) {
-                             const cable = group.path[i].cable;
-                             if (!cable) continue;
-                             
-                             // Check for outage on this specific hour (position = res.hour + 1)
-                             const hourEntry = cableOutagesData.find(item =>
-                                 item.corridor_code === cable &&
-                                 item.trade_date === targetDate &&
-                                 item.position === (res.hour + 1)
-                             );
-                             
-                             if (hourEntry) {
-                                 const orig = parseFloat(hourEntry.original_capacity) || 0;
-                                 const rem  = parseFloat(hourEntry.remaining_capacity) || 0;
-                                 const pct  = orig > 0 ? Math.round(100 * rem / orig) : 0;
-                                 
-                                 let warnColor = "#3b82f6"; // Blue 90-100%
-                                 if (pct <= 30)      warnColor = "#ef4444"; // Red
-                                 else if (pct < 90)  warnColor = "#d97706"; // Gold
-                                 
-                                 const label = pct === 0 ? "OUTAGE" : `${pct}% cap`;
-                                 hourOutageLines.push(`<div style="color:${warnColor}; font-size:10px; font-weight:600; margin-top:3px;">⚠️ ${cable} ${label}</div>`);
-                             }
-                         }
-                         const hourWarningsHtml = hourOutageLines.join("");
-
-                        // Compute realized margin if actual target day spot prices are loaded in historicalData
-                        let realizedMarginStr = "—";
-                        if (historicalData[group.start]?.[targetDate] && historicalData[group.end]?.[targetDate]) {
-                            const realSrcList = historicalData[group.start][targetDate].prices || [];
-                            const realDstList = historicalData[group.end][targetDate].prices || [];
-                            const pSrcReal = realSrcList[res.hour];
-                            const pDstReal = realDstList[res.hour];
-                            if (pSrcReal !== undefined && pSrcReal !== null && pSrcReal > 0.01 &&
-                                pDstReal !== undefined && pDstReal !== null && pDstReal > 0.01) {
-                                const realGross = pDstReal - pSrcReal;
-                                
-                                // Target day cable costs (actual costs from targetDate)
-                                let realCable = 0.0;
-                                for (let idx = 1; idx < group.path.length; idx++) {
-                                    if (group.path[idx].cable) {
-                                        realCable += getCablePrice(group.path[idx].cable, res.hour, targetDate);
-                                    }
-                                }
-                                const realNet = realGross - realCable;
-                                const color = realNet >= 0 ? "#10b981" : "#ef4444";
-                                realizedMarginStr = `<span style="font-weight: 700; color: ${color};">${realNet.toFixed(2)} €</span>`;
+                    // --- Expandable detail table ---
+                    let detailRows = '';
+                    group.hours.forEach(res => {
+                        // Outage warnings for this hour
+                        const outageChips = [];
+                        for (let i = 1; i < group.path.length; i++) {
+                            const cable = group.path[i].cable;
+                            if (!cable) continue;
+                            const hourEntry = cableOutagesData.find(item =>
+                                item.corridor_code === cable &&
+                                item.trade_date === targetDate &&
+                                item.position === (res.hour + 1)
+                            );
+                            if (hourEntry) {
+                                const orig = parseFloat(hourEntry.original_capacity) || 0;
+                                const rem  = parseFloat(hourEntry.remaining_capacity) || 0;
+                                const pct  = orig > 0 ? Math.round(100 * rem / orig) : 0;
+                                let chipBg = '#dbeafe'; let chipCol = '#1d4ed8';
+                                if (pct <= 30) { chipBg = '#fee2e2'; chipCol = '#b91c1c'; }
+                                else if (pct < 90) { chipBg = '#fef9c3'; chipCol = '#854d0e'; }
+                                const lbl = pct === 0 ? 'OUTAGE' : `${pct}%`;
+                                outageChips.push(`<span style="font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;background:${chipBg};color:${chipCol};">${cable} ${lbl}</span>`);
                             }
                         }
 
-                        tableHtml += `
-                        <tr style="${borderStyle} hover:background:#f8fafc;">
-                            ${routeCell}
-                            <td style="padding: 8px 16px; font-weight:700; text-align:center; background:#f8fafc;">Hour ${res.hour+1}${hourWarningsHtml}</td>
-                            <td style="padding: 8px 16px; text-align: right; color:#64748b;">${res.pStart.toFixed(2)} €</td>
-                            <td style="padding: 8px 16px; text-align: right; color:#64748b;">${res.pEnd.toFixed(2)} €</td>
-                            <td style="padding: 8px 16px; text-align: right; font-weight: 600; color:#0f172a;">${res.grossSpread.toFixed(2)} €</td>
-                            <td style="padding: 8px 16px; text-align: right; color:#8b5cf6;">${res.transitCost.toFixed(2)} €</td>
-                            <td style="padding: 8px 16px; text-align: right; font-weight: 700; color:#10b981;">${res.netMargin.toFixed(2)} €</td>
-                            <td style="padding: 8px 16px; text-align: right;">${realizedMarginStr}</td>
-                        </tr>
-                        `;
+                        // Realized margin
+                        let realizedCell = '<span style="color:#94a3b8;">—</span>';
+                        if (historicalData[group.start]?.[targetDate] && historicalData[group.end]?.[targetDate]) {
+                            const rSrc = (historicalData[group.start][targetDate].prices || [])[res.hour];
+                            const rDst = (historicalData[group.end][targetDate].prices || [])[res.hour];
+                            if (rSrc > 0.01 && rDst > 0.01) {
+                                let realCable = 0.0;
+                                for (let idx = 1; idx < group.path.length; idx++) {
+                                    if (group.path[idx].cable) realCable += getCablePrice(group.path[idx].cable, res.hour, targetDate);
+                                }
+                                const realNet = (rDst - rSrc) - realCable;
+                                const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
+                            }
+                        }
+
+                        const mCol = marginColour(res.netMargin, null);
+                        const outagePart = outageChips.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:3px;">${outageChips.join('')}</div>` : '';
+                        detailRows += `<tr style="border-bottom:1px solid #f1f5f9;">
+                            <td style="padding:8px 12px;font-weight:700;color:#1e293b;white-space:nowrap;">H${res.hour+1}</td>
+                            <td style="padding:8px 12px;color:#64748b;text-align:right;white-space:nowrap;">${res.pStart.toFixed(2)} €</td>
+                            <td style="padding:8px 12px;color:#64748b;text-align:right;white-space:nowrap;">${res.pEnd.toFixed(2)} €</td>
+                            <td style="padding:8px 12px;font-weight:600;color:#0f172a;text-align:right;white-space:nowrap;">${res.grossSpread.toFixed(2)} €</td>
+                            <td style="padding:8px 12px;color:#8b5cf6;text-align:right;white-space:nowrap;">${res.transitCost.toFixed(2)} €</td>
+                            <td style="padding:8px 12px;font-weight:800;color:${mCol};text-align:right;white-space:nowrap;">${res.netMargin.toFixed(2)} €</td>
+                            <td style="padding:8px 12px;text-align:right;">${realizedCell}</td>
+                            <td style="padding:8px 12px;">${outagePart}</td>
+                        </tr>`;
                     });
+
+                    const detailTable = `
+                    <div style="margin-top:8px;">
+                        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                            <thead>
+                                <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+                                    <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:left;">Hour</th>
+                                    <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Buy (Start)</th>
+                                    <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Sell (End)</th>
+                                    <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Gross</th>
+                                    <th style="padding:6px 12px;color:#8b5cf6;font-weight:700;text-align:right;">Cap. Cost</th>
+                                    <th style="padding:6px 12px;color:#10b981;font-weight:700;text-align:right;">Net Margin</th>
+                                    <th style="padding:6px 12px;color:#4f46e5;font-weight:700;text-align:right;">Realized</th>
+                                    <th style="padding:6px 12px;color:#475569;font-weight:700;">Outages</th>
+                                </tr>
+                            </thead>
+                            <tbody id="${cid}_body" style="display:none;">
+                                ${detailRows}
+                            </tbody>
+                        </table>
+                        <div style="text-align:center;margin-top:4px;">
+                            <button onclick="const b=document.getElementById('${cid}_body');b.style.display=b.style.display==='none'?'table-row-group':'none';this.textContent=b.style.display==='none'?'▼ Show hour details':'▲ Hide hour details';" style="background:none;border:1px solid #e2e8f0;border-radius:6px;padding:4px 16px;font-size:11px;font-weight:600;color:#64748b;cursor:pointer;width:100%;margin-top:2px;">▼ Show hour details</button>
+                        </div>
+                    </div>`;
+
+                    cardsHtml += `
+                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);">
+                        <!-- Route header -->
+                        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${routeBadges}</div>
+                            <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.04em;text-transform:uppercase;">Optimal Flow Route</span>
+                        </div>
+                        ${pillsHtml}
+                        ${legendHtml}
+                        ${hourBarHtml}
+                        ${detailTable}
+                    </div>`;
                 });
 
                 profitableHoursCount = uniqueProfitableHours.size;
-                
-                if (tableHtml === "") {
-                    tbody.innerHTML = `<tr><td colspan="8" style="padding: 24px; text-align: center; color: #94a3b8;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</td></tr>`;
+
+                if (cardsHtml === '') {
+                    container.innerHTML = `<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</div>`;
                 } else {
-                    tbody.innerHTML = tableHtml;
+                    container.innerHTML = cardsHtml;
                 }
 
                 // Update summary stats
