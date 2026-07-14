@@ -8502,6 +8502,17 @@ function renderAuctionClearingChart(corridor, yearMonth) {
         }
     });
 
+    // Index daily cable prices by corridor+month for quick lookup
+    const dailyPriceByMonth = {};
+    (cablesData || []).forEach(r => {
+        if (r.corridor_code !== corridor) return;
+        if (r.price == null) return;
+        const m = r.trade_date.slice(0, 7);
+        if (m < startStr || m > endStr) return;
+        if (!dailyPriceByMonth[m]) dailyPriceByMonth[m] = [];
+        dailyPriceByMonth[m].push(r.price);
+    });
+
     const months = Object.keys(byDeliveryMonth).sort();
     if (!months.length) {
         document.getElementById('auction_clearing_chart').innerHTML = '<p style="color:#9ca3af;font-size:13px;padding:20px 0;">No historical monthly clearing data for this corridor in the past 12 months.</p>';
@@ -8513,13 +8524,23 @@ function renderAuctionClearingChart(corridor, yearMonth) {
         return monthLabels[parseInt(p[1])-1] + ' ' + p[0];
     });
     const prices = months.map(m => parseFloat(byDeliveryMonth[m].price));
+    const dailyAvgPrices = months.map(m => {
+        const arr = dailyPriceByMonth[m];
+        if (!arr || !arr.length) return null;
+        return arr.reduce((s, v) => s + v, 0) / arr.length;
+    });
     const finalBid = parseFloat(document.getElementById('kpi_bid').textContent.replace('€',''));
-    Plotly.newPlot('auction_clearing_chart', [
+    const traces = [
         { type:'scatter', x: labels, y: prices, mode:'lines+markers',
-          marker:{color:'#6366f1', size:10}, line:{color:'#6366f1',width:2}, name:'Clearing Price' },
-        { type:'scatter', x:[labels[0], labels[labels.length-1]], y:[finalBid,finalBid],
-          mode:'lines', line:{color:'#059669',dash:'dash',width:2}, name:'Our Bid' }
-    ], {
+          marker:{color:'#6366f1', size:10}, line:{color:'#6366f1',width:2}, name:'Monthly Clearing Price' },
+    ];
+    if (dailyAvgPrices.some(v => v !== null)) {
+        traces.push({ type:'scatter', x: labels, y: dailyAvgPrices, mode:'lines+markers',
+          marker:{color:'#10b981', size:6}, line:{color:'#10b981',width:1.5,dash:'dot'}, name:'Avg Daily Cable Price' });
+    }
+    traces.push({ type:'scatter', x:[labels[0], labels[labels.length-1]], y:[finalBid,finalBid],
+          mode:'lines', line:{color:'#059669',dash:'dash',width:2}, name:'Our Bid' });
+    Plotly.newPlot('auction_clearing_chart', traces, {
         margin:{t:5,r:10,b:50,l:50},
         paper_bgcolor:'white', plot_bgcolor:'white',
         yaxis:{title:'€/MW', gridcolor:'#f3f4f6', tickfont:{size:11}},
