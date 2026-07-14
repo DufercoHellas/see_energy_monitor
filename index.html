@@ -8184,14 +8184,30 @@ function renderAuctionCorridors(countryFilter) {
     const container = document.getElementById('auction_corridors_list');
     if (!container) return;
     const allCorrs = [...new Set((cablesLongData || []).map(r => r.corridor_code))].sort();
+
+    // Determine which corridors have daily cable price data
+    const dailyCorridors = new Set((cablesData || []).map(r => r.corridor_code));
+
     const filtered = countryFilter === 'ALL'
         ? allCorrs
         : allCorrs.filter(c => c.split('-').includes(countryFilter));
 
-    container.innerHTML = filtered.map(c => {
-        const active = c === selectedAuctionCorridor ? ' active' : '';
-        return `<button class="auction-corridor-tag${active}" data-corridor="${c}" style="padding:6px 14px;border-radius:6px;border:1px solid #d1d5db;background:${c === selectedAuctionCorridor ? '#4f46e5' : '#fff'};color:${c === selectedAuctionCorridor ? '#fff' : '#374151'};font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter';">${c}</button>`;
-    }).join('');
+    const withDaily = filtered.filter(c => dailyCorridors.has(c));
+    const withoutDaily = filtered.filter(c => !dailyCorridors.has(c));
+
+    const btn = (c) => {
+        const active = c === selectedAuctionCorridor;
+        return `<button class="auction-corridor-tag${active?' active':''}" data-corridor="${c}" style="padding:5px 12px;border-radius:5px;border:1px solid #d1d5db;background:${active?'#4f46e5':'#fff'};color:${active?'#fff':'#374151'};font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;font-family:'Inter';display:inline-block;">${c}</button>`;
+    };
+
+    let html = '';
+    if (withDaily.length) {
+        html += `<div style="font-size:10px;font-weight:700;color:#059669;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">✅ Daily Cables</div><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">${withDaily.map(btn).join('')}</div>`;
+    }
+    if (withoutDaily.length) {
+        html += `<div style="font-size:10px;font-weight:700;color:#b91c1c;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">⚠️ No Daily Cables</div><div style="display:flex;flex-wrap:wrap;gap:6px;">${withoutDaily.map(btn).join('')}</div>`;
+    }
+    container.innerHTML = html;
 
     container.querySelectorAll('.auction-corridor-tag').forEach(btn => {
         btn.addEventListener('click', function() {
