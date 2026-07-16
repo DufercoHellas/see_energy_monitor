@@ -10709,7 +10709,7 @@ function _arbCopyOutputs() {
         var arbId = outMap[origId];
         var orig = document.getElementById(origId);
         var arb = document.getElementById(arbId);
-        if (orig && arb) arb.innerHTML = orig.innerHTML;
+        if (orig && arb) { arb.innerHTML = orig.innerHTML; arb.style.display = orig.style.display; }
     }
     // Copy table
     var origTable = document.getElementById('analogues_table');
@@ -10723,7 +10723,7 @@ function _arbCopyOutputs() {
     var origCards = document.getElementById('arbitrage_cards_container');
     var arbCards = document.getElementById('arb_arbitrage_cards_container');
     if (origCards && arbCards) arbCards.innerHTML = origCards.innerHTML;
-    // Copy arbtitrage stats
+    // Copy arbitrage stats
     ['arb_stat_windows','arb_stat_windows_sub','arb_stat_max_spread','arb_stat_max_spread_sub','arb_stat_strategy'].forEach(function(sid){
         var orig = document.getElementById(sid);
         var arb = document.getElementById('arb_'+sid);
