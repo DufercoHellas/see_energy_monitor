@@ -1934,14 +1934,25 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 if (tabName === 'ArbitrageTab') {
                     const arbInput = document.getElementById("arbitrage_tab_target_date");
                     const mc = document.getElementById("arbitrage_tab_matches_container");
+                    const tbody = document.querySelector("#arbitrage_tab_spreads_table tbody");
                     try {
                         if (arbInput && historicalData && historicalData['DE_LU']) {
                             if (!arbInput.value) {
                                 const dates = Object.keys(historicalData['DE_LU']).sort();
-                                if (dates.length > 0) arbInput.value = dates[dates.length - 1];
+                                if (dates.length > 0) {
+                                    const today = new Date();
+                                    const tomorrow = new Date(today.getTime() + 86400000);
+                                    const y = tomorrow.getFullYear();
+                                    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+                                    const d = String(tomorrow.getDate()).padStart(2, '0');
+                                    const nextDay = `${y}-${m}-${d}`;
+                                    arbInput.value = dates.includes(nextDay) ? nextDay : dates[dates.length - 1];
+                                }
                             }
                             if (arbInput.value) {
-                                runArbitrageTabPrediction();
+                                if (mc) mc.innerHTML = '<p style="color:#3b82f6;font-size:13px;text-align:center;padding:16px 0;">Computing analogues across ' + Object.keys(historicalData['DE_LU']).length + ' days...</p>';
+                                if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="padding:32px 0;text-align:center;color:#3b82f6;">Calculating spreads...</td></tr>';
+                                setTimeout(() => runArbitrageTabPrediction(), 50);
                             } else if (mc) {
                                 mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
                             }
@@ -9057,7 +9068,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     if (arbTargetInput && historicalData && historicalData['DE_LU']) {
                         const dates = Object.keys(historicalData['DE_LU']).sort();
                         if (dates.length > 0) {
-                            arbTargetInput.value = dates[dates.length - 1];
+                            const today = new Date();
+                            const tomorrow = new Date(today.getTime() + 86400000);
+                            const y = tomorrow.getFullYear();
+                            const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+                            const d = String(tomorrow.getDate()).padStart(2, '0');
+                            const nextDay = `${y}-${m}-${d}`;
+                            arbTargetInput.value = dates.includes(nextDay) ? nextDay : dates[dates.length - 1];
                         }
                     }
 
@@ -9066,13 +9083,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     applyOptimizedWeights();
                     renderDashboard();
 
-                    // Run initial prediction for Arbitrage Tab
+                    // Run initial prediction for Arbitrage Tab (deferred to let dashboard paint first)
                     if (arbTargetInput && arbTargetInput.value) {
-                        try {
-                            runArbitrageTabPrediction();
-                        } catch (err) {
-                            console.error("Initial arbitrage prediction failed:", err);
-                        }
+                        setTimeout(() => {
+                            try {
+                                runArbitrageTabPrediction();
+                            } catch (err) {
+                                console.error("Initial arbitrage prediction failed:", err);
+                            }
+                        }, 200);
                     }
 
                     // Hide loading mask cleanly
