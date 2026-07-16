@@ -9031,10 +9031,28 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         countrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
                     }
 
+                    // Initialize Arbitrage & Flows Date Picker
+                    const arbTargetInput = document.getElementById("arbitrage_tab_target_date");
+                    if (arbTargetInput && historicalData && historicalData['DE_LU']) {
+                        const dates = Object.keys(historicalData['DE_LU']).sort();
+                        if (dates.length > 0) {
+                            arbTargetInput.value = dates[dates.length - 1];
+                        }
+                    }
+
                     initCablesMatrix();
                     initLongCablesSelectors();
                     applyOptimizedWeights();
                     renderDashboard();
+
+                    // Run initial prediction for Arbitrage Tab
+                    if (arbTargetInput && arbTargetInput.value) {
+                        try {
+                            runArbitrageTabPrediction();
+                        } catch (err) {
+                            console.error("Initial arbitrage prediction failed:", err);
+                        }
+                    }
 
                     // Hide loading mask cleanly
                     const mask = document.getElementById("loading_mask");
@@ -10153,22 +10171,41 @@ function runArbitrageTabPrediction() {
             
             const t_arr = targetFeatures[cat];
             const c_arr = candFeats[cat];
-            const stats = historicalStats[cat] || historicalStats[cat + '_res']; // handle nested country stats
-            
-            if (!t_arr || !c_arr || !stats) continue;
-            
             let cat_dist_sq = 0.0;
             if (Array.isArray(t_arr)) {
-                for (let i = 0; i < t_arr.length; i++) {
-                    const z_t = (t_arr[i] - stats.mean[i]) / stats.std[i];
-                    const z_c = (c_arr[i] - stats.mean[i]) / stats.std[i];
-                    cat_dist_sq += Math.pow(z_t - z_c, 2);
+                if (cat === 'calendar') {
+                    const stats = historicalStats[cat];
+                    if (t_arr && c_arr && stats) {
+                        for (let i = 0; i < t_arr.length; i++) {
+                            const z_t = (t_arr[i] - stats.mean[i]) / stats.std[i];
+                            const z_c = (c_arr[i] - stats.mean[i]) / stats.std[i];
+                            cat_dist_sq += Math.pow(z_t - z_c, 2);
+                        }
+                    }
+                } else {
+                    const res_stats = historicalStats[cat + '_res'];
+                    const dem_stats = historicalStats[cat + '_dem'];
+                    if (res_stats && dem_stats) {
+                        for (let i = 0; i < 24; i++) {
+                            const z_t = (t_arr[i] - res_stats.mean[i]) / res_stats.std[i];
+                            const z_c = (c_arr[i] - res_stats.mean[i]) / res_stats.std[i];
+                            cat_dist_sq += Math.pow(z_t - z_c, 2);
+                        }
+                        for (let i = 0; i < 24; i++) {
+                            const z_t = (t_arr[i + 24] - dem_stats.mean[i]) / dem_stats.std[i];
+                            const z_c = (c_arr[i + 24] - dem_stats.mean[i]) / dem_stats.std[i];
+                            cat_dist_sq += Math.pow(z_t - z_c, 2);
+                        }
+                    }
                 }
                 dist += weight * Math.sqrt(cat_dist_sq);
             } else {
-                const z_t = (t_arr - stats.mean) / stats.std;
-                const z_c = (c_arr - stats.mean) / stats.std;
-                dist += weight * Math.abs(z_t - z_c);
+                const stats = historicalStats[cat];
+                if (stats) {
+                    const z_t = (t_arr - stats.mean) / stats.std;
+                    const z_c = (c_arr - stats.mean) / stats.std;
+                    dist += weight * Math.abs(z_t - z_c);
+                }
             }
         }
         
