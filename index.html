@@ -1935,23 +1935,23 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 if (tabName === 'ArbitrageTab') {
                     const arbInput = document.getElementById("arbitrage_tab_target_date");
                     const mc = document.getElementById("arbitrage_tab_matches_container");
-                    if (mc) mc.innerHTML = '<span style="color:#64748b;font-size:12px;">Loading arbitrage data…</span>';
-                    if (arbInput && historicalData && historicalData['DE_LU']) {
-                        if (!arbInput.value) {
-                            const dates = Object.keys(historicalData['DE_LU']).sort();
-                            if (dates.length > 0) arbInput.value = dates[dates.length - 1];
-                        }
-                        if (arbInput.value) {
-                            try { runArbitrageTabPrediction(); }
-                            catch (err) {
-                                console.error("Arbitrage tab render failed:", err);
-                                if (mc) mc.innerHTML = '<span style="color:#ef4444;font-size:12px;">Error: ' + err.message + '</span>';
+                    try {
+                        if (arbInput && historicalData && historicalData['DE_LU']) {
+                            if (!arbInput.value) {
+                                const dates = Object.keys(historicalData['DE_LU']).sort();
+                                if (dates.length > 0) arbInput.value = dates[dates.length - 1];
                             }
-                        } else if (mc) {
-                            mc.innerHTML = '<span style="color:#f59e0b;font-size:12px;">No date set for arbitrage prediction.</span>';
+                            if (arbInput.value) {
+                                runArbitrageTabPrediction();
+                            } else if (mc) {
+                                mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
+                            }
+                        } else {
+                            if (mc) mc.innerHTML = '<span style="color:#f59e0b;">Data: ' + (historicalData ? Object.keys(historicalData).join(',') : 'no hist obj') + '</span>';
                         }
-                    } else if (mc) {
-                        mc.innerHTML = '<span style="color:#f59e0b;font-size:12px;">Data not ready yet. historicalData keys: ' + Object.keys(historicalData).join(', ') + '</span>';
+                    } catch(err) {
+                        console.error("Arbitrage tab error:", err);
+                        if (mc) mc.innerHTML = '<span style="color:#ef4444;">Err: ' + err.message + '</span>';
                     }
                 }
                 window.dispatchEvent(new Event('resize'));
@@ -10246,7 +10246,8 @@ function runArbitrageTabPrediction() {
     
     // Render top matches
     const matchesContainer = document.getElementById("arbitrage_tab_matches_container");
-    matchesContainer.innerHTML = topMatches.map((m, idx) => {
+    if (!matchesContainer) { console.error("Arbitrage: missing matchesContainer"); return; }
+    matchesContainer.innerHTML = (topMatches.length === 0 ? '<p style="color:#f59e0b;">No matching days found (0 candidates).</p>' : '') + topMatches.map((m, idx) => {
         const sim = (100 / (1 + m.dist)).toFixed(1);
         return `<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -10255,7 +10256,7 @@ function runArbitrageTabPrediction() {
             </div>
             <span style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 4px 8px; border-radius: 4px;">${sim}% Match</span>
         </div>`;
-    }).join("");
+    }).join("") + `<p style="margin-top:12px;font-size:10px;color:#94a3b8;">candidates: ${candidates.length} | top: ${topMatches.length}</p>`;
     
     // Predict spreads
     const predictedSpreads = {};
@@ -10287,6 +10288,7 @@ function runArbitrageTabPrediction() {
     
     // Render spreads table
     const tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
+    if (!tableBody) { console.error("Arbitrage: missing tableBody"); return; }
     tableBody.innerHTML = arbitrageCorridors.map(corr => {
         const spreads = predictedSpreads[corr.code] || Array(24).fill(0.0);
         const meanSpread = spreads.reduce((a,b) => a+b, 0) / 24;
