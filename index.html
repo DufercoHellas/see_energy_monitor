@@ -1807,7 +1807,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
 
         <!-- Tab 6: Interconnector Arbitrage Tab -->
-        <div id="ArbitrageTab" class="tabcontent" style="display:none; padding: 24px;">
+        <div id="ArbitrageTab" class="tabcontent" style="display:none;">
             <h2>Interconnector Arbitrage & Spreads Prediction (Day-Ahead)</h2>
             <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unified multi-regional 341-dimensional analogue engine. Select a date to predict spot price spreads and capacity flow opportunities for all corridors at once.</p>
             
@@ -1910,7 +1910,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             function openTab(evt, tabName) {
                 document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
                 document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
-                document.getElementById(tabName).style.display = "block";
+                document.getElementById(tabName).style.setProperty("display", "block", "important");
                 evt.currentTarget.classList.add("active");
                 
                 if (tabName === 'Cables') {
