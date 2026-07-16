@@ -1950,9 +1950,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 }
                             }
                             if (arbInput.value) {
-                                if (mc) mc.innerHTML = '<p style="color:#3b82f6;font-size:13px;text-align:center;padding:16px 0;">Computing analogues across ' + Object.keys(historicalData['DE_LU']).length + ' days...</p>';
+                                if (mc) mc.innerHTML = '<div style="text-align:center;padding:20px 0;"><p style="color:#3b82f6;font-size:13px;">Loading historical analogues...</p></div>';
                                 if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="padding:32px 0;text-align:center;color:#3b82f6;">Calculating spreads...</td></tr>';
-                                setTimeout(() => runArbitrageTabPrediction(), 50);
+                                requestAnimationFrame(() => requestAnimationFrame(() => runArbitrageTabPrediction()));
                             } else if (mc) {
                                 mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
                             }
@@ -9085,13 +9085,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
                     // Run initial prediction for Arbitrage Tab (deferred to let dashboard paint first)
                     if (arbTargetInput && arbTargetInput.value) {
-                        setTimeout(() => {
-                            try {
-                                runArbitrageTabPrediction();
-                            } catch (err) {
-                                console.error("Initial arbitrage prediction failed:", err);
-                            }
-                        }, 200);
+                        requestAnimationFrame(() => requestAnimationFrame(() => {
+                            try { runArbitrageTabPrediction(); } catch(err) { console.error("Initial arbitrage prediction failed:", err); }
+                        }));
                     }
 
                     // Hide loading mask cleanly
@@ -10173,199 +10169,244 @@ const arbitrageCorridors = [
     { code: "IT-ME", src: "IT", dst: "ME", premium: 0.40, status: "BINARY RISK", color: "#f59e0b" }
 ];
 
+function computeDistance(targetFeats, candFeats) {
+    let dist = 0.0;
+    for (const [cat, weight] of Object.entries(arbitrageWeights)) {
+        if (weight <= 0) continue;
+        const t_arr = targetFeats[cat];
+        const c_arr = candFeats[cat];
+        let cat_dist_sq = 0.0;
+        if (Array.isArray(t_arr)) {
+            if (cat === 'calendar') {
+                const stats = historicalStats[cat];
+                if (t_arr && c_arr && stats) {
+                    for (let j = 0; j < t_arr.length; j++) {
+                        const z_t = (t_arr[j] - stats.mean[j]) / stats.std[j];
+                        const z_c = (c_arr[j] - stats.mean[j]) / stats.std[j];
+                        cat_dist_sq += Math.pow(z_t - z_c, 2);
+                    }
+                }
+            } else {
+                const res_stats = historicalStats[cat + '_res'];
+                const dem_stats = historicalStats[cat + '_dem'];
+                if (res_stats && dem_stats) {
+                    for (let j = 0; j < 24; j++) {
+                        const z_t = (t_arr[j] - res_stats.mean[j]) / res_stats.std[j];
+                        const z_c = (c_arr[j] - res_stats.mean[j]) / res_stats.std[j];
+                        cat_dist_sq += Math.pow(z_t - z_c, 2);
+                    }
+                    for (let j = 0; j < 24; j++) {
+                        const z_t = (t_arr[j + 24] - dem_stats.mean[j]) / dem_stats.std[j];
+                        const z_c = (c_arr[j + 24] - dem_stats.mean[j]) / dem_stats.std[j];
+                        cat_dist_sq += Math.pow(z_t - z_c, 2);
+                    }
+                }
+            }
+            dist += weight * Math.sqrt(cat_dist_sq);
+        } else {
+            const stats = historicalStats[cat];
+            if (stats) {
+                const z_t = (t_arr - stats.mean) / stats.std;
+                const z_c = (c_arr - stats.mean) / stats.std;
+                dist += weight * Math.abs(z_t - z_c);
+            }
+        }
+    }
+    return dist;
+}
+
+let _arbCandidates = [];
+let _arbDates = [];
+let _arbIdx = 0;
+let _arbTopN = 3;
+let _arbTargetFeats = null;
+
 function runArbitrageTabPrediction() {
     const targetDate = document.getElementById("arbitrage_tab_target_date").value;
     const topN = parseInt(document.getElementById("arbitrage_tab_top_n").value) || 3;
-    
-    if (!targetDate || !historicalData || !historicalData['DE_LU']) {
-        console.warn("Arbitrage: early return - targetDate:", targetDate, "historicalData keys:", Object.keys(historicalData));
-        return;
-    }
-    if (!historicalStats || Object.keys(historicalStats).length === 0) {
-        console.warn("Arbitrage: historicalStats missing");
-        alert("Historical stats not loaded yet. Please wait.");
-        return;
-    }
-    
-    console.log("Arbitrage: targetDate=", targetDate, "DE_LU entries=", Object.keys(historicalData['DE_LU']).length);
-    // Check if target day exists
+
+    if (!targetDate || !historicalData || !historicalData['DE_LU']) return;
+    if (!historicalStats || Object.keys(historicalStats).length === 0) return;
+
     const tData = historicalData['DE_LU'][targetDate];
-    if (!tData) {
-        console.warn("Arbitrage: target date not found in DE_LU");
-        alert("Selected target date is not available in historical data.");
-        return;
-    }
-    
-    // Build target feature vector
+    if (!tData) return;
+
     const targetFeatures = getGlobalDayFeatures(targetDate);
-    if (!targetFeatures) {
-        alert("Incomplete data for target day. Ensure all regional profiles are loaded.");
-        return;
-    }
-    
-    // Calculate distance to all candidates
-    const candidates = [];
-    for (const [date, entry] of Object.entries(historicalData['DE_LU'])) {
-        if (date === targetDate) continue;
-        const candFeats = getGlobalDayFeatures(date);
+    if (!targetFeatures) return;
+
+    _arbTopN = topN;
+    _arbTargetFeats = targetFeatures;
+    _arbCandidates = [];
+    _arbDates = Object.keys(historicalData['DE_LU']).filter(function(d) { return d !== targetDate; });
+    _arbIdx = 0;
+    _arbProcessBatch();
+}
+
+function _arbProcessBatch() {
+    var BATCH = 80;
+    var end = Math.min(_arbIdx + BATCH, _arbDates.length);
+
+    for (var i = _arbIdx; i < end; i++) {
+        var date = _arbDates[i];
+        var candFeats = getGlobalDayFeatures(date);
         if (!candFeats) continue;
-        
-        // Compute weighted distance
-        let dist = 0.0;
-        for (const [cat, weight] of Object.entries(arbitrageWeights)) {
-            if (weight <= 0) continue;
-            
-            const t_arr = targetFeatures[cat];
-            const c_arr = candFeats[cat];
-            let cat_dist_sq = 0.0;
-            if (Array.isArray(t_arr)) {
-                if (cat === 'calendar') {
-                    const stats = historicalStats[cat];
-                    if (t_arr && c_arr && stats) {
-                        for (let i = 0; i < t_arr.length; i++) {
-                            const z_t = (t_arr[i] - stats.mean[i]) / stats.std[i];
-                            const z_c = (c_arr[i] - stats.mean[i]) / stats.std[i];
-                            cat_dist_sq += Math.pow(z_t - z_c, 2);
-                        }
-                    }
-                } else {
-                    const res_stats = historicalStats[cat + '_res'];
-                    const dem_stats = historicalStats[cat + '_dem'];
-                    if (res_stats && dem_stats) {
-                        for (let i = 0; i < 24; i++) {
-                            const z_t = (t_arr[i] - res_stats.mean[i]) / res_stats.std[i];
-                            const z_c = (c_arr[i] - res_stats.mean[i]) / res_stats.std[i];
-                            cat_dist_sq += Math.pow(z_t - z_c, 2);
-                        }
-                        for (let i = 0; i < 24; i++) {
-                            const z_t = (t_arr[i + 24] - dem_stats.mean[i]) / dem_stats.std[i];
-                            const z_c = (c_arr[i + 24] - dem_stats.mean[i]) / dem_stats.std[i];
-                            cat_dist_sq += Math.pow(z_t - z_c, 2);
-                        }
-                    }
-                }
-                dist += weight * Math.sqrt(cat_dist_sq);
-            } else {
-                const stats = historicalStats[cat];
-                if (stats) {
-                    const z_t = (t_arr - stats.mean) / stats.std;
-                    const z_c = (c_arr - stats.mean) / stats.std;
-                    dist += weight * Math.abs(z_t - z_c);
-                }
+        var dist = computeDistance(_arbTargetFeats, candFeats);
+        _arbCandidates.push({ date: date, dist: dist, info: candFeats });
+    }
+    _arbIdx = end;
+
+    var mc = document.getElementById("arbitrage_tab_matches_container");
+    var pct = Math.round(_arbIdx / _arbDates.length * 100);
+    if (mc) {
+        mc.innerHTML = '<div style="text-align:center;padding:14px 0;">' +
+            '<div style="background:#e2e8f0;border-radius:4px;height:6px;overflow:hidden;margin-bottom:10px;">' +
+            '<div style="background:#3b82f6;height:100%;width:' + pct + '%;transition:width 0.1s;"></div>' +
+            '</div>' +
+            '<span style="color:#64748b;font-size:12px;font-weight:500;">Analysing ' + _arbIdx + ' / ' + _arbDates.length + ' historical days (' + pct + '%)</span>' +
+            '</div>';
+    }
+
+    if (_arbIdx < _arbDates.length) {
+        setTimeout(_arbProcessBatch, 0);
+    } else {
+        _arbFinish();
+    }
+}
+
+function _arbFinish() {
+    var candidates = _arbCandidates;
+    var topN = _arbTopN;
+
+    candidates.sort(function(a, b) { return a.dist - b.dist; });
+    var topMatches = candidates.slice(0, topN);
+
+    var matchesContainer = document.getElementById("arbitrage_tab_matches_container");
+    if (matchesContainer) {
+        var html = '';
+        if (topMatches.length === 0) {
+            html = '<p style="color:#f59e0b;text-align:center;padding:16px 0;">No matching days found.</p>';
+        } else {
+            for (var i = 0; i < topMatches.length; i++) {
+                var m = topMatches[i];
+                var sim = (100 / (1 + m.dist)).toFixed(1);
+                html += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">' +
+                    '<div>' +
+                    '<strong style="color:#0f172a;font-size:14px;">#' + (i+1) + ' &bull; ' + m.date + '</strong>' +
+                    '<div style="font-size:11px;color:#64748b;margin-top:2px;">TTF: &euro;' + m.info.ttf.toFixed(2) + ' | EUA: &euro;' + m.info.eua.toFixed(2) + '</div>' +
+                    '</div>' +
+                    '<span style="background:#e0f2fe;color:#0369a1;font-weight:700;font-size:12px;padding:4px 8px;border-radius:4px;">' + sim + '% Match</span>' +
+                    '</div>';
             }
         }
-        
-        candidates.push({ date, dist, info: candFeats });
+        html += '<p style="margin-top:12px;font-size:10px;color:#94a3b8;">candidates: ' + candidates.length + ' | top ' + topMatches.length + '</p>';
+        matchesContainer.innerHTML = html;
     }
-    
-    // Sort and get top N matches
-    candidates.sort((a, b) => a.dist - b.dist);
-    const topMatches = candidates.slice(0, topN);
-    
-    // Render top matches
-    const matchesContainer = document.getElementById("arbitrage_tab_matches_container");
-    if (!matchesContainer) { console.error("Arbitrage: missing matchesContainer"); return; }
-    matchesContainer.innerHTML = (topMatches.length === 0 ? '<p style="color:#f59e0b;">No matching days found (0 candidates).</p>' : '') + topMatches.map((m, idx) => {
-        const sim = (100 / (1 + m.dist)).toFixed(1);
-        return `<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <strong style="color: #0f172a; font-size: 14px;">#${idx+1} &bull; ${m.date}</strong>
-                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">TTF: €${m.info.ttf.toFixed(2)} | EUA: €${m.info.eua.toFixed(2)}</div>
-            </div>
-            <span style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 4px 8px; border-radius: 4px;">${sim}% Match</span>
-        </div>`;
-    }).join("") + `<p style="margin-top:12px;font-size:10px;color:#94a3b8;">candidates: ${candidates.length} | top: ${topMatches.length}</p>`;
-    
-    // Predict spreads
-    const predictedSpreads = {};
-    arbitrageCorridors.forEach(corr => {
-        const hourlySpreads = Array(24).fill(0.0);
-        let sumWeights = 0.0;
-        
-        topMatches.forEach(m => {
-            const w = 1.0 / Math.max(m.dist, 0.01);
+
+    // Predict spreads for every corridor
+    var predictedSpreads = {};
+    for (var c = 0; c < arbitrageCorridors.length; c++) {
+        var corr = arbitrageCorridors[c];
+        var hourlySpreads = new Array(24).fill(0.0);
+        var sumWeights = 0.0;
+
+        for (var m = 0; m < topMatches.length; m++) {
+            var match = topMatches[m];
+            var w = 1.0 / Math.max(match.dist, 0.01);
             sumWeights += w;
-            
-            const srcPrices = historicalData[corr.src]?.[m.date]?.prices;
-            const dstPrices = historicalData[corr.dst]?.[m.date]?.prices;
-            
+
+            var srcPrices = historicalData[corr.src] && historicalData[corr.src][match.date] ? historicalData[corr.src][match.date].prices : null;
+            var dstPrices = historicalData[corr.dst] && historicalData[corr.dst][match.date] ? historicalData[corr.dst][match.date].prices : null;
+
             if (srcPrices && dstPrices && srcPrices.length === 24 && dstPrices.length === 24) {
-                for (let h = 0; h < 24; h++) {
-                    // Spot price FTR positive spread value max(0, dst - src)
+                for (var h = 0; h < 24; h++) {
                     hourlySpreads[h] += w * Math.max(0, dstPrices[h] - srcPrices[h]);
                 }
             }
-        });
-        
-        if (sumWeights > 0) {
-            predictedSpreads[corr.code] = hourlySpreads.map(v => v / sumWeights);
-        } else {
-            predictedSpreads[corr.code] = Array(24).fill(0.0);
         }
-    });
-    
-    // Render spreads table
-    const tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
-    if (!tableBody) { console.error("Arbitrage: missing tableBody"); return; }
-    tableBody.innerHTML = arbitrageCorridors.map(corr => {
-        const spreads = predictedSpreads[corr.code] || Array(24).fill(0.0);
-        const meanSpread = spreads.reduce((a,b) => a+b, 0) / 24;
-        
-        // Solar peak hours (12-17)
-        const solarPeak = spreads.slice(12, 18).reduce((a,b) => a+b, 0) / 6;
-        // Evening peak hours (18-22)
-        const eveningPeak = spreads.slice(18, 23).reduce((a,b) => a+b, 0) / 5;
-        
-        const fwd = arbitrageFwdPrices[corr.code]?.fwd || 0.0;
-        const fwdStr = fwd !== 0.0 ? `${fwd.toFixed(2)} €` : '—';
-        
-        const recBid = meanSpread * corr.premium;
-        const netMargin = Math.max(0, meanSpread - recBid);
-        
-        return `<tr style="border-bottom: 1px solid #f1f5f9; hover: background: #f8fafc;">
-            <td style="padding: 10px 8px; font-weight: 700; color: #0f172a;">${corr.code}</td>
-            <td style="padding: 10px 8px; color: #475569;">${fwdStr}</td>
-            <td style="padding: 10px 8px; font-weight: 600; color: #1e3a8a;">${meanSpread.toFixed(2)} €/MWh</td>
-            <td style="padding: 10px 8px; color: #ea580c;">${solarPeak.toFixed(2)} €/MWh</td>
-            <td style="padding: 10px 8px; color: #7c3aed;">${eveningPeak.toFixed(2)} €/MWh</td>
-            <td style="padding: 10px 8px; font-weight: 600; color: #1e3a8a;">${recBid.toFixed(2)} €/MWh</td>
-            <td style="padding: 10px 8px; font-weight: 600; color: #059669;">+${netMargin.toFixed(2)} €/MWh</td>
-            <td style="padding: 10px 8px; text-align: right;">
-                <span style="background: ${corr.color}15; color: ${corr.color}; font-weight: 700; font-size: 11px; padding: 4px 8px; border-radius: 4px;">${corr.status}</span>
-            </td>
-        </tr>`;
-    }).join("");
-    
-    // Update wheeling routes values
-    const de_at = (predictedSpreads["DE-AT"] || Array(24).fill(0.0)).reduce((a,b)=>a+b, 0) / 24;
-    const at_it = (predictedSpreads["AT-IT"] || Array(24).fill(0.0)).reduce((a,b)=>a+b, 0) / 24;
-    document.getElementById("wheeling_leg_1_val").innerText = `${de_at.toFixed(2)} €/MWh`;
-    document.getElementById("wheeling_leg_2_val").innerText = `${at_it.toFixed(2)} €/MWh`;
-    document.getElementById("wheeling_joint_val").innerText = `${(de_at + at_it).toFixed(2)} €/MWh`;
-    
-    // Render Plotly Chart
-    renderArbitrageTabChart(predictedSpreads);
+
+        if (sumWeights > 0) {
+            predictedSpreads[corr.code] = hourlySpreads.map(function(v) { return v / sumWeights; });
+        } else {
+            predictedSpreads[corr.code] = new Array(24).fill(0.0);
+        }
+    }
+
+    // Render table
+    var tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
+    if (tableBody) {
+        var rows = '';
+        for (var c = 0; c < arbitrageCorridors.length; c++) {
+            var corr = arbitrageCorridors[c];
+            var spreads = predictedSpreads[corr.code] || new Array(24).fill(0.0);
+            var meanSpread = 0;
+            for (var h = 0; h < 24; h++) meanSpread += spreads[h];
+            meanSpread /= 24;
+
+            var solarPeak = 0;
+            for (var h = 12; h < 18; h++) solarPeak += spreads[h];
+            solarPeak /= 6;
+
+            var eveningPeak = 0;
+            for (var h = 18; h < 23; h++) eveningPeak += spreads[h];
+            eveningPeak /= 5;
+
+            var fwd = arbitrageFwdPrices[corr.code] ? arbitrageFwdPrices[corr.code].fwd : 0;
+            var fwdStr = fwd !== 0 ? fwd.toFixed(2) + ' \u20ac' : '\u2014';
+            var recBid = meanSpread * corr.premium;
+            var netMargin = Math.max(0, meanSpread - recBid);
+
+            rows += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                '<td style="padding:10px 8px;font-weight:700;color:#0f172a;">' + corr.code + '</td>' +
+                '<td style="padding:10px 8px;color:#475569;">' + fwdStr + '</td>' +
+                '<td style="padding:10px 8px;font-weight:600;color:#1e3a8a;">' + meanSpread.toFixed(2) + ' \u20ac/MWh</td>' +
+                '<td style="padding:10px 8px;color:#ea580c;">' + solarPeak.toFixed(2) + ' \u20ac/MWh</td>' +
+                '<td style="padding:10px 8px;color:#7c3aed;">' + eveningPeak.toFixed(2) + ' \u20ac/MWh</td>' +
+                '<td style="padding:10px 8px;font-weight:600;color:#1e3a8a;">' + recBid.toFixed(2) + ' \u20ac/MWh</td>' +
+                '<td style="padding:10px 8px;font-weight:600;color:#059669;">+' + netMargin.toFixed(2) + ' \u20ac/MWh</td>' +
+                '<td style="padding:10px 8px;text-align:right;">' +
+                '<span style="background:' + corr.color + '15;color:' + corr.color + ';font-weight:700;font-size:11px;padding:4px 8px;border-radius:4px;">' + corr.status + '</span>' +
+                '</td>' +
+                '</tr>';
+        }
+        tableBody.innerHTML = rows;
+    }
+
+    // Wheeling routes
+    var de_at_arr = predictedSpreads["DE-AT"] || new Array(24).fill(0.0);
+    var at_it_arr = predictedSpreads["AT-IT"] || new Array(24).fill(0.0);
+    var de_at = 0, at_it = 0;
+    for (var h = 0; h < 24; h++) { de_at += de_at_arr[h]; at_it += at_it_arr[h]; }
+    de_at /= 24; at_it /= 24;
+
+    var leg1 = document.getElementById("wheeling_leg_1_val");
+    var leg2 = document.getElementById("wheeling_leg_2_val");
+    var joint = document.getElementById("wheeling_joint_val");
+    if (leg1) leg1.innerText = de_at.toFixed(2) + ' \u20ac/MWh';
+    if (leg2) leg2.innerText = at_it.toFixed(2) + ' \u20ac/MWh';
+    if (joint) joint.innerText = (de_at + at_it).toFixed(2) + ' \u20ac/MWh';
+
+    // Chart
+    if (typeof Plotly !== 'undefined') {
+        renderArbitrageTabChart(predictedSpreads);
+    }
 }
 
 function getGlobalDayFeatures(date) {
     const countries = ['DE_LU', 'AT', 'IT', 'GR', 'BG', 'HU', 'RO', 'HR'];
     const feats = {};
-    
-    // Gas/Carbon
+
     const ttf = historicalData['DE_LU'][date]?.ttf_price;
     const eua = historicalData['DE_LU'][date]?.eua_price;
     if (ttf === undefined || eua === undefined) return null;
-    
+
     feats['ttf'] = ttf;
     feats['eua'] = eua;
-    
-    // Calendar
+
     const parts = date.split('-');
     const m_rad = 2 * Math.PI * parseInt(parts[1]) / 12;
     const dow = parseLocalDate(date).getDay() / 6.0;
     feats['calendar'] = [Math.sin(m_rad), Math.cos(m_rad), dow];
-    
-    // Country profiles
+
     for (const cc of countries) {
         const entry = historicalData[cc]?.[date];
         if (!entry || !entry.residuals || !entry.demand || entry.residuals.length !== 24 || entry.demand.length !== 24) {
@@ -10373,16 +10414,16 @@ function getGlobalDayFeatures(date) {
         }
         feats[cc] = entry.residuals.concat(entry.demand);
     }
-    
+
     return feats;
 }
 
 function renderArbitrageTabChart(predictedSpreads) {
     const targetCorridors = ["GR-IT", "HR-HU", "SI-IT", "AT-IT", "DE-AT"];
     const traces = targetCorridors.map(code => {
-        const spreads = predictedSpreads[code] || Array(24).fill(0.0);
+        const spreads = predictedSpreads[code] || new Array(24).fill(0.0);
         return {
-            x: Array.from({length: 24}, (_, i) => `H${String(i).padStart(2,'0')}`),
+            x: Array.from({length: 24}, (_, i) => 'H' + String(i).padStart(2, '0')),
             y: spreads,
             name: code,
             mode: 'lines+markers',
@@ -10390,7 +10431,7 @@ function renderArbitrageTabChart(predictedSpreads) {
             marker: { size: 5 }
         };
     });
-    
+
     const layout = {
         margin: { l: 40, r: 20, t: 30, b: 40 },
         hovermode: 'closest',
@@ -10398,9 +10439,9 @@ function renderArbitrageTabChart(predictedSpreads) {
         paper_bgcolor: '#ffffff',
         legend: { orientation: 'h', y: -0.2 },
         xaxis: { gridcolor: '#f1f5f9', zeroline: false },
-        yaxis: { title: 'Spread (€/MWh)', gridcolor: '#f1f5f9', zeroline: false }
+        yaxis: { title: 'Spread (\u20ac/MWh)', gridcolor: '#f1f5f9', zeroline: false }
     };
-    
+
     Plotly.newPlot('arbitrage_tab_chart', traces, layout, { responsive: true, displayModeBar: false });
 }
 
