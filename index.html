@@ -10127,8 +10127,6 @@ const arbitrageWeights = {
 };
 
 const arbitrageFwdPrices = {
-    "AT-DE": { fwd: 5.88 },
-    "DE-AT": { fwd: 5.88 },
     "AT-IT": { fwd: 27.27 },
     "IT-AT": { fwd: -27.27 },
     "BG-GR": { fwd: -1.31 },
@@ -10154,8 +10152,6 @@ const arbitrageCorridors = [
     { code: "ME-IT", src: "ME", dst: "IT", premium: 0.45, status: "STRONG BUY", color: "#10b981" },
     { code: "AT-IT", src: "AT", dst: "IT", premium: 0.40, status: "DEFENSIVE BUY", color: "#3b82f6" },
     { code: "CH-IT", src: "CH", dst: "IT", premium: 0.50, status: "VOLATILITY BUY", color: "#3b82f6" },
-    { code: "AT-DE", src: "AT", dst: "DE_LU", premium: 0.55, status: "VOLATILITY BUY", color: "#3b82f6" },
-    { code: "DE-AT", src: "DE_LU", dst: "AT", premium: 0.60, status: "WHEELING BUY", color: "#3b82f6" },
     { code: "GR-BG", src: "GR", dst: "BG", premium: 0.65, status: "SOLAR SURPLUS", color: "#8b5cf6" },
     { code: "RO-HU", src: "RO", dst: "HU", premium: 0.60, status: "ARBITRAGE BUY", color: "#8b5cf6" },
     { code: "BG-GR", src: "BG", dst: "GR", premium: 0.40, status: "BID MINIMAL", color: "#f59e0b" },
@@ -10370,19 +10366,18 @@ function _arbFinish() {
         tableBody.innerHTML = rows;
     }
 
-    // Wheeling routes
-    var de_at_arr = predictedSpreads["DE-AT"] || new Array(24).fill(0.0);
+    // Wheeling routes (AT-IT only, DE-AT removed)
     var at_it_arr = predictedSpreads["AT-IT"] || new Array(24).fill(0.0);
-    var de_at = 0, at_it = 0;
-    for (var h = 0; h < 24; h++) { de_at += de_at_arr[h]; at_it += at_it_arr[h]; }
-    de_at /= 24; at_it /= 24;
+    var at_it = 0;
+    for (var h = 0; h < 24; h++) at_it += at_it_arr[h];
+    at_it /= 24;
 
     var leg1 = document.getElementById("wheeling_leg_1_val");
     var leg2 = document.getElementById("wheeling_leg_2_val");
     var joint = document.getElementById("wheeling_joint_val");
-    if (leg1) leg1.innerText = de_at.toFixed(2) + ' \u20ac/MWh';
+    if (leg1) leg1.innerText = '\u2014';
     if (leg2) leg2.innerText = at_it.toFixed(2) + ' \u20ac/MWh';
-    if (joint) joint.innerText = (de_at + at_it).toFixed(2) + ' \u20ac/MWh';
+    if (joint) joint.innerText = at_it.toFixed(2) + ' \u20ac/MWh';
 
     // Chart
     if (typeof Plotly !== 'undefined') {
@@ -10418,7 +10413,7 @@ function getGlobalDayFeatures(date) {
 }
 
 function renderArbitrageTabChart(predictedSpreads) {
-    const targetCorridors = ["GR-IT", "HR-HU", "SI-IT", "AT-IT", "DE-AT"];
+    const targetCorridors = ["GR-IT", "HR-HU", "SI-IT", "AT-IT"];
     const traces = targetCorridors.map(code => {
         const spreads = predictedSpreads[code] || new Array(24).fill(0.0);
         return {
