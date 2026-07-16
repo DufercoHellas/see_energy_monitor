@@ -1850,18 +1850,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     <thead>
                         <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
                             <th style="padding: 10px 8px;">Corridor</th>
-                            <th style="padding: 10px 8px;">Fwd Base Spread</th>
+                            <th style="padding: 10px 8px;">Route Path</th>
                             <th style="padding: 10px 8px;">Predicted FTR (Mean)</th>
                             <th style="padding: 10px 8px;">Solar Peak Spread (12-17)</th>
                             <th style="padding: 10px 8px;">Evening Peak Spread (18-22)</th>
-                            <th style="padding: 10px 8px;">Recommended Bid</th>
-                            <th style="padding: 10px 8px;">Expected Net Margin</th>
-                            <th style="padding: 10px 8px; text-align: right;">Bidding Status</th>
+                            <th style="padding: 10px 8px; text-align: right;">Status</th>
                         </tr>
                     </thead>
                     <tbody style="color: #334155;">
                         <tr>
-                            <td colspan="8" style="padding: 32px 0; text-align: center; color: #94a3b8;">Select a date to populate the spreads matrix.</td>
+                            <td colspan="6" style="padding: 32px 0; text-align: center; color: #94a3b8;">Select a date to populate the spreads matrix.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1949,7 +1947,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             }
                             if (arbInput.value) {
                                 if (mc) mc.innerHTML = '<div style="text-align:center;padding:20px 0;"><p style="color:#3b82f6;font-size:13px;">Loading historical analogues...</p></div>';
-                                if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="padding:32px 0;text-align:center;color:#3b82f6;">Calculating spreads...</td></tr>';
+                                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="padding:32px 0;text-align:center;color:#3b82f6;">Calculating spreads...</td></tr>';
                                 requestAnimationFrame(() => requestAnimationFrame(() => runArbitrageTabPrediction()));
                             } else if (mc) {
                                 mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
@@ -10125,43 +10123,89 @@ const arbitrageWeights = {
     "HR": 0.1869
 };
 
-const arbitrageFwdPrices = {
-    "AT-IT": { fwd: 27.27 },
-    "IT-AT": { fwd: -27.27 },
-    "BG-GR": { fwd: -1.31 },
-    "GR-BG": { fwd: 1.31 },
-    "CH-IT": { fwd: 30.00 },
-    "IT-CH": { fwd: -30.00 },
-    "GR-IT": { fwd: 26.62 },
-    "IT-GR": { fwd: -26.62 },
-    "HR-HU": { fwd: 8.00 },
-    "HU-HR": { fwd: -8.00 },
-    "HU-RO": { fwd: -6.00 },
-    "RO-HU": { fwd: 6.00 },
-    "IT-SI": { fwd: -25.00 },
-    "SI-IT": { fwd: 25.00 },
-    "IT-ME": { fwd: -30.47 },
-    "ME-IT": { fwd: 30.47 }
-};
-
-const arbitrageCorridors = [
-    { code: "GR-IT", src: "GR", dst: "IT", premium: 0.50, status: "STRONG BUY", color: "#10b981" },
-    { code: "HR-HU", src: "HR", dst: "HU", premium: 0.70, status: "STRONG BUY", color: "#10b981" },
-    { code: "SI-IT", src: "SI", dst: "IT", premium: 0.40, status: "STRONG BUY", color: "#10b981" },
-    { code: "ME-IT", src: "ME", dst: "IT", premium: 0.45, status: "STRONG BUY", color: "#10b981" },
-    { code: "AT-IT", src: "AT", dst: "IT", premium: 0.40, status: "DEFENSIVE BUY", color: "#3b82f6" },
-    { code: "CH-IT", src: "CH", dst: "IT", premium: 0.50, status: "VOLATILITY BUY", color: "#3b82f6" },
-    { code: "GR-BG", src: "GR", dst: "BG", premium: 0.65, status: "SOLAR SURPLUS", color: "#8b5cf6" },
-    { code: "RO-HU", src: "RO", dst: "HU", premium: 0.60, status: "ARBITRAGE BUY", color: "#8b5cf6" },
-    { code: "BG-GR", src: "BG", dst: "GR", premium: 0.40, status: "BID MINIMAL", color: "#f59e0b" },
-    { code: "HU-RO", src: "HU", dst: "RO", premium: 0.40, status: "BID MINIMAL", color: "#f59e0b" },
-    { code: "IT-AT", src: "IT", dst: "AT", premium: 0.40, status: "AVOID", color: "#ef4444" },
-    { code: "IT-GR", src: "IT", dst: "GR", premium: 0.40, status: "AVOID", color: "#ef4444" },
-    { code: "IT-CH", src: "IT", dst: "CH", premium: 0.40, status: "AVOID", color: "#ef4444" },
-    { code: "HU-HR", src: "HU", dst: "HR", premium: 0.40, status: "AVOID", color: "#ef4444" },
-    { code: "IT-SI", src: "IT", dst: "SI", premium: 0.40, status: "AVOID", color: "#ef4444" },
-    { code: "IT-ME", src: "IT", dst: "ME", premium: 0.40, status: "BINARY RISK", color: "#f59e0b" }
+// --- Topology: exact same as Analogues panel ---
+const _arbCountryEU = { 'DE': true, 'DE_LU': true, 'SK': true, 'HU': true, 'RO': true, 'BG': true, 'GR': true, 'IT': true, 'AT': true, 'SI': true, 'HR': true };
+const _arbExplicitBorders = [
+    { from: 'HU', to: 'RS', cable: 'HU-RS' }, { from: 'RS', to: 'HU', cable: 'RS-HU' },
+    { from: 'BG', to: 'RS', cable: 'BG-RS' }, { from: 'RS', to: 'BG', cable: 'RS-BG' },
+    { from: 'RS', to: 'ME', cable: 'RS-ME' }, { from: 'ME', to: 'RS', cable: 'ME-RS' },
+    { from: 'RS', to: 'MK', cable: 'RS-MK' }, { from: 'MK', to: 'RS', cable: 'MK-RS' },
+    { from: 'MK', to: 'BG', cable: 'MK-BG' }, { from: 'BG', to: 'MK', cable: 'BG-MK' },
+    { from: 'IT', to: 'ME', cable: 'IT-ME' }, { from: 'ME', to: 'IT', cable: 'ME-IT' },
+    { from: 'AL', to: 'GR', cable: 'AL-GR' }, { from: 'GR', to: 'AL', cable: 'GR-AL' },
+    { from: 'AL', to: 'ME', cable: 'AL-ME' }, { from: 'ME', to: 'AL', cable: 'ME-AL' },
+    { from: 'GR', to: 'MK', cable: 'GR-MK' }, { from: 'MK', to: 'GR', cable: 'MK-GR' },
+    { from: 'ME', to: 'XK', cable: 'ME-XK' }, { from: 'XK', to: 'ME', cable: 'XK-ME' },
+    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' }
 ];
+const _arbPathCountries = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK"];
+
+var _arbCbamPaths = null;
+var _arbCorridorLookup = null;
+
+function _arbBuildTopology() {
+    if (_arbCbamPaths) return;
+    var adj = {};
+    for (var i = 0; i < _arbPathCountries.length; i++) adj[_arbPathCountries[i]] = [];
+    for (var e = 0; e < _arbExplicitBorders.length; e++) {
+        var edge = _arbExplicitBorders[e];
+        var f = edge.from === 'DE' ? 'DE_LU' : edge.from;
+        var t = edge.to === 'DE' ? 'DE_LU' : edge.to;
+        if (adj[f] && adj[t]) adj[f].push({ to: t, cable: edge.cable });
+    }
+
+    var allPaths = [];
+    function walk(node, path, visited) {
+        if (path.length > 1) allPaths.push(path.slice());
+        if (path.length - 1 >= 4) return;
+        var neighbors = adj[node] || [];
+        for (var n = 0; n < neighbors.length; n++) {
+            var nb = neighbors[n];
+            if (!visited[nb.to]) { visited[nb.to] = true; path.push(nb); walk(nb.to, path, visited); path.pop(); visited[nb.to] = false; }
+        }
+    }
+    for (var s = 0; s < _arbPathCountries.length; s++) {
+        var vis = {};
+        for (var v = 0; v < _arbPathCountries.length; v++) vis[_arbPathCountries[v]] = false;
+        vis[_arbPathCountries[s]] = true;
+        walk(_arbPathCountries[s], [{ to: _arbPathCountries[s], cable: null }], vis);
+    }
+
+    _arbCbamPaths = [];
+    _arbCorridorLookup = {};
+    for (var p = 0; p < allPaths.length; p++) {
+        var path = allPaths[p];
+        var start = path[0].to;
+        var end = path[path.length - 1].to;
+        if (!_arbCountryEU[start] && _arbCountryEU[end]) continue; // non-EU -> EU blocked
+        if (start === 'AL' || end === 'AL') continue;
+        _arbCbamPaths.push(path);
+        var key = start + '-' + end;
+        if (!_arbCorridorLookup[key]) {
+            _arbCorridorLookup[key] = { code: key, src: start, dst: end, path: path };
+        }
+    }
+}
+
+function _arbGetCorridors() {
+    _arbBuildTopology();
+    var list = [];
+    var seen = {};
+    for (var key in _arbCorridorLookup) {
+        if (!seen[key]) { seen[key] = true; list.push(_arbCorridorLookup[key]); }
+    }
+    list.sort(function(a, b) { return a.code.localeCompare(b.code); });
+    return list;
+}
+
+function _arbFixCountry(c) {
+    if (c === 'DE_LU' && (!historicalData['DE_LU'] || !historicalData['DE_LU'][Object.keys(historicalData['DE_LU'] || {})[0]])) return 'DE';
+    if (c === 'DE' && historicalData['DE_LU'] && historicalData['DE_LU'][Object.keys(historicalData['DE_LU'] || {})[0]]) return 'DE_LU';
+    if (c === 'ME' && (!historicalData['ME'] || !historicalData['ME'][Object.keys(historicalData['ME'] || {})[0]])) return 'RS';
+    if (c === 'XK' && (!historicalData['XK'] || !historicalData['XK'][Object.keys(historicalData['XK'] || {})[0]])) return 'AL';
+    if (c === 'BA' && (!historicalData['BA'] || !historicalData['BA'][Object.keys(historicalData['BA'] || {})[0]])) return 'RS';
+    return c;
+}
 
 function computeDistance(targetFeats, candFeats) {
     let dist = 0.0;
@@ -10296,10 +10340,11 @@ function _arbFinish() {
         matchesContainer.innerHTML = html;
     }
 
-    // Predict spreads for every corridor
+    // Predict spreads for every topology-based corridor
+    var corridors = _arbGetCorridors();
     var predictedSpreads = {};
-    for (var c = 0; c < arbitrageCorridors.length; c++) {
-        var corr = arbitrageCorridors[c];
+    for (var c = 0; c < corridors.length; c++) {
+        var corr = corridors[c];
         var hourlySpreads = new Array(24).fill(0.0);
         var sumWeights = 0.0;
 
@@ -10308,8 +10353,10 @@ function _arbFinish() {
             var w = 1.0 / Math.max(match.dist, 0.01);
             sumWeights += w;
 
-            var srcPrices = historicalData[corr.src] && historicalData[corr.src][match.date] ? historicalData[corr.src][match.date].prices : null;
-            var dstPrices = historicalData[corr.dst] && historicalData[corr.dst][match.date] ? historicalData[corr.dst][match.date].prices : null;
+            var srcKey = _arbFixCountry(corr.src);
+            var dstKey = _arbFixCountry(corr.dst);
+            var srcPrices = historicalData[srcKey] && historicalData[srcKey][match.date] ? historicalData[srcKey][match.date].prices : null;
+            var dstPrices = historicalData[dstKey] && historicalData[dstKey][match.date] ? historicalData[dstKey][match.date].prices : null;
 
             if (srcPrices && dstPrices && srcPrices.length === 24 && dstPrices.length === 24) {
                 for (var h = 0; h < 24; h++) {
@@ -10327,10 +10374,11 @@ function _arbFinish() {
 
     // Render table
     var tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
+    var corridors = _arbGetCorridors();
     if (tableBody) {
         var rows = '';
-        for (var c = 0; c < arbitrageCorridors.length; c++) {
-            var corr = arbitrageCorridors[c];
+        for (var c = 0; c < corridors.length; c++) {
+            var corr = corridors[c];
             var spreads = predictedSpreads[corr.code] || new Array(24).fill(0.0);
             var meanSpread = 0;
             for (var h = 0; h < 24; h++) meanSpread += spreads[h];
@@ -10344,39 +10392,34 @@ function _arbFinish() {
             for (var h = 18; h < 23; h++) eveningPeak += spreads[h];
             eveningPeak /= 5;
 
-            var fwd = arbitrageFwdPrices[corr.code] ? arbitrageFwdPrices[corr.code].fwd : 0;
-            var fwdStr = fwd !== 0 ? fwd.toFixed(2) + ' \u20ac' : '\u2014';
-            var recBid = meanSpread * corr.premium;
-            var netMargin = Math.max(0, meanSpread - recBid);
+            var pathLabel = corr.path.map(function(p) { return p.to; }).join('\u279c');
+            var isEUtoNonEU = _arbCountryEU[corr.src] && !_arbCountryEU[corr.dst];
+            var isNonEUtoEU = !_arbCountryEU[corr.src] && _arbCountryEU[corr.dst];
+            var badge = isEUtoNonEU ? 'EXPORT OK' : (isNonEUtoEU ? 'CBAM BLOCKED' : (corr.src === 'DE_LU' || corr.dst === 'DE_LU' ? 'WHEELING' : 'ARBITRAGE'));
+            var badgeColor = isEUtoNonEU ? '#8b5cf6' : (isNonEUtoEU ? '#ef4444' : '#10b981');
 
             rows += '<tr style="border-bottom:1px solid #f1f5f9;">' +
                 '<td style="padding:10px 8px;font-weight:700;color:#0f172a;">' + corr.code + '</td>' +
-                '<td style="padding:10px 8px;color:#475569;">' + fwdStr + '</td>' +
+                '<td style="padding:10px 8px;font-size:10px;color:#64748b;">' + pathLabel + '</td>' +
                 '<td style="padding:10px 8px;font-weight:600;color:#1e3a8a;">' + meanSpread.toFixed(2) + ' \u20ac/MWh</td>' +
                 '<td style="padding:10px 8px;color:#ea580c;">' + solarPeak.toFixed(2) + ' \u20ac/MWh</td>' +
                 '<td style="padding:10px 8px;color:#7c3aed;">' + eveningPeak.toFixed(2) + ' \u20ac/MWh</td>' +
-                '<td style="padding:10px 8px;font-weight:600;color:#1e3a8a;">' + recBid.toFixed(2) + ' \u20ac/MWh</td>' +
-                '<td style="padding:10px 8px;font-weight:600;color:#059669;">+' + netMargin.toFixed(2) + ' \u20ac/MWh</td>' +
                 '<td style="padding:10px 8px;text-align:right;">' +
-                '<span style="background:' + corr.color + '15;color:' + corr.color + ';font-weight:700;font-size:11px;padding:4px 8px;border-radius:4px;">' + corr.status + '</span>' +
+                '<span style="background:' + badgeColor + '15;color:' + badgeColor + ';font-weight:700;font-size:11px;padding:4px 8px;border-radius:4px;">' + badge + '</span>' +
                 '</td>' +
                 '</tr>';
         }
         tableBody.innerHTML = rows;
     }
 
-    // Wheeling routes (AT-IT only, DE-AT removed)
-    var at_it_arr = predictedSpreads["AT-IT"] || new Array(24).fill(0.0);
-    var at_it = 0;
-    for (var h = 0; h < 24; h++) at_it += at_it_arr[h];
-    at_it /= 24;
-
+    // Wheeling routes (top 3 non-EU->EU paths)
+    var topEUPaths = corridors.filter(function(c) { return !_arbCountryEU[c.src] && _arbCountryEU[c.dst]; }).slice(0, 3);
     var leg1 = document.getElementById("wheeling_leg_1_val");
     var leg2 = document.getElementById("wheeling_leg_2_val");
     var joint = document.getElementById("wheeling_joint_val");
-    if (leg1) leg1.innerText = '\u2014';
-    if (leg2) leg2.innerText = at_it.toFixed(2) + ' \u20ac/MWh';
-    if (joint) joint.innerText = at_it.toFixed(2) + ' \u20ac/MWh';
+    if (leg1 && topEUPaths.length > 0) leg1.innerText = topEUPaths[0].code + ' ' + ((predictedSpreads[topEUPaths[0].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
+    if (leg2 && topEUPaths.length > 1) leg2.innerText = topEUPaths[1].code + ' ' + ((predictedSpreads[topEUPaths[1].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
+    if (joint && topEUPaths.length > 2) joint.innerText = topEUPaths[2].code + ' ' + ((predictedSpreads[topEUPaths[2].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
 
     // Chart
     if (typeof Plotly !== 'undefined') {
