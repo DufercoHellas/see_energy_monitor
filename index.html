@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 09:50</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 12:26</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -172,7 +172,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 06:33</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 08:03</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
@@ -196,6 +196,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
             <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
             <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
+            <button class="tablinks" onclick="openTab(event, 'ArbitrageTab')">🔗 Arbitrage & Flows</button>
         </div>
         
         <div id="Residuals" class="tabcontent" style="display:block;">
@@ -1803,6 +1804,103 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
 
+        </div>
+
+        <!-- Tab 6: Interconnector Arbitrage Tab -->
+        <div id="ArbitrageTab" class="tabcontent" style="display:none; padding: 24px;">
+            <h2>Interconnector Arbitrage & Spreads Prediction (Day-Ahead)</h2>
+            <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unified multi-regional 341-dimensional analogue engine. Select a date to predict spot price spreads and capacity flow opportunities for all corridors at once.</p>
+            
+            <!-- Controls Grid -->
+            <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Target Date</span>
+                    <input type="date" id="arbitrage_tab_target_date" onchange="runArbitrageTabPrediction()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155; font-weight: 600; cursor: pointer;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Top Matches</span>
+                    <select id="arbitrage_tab_top_n" onchange="runArbitrageTabPrediction()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; color: #0f172a; background: #fff; cursor: pointer;">
+                        <option value="1">Top 1</option>
+                        <option value="3" selected>Top 3</option>
+                        <option value="5">Top 5</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-width: 280px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Model Optimization Weights (341-D Global Match)</span>
+                    <div style="font-size: 11px; color: #475569; background: #ffffff; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; line-height: 1.5;">
+                        <strong>Fuel:</strong> TTF 13.6% | EUA 17.4% &nbsp;&bull;&nbsp; 
+                        <strong>Grid:</strong> HR 18.7% | DE 13.2% | BG 8.7% | GR 8.6% | HU 7.0% | IT 3.3% | RO 1.2% | AT 0% &nbsp;&bull;&nbsp; 
+                        <strong>Cal:</strong> 8.4%
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analogue Results Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-bottom: 24px; align-items: start; flex-wrap: wrap;">
+                <!-- Left: Top Matches List -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Top Analogue Days</h3>
+                    <div id="arbitrage_tab_matches_container">
+                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 16px 0;">Select a date to calculate matching days.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Chart -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Predicted Hourly Spreads & FTR Payoffs</h3>
+                    <div id="arbitrage_tab_chart" style="width: 100%; height: 320px;">
+                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 100px 0;">No active prediction. Run match search first.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spreads Table Container -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px; overflow-x: auto;">
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions & Bidding Assessment</h3>
+                <table id="arbitrage_tab_spreads_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 800px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
+                            <th style="padding: 10px 8px;">Corridor</th>
+                            <th style="padding: 10px 8px;">Fwd Base Spread</th>
+                            <th style="padding: 10px 8px;">Predicted FTR (Mean)</th>
+                            <th style="padding: 10px 8px;">Solar Peak Spread (12-17)</th>
+                            <th style="padding: 10px 8px;">Evening Peak Spread (18-22)</th>
+                            <th style="padding: 10px 8px;">Recommended Bid (Option 2)</th>
+                            <th style="padding: 10px 8px;">Expected Net Margin</th>
+                            <th style="padding: 10px 8px; text-align: right;">Bidding Status</th>
+                        </tr>
+                    </thead>
+                    <tbody style="color: #334155;">
+                        <tr>
+                            <td colspan="8" style="padding: 32px 0; text-align: center; color: #94a3b8;">Select a date to populate the spreads matrix.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Wheeling Routes Block -->
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px;">
+                <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
+                    <span>🔗</span> DE ➔ AT ➔ IT Wheeling Arbitrage Pathway
+                </h3>
+                <p style="margin: 0 0 16px 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
+                    Captures the Germany-to-Italy spread (€33.15 fwd) via Austria. In tight summer months, price decoupling in Austria often increases the sum of the FTR Options leg values relative to the direct spread.
+                </p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                    <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Leg 1: DE ➔ AT</span>
+                        <p id="wheeling_leg_1_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
+                    </div>
+                    <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Leg 2: AT ➔ IT</span>
+                        <p id="wheeling_leg_2_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
+                    </div>
+                    <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
+                        <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">Combined Joint Path Value</span>
+                        <p id="wheeling_joint_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #047857;">—</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Sub-Tab 4: Cable Auctions Optimizer (inside Cables tab) -->
@@ -4061,11 +4159,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "neighbors": []
   },
   "AT-CZ": {
-    "predicted": 3.75,
+    "predicted": 3.748,
     "confidence": 0.254,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.14,
+    "mae_knn": 1.132,
     "mae_avg": 1.189,
     "features": {
       "ttf": 35.0,
@@ -4089,7 +4187,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.261,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 5.115,
+    "mae_knn": 5.111,
     "mae_avg": 5.664,
     "features": {
       "ttf": 35.0,
@@ -4109,11 +4207,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "AT-IT": {
-    "predicted": 11.632,
-    "confidence": 0.264,
+    "predicted": 11.635,
+    "confidence": 0.265,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 10.368,
+    "mae_knn": 10.369,
     "mae_avg": 12.629,
     "features": {
       "ttf": 35.0,
@@ -4297,7 +4395,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.239,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.123,
+    "mae_knn": 1.096,
     "mae_avg": 2.04,
     "features": {
       "ttf": 35.0,
@@ -4321,7 +4419,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.257,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 2.939,
+    "mae_knn": 2.967,
     "mae_avg": 3.309,
     "features": {
       "ttf": 35.0,
@@ -4393,7 +4491,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.255,
     "n_auctions": 19,
     "method": "historical_avg_only",
-    "mae_knn": 10.076,
+    "mae_knn": 10.077,
     "mae_avg": 9.677,
     "features": {
       "ttf": 35.0,
@@ -4502,10 +4600,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "HU-AT": {
     "predicted": 1.677,
-    "confidence": 0.242,
+    "confidence": 0.241,
     "n_auctions": 19,
     "method": "historical_avg_only",
-    "mae_knn": 0.857,
+    "mae_knn": 0.865,
     "mae_avg": 0.676,
     "features": {
       "ttf": 35.0,
@@ -4549,7 +4647,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.237,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 0.959,
+    "mae_knn": 0.991,
     "mae_avg": 1.307,
     "features": {
       "ttf": 35.0,
@@ -4573,7 +4671,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.264,
     "n_auctions": 41,
     "method": "knn_weighted",
-    "mae_knn": 1.232,
+    "mae_knn": 1.233,
     "mae_avg": 1.463,
     "features": {
       "ttf": 35.0,
@@ -4593,11 +4691,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "HU-SK": {
-    "predicted": 2.83,
+    "predicted": 2.827,
     "confidence": 0.238,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 0.747,
+    "mae_knn": 0.735,
     "mae_avg": 0.759,
     "features": {
       "ttf": 35.0,
@@ -4617,11 +4715,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "IT-AT": {
-    "predicted": 7.374,
+    "predicted": 7.373,
     "confidence": 0.258,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.004,
+    "mae_knn": 1.005,
     "mae_avg": 2.222,
     "features": {
       "ttf": 35.0,
@@ -4690,10 +4788,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "IT-SI": {
     "predicted": 6.539,
-    "confidence": 0.278,
+    "confidence": 0.279,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.534,
+    "mae_knn": 1.535,
     "mae_avg": 2.693,
     "features": {
       "ttf": 35.0,
@@ -4791,8 +4889,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
       "ttf": 35.0,
       "eua": 70.0,
       "src_fwd": 119.75,
-      "dst_fwd": 130.91,
-      "fwd_spread": 11.16,
+      "dst_fwd": 133.3,
+      "fwd_spread": 13.55,
       "hist_spread": 159.628,
       "hist_spread_last_year": 159.628
     },
@@ -4829,7 +4927,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.202,
     "n_auctions": 7,
     "method": "knn_weighted",
-    "mae_knn": 0.287,
+    "mae_knn": 0.286,
     "mae_avg": 0.341,
     "features": {
       "ttf": 35.0,
@@ -4938,10 +5036,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "RO-HU": {
     "predicted": 4.354,
-    "confidence": 0.236,
+    "confidence": 0.235,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.248,
+    "mae_knn": 1.247,
     "mae_avg": 1.467,
     "features": {
       "ttf": 35.0,
@@ -5033,7 +5131,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.246,
     "n_auctions": 48,
     "method": "historical_avg_only",
-    "mae_knn": 1.506,
+    "mae_knn": 1.492,
     "mae_avg": 1.445,
     "features": {
       "ttf": 35.0,
@@ -5058,9 +5156,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
-      "src_fwd": 130.91,
+      "src_fwd": 133.3,
       "dst_fwd": 119.75,
-      "fwd_spread": -11.16,
+      "fwd_spread": -13.55,
       "hist_spread": -159.628,
       "hist_spread_last_year": -159.628
     },
@@ -5097,7 +5195,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.337,
     "n_auctions": 19,
     "method": "historical_avg_only",
-    "mae_knn": 10.423,
+    "mae_knn": 10.338,
     "mae_avg": 9.232,
     "features": {
       "ttf": 35.0,
@@ -5117,7 +5215,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.257,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 0.364,
+    "mae_knn": 0.356,
     "mae_avg": 0.457,
     "features": {
       "ttf": 35.0,
@@ -5137,11 +5235,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "SK-HU": {
-    "predicted": 6.102,
+    "predicted": 6.098,
     "confidence": 0.238,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.924,
+    "mae_knn": 1.847,
     "mae_avg": 2.547,
     "features": {
       "ttf": 35.0,
@@ -8906,14 +9004,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     const t = cacheBust;
 
                     // Fire all requests simultaneously
-                    const [hist, out, cab, cabL, cabO, fwd, cabAll] = await Promise.all([
+                    const [hist, out, cab, cabL, cabO, fwd, cabAll, stats] = await Promise.all([
                         fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d;  }),
                         fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d;  }),
                         fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d;  }),
                         fetchJSON(`data/cables_long.json?t=${t}`).then(d => { tick('cables long-term');   return d;  }),
                         fetchJSON(`data/cable_outages.json?t=${t}`).then(d => { tick('cable curtailments'); return d; }),
                         fetchJSON(`data/auction_fwd.json?t=${t}`).then(d => { tick('forward curves');    return d;  }).catch(() => { tick('forward curves'); return {}; }),
-                        fetchJSON(`data/all_corridors.json?t=${t}`).then(d => { tick('corridors');       return d;  }).catch(() => { tick('corridors');       return []; })
+                        fetchJSON(`data/all_corridors.json?t=${t}`).then(d => { tick('corridors');       return d;  }).catch(() => { tick('corridors');       return []; }),
+                        fetchJSON(`data/historical_stats.json?t=${t}`).catch(() => { return {}; })
                     ]);
 
                     historicalData   = hist;
@@ -8923,6 +9022,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     cableOutagesData = cabO;
                     auctionFwdData   = fwd  || {};
                     allCorridorsData = cabAll || [];
+                    historicalStats  = stats  || {};
 
                     statusEl.innerText = "Initialising dashboard...";
 
@@ -9955,6 +10055,285 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
         <tbody>${rows}</tbody>
     </table></div>`;
 }
+
+// =====================================================================
+// INTERCONNECTOR ARBITRAGE & FLOWS ENGINE (341-D GLOBAL MATCH)
+// =====================================================================
+
+const arbitrageWeights = {
+    "ttf": 0.1362,
+    "eua": 0.1737,
+    "calendar": 0.0835,
+    "DE_LU": 0.1319,
+    "AT": 0.0002,
+    "IT": 0.033,
+    "GR": 0.0864,
+    "BG": 0.0868,
+    "HU": 0.0697,
+    "RO": 0.0116,
+    "HR": 0.1869
+};
+
+const arbitrageFwdPrices = {
+    "AT-DE": { fwd: 5.88 },
+    "DE-AT": { fwd: 5.88 },
+    "AT-IT": { fwd: 27.27 },
+    "IT-AT": { fwd: -27.27 },
+    "BG-GR": { fwd: -1.31 },
+    "GR-BG": { fwd: 1.31 },
+    "CH-IT": { fwd: 30.00 },
+    "IT-CH": { fwd: -30.00 },
+    "GR-IT": { fwd: 26.62 },
+    "IT-GR": { fwd: -26.62 },
+    "HR-HU": { fwd: 8.00 },
+    "HU-HR": { fwd: -8.00 },
+    "HU-RO": { fwd: -6.00 },
+    "RO-HU": { fwd: 6.00 },
+    "IT-SI": { fwd: -25.00 },
+    "SI-IT": { fwd: 25.00 },
+    "IT-ME": { fwd: -30.47 },
+    "ME-IT": { fwd: 30.47 }
+};
+
+const arbitrageCorridors = [
+    { code: "GR-IT", src: "GR", dst: "IT", premium: 0.50, status: "STRONG BUY", color: "#10b981" },
+    { code: "HR-HU", src: "HR", dst: "HU", premium: 0.70, status: "STRONG BUY", color: "#10b981" },
+    { code: "SI-IT", src: "SI", dst: "IT", premium: 0.40, status: "STRONG BUY", color: "#10b981" },
+    { code: "ME-IT", src: "ME", dst: "IT", premium: 0.45, status: "STRONG BUY", color: "#10b981" },
+    { code: "AT-IT", src: "AT", dst: "IT", premium: 0.40, status: "DEFENSIVE BUY", color: "#3b82f6" },
+    { code: "CH-IT", src: "CH", dst: "IT", premium: 0.50, status: "VOLATILITY BUY", color: "#3b82f6" },
+    { code: "AT-DE", src: "AT", dst: "DE_LU", premium: 0.55, status: "VOLATILITY BUY", color: "#3b82f6" },
+    { code: "DE-AT", src: "DE_LU", dst: "AT", premium: 0.60, status: "WHEELING BUY", color: "#3b82f6" },
+    { code: "GR-BG", src: "GR", dst: "BG", premium: 0.65, status: "SOLAR SURPLUS", color: "#8b5cf6" },
+    { code: "RO-HU", src: "RO", dst: "HU", premium: 0.60, status: "ARBITRAGE BUY", color: "#8b5cf6" },
+    { code: "BG-GR", src: "BG", dst: "GR", premium: 0.40, status: "BID MINIMAL", color: "#f59e0b" },
+    { code: "HU-RO", src: "HU", dst: "RO", premium: 0.40, status: "BID MINIMAL", color: "#f59e0b" },
+    { code: "IT-AT", src: "IT", dst: "AT", premium: 0.40, status: "AVOID", color: "#ef4444" },
+    { code: "IT-GR", src: "IT", dst: "GR", premium: 0.40, status: "AVOID", color: "#ef4444" },
+    { code: "IT-CH", src: "IT", dst: "CH", premium: 0.40, status: "AVOID", color: "#ef4444" },
+    { code: "HU-HR", src: "HU", dst: "HR", premium: 0.40, status: "AVOID", color: "#ef4444" },
+    { code: "IT-SI", src: "IT", dst: "SI", premium: 0.40, status: "AVOID", color: "#ef4444" },
+    { code: "IT-ME", src: "IT", dst: "ME", premium: 0.40, status: "BINARY RISK", color: "#f59e0b" }
+];
+
+function runArbitrageTabPrediction() {
+    const targetDate = document.getElementById("arbitrage_tab_target_date").value;
+    const topN = parseInt(document.getElementById("arbitrage_tab_top_n").value) || 3;
+    
+    if (!targetDate || !historicalData || !historicalData['DE_LU']) return;
+    if (!historicalStats || Object.keys(historicalStats).length === 0) {
+        alert("Historical stats not loaded yet. Please wait.");
+        return;
+    }
+    
+    // Check if target day exists
+    const tData = historicalData['DE_LU'][targetDate];
+    if (!tData) {
+        alert("Selected target date is not available in historical data.");
+        return;
+    }
+    
+    // Build target feature vector
+    const targetFeatures = getGlobalDayFeatures(targetDate);
+    if (!targetFeatures) {
+        alert("Incomplete data for target day. Ensure all regional profiles are loaded.");
+        return;
+    }
+    
+    // Calculate distance to all candidates
+    const candidates = [];
+    for (const [date, entry] of Object.entries(historicalData['DE_LU'])) {
+        if (date === targetDate) continue;
+        const candFeats = getGlobalDayFeatures(date);
+        if (!candFeats) continue;
+        
+        // Compute weighted distance
+        let dist = 0.0;
+        for (const [cat, weight] of Object.entries(arbitrageWeights)) {
+            if (weight <= 0) continue;
+            
+            const t_arr = targetFeatures[cat];
+            const c_arr = candFeats[cat];
+            const stats = historicalStats[cat] || historicalStats[cat + '_res']; // handle nested country stats
+            
+            if (!t_arr || !c_arr || !stats) continue;
+            
+            let cat_dist_sq = 0.0;
+            if (Array.isArray(t_arr)) {
+                for (let i = 0; i < t_arr.length; i++) {
+                    const z_t = (t_arr[i] - stats.mean[i]) / stats.std[i];
+                    const z_c = (c_arr[i] - stats.mean[i]) / stats.std[i];
+                    cat_dist_sq += Math.pow(z_t - z_c, 2);
+                }
+                dist += weight * Math.sqrt(cat_dist_sq);
+            } else {
+                const z_t = (t_arr - stats.mean) / stats.std;
+                const z_c = (c_arr - stats.mean) / stats.std;
+                dist += weight * Math.abs(z_t - z_c);
+            }
+        }
+        
+        candidates.push({ date, dist, info: candFeats });
+    }
+    
+    // Sort and get top N matches
+    candidates.sort((a, b) => a.dist - b.dist);
+    const topMatches = candidates.slice(0, topN);
+    
+    // Render top matches
+    const matchesContainer = document.getElementById("arbitrage_tab_matches_container");
+    matchesContainer.innerHTML = topMatches.map((m, idx) => {
+        const sim = (100 / (1 + m.dist)).toFixed(1);
+        return `<div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong style="color: #0f172a; font-size: 14px;">#${idx+1} &bull; ${m.date}</strong>
+                <div style="font-size: 11px; color: #64748b; margin-top: 2px;">TTF: €${m.info.ttf.toFixed(2)} | EUA: €${m.info.eua.toFixed(2)}</div>
+            </div>
+            <span style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 4px 8px; border-radius: 4px;">${sim}% Match</span>
+        </div>`;
+    }).join("");
+    
+    // Predict spreads
+    const predictedSpreads = {};
+    arbitrageCorridors.forEach(corr => {
+        const hourlySpreads = Array(24).fill(0.0);
+        let sumWeights = 0.0;
+        
+        topMatches.forEach(m => {
+            const w = 1.0 / Math.max(m.dist, 0.01);
+            sumWeights += w;
+            
+            const srcPrices = historicalData[corr.src]?.[m.date]?.prices;
+            const dstPrices = historicalData[corr.dst]?.[m.date]?.prices;
+            
+            if (srcPrices && dstPrices && srcPrices.length === 24 && dstPrices.length === 24) {
+                for (let h = 0; h < 24; h++) {
+                    // Spot price FTR positive spread value max(0, dst - src)
+                    hourlySpreads[h] += w * Math.max(0, dstPrices[h] - srcPrices[h]);
+                }
+            }
+        });
+        
+        if (sumWeights > 0) {
+            predictedSpreads[corr.code] = hourlySpreads.map(v => v / sumWeights);
+        } else {
+            predictedSpreads[corr.code] = Array(24).fill(0.0);
+        }
+    });
+    
+    // Render spreads table
+    const tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
+    tableBody.innerHTML = arbitrageCorridors.map(corr => {
+        const spreads = predictedSpreads[corr.code] || Array(24).fill(0.0);
+        const meanSpread = spreads.reduce((a,b) => a+b, 0) / 24;
+        
+        // Solar peak hours (12-17)
+        const solarPeak = spreads.slice(12, 18).reduce((a,b) => a+b, 0) / 6;
+        // Evening peak hours (18-22)
+        const eveningPeak = spreads.slice(18, 23).reduce((a,b) => a+b, 0) / 5;
+        
+        const fwd = arbitrageFwdPrices[corr.code]?.fwd || 0.0;
+        const fwdStr = fwd !== 0.0 ? `${fwd.toFixed(2)} €` : '—';
+        
+        const recBid = meanSpread * corr.premium;
+        const netMargin = Math.max(0, meanSpread - recBid);
+        
+        return `<tr style="border-bottom: 1px solid #f1f5f9; hover: background: #f8fafc;">
+            <td style="padding: 10px 8px; font-weight: 700; color: #0f172a;">${corr.code}</td>
+            <td style="padding: 10px 8px; color: #475569;">${fwdStr}</td>
+            <td style="padding: 10px 8px; font-weight: 600; color: #1e3a8a;">${meanSpread.toFixed(2)} €/MWh</td>
+            <td style="padding: 10px 8px; color: #ea580c;">${solarPeak.toFixed(2)} €/MWh</td>
+            <td style="padding: 10px 8px; color: #7c3aed;">${eveningPeak.toFixed(2)} €/MWh</td>
+            <td style="padding: 10px 8px; font-weight: 600; color: #1e3a8a;">${recBid.toFixed(2)} €/MWh</td>
+            <td style="padding: 10px 8px; font-weight: 600; color: #059669;">+${netMargin.toFixed(2)} €/MWh</td>
+            <td style="padding: 10px 8px; text-align: right;">
+                <span style="background: ${corr.color}15; color: ${corr.color}; font-weight: 700; font-size: 11px; padding: 4px 8px; border-radius: 4px;">${corr.status}</span>
+            </td>
+        </tr>`;
+    }).join("");
+    
+    // Update wheeling routes values
+    const de_at = (predictedSpreads["DE-AT"] || Array(24).fill(0.0)).reduce((a,b)=>a+b, 0) / 24;
+    const at_it = (predictedSpreads["AT-IT"] || Array(24).fill(0.0)).reduce((a,b)=>a+b, 0) / 24;
+    document.getElementById("wheeling_leg_1_val").innerText = `${de_at.toFixed(2)} €/MWh`;
+    document.getElementById("wheeling_leg_2_val").innerText = `${at_it.toFixed(2)} €/MWh`;
+    document.getElementById("wheeling_joint_val").innerText = `${(de_at + at_it).toFixed(2)} €/MWh`;
+    
+    // Render Plotly Chart
+    renderArbitrageTabChart(predictedSpreads);
+}
+
+function getGlobalDayFeatures(date) {
+    const countries = ['DE_LU', 'AT', 'IT', 'GR', 'BG', 'HU', 'RO', 'HR'];
+    const feats = {};
+    
+    // Gas/Carbon
+    const ttf = historicalData['DE_LU'][date]?.ttf_price;
+    const eua = historicalData['DE_LU'][date]?.eua_price;
+    if (ttf === undefined || eua === undefined) return null;
+    
+    feats['ttf'] = ttf;
+    feats['eua'] = eua;
+    
+    // Calendar
+    const parts = date.split('-');
+    const m_rad = 2 * Math.PI * parseInt(parts[1]) / 12;
+    const dow = parseLocalDate(date).getDay() / 6.0;
+    feats['calendar'] = [Math.sin(m_rad), Math.cos(m_rad), dow];
+    
+    // Country profiles
+    for (const cc of countries) {
+        const entry = historicalData[cc]?.[date];
+        if (!entry || !entry.residuals || !entry.demand || entry.residuals.length !== 24 || entry.demand.length !== 24) {
+            return null;
+        }
+        feats[cc] = entry.residuals.concat(entry.demand);
+    }
+    
+    return feats;
+}
+
+function renderArbitrageTabChart(predictedSpreads) {
+    const targetCorridors = ["GR-IT", "HR-HU", "SI-IT", "AT-IT", "DE-AT"];
+    const traces = targetCorridors.map(code => {
+        const spreads = predictedSpreads[code] || Array(24).fill(0.0);
+        return {
+            x: Array.from({length: 24}, (_, i) => `H${String(i).padStart(2,'0')}`),
+            y: spreads,
+            name: code,
+            mode: 'lines+markers',
+            line: { shape: 'spline', width: 2.5 },
+            marker: { size: 5 }
+        };
+    });
+    
+    const layout = {
+        margin: { l: 40, r: 20, t: 30, b: 40 },
+        hovermode: 'closest',
+        plot_bgcolor: '#ffffff',
+        paper_bgcolor: '#ffffff',
+        legend: { orientation: 'h', y: -0.2 },
+        xaxis: { gridcolor: '#f1f5f9', zeroline: false },
+        yaxis: { title: 'Spread (€/MWh)', gridcolor: '#f1f5f9', zeroline: false }
+    };
+    
+    Plotly.newPlot('arbitrage_tab_chart', traces, layout, { responsive: true, displayModeBar: false });
+}
+
+// Automatically set default date for arbitrage target on initialization
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        const targetInput = document.getElementById("arbitrage_tab_target_date");
+        if (targetInput && historicalData && historicalData['DE_LU']) {
+            const dates = Object.keys(historicalData['DE_LU']).sort();
+            if (dates.length > 0) {
+                targetInput.value = dates[dates.length - 1]; // Set to last available day
+                runArbitrageTabPrediction();
+            }
+        }
+    }, 2000);
+});
+
 
         </script>
     </body>
