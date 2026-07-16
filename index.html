@@ -1932,6 +1932,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 if (tabName === 'EUMap') {
                     initEUMap();
                 }
+                if (tabName === 'ArbitrageTab') {
+                    const arbInput = document.getElementById("arbitrage_tab_target_date");
+                    if (arbInput && arbInput.value && historicalData && historicalData['DE_LU']) {
+                        runArbitrageTabPrediction();
+                    }
+                }
                 window.dispatchEvent(new Event('resize'));
             }
             function openInnerTab(evt, tabName) {
