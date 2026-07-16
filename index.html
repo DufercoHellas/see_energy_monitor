@@ -1871,7 +1871,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
                 <!-- Right: Country Residual Comparison -->
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Residual &amp; Demand Comparison (vs Top Match)</h3>
+                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Residual &amp; Price Comparison (vs Top Match)</h3>
                     <div id="arbitrage_tab_residual_charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 40px 0; grid-column: span 2;">No matches computed yet.</p>
                     </div>
@@ -1879,45 +1879,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
 
             <!-- Route Cards Container (1:1 with Interconnector panel) -->
-            <div style="margin-bottom: 24px;">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Optimal Cross-Border Route Cards (per hour, CBAM-compliant)</h3>
-                <div id="arbitrage_tab_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
-                    <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>
-                </div>
-            </div>
-
-            <!-- Spreads Table -->
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px; overflow-x: auto;">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions</h3>
-                <table id="arbitrage_tab_spreads_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 700px;">
-                    <thead>
-                        <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
-                            <th style="padding: 10px 8px;">Corridor</th>
-                            <th style="padding: 10px 8px;">Route</th>
-                            <th style="padding: 10px 8px;">FTR Mean</th>
-                            <th style="padding: 10px 8px;">Solar (12-17)</th>
-                            <th style="padding: 10px 8px;">Evening (18-22)</th>
-                            <th style="padding: 10px 8px; text-align: right;">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody style="color: #334155;">
-                        <tr>
-                            <td colspan="6" style="padding: 32px 0; text-align: center; color: #94a3b8;">Select a date to populate the spreads matrix.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Chart -->
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Predicted Hourly Spreads &amp; FTR Payoffs</h3>
-                <div id="arbitrage_tab_chart" style="width: 100%; height: 380px;">
-                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 150px 0;">No active prediction.</p>
-                </div>
+            <div id="arbitrage_tab_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Select a date above.</div>
             </div>
 
             <!-- Top 3 Routes -->
-            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px;">
+            <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px; margin-top: 24px;">
                 <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #1e40af;">🔗 Top 3 Routes by Predicted Spread</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
@@ -1968,7 +1935,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 if (tabName === 'ArbitrageTab') {
                     const arbInput = document.getElementById("arbitrage_tab_target_date");
                     const mc = document.getElementById("arbitrage_tab_matches_container");
-                    const tbody = document.querySelector("#arbitrage_tab_spreads_table tbody");
                     try {
                         if (arbInput && historicalData && historicalData['DE_LU']) {
                             if (!arbInput.value) {
@@ -1985,7 +1951,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             }
                             if (arbInput.value) {
                                 if (mc) mc.innerHTML = '<div style="text-align:center;padding:20px 0;"><p style="color:#3b82f6;font-size:13px;">Loading historical analogues...</p></div>';
-                                if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="padding:32px 0;text-align:center;color:#3b82f6;">Calculating spreads...</td></tr>';
                                 requestAnimationFrame(() => requestAnimationFrame(() => runArbitrageTabPrediction()));
                             } else if (mc) {
                                 mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
@@ -10533,46 +10498,8 @@ function _arbFinish() {
 
         setTimeout(function() { _arbRenderCountryCharts('DE_LU'); }, 150);
     }
-    var tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
-    var corridors = _arbGetCorridors();
-    if (tableBody) {
-        var rows = '';
-        for (var c = 0; c < corridors.length; c++) {
-            var corr = corridors[c];
-            var spreads = predictedSpreads[corr.code] || new Array(24).fill(0.0);
-            var meanSpread = 0;
-            for (var h = 0; h < 24; h++) meanSpread += spreads[h];
-            meanSpread /= 24;
 
-            var solarPeak = 0;
-            for (var h = 12; h < 18; h++) solarPeak += spreads[h];
-            solarPeak /= 6;
-
-            var eveningPeak = 0;
-            for (var h = 18; h < 23; h++) eveningPeak += spreads[h];
-            eveningPeak /= 5;
-
-            var pathLabel = corr.path.map(function(p) { return p.to; }).join('\u279c');
-            var isEUtoNonEU = _arbCountryEU[corr.src] && !_arbCountryEU[corr.dst];
-            var isNonEUtoEU = !_arbCountryEU[corr.src] && _arbCountryEU[corr.dst];
-            var badge = isEUtoNonEU ? 'EXPORT OK' : (isNonEUtoEU ? 'CBAM BLOCKED' : (corr.src === 'DE_LU' || corr.dst === 'DE_LU' ? 'WHEELING' : 'ARBITRAGE'));
-            var badgeColor = isEUtoNonEU ? '#8b5cf6' : (isNonEUtoEU ? '#ef4444' : '#10b981');
-
-            rows += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                '<td style="padding:10px 8px;font-weight:700;color:#0f172a;">' + corr.code + '</td>' +
-                '<td style="padding:10px 8px;font-size:10px;color:#64748b;">' + pathLabel + '</td>' +
-                '<td style="padding:10px 8px;font-weight:600;color:#1e3a8a;">' + meanSpread.toFixed(2) + ' \u20ac/MWh</td>' +
-                '<td style="padding:10px 8px;color:#ea580c;">' + solarPeak.toFixed(2) + ' \u20ac/MWh</td>' +
-                '<td style="padding:10px 8px;color:#7c3aed;">' + eveningPeak.toFixed(2) + ' \u20ac/MWh</td>' +
-                '<td style="padding:10px 8px;text-align:right;">' +
-                '<span style="background:' + badgeColor + '15;color:' + badgeColor + ';font-weight:700;font-size:11px;padding:4px 8px;border-radius:4px;">' + badge + '</span>' +
-                '</td>' +
-                '</tr>';
-        }
-        tableBody.innerHTML = rows;
-    }
-
-    // Top 3 corridors by mean spread
+    // Top 3 routes
     var topBySpread = corridors.slice().sort(function(a, b) {
         var sa = predictedSpreads[a.code] || new Array(24).fill(0);
         var sb = predictedSpreads[b.code] || new Array(24).fill(0);
@@ -10586,11 +10513,6 @@ function _arbFinish() {
     if (leg1 && topBySpread.length > 0) leg1.innerText = topBySpread[0].code + ' ' + ((predictedSpreads[topBySpread[0].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
     if (leg2 && topBySpread.length > 1) leg2.innerText = topBySpread[1].code + ' ' + ((predictedSpreads[topBySpread[1].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
     if (joint && topBySpread.length > 2) joint.innerText = topBySpread[2].code + ' ' + ((predictedSpreads[topBySpread[2].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
-
-    // Chart
-    if (typeof Plotly !== 'undefined') {
-        renderArbitrageTabChart(predictedSpreads);
-    }
 }
 
 function getGlobalDayFeatures(date) {
