@@ -1876,22 +1876,22 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <!-- Wheeling Routes Block -->
             <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px;">
                 <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
-                    <span>🔗</span> AT ➔ IT Wheeling Arbitrage Pathway
+                    <span>🔗</span> Top CBAM-Compliant Import Routes
                 </h3>
                 <p style="margin: 0 0 16px 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
-                    Austria-to-Italy spread (€27.27 fwd). Captures price decoupling between the two zones.
+                    Best non-EU to EU paths respecting CBAM rules (Albania as transit only, no non-EU→EU direct). Ranked by predicted FTR spread.
                 </p>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Leg 1: DE ➔ AT (N/A)</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #1</span>
                         <p id="wheeling_leg_1_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
                     </div>
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Leg 2: AT ➔ IT</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #2</span>
                         <p id="wheeling_leg_2_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
                     </div>
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">AT ➔ IT FTR Value</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #3</span>
                         <p id="wheeling_joint_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #047857;">—</p>
                     </div>
                 </div>
@@ -10412,14 +10412,20 @@ function _arbFinish() {
         tableBody.innerHTML = rows;
     }
 
-    // Wheeling routes (top 3 non-EU->EU paths)
-    var topEUPaths = corridors.filter(function(c) { return !_arbCountryEU[c.src] && _arbCountryEU[c.dst]; }).slice(0, 3);
+    // Top 3 corridors by mean spread
+    var topBySpread = corridors.slice().sort(function(a, b) {
+        var sa = predictedSpreads[a.code] || new Array(24).fill(0);
+        var sb = predictedSpreads[b.code] || new Array(24).fill(0);
+        var ma = sa.reduce(function(x,y){return x+y;}, 0) / 24;
+        var mb = sb.reduce(function(x,y){return x+y;}, 0) / 24;
+        return mb - ma;
+    }).slice(0, 3);
     var leg1 = document.getElementById("wheeling_leg_1_val");
     var leg2 = document.getElementById("wheeling_leg_2_val");
     var joint = document.getElementById("wheeling_joint_val");
-    if (leg1 && topEUPaths.length > 0) leg1.innerText = topEUPaths[0].code + ' ' + ((predictedSpreads[topEUPaths[0].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
-    if (leg2 && topEUPaths.length > 1) leg2.innerText = topEUPaths[1].code + ' ' + ((predictedSpreads[topEUPaths[1].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
-    if (joint && topEUPaths.length > 2) joint.innerText = topEUPaths[2].code + ' ' + ((predictedSpreads[topEUPaths[2].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
+    if (leg1 && topBySpread.length > 0) leg1.innerText = topBySpread[0].code + ' ' + ((predictedSpreads[topBySpread[0].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
+    if (leg2 && topBySpread.length > 1) leg2.innerText = topBySpread[1].code + ' ' + ((predictedSpreads[topBySpread[1].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
+    if (joint && topBySpread.length > 2) joint.innerText = topBySpread[2].code + ' ' + ((predictedSpreads[topBySpread[2].code] || new Array(24).fill(0)).reduce(function(a,b){return a+b;},0)/24).toFixed(2) + ' \u20ac/MWh';
 
     // Chart
     if (typeof Plotly !== 'undefined') {
@@ -10455,8 +10461,9 @@ function getGlobalDayFeatures(date) {
 }
 
 function renderArbitrageTabChart(predictedSpreads) {
-    const targetCorridors = ["GR-IT", "HR-HU", "SI-IT", "AT-IT"];
-    const traces = targetCorridors.map(code => {
+    var allCorridors = _arbGetCorridors();
+    var topCodes = allCorridors.slice(0, 6).map(function(c) { return c.code; });
+    const traces = topCodes.map(code => {
         const spreads = predictedSpreads[code] || new Array(24).fill(0.0);
         return {
             x: Array.from({length: 24}, (_, i) => 'H' + String(i).padStart(2, '0')),
