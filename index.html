@@ -1934,8 +1934,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 }
                 if (tabName === 'ArbitrageTab') {
                     const arbInput = document.getElementById("arbitrage_tab_target_date");
-                    if (arbInput && arbInput.value && historicalData && historicalData['DE_LU']) {
-                        runArbitrageTabPrediction();
+                    if (arbInput && historicalData && historicalData['DE_LU']) {
+                        if (!arbInput.value) {
+                            const dates = Object.keys(historicalData['DE_LU']).sort();
+                            if (dates.length > 0) arbInput.value = dates[dates.length - 1];
+                        }
+                        if (arbInput.value) {
+                            try { runArbitrageTabPrediction(); }
+                            catch (err) { console.error("Arbitrage tab render failed:", err); }
+                        }
                     }
                 }
                 window.dispatchEvent(new Event('resize'));
@@ -10362,19 +10369,7 @@ function renderArbitrageTabChart(predictedSpreads) {
     Plotly.newPlot('arbitrage_tab_chart', traces, layout, { responsive: true, displayModeBar: false });
 }
 
-// Automatically set default date for arbitrage target on initialization
-document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-        const targetInput = document.getElementById("arbitrage_tab_target_date");
-        if (targetInput && historicalData && historicalData['DE_LU']) {
-            const dates = Object.keys(historicalData['DE_LU']).sort();
-            if (dates.length > 0) {
-                targetInput.value = dates[dates.length - 1]; // Set to last available day
-                runArbitrageTabPrediction();
-            }
-        }
-    }, 2000);
-});
+
 
 
         </script>
