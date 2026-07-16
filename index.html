@@ -10410,7 +10410,129 @@ function _arbFinish() {
         }
     }
 
-    // Render table
+    // --- Route cards (like Interconnector panel) ---
+    var minThreshold = parseFloat(document.getElementById("arbitrage_tab_min_spread")?.value) || 5.0;
+    var hourlyRoutes = [];
+    var totalWindows = 0, maxMargin = -999;
+
+    for (var h = 0; h < 24; h++) {
+        var best = null;
+        for (var c = 0; c < corridors.length; c++) {
+            var corr = corridors[c];
+            var spreads = predictedSpreads[corr.code];
+            if (!spreads) continue;
+            var margin = spreads[h];
+            if (margin > minThreshold && (best === null || margin > best.margin)) {
+                best = { code: corr.code, src: corr.src, dst: corr.dst, margin: margin, path: corr.path };
+            }
+        }
+        if (best) { totalWindows++; if (best.margin > maxMargin) maxMargin = best.margin; }
+        hourlyRoutes.push(best);
+    }
+
+    // Summary cards
+    var winEl = document.getElementById("arb_tab_stat_windows");
+    var winSub = document.getElementById("arb_tab_stat_windows_sub");
+    var maxEl = document.getElementById("arb_tab_stat_max_spread");
+    var maxSub = document.getElementById("arb_tab_stat_max_spread_sub");
+    var stratEl = document.getElementById("arb_tab_stat_strategy");
+    if (winEl) winEl.innerText = totalWindows + ' / 24 hrs';
+    if (winSub) winSub.innerText = 'Hours exceeding ' + minThreshold.toFixed(0) + ' \u20ac/MWh threshold';
+    if (maxEl) maxEl.innerText = maxMargin > -999 ? maxMargin.toFixed(2) + ' \u20ac/MWh' : '0.00 \u20ac/MWh';
+    if (maxSub && maxMargin > -999) maxSub.innerText = 'Best path: ' + (hourlyRoutes.filter(function(r){return r;}).sort(function(a,b){return b.margin-a.margin;})[0]?.code || '—');
+
+    // Route cards
+    var cardsContainer = document.getElementById("arbitrage_tab_cards_container");
+    if (cardsContainer) {
+        var topByMargin = hourlyRoutes.filter(function(r){return r;}).sort(function(a,b){return b.margin-a.margin;}).slice(0, 8);
+        if (topByMargin.length === 0) {
+            cardsContainer.innerHTML = '<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No profitable routes found above ' + minThreshold.toFixed(0) + ' \u20ac/MWh. Lower threshold or try a different date.</div>';
+        } else {
+            var cardsHtml = '';
+            for (var i = 0; i < topByMargin.length; i++) {
+                var r = topByMargin[i];
+                var hr = hourlyRoutes.indexOf(r);
+                var pathStr = r.path.map(function(p){return p.to;}).join(' \u279c ');
+                var color = r.margin > 20 ? '#10b981' : (r.margin > 10 ? '#f59e0b' : '#ef4444');
+                cardsHtml += '<div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:8px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;">' +
+                    '<div style="flex-grow:1;">' +
+                        '<div style="font-weight:700;color:#0f172a;font-size:14px;">H' + String(hr).padStart(2,'0') + ' — ' + r.src + ' \u279c ' + r.dst + '</div>' +
+                        '<div style="font-size:11px;color:#64748b;margin-top:2px;">' + pathStr + '</div>' +
+                    '</div>' +
+                    '<div style="text-align:right;">' +
+                        '<div style="font-weight:700;font-size:16px;color:' + color + ';">' + r.margin.toFixed(2) + ' \u20ac/MWh</div>' +
+                        '<div style="font-size:10px;color:#94a3b8;">net margin</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            cardsContainer.innerHTML = cardsHtml;
+        }
+    }
+
+    // Strategy
+    if (stratEl) {
+        var topRoutes = hourlyRoutes.filter(function(r){return r;}).sort(function(a,b){return b.margin-a.margin;}).slice(0, 3);
+        if (topRoutes.length > 0) {
+            stratEl.innerText = 'Focus: ' + topRoutes.map(function(r){return r.src + '\u2192' + r.dst;}).join(', ') + '. Peak window: H' + String(hourlyRoutes.indexOf(topRoutes[0])).padStart(2,'0') + ' at ' + topRoutes[0].margin.toFixed(2) + ' \u20ac/MWh.';
+        }
+    }
+
+    // Residual charts + price chart
+    var resChartContainer = document.getElementById("arbitrage_tab_residual_charts");
+    if (resChartContainer && topMatches.length > 0 && typeof Plotly !== 'undefined') {
+        var topDate = topMatches[0].date;
+        var chartCountries = ['DE_LU', 'HU', 'IT', 'GR'];
+        var chartHtml = '<div style="grid-column:span 2;margin-bottom:6px;"><select id="arb_res_country_select" onchange="_arbSwitchCountryResChart()" style="padding:4px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px;font-weight:600;color:#334155;">';
+        for (var ci = 0; ci < chartCountries.length; ci++) {
+            chartHtml += '<option value="' + chartCountries[ci] + '">' + chartCountries[ci] + '</option>';
+        }
+        chartHtml += '</select></div>';
+        // Residual chart
+        chartHtml += '<div id="arb_res_chart" style="height:200px;background:white;border-radius:8px;border:1px solid #e2e8f0;padding:6px;"></div>';
+        // Price chart
+        chartHtml += '<div id="arb_price_chart" style="height:200px;background:white;border-radius:8px;border:1px solid #e2e8f0;padding:6px;"></div>';
+        resChartContainer.innerHTML = chartHtml;
+
+        window._arbRenderCountryCharts = function(cc) {
+            var tEntry = historicalData[cc] ? historicalData[cc][targetDate] : null;
+            var mEntry = historicalData[cc] ? historicalData[cc][topDate] : null;
+            if (!tEntry || !mEntry) { document.getElementById('arb_res_chart').innerHTML = '<p style="text-align:center;color:#94a3b8;padding:80px 0;font-size:12px;">No data for ' + cc + '</p>'; return; }
+            var hours = ['00','01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+            var traceT = { x: hours, y: tEntry.residuals, name: 'Target ' + cc, mode: 'lines', line: { width: 2, color: '#4f46e5' } };
+            var traceM = { x: hours, y: mEntry.residuals, name: topDate, mode: 'lines', line: { width: 1.5, color: '#94a3b8', dash: 'dash' } };
+            var traceD = tEntry.demand ? { x: hours, y: tEntry.demand, name: 'Demand', mode: 'lines', line: { width: 1, color: '#f59e0b', dash: 'dot' }, visible: 'legendonly' } : null;
+            var data = [traceT, traceM];
+            if (traceD) data.push(traceD);
+            Plotly.newPlot('arb_res_chart', data, {
+                margin: { l: 45, r: 10, t: 28, b: 35 },
+                title: cc + ' Residuals',
+                legend: { orientation: 'h', y: 1.15, font: { size: 10 } },
+                xaxis: { gridcolor: '#f1f5f9' },
+                yaxis: { gridcolor: '#f1f5f9', title: 'MW' }
+            }, { responsive: true, displayModeBar: false });
+
+            // Price chart
+            var tprices = tEntry.prices || [];
+            var mprices = mEntry.prices || [];
+            Plotly.newPlot('arb_price_chart', [
+                { x: hours, y: tprices, name: 'Target ' + cc, mode: 'lines+markers', line: { width: 2, color: '#dc2626' }, marker: { size: 4 } },
+                { x: hours, y: mprices, name: topDate, mode: 'lines+markers', line: { width: 1.5, color: '#94a3b8', dash: 'dash' }, marker: { size: 3 } }
+            ], {
+                margin: { l: 45, r: 10, t: 28, b: 35 },
+                title: cc + ' Spot Prices (\u20ac/MWh)',
+                legend: { orientation: 'h', y: 1.15, font: { size: 10 } },
+                xaxis: { gridcolor: '#f1f5f9' },
+                yaxis: { gridcolor: '#f1f5f9', title: '\u20ac/MWh' }
+            }, { responsive: true, displayModeBar: false });
+        };
+
+        window._arbSwitchCountryResChart = function() {
+            var sel = document.getElementById('arb_res_country_select');
+            if (sel) _arbRenderCountryCharts(sel.value);
+        };
+
+        setTimeout(function() { _arbRenderCountryCharts('DE_LU'); }, 150);
+    }
     var tableBody = document.querySelector("#arbitrage_tab_spreads_table tbody");
     var corridors = _arbGetCorridors();
     if (tableBody) {
