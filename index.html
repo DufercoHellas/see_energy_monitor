@@ -1826,37 +1826,26 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-width: 280px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Model Optimization Weights (341-D Global Match)</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Model Weights &mdash; 8 Countries &times; 48 hourly (24 res + 24 dem) = 384 grid dims</span>
                     <div style="font-size: 11px; color: #475569; background: #ffffff; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; line-height: 1.5;">
-                        <strong>Fuel:</strong> TTF 13.6% | EUA 17.4% &nbsp;&bull;&nbsp; 
-                        <strong>Grid:</strong> HR 18.7% | DE 13.2% | BG 8.7% | GR 8.6% | HU 7.0% | IT 3.3% | RO 1.2% | AT 0% &nbsp;&bull;&nbsp; 
+                        <strong>Grid:</strong> HR 18.7% | DE 13.2% | BG 8.7% | GR 8.6% | HU 7.0% | IT 3.3% | RO 1.2% &nbsp;&bull;&nbsp;
+                        <strong>Fuel:</strong> TTF 13.6% | EUA 17.4% &nbsp;&bull;&nbsp;
                         <strong>Cal:</strong> 8.4%
                     </div>
                 </div>
             </div>
 
-            <!-- Analogue Results Grid -->
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-bottom: 24px; align-items: start; flex-wrap: wrap;">
-                <!-- Left: Top Matches List -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Top Analogue Days</h3>
-                    <div id="arbitrage_tab_matches_container">
-                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 16px 0;">Select a date to calculate matching days.</p>
-                    </div>
-                </div>
-
-                <!-- Right: Chart -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Predicted Hourly Spreads & FTR Payoffs</h3>
-                    <div id="arbitrage_tab_chart" style="width: 100%; height: 320px;">
-                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 100px 0;">No active prediction. Run match search first.</p>
-                    </div>
+            <!-- Top Matches Panel (full width) -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Top Analogue Days</h3>
+                <div id="arbitrage_tab_matches_container">
+                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 16px 0;">Select a date to calculate matching days.</p>
                 </div>
             </div>
 
             <!-- Spreads Table Container -->
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px; overflow-x: auto;">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions & Bidding Assessment</h3>
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions &amp; Bidding Assessment</h3>
                 <table id="arbitrage_tab_spreads_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 800px;">
                     <thead>
                         <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
@@ -1865,7 +1854,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             <th style="padding: 10px 8px;">Predicted FTR (Mean)</th>
                             <th style="padding: 10px 8px;">Solar Peak Spread (12-17)</th>
                             <th style="padding: 10px 8px;">Evening Peak Spread (18-22)</th>
-                            <th style="padding: 10px 8px;">Recommended Bid (Option 2)</th>
+                            <th style="padding: 10px 8px;">Recommended Bid</th>
                             <th style="padding: 10px 8px;">Expected Net Margin</th>
                             <th style="padding: 10px 8px; text-align: right;">Bidding Status</th>
                         </tr>
@@ -1876,6 +1865,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Chart (moved below table) -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Predicted Hourly Spreads &amp; FTR Payoffs</h3>
+                <div id="arbitrage_tab_chart" style="width: 100%; height: 380px;">
+                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 150px 0;">No active prediction. Run match search first.</p>
+                </div>
             </div>
 
             <!-- Wheeling Routes Block -->
@@ -1899,6 +1896,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">AT ➔ IT FTR Value</span>
                         <p id="wheeling_joint_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #047857;">—</p>
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
         </div>
