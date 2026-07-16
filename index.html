@@ -1934,6 +1934,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 }
                 if (tabName === 'ArbitrageTab') {
                     const arbInput = document.getElementById("arbitrage_tab_target_date");
+                    const mc = document.getElementById("arbitrage_tab_matches_container");
+                    if (mc) mc.innerHTML = '<span style="color:#64748b;font-size:12px;">Loading arbitrage data…</span>';
                     if (arbInput && historicalData && historicalData['DE_LU']) {
                         if (!arbInput.value) {
                             const dates = Object.keys(historicalData['DE_LU']).sort();
@@ -1941,8 +1943,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         }
                         if (arbInput.value) {
                             try { runArbitrageTabPrediction(); }
-                            catch (err) { console.error("Arbitrage tab render failed:", err); }
+                            catch (err) {
+                                console.error("Arbitrage tab render failed:", err);
+                                if (mc) mc.innerHTML = '<span style="color:#ef4444;font-size:12px;">Error: ' + err.message + '</span>';
+                            }
+                        } else if (mc) {
+                            mc.innerHTML = '<span style="color:#f59e0b;font-size:12px;">No date set for arbitrage prediction.</span>';
                         }
+                    } else if (mc) {
+                        mc.innerHTML = '<span style="color:#f59e0b;font-size:12px;">Data not ready yet. historicalData keys: ' + Object.keys(historicalData).join(', ') + '</span>';
                     }
                 }
                 window.dispatchEvent(new Event('resize'));
@@ -10150,15 +10159,21 @@ function runArbitrageTabPrediction() {
     const targetDate = document.getElementById("arbitrage_tab_target_date").value;
     const topN = parseInt(document.getElementById("arbitrage_tab_top_n").value) || 3;
     
-    if (!targetDate || !historicalData || !historicalData['DE_LU']) return;
+    if (!targetDate || !historicalData || !historicalData['DE_LU']) {
+        console.warn("Arbitrage: early return - targetDate:", targetDate, "historicalData keys:", Object.keys(historicalData));
+        return;
+    }
     if (!historicalStats || Object.keys(historicalStats).length === 0) {
+        console.warn("Arbitrage: historicalStats missing");
         alert("Historical stats not loaded yet. Please wait.");
         return;
     }
     
+    console.log("Arbitrage: targetDate=", targetDate, "DE_LU entries=", Object.keys(historicalData['DE_LU']).length);
     // Check if target day exists
     const tData = historicalData['DE_LU'][targetDate];
     if (!tData) {
+        console.warn("Arbitrage: target date not found in DE_LU");
         alert("Selected target date is not available in historical data.");
         return;
     }
