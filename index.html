@@ -1809,9 +1809,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
          <!-- Tab 6: Interconnector Arbitrage Tab -->
         <div id="ArbitrageTab" class="tabcontent" style="display:none;">
             <h2>Interconnector Arbitrage & Spreads Prediction (Day-Ahead)</h2>
-            <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unified multi-regional 341-dimensional analogue engine. Select a date to predict spot price spreads and capacity flow opportunities for all corridors at once.</p>
-            
-            <!-- Controls Grid -->
+            <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Topology-based CBAM-compliant routing via 341-D global match. Select a date to predict optimal cross-border flows.</p>
+
+            <!-- Controls + Weights -->
             <div style="background: #f8fafc; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 24px; align-items: center; flex-wrap: wrap;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                     <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Target Date</span>
@@ -1825,8 +1825,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <option value="5">Top 5</option>
                     </select>
                 </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Min Net Margin</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <input type="number" id="arbitrage_tab_min_spread" value="5" min="0" step="5" style="width: 70px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center;">
+                        <span style="font-size: 13px; font-weight: 600; color: #64748b;">€/MWh</span>
+                    </div>
+                </div>
                 <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; min-width: 280px;">
-                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Model Weights &mdash; 8 Countries &times; 48 hourly (24 res + 24 dem) = 384 grid dims</span>
+                    <span style="font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase;">Model — 8×48h + Fuel + Cal = 384-D</span>
                     <div style="font-size: 11px; color: #475569; background: #ffffff; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 6px; line-height: 1.5;">
                         <strong>Grid:</strong> HR 18.7% | DE 13.2% | BG 8.7% | GR 8.6% | HU 7.0% | IT 3.3% | RO 1.2% &nbsp;&bull;&nbsp;
                         <strong>Fuel:</strong> TTF 13.6% | EUA 17.4% &nbsp;&bull;&nbsp;
@@ -1835,25 +1842,61 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
 
-            <!-- Top Matches Panel (full width) -->
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Top Analogue Days</h3>
-                <div id="arbitrage_tab_matches_container">
-                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 16px 0;">Select a date to calculate matching days.</p>
+            <!-- Summary Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Arbitrage Windows</h4>
+                    <p id="arb_tab_stat_windows" style="margin: 0; font-size: 24px; font-weight: 700; color: #0f172a;">0 / 24 hrs</p>
+                    <p id="arb_tab_stat_windows_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Hours exceeding threshold</p>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Max Net Margin</h4>
+                    <p id="arb_tab_stat_max_spread" style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981;">0.00 €/MWh</p>
+                    <p id="arb_tab_stat_max_spread_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">No path found</p>
+                </div>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; grid-column: span 2;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Recommended Strategy</h4>
+                    <p id="arb_tab_stat_strategy" style="margin: 0; font-size: 14px; font-weight: 600; color: #334155; line-height: 1.5;">Select a date to run the prediction engine.</p>
                 </div>
             </div>
 
-            <!-- Spreads Table Container -->
+            <!-- Main grid: Matches (left) + Residual Charts (right) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; align-items: start;">
+                <!-- Left: Top Matches + Progress -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Top Analogue Days</h3>
+                    <div id="arbitrage_tab_matches_container">
+                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 16px 0;">Select a date to calculate matching days.</p>
+                    </div>
+                </div>
+                <!-- Right: Country Residual Comparison -->
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+                    <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Residual &amp; Demand Comparison (vs Top Match)</h3>
+                    <div id="arbitrage_tab_residual_charts" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 40px 0; grid-column: span 2;">No matches computed yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Route Cards Container (1:1 with Interconnector panel) -->
+            <div style="margin-bottom: 24px;">
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Optimal Cross-Border Route Cards (per hour, CBAM-compliant)</h3>
+                <div id="arbitrage_tab_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>
+                </div>
+            </div>
+
+            <!-- Spreads Table -->
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px; overflow-x: auto;">
-                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions &amp; Bidding Assessment</h3>
-                <table id="arbitrage_tab_spreads_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 800px;">
+                <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">All-Corridor Predictions</h3>
+                <table id="arbitrage_tab_spreads_table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; min-width: 700px;">
                     <thead>
                         <tr style="border-bottom: 2px solid #e2e8f0; color: #475569; font-weight: 600;">
                             <th style="padding: 10px 8px;">Corridor</th>
-                            <th style="padding: 10px 8px;">Route Path</th>
-                            <th style="padding: 10px 8px;">Predicted FTR (Mean)</th>
-                            <th style="padding: 10px 8px;">Solar Peak Spread (12-17)</th>
-                            <th style="padding: 10px 8px;">Evening Peak Spread (18-22)</th>
+                            <th style="padding: 10px 8px;">Route</th>
+                            <th style="padding: 10px 8px;">FTR Mean</th>
+                            <th style="padding: 10px 8px;">Solar (12-17)</th>
+                            <th style="padding: 10px 8px;">Evening (18-22)</th>
                             <th style="padding: 10px 8px; text-align: right;">Status</th>
                         </tr>
                     </thead>
@@ -1865,38 +1908,33 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </table>
             </div>
 
-            <!-- Chart (moved below table) -->
+            <!-- Chart -->
             <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); margin-bottom: 24px;">
                 <h3 style="margin: 0 0 16px 0; font-size: 15px; color: #1e293b; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px;">Predicted Hourly Spreads &amp; FTR Payoffs</h3>
                 <div id="arbitrage_tab_chart" style="width: 100%; height: 380px;">
-                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 150px 0;">No active prediction. Run match search first.</p>
+                    <p style="color: #94a3b8; font-size: 13px; text-align: center; padding: 150px 0;">No active prediction.</p>
                 </div>
             </div>
 
-            <!-- Wheeling Routes Block -->
+            <!-- Top 3 Routes -->
             <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 20px;">
-                <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #1e40af; display: flex; align-items: center; gap: 8px;">
-                    <span>🔗</span> Top CBAM-Compliant Import Routes
-                </h3>
-                <p style="margin: 0 0 16px 0; font-size: 13px; color: #1e3a8a; line-height: 1.5;">
-                    Best non-EU to EU paths respecting CBAM rules (Albania as transit only, no non-EU→EU direct). Ranked by predicted FTR spread.
-                </p>
+                <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #1e40af;">🔗 Top 3 Routes by Predicted Spread</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #1</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase;">Route #1</span>
                         <p id="wheeling_leg_1_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
                     </div>
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #2</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #3b82f6; text-transform: uppercase;">Route #2</span>
                         <p id="wheeling_leg_2_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #1e3a8a;">—</p>
                     </div>
                     <div style="background: #ffffff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px;">
-                        <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.5px;">Top Route #3</span>
+                        <span style="font-size: 10px; font-weight: 700; color: #10b981; text-transform: uppercase;">Route #3</span>
                         <p id="wheeling_joint_val" style="margin: 4px 0 0 0; font-size: 16px; font-weight: 700; color: #047857;">—</p>
                     </div>
                 </div>
             </div>
-                </div>
+        </div>
             </div>
         </div>
 
