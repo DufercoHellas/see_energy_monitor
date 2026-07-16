@@ -196,7 +196,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
             <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
             <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
-            <button class="tablinks" onclick="openTab(event, 'Analogues')">🔗 Arbitrage & Flows</button>
+            <button class="tablinks" onclick="openTab(event, 'ArbitrageTab')">🔗 Arbitrage & Flows</button>
         </div>
         
         <div id="Residuals" class="tabcontent" style="display:block;">
@@ -2055,35 +2055,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     initEUMap();
                 }
                 if (tabName === 'ArbitrageTab') {
-                    const arbInput = document.getElementById("arbitrage_tab_target_date");
-                    const mc = document.getElementById("arbitrage_tab_matches_container");
-                    try {
-                        if (arbInput && historicalData && historicalData['DE_LU']) {
-                            if (!arbInput.value) {
-                                const dates = Object.keys(historicalData['DE_LU']).sort();
-                                if (dates.length > 0) {
-                                    const today = new Date();
-                                    const tomorrow = new Date(today.getTime() + 86400000);
-                                    const y = tomorrow.getFullYear();
-                                    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
-                                    const d = String(tomorrow.getDate()).padStart(2, '0');
-                                    const nextDay = `${y}-${m}-${d}`;
-                                    arbInput.value = dates.includes(nextDay) ? nextDay : dates[dates.length - 1];
-                                }
-                            }
-                            if (arbInput.value) {
-                                if (mc) mc.innerHTML = '<div style="text-align:center;padding:20px 0;"><p style="color:#3b82f6;font-size:13px;">Loading historical analogues...</p></div>';
-                                requestAnimationFrame(() => requestAnimationFrame(() => runArbitrageTabPrediction()));
-                            } else if (mc) {
-                                mc.innerHTML = '<span style="color:#f59e0b;">No date set.</span>';
-                            }
-                        } else {
-                            if (mc) mc.innerHTML = '<span style="color:#f59e0b;">Data: ' + (historicalData ? Object.keys(historicalData).join(',') : 'no hist obj') + '</span>';
-                        }
-                    } catch(err) {
-                        console.error("Arbitrage tab error:", err);
-                        if (mc) mc.innerHTML = '<span style="color:#ef4444;">Err: ' + err.message + '</span>';
-                    }
+                    // Tab is a mirror of Analogues — no special init needed
                 }
                 window.dispatchEvent(new Event('resize'));
             }
@@ -9183,33 +9155,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     if (countrySelect && typeof countries !== 'undefined') {
                         countrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
                     }
-
-                    // Initialize Arbitrage & Flows Date Picker
-                    const arbTargetInput = document.getElementById("arbitrage_tab_target_date");
-                    if (arbTargetInput && historicalData && historicalData['DE_LU']) {
-                        const dates = Object.keys(historicalData['DE_LU']).sort();
-                        if (dates.length > 0) {
-                            const today = new Date();
-                            const tomorrow = new Date(today.getTime() + 86400000);
-                            const y = tomorrow.getFullYear();
-                            const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
-                            const d = String(tomorrow.getDate()).padStart(2, '0');
-                            const nextDay = `${y}-${m}-${d}`;
-                            arbTargetInput.value = dates.includes(nextDay) ? nextDay : dates[dates.length - 1];
-                        }
+                    const arbCountrySelect = document.getElementById("arb_analogue_country");
+                    if (arbCountrySelect && typeof countries !== 'undefined') {
+                        arbCountrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
+                    }
+                    const arbDateInput = document.getElementById("arb_analogue_date");
+                    if (arbDateInput && document.getElementById("analogue_date")) {
+                        arbDateInput.value = document.getElementById("analogue_date").value;
                     }
 
                     initCablesMatrix();
                     initLongCablesSelectors();
                     applyOptimizedWeights();
                     renderDashboard();
-
-                    // Run initial prediction for Arbitrage Tab (deferred to let dashboard paint first)
-                    if (arbTargetInput && arbTargetInput.value) {
-                        requestAnimationFrame(() => requestAnimationFrame(() => {
-                            try { runArbitrageTabPrediction(); } catch(err) { console.error("Initial arbitrage prediction failed:", err); }
-                        }));
-                    }
 
                     // Hide loading mask cleanly
                     const mask = document.getElementById("loading_mask");
@@ -9667,6 +9625,12 @@ function renderEUMapCountryDetail(dataKey, date) {
                 
                 document.getElementById("analogue_date").value = formatD(start);
                 document.getElementById("analogue_date").addEventListener("change", () => applyOptimizedWeights());
+
+                document.getElementById("arb_analogue_date").value = formatD(start);
+                document.getElementById("arb_analogue_date").addEventListener("change", () => {
+                    document.getElementById("analogue_date").value = document.getElementById("arb_analogue_date").value;
+                    applyOptimizedWeights();
+                });
                 
                 // Start asynchronous data fetch
                 initDashboardData();
