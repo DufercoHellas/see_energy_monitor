@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 13:58</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-17 09:50</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -172,7 +172,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 08:03</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-16 12:03</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
@@ -4226,10 +4226,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             const clearingPredictions = {
   "AL-GR": {
     "predicted": 5.77,
-    "confidence": 0.495,
+    "confidence": 0.453,
     "n_auctions": 67,
-    "method": "historical_avg_only",
-    "mae_knn": 1.773,
+    "method": "knn_weighted",
+    "mae_knn": 1.681,
     "mae_avg": 1.757,
     "features": {
       "ttf": 35.0,
@@ -4242,7 +4242,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     },
     "p90": 5.77,
     "note": "capped_at_p90",
-    "neighbors": []
+    "neighbors": [
+      "3.500",
+      "1.500",
+      "0.360"
+    ]
   },
   "AL-ME": {
     "predicted": 1.167,
@@ -4309,11 +4313,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "AT-HU": {
-    "predicted": 13.353,
-    "confidence": 0.261,
+    "predicted": 13.364,
+    "confidence": 0.26,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 5.111,
+    "mae_knn": 5.097,
     "mae_avg": 5.664,
     "features": {
       "ttf": 35.0,
@@ -4333,11 +4337,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "AT-IT": {
-    "predicted": 11.635,
+    "predicted": 11.637,
     "confidence": 0.265,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 10.369,
+    "mae_knn": 10.368,
     "mae_avg": 12.629,
     "features": {
       "ttf": 35.0,
@@ -4358,14 +4362,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "BA-HR": {
     "predicted": 2.21,
-    "confidence": 0.61,
+    "confidence": 0.624,
     "n_auctions": 67,
     "method": "knn_weighted",
     "mae_knn": 0.623,
     "mae_avg": 0.65,
     "features": {
       "ttf": 54.4,
-      "eua": 80.2,
+      "eua": 78.3,
       "src_fwd": 80.0,
       "dst_fwd": 85.0,
       "fwd_spread": 5.0,
@@ -4381,15 +4385,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "BA-ME": {
-    "predicted": 2.716,
-    "confidence": 0.593,
+    "predicted": 2.637,
+    "confidence": 0.605,
     "n_auctions": 67,
     "method": "knn_weighted",
     "mae_knn": 1.565,
     "mae_avg": 1.743,
     "features": {
       "ttf": 54.4,
-      "eua": 80.2,
+      "eua": 78.3,
       "src_fwd": 80.0,
       "dst_fwd": 85.0,
       "fwd_spread": 5.0,
@@ -4406,14 +4410,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "BA-RS": {
     "predicted": 3.28,
-    "confidence": 0.489,
+    "confidence": 0.483,
     "n_auctions": 60,
     "method": "historical_avg_only",
     "mae_knn": 1.138,
     "mae_avg": 1.087,
     "features": {
       "ttf": 54.4,
-      "eua": 80.2,
+      "eua": 78.3,
       "src_fwd": 80.0,
       "dst_fwd": 139.53,
       "fwd_spread": 59.53,
@@ -4426,10 +4430,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "BG-GR": {
     "predicted": 4.88,
-    "confidence": 0.214,
+    "confidence": 0.198,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.169,
+    "mae_knn": 0.941,
     "mae_avg": 1.274,
     "features": {
       "ttf": 35.0,
@@ -4445,15 +4449,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "neighbors": [
       "0.630",
       "0.750",
-      "0.760"
+      "4.110"
     ]
   },
   "BG-MK": {
     "predicted": 0.62,
-    "confidence": 0.201,
+    "confidence": 0.195,
     "n_auctions": 7,
     "method": "historical_avg_only",
-    "mae_knn": 0.222,
+    "mae_knn": 0.204,
     "mae_avg": 0.19,
     "features": {
       "ttf": 35.0,
@@ -4493,11 +4497,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "BG-RS": {
-    "predicted": 1.091,
+    "predicted": 1.113,
     "confidence": 0.234,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 2.642,
+    "mae_knn": 2.655,
     "mae_avg": 4.158,
     "features": {
       "ttf": 35.0,
@@ -4565,11 +4569,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "GR-AL": {
-    "predicted": 1.95,
-    "confidence": 0.5,
+    "predicted": 2.09,
+    "confidence": 0.456,
     "n_auctions": 66,
     "method": "knn_weighted",
-    "mae_knn": 1.81,
+    "mae_knn": 1.757,
     "mae_avg": 2.148,
     "features": {
       "ttf": 35.0,
@@ -4584,16 +4588,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "note": "normal",
     "neighbors": [
       "1.000",
-      "0.000",
-      "5.210"
+      "5.210",
+      "0.000"
     ]
   },
   "GR-BG": {
-    "predicted": 15.003,
-    "confidence": 0.214,
+    "predicted": 14.769,
+    "confidence": 0.199,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 3.311,
+    "mae_knn": 3.203,
     "mae_avg": 3.884,
     "features": {
       "ttf": 35.0,
@@ -4609,15 +4613,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "neighbors": [
       "15.220",
       "19.410",
-      "9.600"
+      "8.800"
     ]
   },
   "GR-IT": {
     "predicted": 9.77,
-    "confidence": 0.255,
+    "confidence": 0.313,
     "n_auctions": 19,
     "method": "historical_avg_only",
-    "mae_knn": 10.077,
+    "mae_knn": 10.361,
     "mae_avg": 9.677,
     "features": {
       "ttf": 35.0,
@@ -4633,11 +4637,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "neighbors": []
   },
   "GR-MK": {
-    "predicted": 2.898,
-    "confidence": 0.502,
+    "predicted": 2.935,
+    "confidence": 0.455,
     "n_auctions": 63,
     "method": "knn_weighted",
-    "mae_knn": 1.6,
+    "mae_knn": 1.545,
     "mae_avg": 1.877,
     "features": {
       "ttf": 35.0,
@@ -4652,8 +4656,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "note": "normal",
     "neighbors": [
       "0.760",
-      "3.660",
-      "5.030"
+      "5.030",
+      "3.660"
     ]
   },
   "HR-BA": {
@@ -4681,7 +4685,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.251,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.192,
+    "mae_knn": 1.191,
     "mae_avg": 1.425,
     "features": {
       "ttf": 35.0,
@@ -4705,7 +4709,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.428,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.676,
+    "mae_knn": 1.675,
     "mae_avg": 2.178,
     "features": {
       "ttf": 35.0,
@@ -4749,7 +4753,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.246,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 0.816,
+    "mae_knn": 0.818,
     "mae_avg": 1.202,
     "features": {
       "ttf": 35.0,
@@ -4865,11 +4869,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "IT-GR": {
-    "predicted": 5.746,
-    "confidence": 0.255,
+    "predicted": 4.091,
+    "confidence": 0.313,
     "n_auctions": 19,
-    "method": "knn_weighted",
-    "mae_knn": 2.799,
+    "method": "historical_avg_only",
+    "mae_knn": 2.967,
     "mae_avg": 2.922,
     "features": {
       "ttf": 35.0,
@@ -4882,11 +4886,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     },
     "p90": 10.0,
     "note": "normal",
-    "neighbors": [
-      "10.000",
-      "0.000",
-      "7.240"
-    ]
+    "neighbors": []
   },
   "IT-ME": {
     "predicted": 3.4,
@@ -4913,11 +4913,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "IT-SI": {
-    "predicted": 6.539,
+    "predicted": 6.54,
     "confidence": 0.279,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.535,
+    "mae_knn": 1.534,
     "mae_avg": 2.693,
     "features": {
       "ttf": 35.0,
@@ -4989,7 +4989,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.423,
     "n_auctions": 60,
     "method": "historical_avg_only",
-    "mae_knn": 4.915,
+    "mae_knn": 4.914,
     "mae_avg": 4.509,
     "features": {
       "ttf": 35.0,
@@ -5029,11 +5029,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     ]
   },
   "ME-XK": {
-    "predicted": 1.976,
+    "predicted": 3.73,
     "confidence": 0.563,
     "n_auctions": 67,
-    "method": "historical_avg_only",
-    "mae_knn": 1.18,
+    "method": "knn_weighted",
+    "mae_knn": 1.139,
     "mae_avg": 1.162,
     "features": {
       "ttf": 35.0,
@@ -5046,14 +5046,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     },
     "p90": 4.0,
     "note": "normal",
-    "neighbors": []
+    "neighbors": [
+      "6.360",
+      "0.910",
+      "1.300"
+    ]
   },
   "MK-BG": {
     "predicted": 1.5,
-    "confidence": 0.202,
+    "confidence": 0.196,
     "n_auctions": 7,
     "method": "knn_weighted",
-    "mae_knn": 0.286,
+    "mae_knn": 0.269,
     "mae_avg": 0.341,
     "features": {
       "ttf": 35.0,
@@ -5074,10 +5078,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
   },
   "MK-GR": {
     "predicted": 8.11,
-    "confidence": 0.494,
+    "confidence": 0.453,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 2.126,
+    "mae_knn": 2.076,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
@@ -5092,8 +5096,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "note": "capped_at_p90",
     "neighbors": [
       "3.410",
-      "0.000",
-      "2.110"
+      "2.110",
+      "0.000"
     ]
   },
   "MK-RS": {
@@ -5125,7 +5129,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.508,
     "n_auctions": 65,
     "method": "historical_avg_only",
-    "mae_knn": 1.966,
+    "mae_knn": 1.967,
     "mae_avg": 1.791,
     "features": {
       "ttf": 35.0,
@@ -5209,7 +5213,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.233,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 0.515,
+    "mae_knn": 0.501,
     "mae_avg": 0.562,
     "features": {
       "ttf": 35.0,
@@ -5321,7 +5325,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.337,
     "n_auctions": 19,
     "method": "historical_avg_only",
-    "mae_knn": 10.338,
+    "mae_knn": 10.332,
     "mae_avg": 9.232,
     "features": {
       "ttf": 35.0,
@@ -5365,7 +5369,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.238,
     "n_auctions": 19,
     "method": "knn_weighted",
-    "mae_knn": 1.847,
+    "mae_knn": 1.848,
     "mae_avg": 2.547,
     "features": {
       "ttf": 35.0,
@@ -5413,7 +5417,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.563,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 0.438,
+    "mae_knn": 0.43,
     "mae_avg": 0.486,
     "features": {
       "ttf": 35.0,
@@ -5437,7 +5441,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     "confidence": 0.466,
     "n_auctions": 67,
     "method": "historical_avg_only",
-    "mae_knn": 0.294,
+    "mae_knn": 0.291,
     "mae_avg": 0.255,
     "features": {
       "ttf": 35.0,
