@@ -9062,8 +9062,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
                 profitableHoursCount = uniqueProfitableHours.size;
 
-                // --- Calculate Special MK Peak/Middle Hours Trades (starting from MK to anywhere) ---
-                const mkPaths = allTopologyPaths.filter(p => p[0].to === 'MK');
+                // --- Calculate Special MK Peak/Middle Hours Trades (starting from MK to anywhere, excluding AL destination) ---
+                const mkPaths = allTopologyPaths.filter(p => p[0].to === 'MK' && p[p.length - 1].to !== 'AL');
                 const mkTrades = [];
 
                 mkPaths.forEach(path => {
