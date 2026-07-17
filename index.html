@@ -9093,7 +9093,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     let sumNetMargin = 0;
                     let hourlyDetails = [];
 
-                    middleHourIndices.forEach(h => {
+                    for (let h = 0; h < 24; h++) {
                         let weightedGross = 0;
                         let weightedCable = 0;
                         let weightedPStart = 0;
@@ -9116,7 +9116,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             weightedPEnd += w * pDst;
                         }
                         const netMargin = weightedGross - weightedCable;
-                        sumNetMargin += netMargin;
+                        if (middleHourIndices.includes(h)) {
+                            sumNetMargin += netMargin;
+                        }
                         hourlyDetails.push({
                             hour: h,
                             pStart: weightedPStart,
@@ -9125,7 +9127,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             cable: weightedCable,
                             net: netMargin
                         });
-                    });
+                    }
 
                     const avgNetMargin = sumNetMargin / middleHourIndices.length;
                     const routeName = path.map(p => p.to).join(' ➔ ');
@@ -9166,11 +9168,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 let mkHtml = '';
                 if (top5MkTrades.length > 0) {
                     mkHtml += `
-                    <div style="margin-top: 24px; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
-                        <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 15px; display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 16px;">☀️</span> MK PV Owner Export Opportunities (Peak Hours 09:00 - 17:00)
+                    <div style="margin-top: 28px; border-top: 2px dashed #cbd5e1; padding-top: 20px;">
+                        <h4 style="margin: 0 0 16px 0; color: #1e293b; font-size: 16px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+                            <span style="font-size: 20px;">☀️</span> MK PV Owner Export Opportunities (Peak Hours 09:00 - 17:00)
                         </h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">`;
+                        <div style="display: flex; flex-direction: column; gap: 16px;">`;
 
                     top5MkTrades.forEach((trade, ti) => {
                         const cbamBadge = `<span style="font-size:10px;font-weight:700;background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;padding:2px 6px;border-radius:4px;margin-left:8px;">☀️ PV Exempt</span>`;
@@ -9180,34 +9182,86 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             return `<span style="padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;background:${isEU?'#dbeafe':'#fee2e2'};color:${isEU?'#1d4ed8':'#b91c1c'}">${p.to}</span>`;
                         }).join(`<span style="color:#94a3b8;margin:0 3px;">➔</span>`);
 
-                        // 8-hour mini heat map
-                        let miniHeatMap = '<div style="display:flex;gap:2px;margin-top:8px;">';
+                        // 24-hour heat map with peak hour highlighting
+                        let hourBarHtml = '<div style="display:flex;gap:2px;margin:10px 0 4px 0;">';
                         trade.hourlyDetails.forEach(hd => {
+                            const isPVHour = hd.hour >= 8 && hd.hour <= 15;
                             const bg = mkMarginColour(hd.net, '0.9');
-                            miniHeatMap += `<div title="H${hd.hour+1}: ${hd.net.toFixed(1)} €/MWh" style="flex:1;height:16px;border-radius:3px;background:${bg};display:flex;align-items:center;justify-content:center;">
-                                <span style="font-size:8px;font-weight:800;color:#fff;">H${hd.hour+1}</span>
+                            const borderStyle = isPVHour ? 'border-top: 3px solid #f59e0b; border-bottom: 1px solid #f59e0b; margin-top: -2px; padding-top: 2px;' : '';
+                            
+                            hourBarHtml += `<div title="H${hd.hour+1}: ${hd.net.toFixed(1)} €/MWh" style="flex:1;min-width:0;border-radius:3px;background:${bg};padding:2px 0;${borderStyle}">
+                                <div style="text-align:center;font-size:9px;font-weight:700;color:white;line-height:1.4;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${hd.hour+1}</div>
                             </div>`;
                         });
-                        miniHeatMap += '</div>';
+                        hourBarHtml += '</div><div style="display:flex;justify-content:space-between;font-size:9px;color:#94a3b8;margin-bottom:8px;"><span>00:00</span><span>06:00</span><span style="color:#d97706;font-weight:700;">☀️ 09:00 - 17:00 PV Peak Hours</span><span>18:00</span><span>24:00</span></div>';
 
                         const avgColor = mkMarginColour(trade.avgNetMargin, null);
 
+                        // 24-hour details rows
+                        let detailRows = '';
+                        trade.hourlyDetails.forEach(hd => {
+                            const isPVHour = hd.hour >= 8 && hd.hour <= 15;
+                            const rowBg = isPVHour ? 'background:#fffbeb;' : '';
+                            
+                            let realizedCell = '<span style="color:#94a3b8;">—</span>';
+                            if (historicalData[trade.start]?.[targetDate] && historicalData[trade.end]?.[targetDate]) {
+                                const rSrc = (historicalData[trade.start][targetDate].prices || [])[hd.hour];
+                                const rDst = (trade.end === 'DE_LU' && historicalData['DE']?.[targetDate]?.prices ? (historicalData['DE'][targetDate].prices || [])[hd.hour] : (historicalData[trade.end]?.[targetDate]?.prices || [])[hd.hour]);
+                                if (rSrc > 0.01 && rDst > 0.01) {
+                                    let realCable = 0.0;
+                                    for (let idx = 1; idx < trade.path.length; idx++) {
+                                        if (trade.path[idx].cable) realCable += getCablePrice(trade.path[idx].cable, hd.hour, targetDate);
+                                    }
+                                    const realNet = (rDst - rSrc) - realCable;
+                                    const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                    realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
+                                }
+                            }
+                            const mCol = mkMarginColour(hd.net, null);
+                            detailRows += `<tr style="border-bottom:1px solid #f1f5f9;${rowBg}">
+                                <td style="padding:6px 12px;font-weight:700;color:#1e293b;">${hd.hour+1}:00${isPVHour?' <span style="font-size:9px;background:#fef3c7;color:#d97706;padding:1px 3px;border-radius:3px;font-weight:800;">☀️ PV</span>':''}</td>
+                                <td style="padding:6px 12px;color:#64748b;text-align:right;">${hd.pStart.toFixed(2)} €</td>
+                                <td style="padding:6px 12px;color:#64748b;text-align:right;">${hd.pEnd.toFixed(2)} €</td>
+                                <td style="padding:6px 12px;font-weight:600;color:#0f172a;text-align:right;">${hd.gross.toFixed(2)} €</td>
+                                <td style="padding:6px 12px;color:#8b5cf6;text-align:right;">${hd.cable.toFixed(2)} €</td>
+                                <td style="padding:6px 12px;font-weight:800;color:${mCol};text-align:right;">${hd.net.toFixed(2)} €</td>
+                                <td style="padding:6px 12px;text-align:right;">${realizedCell}</td>
+                            </tr>`;
+                        });
+
+                        const detailTableHtml = `
+                        <div id="mk_card_${ti}_details" style="display:none;margin-top:12px;border-top:1px solid #f1f5f9;padding-top:10px;">
+                            <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
+                                <span>Corridor:</span>
+                                <span style="color:#0f172a;">${trade.routeName}</span>
+                            </div>
+                            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                                <thead>
+                                    <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:left;">Hour</th>
+                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Buy (MK)</th>
+                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Sell (${trade.end})</th>
+                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Gross</th>
+                                        <th style="padding:6px 12px;color:#8b5cf6;font-weight:700;text-align:right;">Cap. Cost</th>
+                                        <th style="padding:6px 12px;color:#10b981;font-weight:700;text-align:right;">Net Margin</th>
+                                        <th style="padding:6px 12px;color:#4f46e5;font-weight:700;text-align:right;">Realized</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${detailRows}</tbody>
+                            </table>
+                        </div>`;
+
+                        const toggleBtnHtml = `<button onclick="toggleDetail('mk_card_${ti}_details');const t=this;setTimeout(()=>{t.textContent=document.getElementById('mk_card_${ti}_details').style.display==='none'?'📊 Show hour details':'📊 Hide details';},50);" style="width:100%;margin-top:12px;padding:10px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,0.3);transition:box-shadow 0.15s,transform 0.1s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(99,102,241,0.45)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(99,102,241,0.3)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">📊 Show hour details</button>`;
+
                         mkHtml += `
-                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;">
-                            <div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
-                                    <div style="display:flex;align-items:center;">${routeBadges}</div>
-                                    <div style="font-size:14px;font-weight:800;color:${avgColor};">${trade.avgNetMargin.toFixed(2)} <span style="font-size:10px;font-weight:600;color:#64748b;">€ avg</span></div>
-                                </div>
-                                <div style="display:flex;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
-                                    <span style="font-size:10px;color:#64748b;font-weight:600;">Status:</span>
-                                    ${cbamBadge}
-                                </div>
+                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid #f59e0b;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
+                                <div style="display:flex;align-items:center;gap:6px;">${routeBadges} ${cbamBadge}</div>
+                                <div style="font-size:16px;font-weight:800;color:${avgColor};">${trade.avgNetMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;color:#64748b;">€ avg PV</span></div>
                             </div>
-                            <div>
-                                <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:6px;text-transform:uppercase;letter-spacing:0.03em;">Peak Hours Prediction (H9 - H16)</div>
-                                ${miniHeatMap}
-                            </div>
+                            ${hourBarHtml}
+                            ${detailTableHtml}
+                            ${toggleBtnHtml}
                         </div>`;
                     });
 
