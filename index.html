@@ -9062,10 +9062,148 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
                 profitableHoursCount = uniqueProfitableHours.size;
 
+                // --- Calculate Special MK Peak/Middle Hours Trades (starting from MK to anywhere) ---
+                const mkPaths = allTopologyPaths.filter(p => p[0].to === 'MK');
+                const mkTrades = [];
+
+                mkPaths.forEach(path => {
+                    const start = 'MK';
+                    const end = path[path.length - 1].to;
+                    const middleHourIndices = [8, 9, 10, 11, 12, 13, 14, 15]; // Hours 9-16 (09:00 - 17:00)
+
+                    // Find valid matches
+                    const validMatches = [];
+                    for (let i = 0; i < currentTop7.length; i++) {
+                        const m = currentTop7[i];
+                        const avgStart = getDayAveragePriceWithFallback(start, m.date);
+                        const avgEnd = getDayAveragePriceWithFallback(end, m.date);
+                        if (avgStart > 0.01 && avgEnd > 0.01) {
+                            validMatches.push(m);
+                        }
+                        if (validMatches.length === count) break;
+                    }
+                    if (validMatches.length < count) return;
+
+                    // Re-calculate weights dynamically for these valid matches
+                    const rawSimsLocal = validMatches.map(m => m.combined);
+                    const invSimsLocal = rawSimsLocal.map(s => 1.0 / Math.max(s, 1e-6));
+                    const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
+                    const matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
+
+                    let sumNetMargin = 0;
+                    let hourlyDetails = [];
+
+                    middleHourIndices.forEach(h => {
+                        let weightedGross = 0;
+                        let weightedCable = 0;
+                        let weightedPStart = 0;
+                        let weightedPEnd = 0;
+
+                        for (let i = 0; i < validMatches.length; i++) {
+                            const md = validMatches[i].date;
+                            const w = matchWeightsLocal[i];
+                            const pSrc = getRealizedPriceWithFallback(start, h, md);
+                            const pDst = getRealizedPriceWithFallback(end, h, md);
+                            const gross = pDst - pSrc;
+
+                            let cable = 0;
+                            for (let idx = 1; idx < path.length; idx++) {
+                                if (path[idx].cable) cable += getCablePrice(path[idx].cable, h, md);
+                            }
+                            weightedGross += w * gross;
+                            weightedCable += w * cable;
+                            weightedPStart += w * pSrc;
+                            weightedPEnd += w * pDst;
+                        }
+                        const netMargin = weightedGross - weightedCable;
+                        sumNetMargin += netMargin;
+                        hourlyDetails.push({
+                            hour: h,
+                            pStart: weightedPStart,
+                            pEnd: weightedPEnd,
+                            gross: weightedGross,
+                            cable: weightedCable,
+                            net: netMargin
+                        });
+                    });
+
+                    const avgNetMargin = sumNetMargin / middleHourIndices.length;
+                    const routeName = path.map(p => p.to).join(' ➔ ');
+                    const routeKey = path.map(p => p.to + (p.cable ? `-${p.cable}` : "")).join("->");
+
+                    mkTrades.push({
+                        path,
+                        routeKey,
+                        routeName,
+                        start,
+                        end,
+                        avgNetMargin,
+                        hourlyDetails
+                    });
+                });
+
+                // Sort by highest average net margin during peak hours
+                mkTrades.sort((a, b) => b.avgNetMargin - a.avgNetMargin);
+                const top3MkTrades = mkTrades.slice(0, 3);
+
+                let mkHtml = '';
+                if (top3MkTrades.length > 0) {
+                    mkHtml += `
+                    <div style="margin-top: 24px; border-top: 2px dashed #e2e8f0; padding-top: 20px;">
+                        <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 15px; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 16px;">🇲🇰</span> Top 3 MK Export Opportunities (Peak Hours 09:00 - 17:00)
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;">`;
+
+                    top3MkTrades.forEach((trade, ti) => {
+                        const isCBAMViolation = !countryEU[trade.start] && countryEU[trade.end];
+                        const cbamBadge = isCBAMViolation 
+                            ? `<span style="font-size:10px;font-weight:700;background:#fef2f2;color:#ef4444;border:1px solid #fee2e2;padding:2px 6px;border-radius:4px;margin-left:8px;">⚠️ CBAM RESTRICTED</span>`
+                            : `<span style="font-size:10px;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;padding:2px 6px;border-radius:4px;margin-left:8px;">✅ CBAM COMPLIANT</span>`;
+
+                        const routeBadges = trade.path.map(p => {
+                            const isEU = countryEU[p.to];
+                            return `<span style="padding:2px 6px;border-radius:4px;font-size:11px;font-weight:700;background:${isEU?'#dbeafe':'#fee2e2'};color:${isEU?'#1d4ed8':'#b91c1c'}">${p.to}</span>`;
+                        }).join(`<span style="color:#94a3b8;margin:0 3px;">➔</span>`);
+
+                        // 8-hour mini heat map
+                        let miniHeatMap = '<div style="display:flex;gap:2px;margin-top:8px;">';
+                        trade.hourlyDetails.forEach(hd => {
+                            const bg = marginColour(hd.net, '0.9');
+                            miniHeatMap += `<div title="H${hd.hour+1}: ${hd.net.toFixed(1)} €/MWh" style="flex:1;height:16px;border-radius:3px;background:${bg};display:flex;align-items:center;justify-content:center;">
+                                <span style="font-size:8px;font-weight:800;color:#fff;">H${hd.hour+1}</span>
+                            </div>`;
+                        });
+                        miniHeatMap += '</div>';
+
+                        const avgColor = marginColour(trade.avgNetMargin, null);
+
+                        mkHtml += `
+                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,0.05);display:flex;flex-direction:column;justify-content:space-between;">
+                            <div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+                                    <div style="display:flex;align-items:center;">${routeBadges}</div>
+                                    <div style="font-size:14px;font-weight:800;color:${avgColor};">${trade.avgNetMargin.toFixed(2)} <span style="font-size:10px;font-weight:600;color:#64748b;">€ avg</span></div>
+                                </div>
+                                <div style="display:flex;align-items:center;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+                                    <span style="font-size:10px;color:#64748b;font-weight:600;">Status:</span>
+                                    ${cbamBadge}
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-size:10px;font-weight:700;color:#64748b;margin-top:6px;text-transform:uppercase;letter-spacing:0.03em;">Peak Hours Prediction (H9 - H16)</div>
+                                ${miniHeatMap}
+                            </div>
+                        </div>`;
+                    });
+
+                    mkHtml += `</div></div>`;
+                }
+
                 if (cardsHtml === '') {
-                    container.innerHTML = `<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</div>`;
+                    container.innerHTML = `<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</div>` + mkHtml;
                 } else {
-                    container.innerHTML = cardsHtml;
+                    container.innerHTML = cardsHtml + mkHtml;
                 }
 
                 // Update summary stats
