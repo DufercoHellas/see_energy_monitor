@@ -9829,9 +9829,11 @@ function renderEUMapCountryDetail(dataKey, date) {
                 document.getElementById("res_date_3").value = formatD(end);
                 // Date 4 & 5 remain empty by default
                 
-                // Set Generation Outages default pickers
-                document.getElementById("outages_start_date").value = formatD(start);
-                document.getElementById("outages_end_date").value = formatD(end);
+                // Set Generation Outages default pickers (start: today - 1 day, end: today + 2 days)
+                const outagesStart = new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000);
+                const outagesEnd = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
+                document.getElementById("outages_start_date").value = formatD(outagesStart);
+                document.getElementById("outages_end_date").value = formatD(outagesEnd);
                 
                 document.getElementById("analogue_date").value = formatD(start);
                 document.getElementById("analogue_date").addEventListener("change", () => applyOptimizedWeights());
