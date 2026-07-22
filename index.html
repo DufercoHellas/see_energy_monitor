@@ -8,8 +8,11 @@
         <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+            /* ── SEE Energy Dashboard — Styles ── */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ── LAYOUT ── */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
@@ -17,6 +20,7 @@ body {
     background-color: #f3f4f6;
     color: #1f2937;
 }
+/* ── HEADER ── */
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -27,6 +31,7 @@ body {
 }
 h2 { color: #111827; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.5px; }
 
+/* ── SUMMARY BOX ── */
 .summary-box {
     background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
     color: #ffffff;
@@ -40,6 +45,7 @@ h2 { color: #111827; font-size: 28px; margin: 0; font-weight: 700; letter-spacin
 .summary-box h4 { margin: 0 0 8px 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #e0e7ff; opacity: 0.9; font-weight: 600; }
 .summary-box p { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
 
+/* ── TABLES ── */
 .table-container { overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
 table { border-collapse: collapse; width: 100%; background-color: #ffffff; border: none; }
 th, td { padding: 12px 14px; text-align: left; font-size: 13px; border-bottom: 1px solid #f3f4f6; word-break: keep-all; }
@@ -49,17 +55,21 @@ tr.selected-match-row { background-color: #eeebff !important; border-left: 4px s
 #analogues_table th, #analogues_table td { white-space: nowrap; padding: 10px 12px; }
 #hourly_comp_table th, #hourly_comp_table td { white-space: nowrap; }
 
+/* ── TABS ── */
 .tab { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
 .tab::-webkit-scrollbar { display: none; }
 .tab button { background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; padding: 10px 20px; transition: all 0.2s ease; font-size: 14px; font-weight: 600; color: #4b5563; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
 .tab button:hover { background-color: #f9fafb; border-color: #d1d5db; }
 .tab button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); transform: translateY(-1px); }
 
+/* ── TAB CONTENT ── */
 .tabcontent { display: none; padding: 32px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb; }
 
+/* ── HEADINGS ── */
 h3 { font-size: 22px; color: #111827; margin-top: 0; margin-bottom: 24px; font-weight: 600; letter-spacing: -0.5px; }
 h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
+/* ── CHARTS & INNER TABS ── */
 .chart-wrapper { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); }
 .inner-tab { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
 .inner-tablinks { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; padding: 7px 16px; font-size: 13px; font-weight: 600; color: #4b5563; transition: all 0.2s ease; }
@@ -68,6 +78,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 .inner-tabcontent { display: none; }
 .inner-cables-tabcontent { display: none; }
 
+/* ── DETAIL TABS ── */
 .detail-tablinks {
     background-color: #ffffff;
     border: 1px solid #e2e8f0;
@@ -92,7 +103,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     animation: fadeIn 0.3s ease-out;
 }
 
-/* Loading Mask Styles */
+/* ── LOADING MASK ── */
 #loading_mask {
     position: fixed;
     top: 0;
@@ -140,7 +151,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </style>
     </head>
     <body>
-        <!-- Loading Overlay Mask -->
+        <!-- ── LOADING OVERLAY MASK ── -->
         <div id="loading_mask">
             <div class="spinner-container">
                 <div class="spinner"></div>
@@ -148,8 +159,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- NAV BAR + HEADER -->
-        <div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <!-- ── NAVIGATION BAR ── -->
+        <!-- ── NAVIGATION BAR ── -->
+<div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
     <div>
         <h2>SEE Energy Monitor</h2>
         <div style="font-size:14px;color:#6b7280;margin-top:4px;">Generation Outages &bull; Forecast Residuals &bull; Historical Analogues</div>
@@ -199,12 +211,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 </div>
 
 
-        <!-- TAB: Forecast Residuals -->
-        <div id="Residuals" class="tabcontent" style="display:block;">
+        <!-- ── TAB: Forecast Residuals ── -->
+        <!-- ── TAB: Forecast Residuals ── -->
+<div id="Residuals" class="tabcontent" style="display:block;">
     <h2>Forecast Residuals — Net Demand by Hour</h2>
     <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Net demand = Demand − (Wind + Solar + Hydro). Snapshot taken before 09:00 on the day prior to delivery.</p>
     
-    <!-- Date Pickers for Residuals -->
+    <!-- ── Date Pickers ── -->
     <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Dates:</span>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -267,12 +280,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 </div>
 
 
-        <!-- TAB: Generation Outages -->
-        <div id="Outages" class="tabcontent" style="display:none;">
+        <!-- ── TAB: Generation Outages ── -->
+        <!-- ── TAB: Generation Outages ── -->
+<div id="Outages" class="tabcontent" style="display:none;">
     <h2>Generation Outages by Country</h2>
     <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unplanned outages are highlighted in red. Sorted by new records first, then by outage volume.</p>
     
-    <!-- Date Pickers for Outages -->
+    <!-- ── Date Pickers ── -->
     <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: inline-flex; gap: 16px; align-items: center; flex-wrap: wrap;">
         <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Outage Period:</span>
         <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
@@ -287,6 +301,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
     
+    <!-- ── Summary Cards ── -->
     <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
         <div class="summary-box" style="min-width:220px;">
             <h4>Total Records</h4>
@@ -302,6 +317,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <p id="total_offline_card">0.0 MW</p>
         </div>
     </div>
+    <!-- ── Country Sub-Tabs ── -->
     <div class="inner-tab">
         <button class='inner-tablinks active' onclick='openInnerTab(event, "outage_GR")'>Greece</button>
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_BG")'>Bulgaria</button>
@@ -661,8 +677,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 </div>
 
 
-        <!-- TAB: Cables -->
-        <!-- Cables Tab -->
+        <!-- ── TAB: Cables ── -->
+        <!-- ── TAB: Cables ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
     <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
         <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
@@ -670,13 +686,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
     </div>
 
-    <!-- Sub-Tab 1: Daily Price Matrix -->
+    <!-- ── Sub-Tab: Daily Price Matrix ── -->
     <div id="CablesDaily" class="inner-cables-tabcontent" style="display:block;">
         <h2>Cables Daily Price Matrix</h2>
         <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly auction prices (€/MWh) for selected corridors. Use the sidebar controls to filter and select columns.</p>
         
         <div style="display: flex; gap: 24px; align-items: flex-start;">
-            <!-- Left Sidebar -->
+            <!-- ── Sidebar Controls ── -->
             <div style="width: 280px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-sizing: border-box;">
                 <div style="margin-bottom: 20px;">
                     <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Date</label>
@@ -704,7 +720,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
             
-            <!-- Main Grid Panel -->
+            <!-- ── Price Matrix Grid ── -->
             <div style="flex-grow: 1; overflow-x: auto;">
                 <div class="table-container" style="max-height: 650px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
                     <table id="cables_matrix_table" style="min-width: 100%;">
@@ -727,7 +743,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Sub-Tab 3: Cable Auctions Optimizer -->
+    <!-- ── Sub-Tab: Cable Auctions Optimizer ── -->
     <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
             <div>
@@ -769,7 +785,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- KPI Cards Row -->
+        <!-- ── KPI Cards ── -->
         <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
             <div class="chart-wrapper" style="padding:20px; margin:0;">
                 <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
@@ -798,7 +814,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- Main Content: 2 columns -->
+        <!-- ── Auction Charts ── -->
         <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
             <div class="chart-wrapper" style="margin:0;">
                 <h4 style="margin-top:0;">Bid Profit Curve</h4>
@@ -824,7 +840,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- Bottom: Historical Clearing + Active Outages -->
+        <!-- ── Historical Data & Outages ── -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
             <div class="chart-wrapper" style="margin:0;">
                 <h4 style="margin-top:0;">Historical Clearing Prices</h4>
@@ -838,19 +854,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Sub-Tab 4: Cable Outages -->
+    <!-- ── Sub-Tab: Cable Outages ── -->
     <div id="CableOutages" class="inner-cables-tabcontent" style="display:none;">
         <h2>Cable Capacity Outages & Curtailments</h2>
         <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
     
-    <!-- Outage Views Sub-Toggle -->
+    <!-- ── Outage View Toggle ── -->
     <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
         <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
         <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🕒 Daily Outages</button>
         <button class="inner-tablinks" id="btn_search_log" onclick="toggleOutagesGridView('search')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🔍 Outage History Log</button>
     </div>
 
-    <!-- Monthly & Yearly Section -->
+    <!-- ── 30-Day Outage Calendar Matrix ── -->
     <div id="outages_matrix_section" style="display: block;">
         <!-- 30-Day Outage Calendar Matrix -->
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
@@ -873,7 +889,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
 
-            <!-- Monthly/Yearly Filters -->
+            <!-- ── Matrix Filters ── -->
             <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
@@ -899,7 +915,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Daily Outages Section -->
+    <!-- ── Daily Outages ── -->
     <div id="outages_daily_section" style="display: none;">
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <h3 style="margin-top:0; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
@@ -909,7 +925,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 Hourly view (1-24 hours) of daily capacity reductions for tomorrow (D+1). Green = 100% capacity, Orange = partial reduction, Red = total outage. Click a cell to view details.
             </p>
 
-            <!-- Daily Filters -->
+            <!-- ── Daily Filters ── -->
             <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
@@ -935,11 +951,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Search Log Section -->
+    <!-- ── Outage History Log ── -->
     <div id="outages_search_section" style="display: none;">
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <h3 style="margin-top:0; margin-bottom: 16px; font-size: 15px; font-weight: 700; color: #1e293b;">🔍 Advanced Search & Outage History Log</h3>
             
+            <!-- ── Search Filters ── -->
             <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 20px;">
                 <div style="display: flex; flex-direction: column; gap: 6px; min-width: 250px; flex-grow: 1;">
                     <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
@@ -990,17 +1007,17 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     </div>
 
     <div style="display: flex; gap: 24px; align-items: flex-start;">
-        <!-- Grid Details Side Panel -->
+        <!-- ── Details Side Panel ── -->
         <div id="cable_outages_detail_panel" style="width: 320px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: none; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <!-- Populate dynamically when a cell is clicked -->
         </div>
     </div>
-    </div> <!-- Closes CableOutages -->
-    </div> <!-- Closes Cables parent div -->
+    </div> <!-- ── /CableOutages ── -->
+    </div> <!-- ── /Cables ── -->
 
 
-        <!-- TAB: EU Map -->
-        <!-- EU Map Tab -->
+        <!-- ── TAB: EU Map ── -->
+        <!-- ── TAB: EU Map ── -->
 <div id="EUMap" class="tabcontent" style="display:none;">
     <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 8px;">
         <div>
@@ -1014,18 +1031,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Date badge -->
+    <!-- ── Date Badge ── -->
     <div id="eumap_date_badge" style="display:inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(79,70,229,0.25);">
         <span>&#128197;</span><span id="eumap_date_label">&mdash;</span>
     </div>
 
     <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
-        <!-- Plotly Map container -->
+        <!-- ── Map Container ── -->
         <div style="flex: 1.8; min-width: 480px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div id="eumap_container" style="width: 100%; height: 560px;"></div>
         </div>
 
-        <!-- Country detail panel -->
+        <!-- ── Country Detail Panel ── -->
         <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
                 <span style="font-size:48px;">&#128506;&#65039;</span>
@@ -1041,11 +1058,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 </div>
 
 
-        <!-- TAB: Historical Analogues -->
-        <!-- Historical Analogues Tab -->
+        <!-- ── TAB: Historical Analogues ── -->
+        <!-- ── TAB: Historical Analogues ── -->
 <div id="Analogues" class="tabcontent" style="display:none;">
     <h2>Historical Analogues</h2>
     <p style="color:#6b7280;margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
+    <!-- ── Search Controls ── -->
     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
@@ -1122,13 +1140,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     </div>
     
     <div id="analogues_results_container" style="display:none;">
-        <!-- Target Date Overview Panel -->
+        <!-- ── Target Date Overview ── -->
         <div id="target_date_details_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <!-- Target details will be dynamically populated here -->
+            <!-- Dynamically populated -->
         </div>
         
         <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-            <!-- Left Column: Matches list -->
+            <!-- ── Matches Table ── -->
             <div style="flex: 1.3; min-width: 500px;">
                 <h3 style="margin-top: 0; color: #1f2937;">Top 13 Closest Matches</h3>
                 <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px; margin-top: -12px;">Click a match row to compare profiles and price curves.</p>
@@ -1156,7 +1174,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </div>
             </div>
             
-            <!-- Right Column: Detail Panel -->
+            <!-- ── Comparison Detail Panel ── -->
             <div style="flex: 2; min-width: 500px;">
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
@@ -1169,11 +1187,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </div>
                     </div>
                     
-                    <!-- Tab 1: Comparison Charts -->
+                    <!-- ── Comparison Charts ── -->
                     <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
-                        <!-- Full-Width Prices Comparison -->
+                        <!-- ── Prices Comparison ── -->
                         <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
-                        <!-- Grid for Residuals & Demand Comparisons -->
+                        <!-- ── Residuals & Demand Grid ── -->
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
                             <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                             <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
@@ -1182,7 +1200,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </div>
                     </div>
                     
-                    <!-- Tab 2: Hourly Values Table -->
+                    <!-- ── Hourly Values Table ── -->
                     <div id="comp_table_tab" class="detail-tabcontent" style="display: none;">
                         <div class="table-container" style="max-height: 520px; overflow-y: auto;">
                             <table id="hourly_comp_table">
@@ -1207,7 +1225,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- Interconnector Arbitrage & Spreads Panel -->
+    <!-- ── Interconnector Arbitrage & Spreads ── -->
     <div id="arbitrage_opportunities_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
         <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div>
@@ -1235,7 +1253,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- Summary Cards Grid -->
+        <!-- ── Summary Cards ── -->
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
                 <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Arbitrage Windows</h4>
@@ -1253,7 +1271,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- Route Cards Container -->
+        <!-- ── Route Cards ── -->
         <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
             <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>
         </div>
@@ -1263,7 +1281,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         <script>
             // === utils.js ===
-// Tab switching logic
+// ── Tab Switching ──────────────────────────────────────────────────────────
+
+// Switch main tabs (Dashboard, Cables, EUMap, Analogues, Arbitrage)
 function openTab(evt, tabName) {
     document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
     document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
@@ -1278,6 +1298,8 @@ function openTab(evt, tabName) {
     }
     window.dispatchEvent(new Event('resize'));
 }
+
+// Switch inner sub-tabs within a main tab
 function openInnerTab(evt, tabName) {
     const parent = evt.currentTarget.closest(".tabcontent");
     parent.querySelectorAll(".inner-tabcontent").forEach(el => el.style.display = "none");
@@ -1286,6 +1308,7 @@ function openInnerTab(evt, tabName) {
     evt.currentTarget.classList.add("active");
     window.dispatchEvent(new Event('resize'));
 }
+// Switch detail sub-tabs within the Analogues panel
 function openDetailTab(evt, tabId) {
     try {
         let parent = evt.currentTarget.closest(".detail-tab");
@@ -1305,6 +1328,9 @@ function openDetailTab(evt, tabId) {
     }
 }
 
+// ── Date & Day-Type Utilities ─────────────────────────────────────────────
+
+// Classify a date as Weekday, Saturday, or Sunday (holidays treated as Sunday)
 function get3DayType(date, isHoliday) {
     if (isHoliday) return "Sunday";
     const day = date.getDay();
@@ -1313,6 +1339,7 @@ function get3DayType(date, isHoliday) {
     return "Weekday";
 }
 
+// Determine solar penetration state from residual/demand ratio
 function getSolarState(data, date) {
     if (!data || !data.residuals || !data.demand) return "MedSolar_Short";
     let sumRes = 0;
@@ -1328,29 +1355,36 @@ function getSolarState(data, date) {
     return "HighSolar" + (isLongDay ? "_Long" : "_Short");
 }
 
+// Parse YYYY-MM-DD string into local Date object
 function parseLocalDate(dateStr) {
     const [year, month, day] = dateStr.split('-').map(Number);
     return new Date(year, month - 1, day);
 }
 
+// ── Corridor & Outage Filtering ───────────────────────────────────────────
+
+// Check whether a corridor code should be excluded from display
 function shouldExcludeCorridor(corr) {
     if (!corr) return true;
     const parts = corr.split('-');
     return parts.some(p => ['TR', 'CH'].includes(p.trim().toUpperCase()));
 }
 
+// Check if an outage reason indicates monthly maintenance
 function isMonthlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("monthly maintenance") || r.includes("monthly outage");
 }
 
+// Check if an outage reason indicates yearly maintenance
 function isYearlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("yearly maintenance") || r.includes("yearly outage");
 }
 
+// Handle cable outage type filter change (auto-sets date range for monthly/yearly)
 function onSearchTypeChange() {
     const typeFilter = document.getElementById("cable_outages_type_filter").value;
     if (typeFilter === "MONTHLY" || typeFilter === "YEARLY") {
@@ -1365,12 +1399,16 @@ function onSearchTypeChange() {
     renderCableOutages();
 }
 
+// Check if outage is monthly or yearly maintenance
 function isMonthlyYearlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("monthly maintenance") || r.includes("monthly outage") || r.includes("yearly maintenance") || r.includes("yearly outage");
 }
 
+// ── Similarity Metrics ─────────────────────────────────────────────────────
+
+// Compute Euclidean distance between two arrays
 function euclideanDistance(arr1, arr2) {
     if (!arr1 || !arr2 || arr1.length !== arr2.length) return Infinity;
     let sum = 0;
@@ -1380,12 +1418,16 @@ function euclideanDistance(arr1, arr2) {
     return Math.sqrt(sum);
 }
 
+// Center an array by subtracting its mean (shape comparison)
 function getCenteredProfile(arr) {
     if (!arr || arr.length !== 24) return Array(24).fill(0);
     const avg = arr.reduce((a, b) => a + b, 0) / 24.0;
     return arr.map(x => x - avg);
 }
 
+// ── UI Toggles ─────────────────────────────────────────────────────────────
+
+// Toggle visibility of the hourly target details table
 function toggleHourlyTargetDetails() {
     const el = document.getElementById("target_hourly_details");
     const btn = document.getElementById("btn_toggle_target_hourly");
@@ -1398,6 +1440,7 @@ function toggleHourlyTargetDetails() {
     }
 }
 
+// Toggle visibility of any element by ID
 function toggleDetail(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -1405,6 +1448,7 @@ function toggleDetail(id) {
     }
 }
 
+// Select a corridor tab in the arbitrage panel by index
 function selectCorridorTab(cid, selectedIdx, count) {
     for (let ci = 0; ci < count; ci++) {
         const body = document.getElementById(`${cid}_corridor_${ci}`);
@@ -1419,8 +1463,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
 
 
 // === core.js ===
+// ── Core Dashboard — Global Data & Main Logic ─────────────────────────────
+// This file drives the energy trading dashboard: analogue matching, cable
+// auctions, outages, arbitrage engine, and all interactive visualisations.
 
-            // Main dashboard logic
             let historicalData = {};
             const historicalStats = {"ttf": {"mean": 54.28151679841898, "std": 41.58055892773939}, "eua": {"mean": 71.25686264822136, "std": 15.11728203641688}, "calendar": {"mean": [0.04237894799782261, -0.02704975855037766, 0.49851778656126483], "std": [0.7013691217429003, 0.7110428527409919, 0.3327218696398267]}, "DE_LU_res": {"mean": [30201.18824110672, 28619.223814229248, 27891.9935770751, 28048.45108695652, 28970.534584980236, 31267.595355731224, 35581.452075098816, 37712.0331027668, 36761.02618577075, 33264.24456521739, 29696.048418972332, 27382.129940711464, 25473.220849802372, 24377.915513833992, 24824.967885375496, 27068.254940711464, 30706.731225296444, 35724.0662055336, 39894.97134387352, 41949.47677865613, 40882.82608695652, 38506.94812252965, 36123.838438735176, 32787.979743083], "std": [10354.708329410993, 10384.982149434305, 10438.020683835119, 10499.603975266939, 10584.068537352296, 10980.704027284835, 12281.719898824393, 13253.05040696512, 13599.509161395843, 14074.940001341043, 14956.939222662866, 15653.78468936611, 16154.895953820624, 16558.205151565162, 16795.596704860793, 16701.59869555655, 16015.408408904128, 14603.708735291882, 12699.130686853267, 11470.451030388038, 11041.752572504396, 10818.098831166406, 10522.580823721946, 10291.607792273611]}, "DE_LU_dem": {"mean": [45771.28705533597, 44082.03013833992, 43233.671936758896, 43265.08745059289, 44074.088438735176, 46324.43231225297, 51160.59634387352, 55343.80335968379, 58324.125494071144, 59852.79496047431, 60901.201581027664, 61755.75296442688, 61270.983695652176, 59943.54743083004, 58592.104743083, 57700.15217391304, 57422.17638339921, 58403.22826086957, 58991.58152173913, 58526.875, 56320.91946640316, 53877.04298418972, 51636.44367588933, 48299.999505928856], "std": [4783.157062661484, 4718.8117233184885, 4752.279996100098, 4883.737359891766, 5137.360889470485, 6017.30994420088, 8269.394184810257, 9528.483808894716, 9340.255839977526, 8676.287021577431, 8398.366157443157, 8170.349254125934, 8167.549491868216, 8361.268618754908, 8388.860100882684, 8301.709633058279, 8154.378962671402, 8128.29519836765, 7890.200876436909, 7461.863193128113, 6716.8629637649965, 5974.23610043526, 5448.734665734875, 5052.4290779493795]}, "AT_res": {"mean": [4813.37104743083, 4580.155632411067, 4498.122529644269, 4425.41057312253, 4546.583003952569, 5007.539031620553, 5743.352766798419, 6237.125, 6261.726778656126, 5994.487648221344, 5679.634881422925, 5439.368083003953, 5125.388339920949, 5003.780632411067, 5035.125, 5263.311758893281, 5643.225296442688, 6106.441699604743, 6407.836462450593, 6394.313735177866, 6128.728754940711, 5707.474802371542, 5521.338438735178, 5086.75790513834], "std": [966.4579990693927, 957.5975736255332, 955.0583271391604, 958.0229055954267, 975.1719513748185, 1064.6276581046982, 1293.9480364372314, 1500.1287095800906, 1632.051337479612, 1796.0595808552846, 1989.2784791080348, 2133.5753171531264, 2203.5330797560027, 2219.632425197893, 2177.267916856838, 2073.046872140006, 1916.0316629460876, 1682.996311819179, 1414.058893890352, 1197.166912226932, 1077.916804402688, 1008.6288068129484, 986.4442355211216, 961.4807375311318]}, "AT_dem": {"mean": [5780.237648221344, 5529.5395256917, 5434.243083003953, 5352.878458498024, 5464.66057312253, 5917.991106719368, 6676.719367588933, 7276.036067193676, 7524.12104743083, 7558.631422924901, 7538.268280632411, 7515.494565217391, 7303.076086956522, 7166.756916996047, 7076.178853754941, 7089.822628458498, 7212.208003952569, 7426.597826086957, 7526.827075098814, 7399.417490118577, 7104.929347826087, 6690.90662055336, 6505.961956521739, 6062.202075098814], "std": [640.4888474783671, 634.490397474392, 637.0797274645599, 646.3046691974954, 686.155778786073, 823.0631609876962, 1093.5850548396015, 1273.610114701582, 1281.7026570928858, 1239.0081019420886, 1217.4180805735798, 1193.0596478126192, 1186.5160005335476, 1202.9729422363262, 1206.3675120602734, 1208.5478857770674, 1212.2266026680165, 1194.1900431570843, 1113.357623097621, 975.8099098183113, 837.6665779727092, 725.4419025060838, 694.7490241933659, 660.7227810720178]}, "IT_res": {"mean": [24045.024703557312, 22580.58695652174, 21669.780632411068, 21361.579545454544, 21527.639822134388, 22665.771245059288, 25791.81027667984, 28724.273221343872, 29726.782114624504, 28394.053359683796, 26347.494565217392, 24855.402173913044, 23063.410573122528, 22713.853754940712, 23851.7831027668, 25591.0854743083, 27923.625988142292, 30395.167490118576, 32713.109683794468, 34441.51432806324, 34004.81768774703, 32027.767786561264, 29169.983201581028, 26434.68033596838], "std": [4123.145129357195, 3947.9949081424384, 3799.0556734631327, 3669.303584108989, 3620.579185685334, 3623.7948558113467, 4461.36045412733, 6015.360565905499, 7184.44273509801, 7546.416999444442, 7644.659217330007, 7729.304717039562, 7419.632678580491, 7709.469035842864, 8189.904289755188, 8460.413610271245, 8402.8488359774, 7719.278327126759, 6530.117316252928, 5602.734129554415, 4997.373490580618, 4828.870229550602, 4543.8021810543605, 4311.819865294809]}, "IT_dem": {"mean": [26403.633893280632, 24938.442193675888, 24026.344367588932, 23712.523221343872, 23862.386857707508, 24974.932806324112, 28241.617588932808, 32246.538537549408, 35571.38339920949, 36796.512351778656, 36660.89476284585, 36340.020750988144, 35058.514822134384, 34621.18675889328, 35024.273715415016, 35344.76877470356, 35798.2831027668, 36300.40415019763, 36829.87895256917, 37350.309782608696, 36473.68922924901, 34413.97282608696, 31529.576581027668, 28793.37648221344], "std": [3551.517107736025, 3372.7977511030213, 3226.3778857489683, 3117.086868851832, 3092.3375760775307, 3177.446461166483, 4245.743662536068, 5793.23618326161, 6716.076445611304, 6764.093673805431, 6616.978544361575, 6556.432724313203, 6154.593379608977, 6494.542197559531, 6959.086664610947, 7108.726894253907, 7027.39711684008, 6585.584739614475, 6004.455196001744, 5418.333842474833, 4734.478110295376, 4432.653796019403, 4062.575854602438, 3777.096721201744]}, "GR_res": {"mean": [3573.85918972332, 3411.201581027668, 3275.1679841897235, 3200.9891304347825, 3252.1986166007905, 3485.372529644269, 3712.927865612648, 3495.3819169960475, 2995.320652173913, 2512.7667984189725, 2236.5494071146245, 2164.431818181818, 2198.1506916996045, 2218.1235177865615, 2517.452075098814, 3042.270256916996, 3759.6264822134385, 4545.006916996047, 5084.633399209486, 5314.270256916996, 5159.668972332016, 4731.61314229249, 4366.590415019763, 3938.0187747035575], "std": [1171.4181180334183, 1122.0476867986997, 1086.00963089776, 1051.8593339741046, 1028.8596881054684, 1012.6788916540736, 1106.9230276173116, 1310.7867234628693, 1568.4449948188908, 1732.8126625103705, 1802.4832535861187, 1806.4300893872069, 1787.9712943763636, 1745.8949713217414, 1719.4559601486585, 1677.841557489791, 1563.794784151113, 1399.7908251002816, 1232.1774016515192, 1156.09992626506, 1177.5325490575244, 1199.4873399821688, 1204.9721455933304, 1198.5266580682544]}, "GR_dem": {"mean": [4680.175889328063, 4527.694169960474, 4405.361660079051, 4344.819664031621, 4408.291007905138, 4662.331027667984, 5109.967391304348, 5574.709486166008, 5983.889822134387, 6218.001976284585, 6364.699604743083, 6466.702075098814, 6479.189229249012, 6282.784090909091, 6136.810276679842, 6018.517292490119, 6051.981225296443, 6250.920948616601, 6379.579545454545, 6442.647233201581, 6264.134387351779, 5827.310770750988, 5458.575592885375, 5032.696640316206], "std": [839.0950992868551, 783.543861509753, 739.7134504247837, 697.3058647919704, 669.9549962453691, 662.4781393322879, 776.0325262826462, 889.224857624791, 968.6838616063001, 1011.1515685234466, 1053.081249279089, 1100.1578834515499, 1168.520387144098, 1233.4478413619765, 1237.9065977253897, 1220.054334220357, 1185.0486233702154, 1160.0855794024735, 1069.0855186007798, 945.9738761281733, 914.7074486617836, 919.724607227697, 910.4572688403282, 887.7763194168684]}, "BG_res": {"mean": [3424.848320158103, 3310.8320158102765, 3291.3453557312255, 3303.3320158102765, 3390.665513833992, 3642.963438735178, 3837.86314229249, 3843.417490118577, 3622.4886363636365, 3331.7267786561265, 3172.7485177865615, 3087.850790513834, 3110.37895256917, 3177.9006916996045, 3354.6324110671935, 3642.7850790513835, 4004.1462450592885, 4407.577075098814, 4623.194169960474, 4583.772727272727, 4426.26185770751, 4263.990612648221, 3990.3843873517785, 3650.8977272727275], "std": [630.5521852155924, 644.5160603607467, 673.8670322191891, 684.3599901663221, 700.1922473502053, 791.3925552761162, 962.374891013597, 1165.326395648825, 1307.0944365017044, 1349.293999724193, 1325.5196129795931, 1273.6366392273683, 1229.6247318933895, 1203.826470810094, 1201.0347603705895, 1214.792060534653, 1203.2088025928972, 1103.3142218128833, 943.8569699339796, 827.6078386905909, 755.3931029713366, 725.4736466274945, 672.8544286148491, 638.0390326171022]}, "BG_dem": {"mean": [3580.086462450593, 3468.3977272727275, 3450.852766798419, 3465.560770750988, 3556.6946640316205, 3835.447628458498, 4173.564229249012, 4488.060276679842, 4612.068181818182, 4567.493577075099, 4529.90662055336, 4468.356719367589, 4447.917984189723, 4404.671442687747, 4400.744071146245, 4462.966403162055, 4592.258893280632, 4784.028656126482, 4860.479249011858, 4778.932312252964, 4617.469861660079, 4441.755928853755, 4152.110177865613, 3807.5894268774705], "std": [654.413083135801, 668.2359822725972, 696.0766280272702, 704.977156395064, 718.6620605745063, 789.427152092442, 870.2606178174923, 920.9272441911835, 923.7590195916958, 892.9519012003436, 855.8791581747176, 820.1413288166689, 797.6299318843685, 783.1691320735529, 781.7725214118791, 806.21858775439, 874.1175368582774, 925.7352194592604, 883.3771550515547, 797.507713051371, 725.2218896915743, 719.0944213571498, 688.9377472057745, 660.7636005792967]}, "HU_res": {"mean": [4422.147233201581, 4198.208498023715, 4038.3334980237155, 3992.804347826087, 4063.3903162055335, 4272.857707509881, 4650.514328063241, 4611.007411067194, 4192.019268774704, 3758.8577075098815, 3475.61314229249, 3372.560770750988, 3371.707509881423, 3406.047924901186, 3622.8680830039525, 4010.943181818182, 4485.739624505929, 4910.208498023715, 5269.639328063241, 5469.602272727273, 5438.206027667984, 5237.297924901186, 4967.867588932806, 4738.160079051383], "std": [522.295046166914, 504.0231955265555, 491.35538112724237, 487.35996075677923, 508.3981179732782, 605.8823905012487, 848.9234347092032, 1059.3882360449315, 1256.102113411155, 1402.3521932124597, 1468.7802583791977, 1490.7556511707467, 1489.1846781034396, 1484.1849206454992, 1476.6514389358001, 1458.5897101122944, 1364.224196241809, 1145.496662994955, 878.4521309542589, 690.8887752748287, 591.3351665188804, 565.8501082341378, 557.8387523860368, 547.2254704930689]}, "HU_dem": {"mean": [4496.981719367589, 4271.683300395257, 4110.691205533597, 4064.0469367588935, 4133.565217391304, 4355.661067193676, 4835.993083003953, 5095.020750988142, 5126.332509881423, 5110.978260869565, 5098.428853754941, 5107.052371541502, 5097.03557312253, 5026.032114624506, 5042.750988142292, 5148.696640316206, 5303.517786561265, 5415.748023715415, 5520.29743083004, 5578.188241106719, 5512.182806324111, 5312.193181818182, 5043.665513833992, 4813.537549407115], "std": [523.6475887408494, 506.10003291976284, 493.6438773662116, 489.54973280385985, 510.8834207534276, 600.2119626375492, 780.0966094654823, 829.7793621682811, 813.542289858287, 802.6604482749152, 807.6143601784133, 819.2821654395339, 821.7688199431749, 814.4632510392896, 808.42068355055, 816.5420856657835, 823.0830023718864, 802.3945228766221, 745.4675506901696, 673.2010167536583, 594.6834580130934, 567.8127772648161, 559.6031075212414, 548.8457738563728]}, "RO_res": {"mean": [3254.193675889328, 3168.5113636363635, 3135.7648221343875, 3174.1497035573125, 3260.357213438735, 3442.661561264822, 3684.3092885375495, 3842.3211462450595, 3768.409090909091, 3575.206027667984, 3404.6240118577075, 3335.745553359684, 3369.7593873517785, 3383.5074110671935, 3470.9970355731225, 3646.61314229249, 3904.2168972332015, 4063.4985177865615, 4206.857707509881, 4280.8354743083, 4173.147233201581, 3870.6156126482215, 3569.7870553359685, 3376.3700592885375], "std": [875.0997445980659, 874.8296455149484, 879.0496506792548, 889.1883783267003, 909.6210786353291, 966.5912770075545, 1048.4776520139108, 1159.1834436434722, 1248.8032207289104, 1294.238541349945, 1300.7164466052482, 1286.2753840645476, 1280.4599562009419, 1269.6729452842403, 1245.770302046079, 1244.9742355079245, 1251.317139740054, 1193.3305371522113, 1110.5445535956908, 1025.2600705723476, 944.1034049823744, 919.2526528661081, 909.8319590457406, 878.6543046341563]}, "RO_dem": {"mean": [5496.268774703557, 5375.033596837945, 5326.228754940711, 5355.373517786561, 5474.863636363636, 5792.066699604743, 6303.502470355731, 6641.308300395257, 6703.120059288538, 6596.808794466403, 6458.475790513834, 6403.643280632411, 6417.941699604743, 6384.577075098814, 6404.48023715415, 6539.473814229249, 6786.305830039526, 6995.01185770751, 7141.01185770751, 7200.820652173913, 7048.743577075099, 6590.076581027668, 6080.421442687747, 5719.016798418972], "std": [574.4151627258897, 569.235059308606, 573.4467525530421, 582.1901834260639, 624.9231658940241, 750.7365896690211, 948.5120166049451, 1097.1474232735509, 1187.903933362123, 1230.8766700575513, 1251.0524398446587, 1246.123718014656, 1237.6759597067437, 1202.6627519758626, 1137.934128005819, 1088.6128690202247, 1068.8119889233847, 1021.1835836848412, 936.0378578599003, 824.1288319485914, 705.8117080617435, 647.0417096087494, 604.7406975386483, 579.6390321188289]}, "HR_res": {"mean": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "std": [1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05]}, "HR_dem": {"mean": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "std": [1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05, 1e-05]}};
             let outagesData = [];
@@ -4809,6 +4855,9 @@ function selectCorridorTab(cid, selectedIdx, count) {
             let selectedAuctionCorridor = "";
             let selectedSearchCorridor = null;
 
+// ── Weight Configuration ────────────────────────────────────────────────────
+// Pre-computed optimal weights per solar state / day-type for analogue scoring
+
             const OPTIMIZED_WEIGHTS = {
                 "HighSolar_Long": {
                     "Weekday": { res: 10, eua: 0, de_res: 50, bg_res: 20, ttf: 0, gr_prior: 5, de_prior: 0, bg_prior: 15 },
@@ -4837,9 +4886,9 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             };
 
-            // ===== NATIONAL HOLIDAYS LOOKUP =====
-            // Primary source: holidaysData injected from DB (national_holidays table).
-            // Fallback: Easter computation for years not yet seeded in the DB.
+// ── National Holidays Lookup ───────────────────────────────────────────────
+// Primary source: holidaysData injected from DB. Fallback: Easter computation.
+
             function getHolidaysForDate(countryCode, dateStr) {
                 if (!dateStr) return [];
                 const result = [];
@@ -4895,8 +4944,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
 
             let isManualWeights = false;
 
+// ── Analogue Weight Optimisation ──────────────────────────────────────────
 
-            function applyOptimizedWeights(force = false) {
+// Apply the pre-computed optimal weights for the target date's solar/day-type
+function applyOptimizedWeights(force = false) {
                 if (isManualWeights && !force) return;
                 
                 const targetDateStr = document.getElementById("analogue_date").value;
@@ -4931,7 +4982,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             }
             
-            function updateWeights(changedId) {
+// Re-distribute weights proportionally when the user manually changes one slider
+function updateWeights(changedId) {
                 isManualWeights = true;
                 const label = document.getElementById("weights_auto_label");
                 if (label) {
@@ -4987,7 +5039,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
             }
 
 
-            function renderResidualsTab() {
+// ── Dashboard Rendering ───────────────────────────────────────────────────
+
+// Collect date inputs and render residuals charts
+function renderResidualsTab() {
                 const dateList = [];
                 for (let i = 1; i <= 5; i++) {
                     const val = document.getElementById(`res_date_${i}`).value;
@@ -4998,7 +5053,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderResiduals(dateList);
             }
 
-            function renderOutagesTab() {
+// Collect date range and render generation outages
+function renderOutagesTab() {
                 const startStr = document.getElementById("outages_start_date").value;
                 const endStr = document.getElementById("outages_end_date").value;
                 if (!startStr || !endStr) return;
@@ -5018,15 +5074,19 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderOutages(startStr, endStr, dateList);
             }
 
-            function renderDashboard() {
+// Render all dashboard panels together
+function renderDashboard() {
                 renderResidualsTab();
                 renderOutagesTab();
                 renderCablesMatrix();
             }
 
+// ── Cables Matrix ─────────────────────────────────────────────────────────
+
             let cablesMatrixInitialized = false;
 
-            function initCablesMatrix() {
+// One-time initialisation of the daily cables matrix selectors
+function initCablesMatrix() {
                 if (cablesMatrixInitialized) return;
                 
                 // Set default date to tomorrow
@@ -5074,7 +5134,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 cablesMatrixInitialized = true;
             }
 
-            function filterCablesCheckboxes() {
+// Filter corridor checkboxes by selected country
+function filterCablesCheckboxes() {
                 const selectVal = document.getElementById("cables_country_select").value;
                 const items = document.querySelectorAll(".cable-checkbox-item");
                 items.forEach(item => {
@@ -5092,7 +5153,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 });
             }
 
-            function toggleAllCables(checked) {
+// Toggle all visible corridor checkboxes on/off
+function toggleAllCables(checked) {
                 const items = document.querySelectorAll(".cable-checkbox-item");
                 items.forEach(item => {
                     if (item.style.display !== "none") {
@@ -5103,7 +5165,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderCablesMatrix();
             }
 
-            function renderCablesMatrix() {
+// Render the hourly cable price matrix table for selected corridors
+function renderCablesMatrix() {
                 initCablesMatrix();
                 
                 const targetDate = document.getElementById("cables_matrix_date").value;
@@ -5192,7 +5255,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             }
 
-            function openInnerCablesTab(evt, subTabId) {
+// ── Cable Sub-Tab Switching ──────────────────────────────────────────────
+
+// Switch between Cables sub-tabs (Matrix / Outages / Auctions)
+function openInnerCablesTab(evt, subTabId) {
                 const parent = document.getElementById("Cables");
                 parent.querySelectorAll(".inner-cables-tabcontent").forEach(el => el.style.display = "none");
                 parent.querySelectorAll(".inner-tablinks").forEach(el => el.classList.remove("active"));
@@ -5212,10 +5278,12 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 window.dispatchEvent(new Event('resize'));
             }
 
+// ── Cable Outages ─────────────────────────────────────────────────────────
+
             let cableOutagesInitialized = false;
 
-
-            function onMatrixCountryChange() {
+// Handle maintenance matrix country filter change
+function onMatrixCountryChange() {
                  const country = document.getElementById("matrix_country_filter").value;
                  const select = document.getElementById("matrix_corridor_filter");
                  if (select) {
@@ -5238,7 +5306,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                  renderCableOutagesGrid();
              }
 
-             function onDailyCountryChange() {
+// Handle daily outages country filter change
+function onDailyCountryChange() {
                  const country = document.getElementById("daily_country_filter").value;
                  const select = document.getElementById("daily_corridor_filter");
                  if (select) {
@@ -5261,7 +5330,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                  renderCableDailyOutagesGrid();
              }
 
-             function initCableOutagesSelectors() {
+// One-time initialisation of cable outages country/corridor selectors
+function initCableOutagesSelectors() {
                  if (cableOutagesInitialized) return;
                  
                  // Get unique country codes from corridor codes
@@ -5321,7 +5391,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
              }
              
 
-             function renderCableOutages() {
+// Filter and render the cable outages search table
+function renderCableOutages() {
                  const countryFilter = document.getElementById("cable_outages_country_filter").value;
                  const typeFilter = document.getElementById("cable_outages_type_filter") ? document.getElementById("cable_outages_type_filter").value : "ALL";
                  const startDate = document.getElementById("cable_outages_start_date").value;
@@ -5486,7 +5557,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                  tbody.innerHTML = html;
              }
 
-             function toggleSearchCorridorFilter(corridor) {
+// Toggle a specific corridor filter in the outages search view
+function toggleSearchCorridorFilter(corridor) {
                  if (selectedSearchCorridor === corridor) {
                      selectedSearchCorridor = null;
                  } else {
@@ -5495,17 +5567,21 @@ function selectCorridorTab(cid, selectedIdx, count) {
                  renderCableOutages();
              }
 
+// ── Outages Grid & Matrix Views ──────────────────────────────────────────
+
             let outagesGridOffset = 0;
 
-            function shiftOutagesGrid(amount) {
-                outagesGridOffset += amount;
-                if (outagesGridOffset < 0) outagesGridOffset = 0;
-                if (outagesGridOffset > 15) outagesGridOffset = 15;
-                renderCableOutagesGrid();
-            }
+// Shift the visible 15-day window in the maintenance grid
+function shiftOutagesGrid(amount) {
+    outagesGridOffset += amount;
+    if (outagesGridOffset < 0) outagesGridOffset = 0;
+    if (outagesGridOffset > 15) outagesGridOffset = 15;
+    renderCableOutagesGrid();
+}
 
 
-            function getYearlyCapacityForDate(corridor, dateStr) {
+// Look up yearly allocated capacity for a corridor on a given date
+function getYearlyCapacityForDate(corridor, dateStr) {
                 const targetTime = new Date(dateStr).getTime();
                 const yearlyAuctions = cablesLongData.filter(item => 
                     item.corridor_code === corridor && 
@@ -5519,7 +5595,11 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 return null;
             }
 
-            function toggleOutagesGridView(mode) {
+// Toggle between matrix / daily / search views in the outages tab
+// ── Outages Grid View Switching ──────────────────────────────────────────
+
+// Switch between matrix / daily / search views in the outages tab
+function toggleOutagesGridView(mode) {
                 document.querySelectorAll("#CableOutages .inner-tablinks").forEach(btn => btn.classList.remove("active"));
                 if (mode === 'matrix') {
                     document.getElementById("btn_maint_matrix").classList.add("active");
@@ -5542,7 +5622,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             }
 
-            function renderCableOutagesGrid() {
+// Render the 30-day maintenance matrix grid (15 visible at a time)
+function renderCableOutagesGrid() {
                 const container = document.getElementById("cable_outages_grid_container");
                 if (!container) return;
 
@@ -5761,7 +5842,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 container.innerHTML = html;
             }
 
-            function renderCableDailyOutagesGrid() {
+// ── Daily Outages Grid ────────────────────────────────────────────────────
+
+// Render the D+1 daily cable outages grid (24-hour view per corridor)
+function renderCableDailyOutagesGrid() {
                 const container = document.getElementById("cable_outages_daily_grid_container");
                 if (!container) return;
 
@@ -5970,7 +6054,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 container.innerHTML = html;
             }
 
-            function showOutageGridDetails(corridor, dateStr) {
+// ── Outage Detail Panel ───────────────────────────────────────────────────
+
+// Show hourly outage details for a corridor on a given date
+function showOutageGridDetails(corridor, dateStr) {
                 const panel = document.getElementById("cable_outages_detail_panel");
                 if (!panel) return;
 
@@ -6024,11 +6111,14 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 `;
             }
 
+// ── Long-Term Cables (Monthly / Yearly) ────────────────────────────────────
+
             let currentLongCableHorizon = "Monthly";
             let longCablesInitialized = false;
             let currentSelectedLongPeriodIdx = 0;
 
-            function changeLongCableHorizon(evt, horizon) {
+// Switch between Monthly and Yearly horizon tabs
+function changeLongCableHorizon(evt, horizon) {
                 currentLongCableHorizon = horizon;
                 document.querySelectorAll("#long_cables_horizon_tabs button").forEach(btn => btn.classList.remove("active"));
                 if (evt) {
@@ -6042,7 +6132,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderLongCablesTab();
             }
 
-            function selectLongCorridor(corridor) {
+// Select a corridor in the long cables tab
+function selectLongCorridor(corridor) {
                 selectedCableCorridor = corridor;
                 document.querySelectorAll("#long_cables_corridors_tabs button").forEach(btn => {
                     if (btn.innerText === corridor) {
@@ -6055,7 +6146,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderLongCablesTab();
             }
 
-            function initLongCablesSelectors() {
+// One-time initialisation of long cables corridor tabs
+function initLongCablesSelectors() {
                 if (longCablesInitialized) return;
                 const tabsContainer = document.getElementById("long_cables_corridors_tabs");
                 if (!tabsContainer) return;
@@ -6078,7 +6170,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 longCablesInitialized = true;
             }
 
-            function renderLongCablesTab() {
+// Render the long cables tab (table + valuation details)
+function renderLongCablesTab() {
                 const corr = selectedCableCorridor;
                 const container = document.getElementById("long_cables_container");
                 if (!container) return;
@@ -6155,12 +6248,14 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 renderLongCableDetails(records[currentSelectedLongPeriodIdx], corr);
             }
 
-            function selectLongPeriod(idx) {
+// Select a specific delivery period in the long cables table
+function selectLongPeriod(idx) {
                 currentSelectedLongPeriodIdx = idx;
                 renderLongCablesTab();
             }
 
-            function renderLongCableDetails(rec, corridorCode) {
+// Render the valuation details panel for a long-term cable record
+function renderLongCableDetails(rec, corridorCode) {
                 const panel = document.getElementById("long_period_details_panel");
                 if (!panel || !rec) return;
                 
@@ -6271,7 +6366,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 `;
             }
 
-            function renderResiduals(dateList) {
+// ── Residuals & Outages Charts ────────────────────────────────────────────
+
+// Render residual forecast charts for all countries
+function renderResiduals(dateList) {
                 countries.forEach(c => {
                     const traces = [];
                     dateList.forEach(dStr => {
@@ -6317,7 +6415,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 });
             }
 
-            function renderOutages(startStr, endStr, dateList) {
+// Render generation outages summary cards, charts, and tables
+function renderOutages(startStr, endStr, dateList) {
                 const searchStart = parseLocalDate(startStr);
                 searchStart.setHours(0, 0, 0, 0);
                 const searchEnd = parseLocalDate(endStr);
@@ -6380,7 +6479,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 });
             }
 
-            function renderCountryOutageChart(c, countryOutages, dateList) {
+// Render a stacked bar chart of unavailable capacity by fuel type for a country
+function renderCountryOutageChart(c, countryOutages, dateList) {
                 const plotId = `plot_${c}`;
                 const div = document.getElementById(plotId);
                 if (!div) return;
@@ -6427,7 +6527,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 Plotly.newPlot(plotId, traces, layout, {responsive: true});
             }
 
-            function renderCountryOutageTable(c, countryOutages) {
+// Render the detailed outages table for a country
+function renderCountryOutageTable(c, countryOutages) {
                 const tableContainerId = `table_container_${c}`;
                 const div = document.getElementById(tableContainerId);
                 if (!div) return;
@@ -6491,11 +6592,14 @@ function selectCorridorTab(cid, selectedIdx, count) {
             }
 
 
+// ── Historical Analogue Matching & Comparison ─────────────────────────────
+
             let currentTop7 = [];
             let currentTargetData = null;
             let currentTargetDate = "";
 
-            function selectMatch(idx, date) {
+// Select a match row, render comparison charts and price adjustments
+function selectMatch(idx, date) {
                 // Highlight row in table
                 const rows = document.querySelectorAll("#analogues_table tbody tr");
                 rows.forEach(r => r.classList.remove("selected-match-row"));
@@ -6838,7 +6942,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             }
 
-            function getPriorSameDayTypeDate(targetDateStr, country) {
+// Find the most recent prior date of the same day-type (weekday/Sunday/Saturday)
+function getPriorSameDayTypeDate(targetDateStr, country) {
                 const targetDate = parseLocalDate(targetDateStr);
                 const targetIsWe = targetDate.getDay() === 0 || targetDate.getDay() === 6;
                 
@@ -6861,7 +6966,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
             }
 
 
-            function getDayAveragePrice(c, date) {
+// Calculate the average daily price for a country on a given date
+function getDayAveragePrice(c, date) {
                 const countryData = historicalData[c];
                 if (!countryData) return 0.0;
                 const dateData = countryData[date];
@@ -6874,7 +6980,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 return sum / nonNull.length;
             }
 
-            function getDayAveragePriceWithFallback(c, date) {
+// Get average daily price with fallback for countries without direct data
+function getDayAveragePriceWithFallback(c, date) {
                 let avg = getDayAveragePrice(c, date);
                 if (avg === 0.0) {
                     if (c === 'ME') avg = getDayAveragePrice('RS', date);
@@ -6886,7 +6993,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 return avg;
             }
 
-            function findAnalogues() {
+// ── Analogue Search Algorithm ─────────────────────────────────────────────
+
+// Find historical analogue days matching the target date, score them, render results
+function findAnalogues() {
                 const targetDate = document.getElementById("analogue_date").value;
                 const country = document.getElementById("analogue_country").value;
                 const lookback = document.getElementById("analogue_lookback").value;
@@ -7286,7 +7396,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
             }
 
-            function renderTargetDetailsCard(viewMode) {
+// ── Target / Match Details Card ───────────────────────────────────────────
+
+// Render the target date or selected match details panel with hourly profiles
+function renderTargetDetailsCard(viewMode) {
                 if (viewMode) {
                     currentDetailsCardMode = viewMode;
                 }
@@ -7659,6 +7772,9 @@ function selectCorridorTab(cid, selectedIdx, count) {
 
 
             // --- Interconnector Arbitrage & Spreads Prediction Engine ---
+// ── Arbitrage Engine Setup ─────────────────────────────────────────────────
+
+// EU member states for CBAM compliance checks
             const countryEU = {
                 'DE': true, 'DE_LU': true, 'SK': true, 'HU': true, 'RO': true, 'BG': true, 'GR': true, 'IT': true, 'AT': true, 'SI': true, 'HR': true
             };
@@ -7712,7 +7828,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
 
             // Generate all simple paths up to 4 hops
             const allTopologyPaths = [];
-            function traversePaths(current, path, visited) {
+// Recursively enumerate all simple paths up to 4 hops in the topology graph
+function traversePaths(current, path, visited) {
                 if (path.length > 1) {
                     allTopologyPaths.push([...path]);
                 }
@@ -7737,8 +7854,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 traversePaths(start, [{ to: start, cable: null }], visited);
             });
 
-            // Filter CBAM compliant paths
-            function isValidPathCBAM(path) {
+// Check whether a path satisfies CBAM trading rules (no non-EU -> EU)
+function isValidPathCBAM(path) {
                 const start = path[0].to;
                 const end = path[path.length - 1].to;
                 const startIsEU = countryEU[start] || false;
@@ -7749,15 +7866,16 @@ function selectCorridorTab(cid, selectedIdx, count) {
             }
             const cbamCompliantPaths = allTopologyPaths.filter(isValidPathCBAM);
 
-            // Get realized price for a country/hour from a specific historical date (with fallbacks)
-            function getRealizedPrice(c, h, date) {
+// Get realized spot price for a country at a given hour and date
+function getRealizedPrice(c, h, date) {
                 const prices = historicalData[c]?.[date]?.prices;
                 if (!prices) return 0.0;
                 const p = prices[h];
                 return (p !== null && p !== undefined && p >= 0) ? p : 0.0;
             }
 
-            function getRealizedPriceWithFallback(c, h, date) {
+// Get realized price with fallback for countries missing direct price data
+function getRealizedPriceWithFallback(c, h, date) {
                 let p = getRealizedPrice(c, h, date);
                 if (p === 0.0) {
                     if (c === 'ME') p = getRealizedPrice('RS', h, date);
@@ -7769,8 +7887,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 return p;
             }
 
-            // Weighted average of realized prices across up to 5 analogue dates
-            function getWeightedRealizedPrice(c, h, dates, weights) {
+// Compute weighted average of realized prices across multiple analogue dates
+function getWeightedRealizedPrice(c, h, dates, weights) {
                 let p = 0.0;
                 for (let i = 0; i < dates.length; i++) {
                     p += weights[i] * getRealizedPriceWithFallback(c, h, dates[i]);
@@ -7778,7 +7896,10 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 return p;
             }
 
-            function renderArbitragePanel() {
+// ── Arbitrage Panel Rendering ─────────────────────────────────────────────
+
+// Render all arbitrage opportunity cards for profitable interconnector flows
+function renderArbitragePanel() {
                 const container = document.getElementById("arbitrage_cards_container");
                 if (!container) return;
 
@@ -8522,17 +8643,22 @@ function selectCorridorTab(cid, selectedIdx, count) {
                 }
 
 
-            async function initDashboardData() {
+// ── Data Loading ───────────────────────────────────────────────────────────
+
+// Fetch all JSON data files in parallel, then initialise the UI
+async function initDashboardData() {
                 const statusEl = document.getElementById("loading_status");
                 try {
                     const cacheBust = Date.now();
                     let loaded = 0;
                     const total = 7;
+                    // Progress tick — updates the loading status label
                     const tick = (label) => {
                         loaded++;
                         statusEl.innerHTML = `Loading energy data \u2014 <strong>${loaded}\u202f/\u202f${total}</strong> files\u2026 <span style="color:#94a3b8;font-size:11px;">(${label})</span>`;
                     };
 
+                    // Fetch a JSON file (supports .gz decompression via pako)
                     const fetchJSON = (url) => {
                         if (url.includes('.gz')) {
                             return fetch(url)
@@ -8609,12 +8735,9 @@ function selectCorridorTab(cid, selectedIdx, count) {
 
 
 // === tab_eumap.js ===
+// ── EU Map Tab: Day-Ahead Spot Price Choropleth (Plotly) ─────────────────
 
-// =====================================================================
-// EU MAP TAB — Day-Ahead Spot Price Choropleth (Plotly)
-// =====================================================================
-
-// Maps our internal data keys to ISO-3 codes used by Plotly
+// Maps internal data keys to ISO-3 country codes used by Plotly
 const EU_MAP_DATA_TO_ISO3 = {
     'AT':    'AUT',
     'BG':    'BGR',
@@ -8656,12 +8779,13 @@ const EU_MAP_DATA_TO_ISO3 = {
     'SE4':   'SWE'
 };
 
-// Reverse: ISO3 -> data key
+// Reverse mapping: ISO-3 code -> internal data key
 const EU_MAP_ISO3_TO_DATA = {};
 for (const [dk, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
     EU_MAP_ISO3_TO_DATA[iso3] = dk;
 }
 
+// Human-readable country names for hover labels
 const EU_MAP_COUNTRY_NAMES = {
     'AT': 'Austria',        'BG': 'Bulgaria',       'HR': 'Croatia',
     'CZ': 'Czech Republic', 'DE_LU': 'Germany',     'GR': 'Greece',
@@ -8678,8 +8802,10 @@ const EU_MAP_COUNTRY_NAMES = {
     'SE1': 'Sweden (SE1)',  'SE2': 'Sweden (SE2)',   'SE3': 'Sweden (SE3)',  'SE4': 'Sweden (SE4)'
 };
 
+// Track whether the EU map has been initialised once
 let euMapInitialized = false;
 
+// Find the most recent date with price data across all countries
 function euMapGetLatestDate() {
     if (!historicalData || Object.keys(historicalData).length === 0) return null;
     const today = new Date();
@@ -8699,12 +8825,14 @@ function euMapGetLatestDate() {
     return sorted.length ? sorted[sorted.length - 1] : null;
 }
 
+// Set the date picker to the latest available date and re-render
 function euMapSetLatest() {
     const latest = euMapGetLatestDate();
     if (latest) document.getElementById('eumap_date').value = latest;
     renderEUMap();
 }
 
+// Initialise the EU map tab (one-time) and render
 function initEUMap() {
     if (!euMapInitialized) {
         const latest = euMapGetLatestDate();
@@ -8714,6 +8842,7 @@ function initEUMap() {
     renderEUMap();
 }
 
+// Update the date label and re-draw the Plotly choropleth
 function renderEUMap() {
     const dateInput = document.getElementById('eumap_date');
     const selectedDate = dateInput ? dateInput.value : null;
@@ -8727,6 +8856,9 @@ function renderEUMap() {
     drawPlotlyEUMap(selectedDate);
 }
 
+// ── Choropleth Rendering ───────────────────────────────────────────────────
+
+// Build and render the Plotly choropleth map for a given date
 function drawPlotlyEUMap(selectedDate) {
     const groups = {};
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
@@ -8782,15 +8914,14 @@ function drawPlotlyEUMap(selectedDate) {
         customdata.push(repKey);
     }
 
-    // Exclude structurally low-price Nordic/Baltic zones from the colour scale
-    // anchoring so they don't drag everything else into the red.
+    // Exclude Nordic/Baltic zones from colour-scale anchoring to avoid dragging other prices into red
     const SCALE_EXCLUDE = new Set(['NO1','NO2','NO3','NO4','NO5','SE1','SE2','SE3','SE4','LT','LV','EE','FI','DK1','DK2']);
     const scalePrices = [];
     for (let i = 0; i < z.length; i++) {
         if (z[i] > 0 && !SCALE_EXCLUDE.has(customdata[i])) scalePrices.push(z[i]);
     }
     const allValidPrices = z.filter(v => v > 0);
-    // Percentile helper — clamps the scale so a single outlier doesn't dominate
+    // Percentile helper to clamp scale so a single outlier does not dominate
     function pct(arr, p) {
         if (!arr.length) return p < 50 ? 50 : 300;
         const s = [...arr].sort((a,b) => a - b);
@@ -8886,6 +9017,9 @@ function drawPlotlyEUMap(selectedDate) {
     });
 }
 
+// ── Country Detail Panel ───────────────────────────────────────────────────
+
+// Show hourly prices, stats, and bar chart for a selected country
 function renderEUMapCountryDetail(dataKey, date) {
     if (!date) {
         const dateInput = document.getElementById('eumap_date');
@@ -9028,6 +9162,9 @@ function renderEUMapCountryDetail(dataKey, date) {
         </div>`;
 }
 
+// ── Initialisation ─────────────────────────────────────────────────────────
+
+// Set default date pickers and start async data fetch on page load
             document.addEventListener("DOMContentLoaded", function() {
                 const today = new Date();
                 const start = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
@@ -9064,8 +9201,9 @@ function renderEUMapCountryDetail(dataKey, date) {
             });
 
 // === tab_cables_auctions.js ===
-// ============================================================
+// ── Auction Tab Init ───────────────────────────────────────────────────────
 
+// Initialize the cable auctions tab: populate selectors and render
 function initAuctionTab() {
     const countrySel = document.getElementById('auction_country_filter');
     const corridorsList = document.getElementById('auction_corridors_list');
@@ -9081,8 +9219,7 @@ function initAuctionTab() {
     countrySel.innerHTML = '<option value="ALL">All Countries</option>'
         + sortedCountries.map(c => `<option value="${c}">${c}</option>`).join('');
 
-    // Populate month selector: next 12 months
-    const monthSel = document.getElementById('auction_month');
+    // Populate month selector with the next 12 months
     const months = [];
     const now = new Date();
     for (let i = 1; i <= 12; i++) {
@@ -9099,6 +9236,7 @@ function initAuctionTab() {
     runAuctionOptimizer();
 }
 
+// Render the corridor selection tags filtered by country
 function renderAuctionCorridors(countryFilter) {
     const container = document.getElementById('auction_corridors_list');
     if (!container) return;
@@ -9149,12 +9287,14 @@ function renderAuctionCorridors(countryFilter) {
     }
 }
 
+// Handle country filter change in the auction panel
 function onAuctionCountryFilterChange() {
     const country = document.getElementById('auction_country_filter').value;
     selectedAuctionCorridor = "";
     renderAuctionCorridors(country);
 }
 
+// Handle product type (Monthly/Yearly) change in the auction panel
 function onAuctionProductTypeChange() {
     const label = document.getElementById('auction_date_label');
     const product = document.getElementById('auction_product_type').value;
@@ -9162,12 +9302,16 @@ function onAuctionProductTypeChange() {
     runAuctionOptimizer();
 }
 
+// ── Auction Optimisation ─────────────────────────────────────────────────
+
+// Calculate total hours in a given year-month
 function getHoursInMonth(yearMonth) {
     const [y, m] = yearMonth.split('-').map(Number);
     const days = new Date(y, m, 0).getDate();
     return days * 24;
 }
 
+// Shape a flat forward price into an hourly profile using historical patterns
 function shapeForwardToHourly(forwardPrice, historicalPrices) {
     // historicalPrices: array of 24-element arrays from same calendar month
     if (!historicalPrices || historicalPrices.length === 0) {
@@ -9186,6 +9330,7 @@ function shapeForwardToHourly(forwardPrice, historicalPrices) {
     return hourlyAvg.map(v => forwardPrice * (v / meanProfile));
 }
 
+// Collect historical hourly prices for a country in a given month (last 2 years)
 function getHistoricalPricesForMonth(country, yearMonth) {
     const targetMonth = parseInt(yearMonth.split('-')[1]);
     const data = historicalData[country];
@@ -9202,6 +9347,7 @@ function getHistoricalPricesForMonth(country, yearMonth) {
     return result;
 }
 
+// Look up forward baseload price for a country and delivery month
 function getForwardPrice(country, yearMonth) {
     const countryMap = {'AL':'XK'};
     const mapped = countryMap[country] || country;
@@ -9212,12 +9358,14 @@ function getForwardPrice(country, yearMonth) {
     return entry ? entry.price : null;
 }
 
+// Extract source and destination countries from a corridor code
 function getCorridorCountries(corridor) {
     const parts = corridor.split('-');
     if (parts.length >= 2) return { source: parts[0], dest: parts[1] };
     return { source: 'GR', dest: 'BG' };
 }
 
+// Run the full auction optimisation: compute bid, EV, demand curve, and charts
 function runAuctionOptimizer() {
     const corridor = selectedAuctionCorridor;
     const yearMonth = document.getElementById('auction_month')?.value;
@@ -9485,6 +9633,9 @@ function runAuctionOptimizer() {
     renderAuctionOutagesTable(corridor, yearMonth);
 }
 
+// ── Auction Charts ─────────────────────────────────────────────────────────
+
+// Render forward curve comparison chart for source vs destination
 function renderAuctionFwdChart(source, dest, corridor) {
     const countryProxySrc = {'AL':'XK'};
     const isProxySrc = !!countryProxySrc[source];
@@ -9515,6 +9666,7 @@ function renderAuctionFwdChart(source, dest, corridor) {
     }, {responsive:true, displayModeBar:false});
 }
 
+// Render historical monthly clearing prices chart for a corridor
 function renderAuctionClearingChart(corridor, yearMonth) {
     const [targetYear, targetMonth] = yearMonth.split('-').map(Number);
     let endYear = targetYear, endMonth = targetMonth - 1;
@@ -9583,6 +9735,7 @@ function renderAuctionClearingChart(corridor, yearMonth) {
     }, {responsive:true, displayModeBar:false});
 }
 
+// Render cable outages table for a corridor and month
 function renderAuctionOutagesTable(corridor, yearMonth) {
     const [y, m] = yearMonth.split('-').map(Number);
     const outages = (cableOutagesData || []).filter(r => {
@@ -9619,9 +9772,7 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
     </table></div>`;
 }
 
-// =====================================================================
-// INTERCONNECTOR ARBITRAGE & FLOWS ENGINE (341-D GLOBAL MATCH)
-// =====================================================================
+// ── End of Cable Auctions ─────────────────────────────────────────────────
 
 // === tab_analogues.js ===
 
