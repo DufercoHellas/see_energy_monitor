@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="ENTSO-E generation outages and forecast residuals dashboard for SEE countries.">
-        <title>SEE Energy Dashboard — ENTSO-E Outages & Residuals</title>
+        <title>SEE Energy Dashboard — ENTSO-E Outages &amp; Residuals</title>
         <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
         <style>
@@ -149,88 +149,90 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
+        <!-- NAV BAR + HEADER -->
         <div class="header-container" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
-            <div>
-                <h2>SEE Energy Monitor</h2>
-                <div style="font-size:14px;color:#6b7280;margin-top:4px;">Generation Outages &bull; Forecast Residuals &bull; Historical Analogues</div>
-            </div>
-            
-            <!-- Metadata Update Status Table -->
-            <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 10px; color: #475569; min-width: 240px; font-family: 'Inter', sans-serif; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);">
-                <div style="font-weight: 700; font-size: 9px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px;">
-                    <span style="display: inline-block; width: 5px; height: 5px; background-color: #10b981; border-radius: 50%;"></span>
-                    Update Status
-                </div>
-                <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 12:00</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:27</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 08:03</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 04:10</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:36</td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:37</td>
-                    </tr>
-                </table>
-            </div>
+    <div>
+        <h2>SEE Energy Monitor</h2>
+        <div style="font-size:14px;color:#6b7280;margin-top:4px;">Generation Outages &bull; Forecast Residuals &bull; Historical Analogues</div>
+    </div>
+    
+    <!-- Metadata Update Status Table -->
+    <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 10px; color: #475569; min-width: 240px; font-family: 'Inter', sans-serif; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);">
+        <div style="font-weight: 700; font-size: 9px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px;">
+            <span style="display: inline-block; width: 5px; height: 5px; background-color: #10b981; border-radius: 50%;"></span>
+            Update Status
         </div>
-        
-        <div class="tab">
-            <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
-            <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
-            <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
-            <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
-            <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
-            <button class="tablinks" onclick="openTab(event, 'ArbitrageTab')">🔗 Arbitrage & Flows</button>
-        </div>
-        
+        <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 12:00</td>
+            </tr>
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:27</td>
+            </tr>
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 08:03</td>
+            </tr>
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 04:10</td>
+            </tr>
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:36</td>
+            </tr>
+            <tr>
+                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:37</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="tab">
+    <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
+    <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
+    <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
+    <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
+    <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
+</div>
+
+
+        <!-- TAB: Forecast Residuals -->
         <div id="Residuals" class="tabcontent" style="display:block;">
-            <h2>Forecast Residuals — Net Demand by Hour</h2>
-            <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Net demand = Demand − (Wind + Solar + Hydro). Snapshot taken before 09:00 on the day prior to delivery.</p>
-            
-            <!-- Date Pickers for Residuals -->
-            <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Dates:</span>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 1</span>
-                        <input type="date" id="res_date_1" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 2</span>
-                        <input type="date" id="res_date_2" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 3</span>
-                        <input type="date" id="res_date_3" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 4</span>
-                        <input type="date" id="res_date_4" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 5</span>
-                        <input type="date" id="res_date_5" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                </div>
+    <h2>Forecast Residuals — Net Demand by Hour</h2>
+    <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Net demand = Demand − (Wind + Solar + Hydro). Snapshot taken before 09:00 on the day prior to delivery.</p>
+    
+    <!-- Date Pickers for Residuals -->
+    <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Dates:</span>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 1</span>
+                <input type="date" id="res_date_1" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
             </div>
-            
-            <div id="plot_res_GR" style="width:100%; height:400px; margin-bottom:40px;"></div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 2</span>
+                <input type="date" id="res_date_2" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 3</span>
+                <input type="date" id="res_date_3" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 4</span>
+                <input type="date" id="res_date_4" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Date 5</span>
+                <input type="date" id="res_date_5" onchange="renderResidualsTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
+            </div>
+        </div>
+    </div>
+    
+    <div id="plot_res_GR" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_BG" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
@@ -263,44 +265,46 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 <div id="plot_res_CH" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
 
-        </div>
+</div>
 
+
+        <!-- TAB: Generation Outages -->
         <div id="Outages" class="tabcontent" style="display:none;">
-            <h2>Generation Outages by Country</h2>
-            <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unplanned outages are highlighted in red. Sorted by new records first, then by outage volume.</p>
-            
-            <!-- Date Pickers for Outages (moved from top left) -->
-            <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: inline-flex; gap: 16px; align-items: center; flex-wrap: wrap;">
-                <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Outage Period:</span>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">Start Date</span>
-                        <input type="date" id="outages_start_date" onchange="renderOutagesTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                        <span style="font-size: 10px; font-weight: 600; color: #64748b;">End Date</span>
-                        <input type="date" id="outages_end_date" onchange="renderOutagesTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
-                    </div>
-                </div>
+    <h2>Generation Outages by Country</h2>
+    <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Unplanned outages are highlighted in red. Sorted by new records first, then by outage volume.</p>
+    
+    <!-- Date Pickers for Outages -->
+    <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: inline-flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <span style="font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Outage Period:</span>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">Start Date</span>
+                <input type="date" id="outages_start_date" onchange="renderOutagesTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
             </div>
-            
-            <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
-                <div class="summary-box" style="min-width:220px;">
-                    <h4>Total Records</h4>
-                    <p id="total_records_card">0</p>
-                </div>
-                <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#dc2626 0%,#ef4444 100%);box-shadow:0 10px 15px -3px rgba(220,38,38,0.3);">
-                    <h4>Total Unplanned Unavailable Capacity</h4>
-                    <p id="unplanned_outages_card">0.00 MW</p>
-                    <div id="unplanned_records_count" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
-                </div>
-                <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);box-shadow:0 10px 15px -3px rgba(15,23,42,0.3);">
-                    <h4>Total Offline Capacity</h4>
-                    <p id="total_offline_card">0.0 MW</p>
-                </div>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 600; color: #64748b;">End Date</span>
+                <input type="date" id="outages_end_date" onchange="renderOutagesTab()" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; font-family: 'Inter'; font-size: 13px; color: #334155;">
             </div>
-            <div class="inner-tab">
-                <button class='inner-tablinks active' onclick='openInnerTab(event, "outage_GR")'>Greece</button>
+        </div>
+    </div>
+    
+    <div style="display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap;">
+        <div class="summary-box" style="min-width:220px;">
+            <h4>Total Records</h4>
+            <p id="total_records_card">0</p>
+        </div>
+        <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#dc2626 0%,#ef4444 100%);box-shadow:0 10px 15px -3px rgba(220,38,38,0.3);">
+            <h4>Total Unplanned Unavailable Capacity</h4>
+            <p id="unplanned_outages_card">0.00 MW</p>
+            <div id="unplanned_records_count" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+        </div>
+        <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);box-shadow:0 10px 15px -3px rgba(15,23,42,0.3);">
+            <h4>Total Offline Capacity</h4>
+            <p id="total_offline_card">0.0 MW</p>
+        </div>
+    </div>
+    <div class="inner-tab">
+        <button class='inner-tablinks active' onclick='openInnerTab(event, "outage_GR")'>Greece</button>
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_BG")'>Bulgaria</button>
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_RO")'>Romania</button>
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_HU")'>Hungary</button>
@@ -317,8 +321,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_EE")'>EE</button>
 <button class='inner-tablinks ' onclick='openInnerTab(event, "outage_CH")'>Switzerland</button>
 
-            </div>
-            
+    </div>
+    
             <div id="outage_GR" class="inner-tabcontent" style="display:block;">
                 <h3>Greece — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
@@ -655,772 +659,560 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <div id="table_container_CH" class="table-container"></div>
             </div>
             
+</div>
+
+
+        <!-- TAB: Cables -->
+        <!-- Cables Tab -->
+<div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
+    <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
+        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
+        <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
+        <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
+    </div>
+
+    <!-- Sub-Tab 1: Daily Price Matrix -->
+    <div id="CablesDaily" class="inner-cables-tabcontent" style="display:block;">
+        <h2>Cables Daily Price Matrix</h2>
+        <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly auction prices (€/MWh) for selected corridors. Use the sidebar controls to filter and select columns.</p>
+        
+        <div style="display: flex; gap: 24px; align-items: flex-start;">
+            <!-- Left Sidebar -->
+            <div style="width: 280px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-sizing: border-box;">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Date</label>
+                    <input type="date" id="cables_matrix_date" onchange="renderCablesMatrix()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Filter by Country</label>
+                    <select id="cables_country_select" onchange="filterCablesCheckboxes()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
+                        <!-- populated dynamically -->
+                    </select>
+                </div>
+                
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Cables/Corridors</label>
+                        <div style="font-size: 11px;">
+                            <a href="javascript:void(0)" onclick="toggleAllCables(true)" style="color: #4f46e5; font-weight: 600; text-decoration: none; margin-right: 8px;">All</a>
+                            <a href="javascript:void(0)" onclick="toggleAllCables(false)" style="color: #6b7280; font-weight: 600; text-decoration: none;">None</a>
+                        </div>
+                    </div>
+                    <div id="cables_checkboxes_container" style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; background: white; box-sizing: border-box;">
+                        <!-- checkboxes populated dynamically -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Grid Panel -->
+            <div style="flex-grow: 1; overflow-x: auto;">
+                <div class="table-container" style="max-height: 650px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                    <table id="cables_matrix_table" style="min-width: 100%;">
+                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
+                            <tr id="cables_matrix_head">
+                                <!-- populated dynamically -->
+                            </tr>
+                        </thead>
+                        <tbody id="cables_matrix_body" style="font-weight: 500;">
+                            <!-- populated dynamically -->
+                        </tbody>
+                        <tfoot style="position: sticky; bottom: 0; background: #f8fafc; font-weight: 700; border-top: 2px solid #e2e8f0; z-index: 1;">
+                            <tr id="cables_matrix_foot">
+                                <!-- populated dynamically -->
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub-Tab 3: Cable Auctions Optimizer -->
+    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+            <div>
+                <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
+                <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:12px; width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;">
+                <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width: 150px;">
+                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Country</label>
+                        <select id="auction_country_filter" onchange="onAuctionCountryFilterChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
+                            <option value="ALL">All Countries</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width:120px;">
+                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Product</label>
+                        <select id="auction_product_type" onchange="onAuctionProductTypeChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width:140px;">
+                        <label id="auction_date_label" style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Month</label>
+                        <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width:80px;">
+                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Volume (MW)</label>
+                        <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:4px; min-width:100px;">
+                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Risk Margin (€)</label>
+                        <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid #e2e8f0; padding-top:10px;">
+                    <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom: 2px;">Corridor</label>
+                    <div id="auction_corridors_list" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; min-height: 32px;"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- Cables Tab -->
-        <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
-            <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
-                <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
-                <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CablesLongTerm')">⏳ Long-Term Cables</button>
-                <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
-                <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
+        <!-- KPI Cards Row -->
+        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
+            <div class="chart-wrapper" style="padding:20px; margin:0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
+                <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
+                <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
+            </div>
+            <div class="chart-wrapper" style="padding:20px; margin:0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Win Probability</div>
+                <div id="kpi_win_prob" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
+                <div id="kpi_win_prob_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">at optimal bid</div>
+            </div>
+            <div class="chart-wrapper" style="padding:20px; margin:0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
+                <div id="kpi_ev" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
+                <div style="font-size:12px; color:#6b7280; margin-top:6px;">/MWh shaped</div>
+            </div>
+            <div class="chart-wrapper" style="padding:20px; margin:0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Total Exposure</div>
+                <div id="kpi_exposure" style="font-size:32px; font-weight:700; color:#d97706; line-height:1;">—</div>
+                <div id="kpi_exposure_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">MWh</div>
+            </div>
+            <div class="chart-wrapper" style="padding:20px; margin:0;">
+                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Financial Liability</div>
+                <div id="kpi_liability" style="font-size:32px; font-weight:700; color:#7c3aed; line-height:1;">—</div>
+                <div style="font-size:12px; color:#6b7280; margin-top:6px;">at bid price</div>
+            </div>
+        </div>
+
+        <!-- Main Content: 2 columns -->
+        <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
+            <div class="chart-wrapper" style="margin:0;">
+                <h4 style="margin-top:0;">Bid Profit Curve</h4>
+                <p id="auction_bid_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Historical demand curve: past clearing prices (€/MWh) vs cumulative allocated volume (MW). Red dashed = available capacity (ATC). Green dashed = optimal bid. The <strong>clearing point</strong> is where they intersect.</p>
+                <div id="auction_bid_curve_chart" style="width:100%; height:300px;"></div>
+            </div>
+            <div class="chart-wrapper" style="margin:0; margin-top:16px;">
+                <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
+                <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread by hour. Gray = solar suppression. Used to compute E[V].</p>
+                <div id="auction_spread_chart" style="width:100%; height:160px;"></div>
+                <div id="historical_profile_toggles_container" style="margin-top: 8px; margin-bottom: 12px;"></div>
+                <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+                <div class="chart-wrapper" style="margin:0;">
+                    <h4 style="margin-top:0;">Fundamental Adjustments</h4>
+                    <div id="auction_adjustments" style="font-size:13px;"></div>
+                </div>
+                <div class="chart-wrapper" style="margin:0;">
+                    <h4 style="margin-top:0;">Forward Curve Context</h4>
+                    <div id="auction_fwd_chart" style="width:100%; height:180px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom: Historical Clearing + Active Outages -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="chart-wrapper" style="margin:0;">
+                <h4 style="margin-top:0;">Historical Clearing Prices</h4>
+                <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
+                <div id="auction_clearing_chart" style="width:100%; height:350px;"></div>
+            </div>
+            <div class="chart-wrapper" style="margin:0;">
+                <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
+                <div id="auction_outages_table"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sub-Tab 4: Cable Outages -->
+    <div id="CableOutages" class="inner-cables-tabcontent" style="display:none;">
+        <h2>Cable Capacity Outages & Curtailments</h2>
+        <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
+    
+    <!-- Outage Views Sub-Toggle -->
+    <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
+        <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
+        <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🕒 Daily Outages</button>
+        <button class="inner-tablinks" id="btn_search_log" onclick="toggleOutagesGridView('search')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🔍 Outage History Log</button>
+    </div>
+
+    <!-- Monthly & Yearly Section -->
+    <div id="outages_matrix_section" style="display: block;">
+        <!-- 30-Day Outage Calendar Matrix -->
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        📅 30-Day Outage Calendar Matrix
+                    </h3>
+                    <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 0;">
+                        Quick visual overview of monthly & yearly capacity maintenance for the next 30 days (showing 15 days at a time). Click a cell to view details.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button onclick="shiftOutagesGrid(-15)" id="grid_prev_btn" style="background: #e2e8f0; color: #475569; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
+                        &larr; Prev 15 Days
+                    </button>
+                    <button onclick="shiftOutagesGrid(15)" id="grid_next_btn" style="background: #4f46e5; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">
+                        Next 15 Days &rarr;
+                    </button>
+                </div>
             </div>
 
-            <!-- Sub-Tab 1: Daily Price Matrix -->
-            <div id="CablesDaily" class="inner-cables-tabcontent" style="display:block;">
-                <h2>Cables Daily Price Matrix</h2>
-                <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly auction prices (€/MWh) for selected corridors. Use the sidebar controls to filter and select columns.</p>
-                
-                <div style="display: flex; gap: 24px; align-items: flex-start;">
-                    <!-- Left Sidebar -->
-                    <div style="width: 280px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-sizing: border-box;">
-                        <div style="margin-bottom: 20px;">
-                            <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Date</label>
-                            <input type="date" id="cables_matrix_date" onchange="renderCablesMatrix()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Filter by Country</label>
-                            <select id="cables_country_select" onchange="filterCablesCheckboxes()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                                <!-- populated dynamically -->
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Cables/Corridors</label>
-                                <div style="font-size: 11px;">
-                                    <a href="javascript:void(0)" onclick="toggleAllCables(true)" style="color: #4f46e5; font-weight: 600; text-decoration: none; margin-right: 8px;">All</a>
-                                    <a href="javascript:void(0)" onclick="toggleAllCables(false)" style="color: #6b7280; font-weight: 600; text-decoration: none;">None</a>
-                                </div>
-                            </div>
-                            <div id="cables_checkboxes_container" style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; background: white; box-sizing: border-box;">
-                                <!-- checkboxes populated dynamically -->
-                            </div>
+            <!-- Monthly/Yearly Filters -->
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                    <select id="matrix_country_filter" onchange="onMatrixCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                        <option value="ALL">All Countries</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
+                    <select id="matrix_corridor_filter" onchange="renderCableOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                        <option value="ALL">All Corridors</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
+                    <input type="checkbox" id="matrix_hide_full" onchange="renderCableOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
+                    <label for="matrix_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
+                </div>
+            </div>
+
+            <div id="cable_outages_grid_container" style="overflow-x: auto;">
+                <!-- Grid generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Outages Section -->
+    <div id="outages_daily_section" style="display: none;">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <h3 style="margin-top:0; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
+                🕒 Daily Outages
+            </h3>
+            <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 20px;">
+                Hourly view (1-24 hours) of daily capacity reductions for tomorrow (D+1). Green = 100% capacity, Orange = partial reduction, Red = total outage. Click a cell to view details.
+            </p>
+
+            <!-- Daily Filters -->
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                    <select id="daily_country_filter" onchange="onDailyCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                        <option value="ALL">All Countries</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
+                    <select id="daily_corridor_filter" onchange="renderCableDailyOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                        <option value="ALL">All Corridors</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
+                    <input type="checkbox" id="daily_hide_full" onchange="renderCableDailyOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
+                    <label for="daily_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
+                </div>
+            </div>
+
+            <div id="cable_outages_daily_grid_container" style="overflow-x: auto;">
+                <!-- Daily grid generated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Log Section -->
+    <div id="outages_search_section" style="display: none;">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <h3 style="margin-top:0; margin-bottom: 16px; font-size: 15px; font-weight: 700; color: #1e293b;">🔍 Advanced Search & Outage History Log</h3>
+            
+            <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 20px;">
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 250px; flex-grow: 1;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                    <select id="cable_outages_country_filter" onchange="selectedSearchCorridor = null; renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
+                        <option value="ALL">All Countries</option>
+                    </select>
+                    <div id="country_corridors_list" style="margin-top: 8px; font-size: 13px; color: #475569; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;"></div>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 160px;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Type</label>
+                    <select id="cable_outages_type_filter" onchange="onSearchTypeChange()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box; background: white;">
+                        <option value="ALL">All Types</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <option value="YEARLY">Yearly</option>
+                        <option value="DAILY">Daily</option>
+                    </select>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
+                    <input type="date" id="cable_outages_start_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
+                    <input type="date" id="cable_outages_end_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
+                </div>
+            </div>
+
+            <div class="table-container" style="max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                <table style="min-width: 100%; border-collapse: collapse; background: white;">
+                    <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
+                        <tr>
+                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Trade Date</th>
+                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Type</th>
+                            <th style="padding: 14px 16px; text-align: center; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Hour (Pos)</th>
+                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Corridor</th>
+                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Original NTC</th>
+                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Remaining Capacity</th>
+                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reduction</th>
+                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reason / Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cable_outages_body" style="font-weight: 500; font-size: 14px; color: #1e293b;">
+                        <!-- Dynamically populated -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 24px; align-items: flex-start;">
+        <!-- Grid Details Side Panel -->
+        <div id="cable_outages_detail_panel" style="width: 320px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: none; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <!-- Populate dynamically when a cell is clicked -->
+        </div>
+    </div>
+    </div> <!-- Closes CableOutages -->
+    </div> <!-- Closes Cables parent div -->
+
+
+        <!-- TAB: EU Map -->
+        <!-- EU Map Tab -->
+<div id="EUMap" class="tabcontent" style="display:none;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 8px;">
+        <div>
+            <h2 style="margin:0;">EU Day-Ahead Spot Prices</h2>
+            <p style="color:#6b7280;margin-top:6px;margin-bottom:0;font-size:14px;">Day-ahead market clearing prices by country &mdash; average &euro;/MWh. Click a country to see its 24h price profile.</p>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 18px;">
+            <label for="eumap_date" style="font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap;">&#128197; Date:</label>
+            <input type="date" id="eumap_date" onchange="renderEUMap()" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 12px; font-family: 'Inter'; font-size: 14px; color: #0f172a; font-weight: 600; background: white; cursor: pointer;">
+            <button onclick="euMapSetLatest()" style="background: #4f46e5; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Latest</button>
+        </div>
+    </div>
+
+    <!-- Date badge -->
+    <div id="eumap_date_badge" style="display:inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(79,70,229,0.25);">
+        <span>&#128197;</span><span id="eumap_date_label">&mdash;</span>
+    </div>
+
+    <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
+        <!-- Plotly Map container -->
+        <div style="flex: 1.8; min-width: 480px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div id="eumap_container" style="width: 100%; height: 560px;"></div>
+        </div>
+
+        <!-- Country detail panel -->
+        <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
+                <span style="font-size:48px;">&#128506;&#65039;</span>
+                <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
+            </div>
+            <div id="eumap_detail_content" style="display:none;">
+                <div id="eumap_detail_header" style="margin-bottom:14px;"></div>
+                <div id="eumap_hourly_chart" style="width:100%; height:300px;"></div>
+                <div id="eumap_hourly_stats" style="margin-top:12px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- TAB: Historical Analogues -->
+        <!-- Historical Analogues Tab -->
+<div id="Analogues" class="tabcontent" style="display:none;">
+    <h2>Historical Analogues</h2>
+    <p style="color:#6b7280;margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
+    <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+        <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
+            <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+        </div>
+        <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Country</label>
+            <select id="analogue_country" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+                <!-- populated by js -->
+            </select>
+        </div>
+        <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
+            <select id="analogue_lookback" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+                <option value="all">All Time</option>
+                <option value="2">2 Years</option>
+                <option value="1">1 Year</option>
+                <option value="0.5">6 Months</option>
+                <option value="0.25">3 Months</option>
+                <option value="0.083">1 Month</option>
+            </select>
+        </div>
+        
+        <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Weights</label>
+            <div style="display: flex; gap: 8px; background: white; padding: 6px 10px; border-radius: 8px; border: 1px solid #d1d5db; align-items: center; min-height: 38px; height: auto; box-sizing: border-box; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Residuals shape similarity">Res:</span>
+                    <input type="number" id="w_res" min="0" max="100" value="12" onchange="updateWeights('w_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="EUA Carbon price similarity">EUA:</span>
+                    <input type="number" id="w_eua" min="0" max="100" value="12" onchange="updateWeights('w_eua')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Residuals shape similarity">DE Res:</span>
+                    <input type="number" id="w_de_res" min="0" max="100" value="12" onchange="updateWeights('w_de_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Residuals shape similarity">BG Res:</span>
+                    <input type="number" id="w_bg_res" min="0" max="100" value="10" onchange="updateWeights('w_bg_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="TTF Gas price similarity">TTF:</span>
+                    <input type="number" id="w_ttf" min="0" max="100" value="12" onchange="updateWeights('w_ttf')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Prior Day Price shape similarity">GR Prior:</span>
+                    <input type="number" id="w_gr_prior" min="0" max="100" value="14" onchange="updateWeights('w_gr_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Prior Day Price shape similarity">DE Prior:</span>
+                    <input type="number" id="w_de_prior" min="0" max="100" value="14" onchange="updateWeights('w_de_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Prior Day Price shape similarity">BG Prior:</span>
+                    <input type="number" id="w_bg_prior" min="0" max="100" value="14" onchange="updateWeights('w_bg_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
+            </div>
+            <div id="weights_auto_label" style="font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 6px; min-height: 16px;"></div>
+        </div>
+        
+        <div style="margin-top: 26px;">
+            <button onclick="findAnalogues()" style="background: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Find Matches</button>
+        </div>
+    </div>
+    
+    <div id="analogues_results_container" style="display:none;">
+        <!-- Target Date Overview Panel -->
+        <div id="target_date_details_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+            <!-- Target details will be dynamically populated here -->
+        </div>
+        
+        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
+            <!-- Left Column: Matches list -->
+            <div style="flex: 1.3; min-width: 500px;">
+                <h3 style="margin-top: 0; color: #1f2937;">Top 13 Closest Matches</h3>
+                <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px; margin-top: -12px;">Click a match row to compare profiles and price curves.</p>
+                <div class="table-container">
+                    <table id="analogues_table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Date</th>
+                                <th>Combined</th>
+                                <th>Res</th>
+                                <th>EUA</th>
+                                <th>DE Res</th>
+                                <th>BG Res</th>
+                                <th>TTF</th>
+                                <th>GRp</th>
+                                <th>DEp</th>
+                                <th>BGp</th>
+                                <th>Avg. Price</th>
+                                <th>DE Price</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Right Column: Detail Panel -->
+            <div style="flex: 2; min-width: 500px;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                        <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 65%;">
+                            Zoom Comparison
+                        </h3>
+                        <div class="detail-tab" style="display: flex; gap: 4px;">
+                            <button class="detail-tablinks active" onclick="openDetailTab(event, 'comp_charts_tab')">📈 Charts</button>
+                            <button class="detail-tablinks" onclick="openDetailTab(event, 'comp_table_tab')">📋 Table</button>
                         </div>
                     </div>
                     
-                    <!-- Main Grid Panel -->
-                    <div style="flex-grow: 1; overflow-x: auto;">
-                        <div class="table-container" style="max-height: 650px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                            <table id="cables_matrix_table" style="min-width: 100%;">
-                                <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
-                                    <tr id="cables_matrix_head">
-                                        <!-- populated dynamically -->
+                    <!-- Tab 1: Comparison Charts -->
+                    <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
+                        <!-- Full-Width Prices Comparison -->
+                        <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
+                        <!-- Grid for Residuals & Demand Comparisons -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+                            <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                            <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                            <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                            <div id="plot_comp_demand" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tab 2: Hourly Values Table -->
+                    <div id="comp_table_tab" class="detail-tabcontent" style="display: none;">
+                        <div class="table-container" style="max-height: 520px; overflow-y: auto;">
+                            <table id="hourly_comp_table">
+                                <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
+                                    <tr>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Hour</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Target Res.</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Match Res.</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Target Dem.</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Match Dem.</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Target Price</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Match Price</th>
+                                        <th style="font-size: 10px; padding: 6px 8px;">Price Diff</th>
                                     </tr>
                                 </thead>
-                                <tbody id="cables_matrix_body" style="font-weight: 500;">
-                                    <!-- populated dynamically -->
-                                </tbody>
-                                <tfoot style="position: sticky; bottom: 0; background: #f8fafc; font-weight: 700; border-top: 2px solid #e2e8f0; z-index: 1;">
-                                    <tr id="cables_matrix_foot">
-                                        <!-- populated dynamically -->
-                                    </tr>
-                                </tfoot>
+                                <tbody style="font-size: 11px;"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Sub-Tab 2: Long-Term Cables -->
-            <div id="CablesLongTerm" class="inner-cables-tabcontent" style="display:none;">
-                <h2>Long-Term Capacity Cables</h2>
-                <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Monthly and Yearly transmission capacity allocations, clearing prices, and decision-support valuation metrics.</p>
-                
-                <!-- Corridor Tabs Row -->
-                <div id="long_cables_corridors_tabs" class="inner-tab" style="margin-bottom: 12px; gap: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
-                    <!-- Dynamically populated with corridor buttons -->
-                </div>
-
-                <!-- Horizon Tabs Row -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div id="long_cables_horizon_tabs" class="inner-tab" style="margin-bottom: 0; gap: 4px;">
-                        <button class="inner-tablinks active" id="long_cable_btn_monthly" onclick="changeLongCableHorizon(event, 'Monthly')">📅 Monthly</button>
-                        <button class="inner-tablinks" id="long_cable_btn_yearly" onclick="changeLongCableHorizon(event, 'Yearly')">⏳ Yearly</button>
-                    </div>
-                </div>
-
-                <!-- Main Panel for Long Term Cable Metrics -->
-                <div style="width: 100%;">
-                    <div id="long_cables_container">
-                        <!-- Dynamically generated split panel of periods list and valuation table -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-Tab 3: Cable Auctions Optimizer -->
-            <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-                    <div>
-                        <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
-                        <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:12px; width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;">
-                        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                            <div style="display:flex; flex-direction:column; gap:4px; min-width: 150px;">
-                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Country</label>
-                                <select id="auction_country_filter" onchange="onAuctionCountryFilterChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
-                                    <option value="ALL">All Countries</option>
-                                </select>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:4px; min-width:120px;">
-                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Product</label>
-                                <select id="auction_product_type" onchange="onAuctionProductTypeChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Yearly">Yearly</option>
-                                </select>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:4px; min-width:140px;">
-                                <label id="auction_date_label" style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Month</label>
-                                <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:4px; min-width:80px;">
-                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Volume (MW)</label>
-                                <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                            </div>
-                            <div style="display:flex; flex-direction:column; gap:4px; min-width:100px;">
-                                <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Risk Margin (€)</label>
-                                <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                            </div>
-                        </div>
-                        <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid #e2e8f0; padding-top:10px;">
-                            <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom: 2px;">Corridor</label>
-                            <div id="auction_corridors_list" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; min-height: 32px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- KPI Cards Row -->
-                <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
-                    <div class="chart-wrapper" style="padding:20px; margin:0;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
-                        <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
-                        <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
-                    </div>
-                    <div class="chart-wrapper" style="padding:20px; margin:0;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Win Probability</div>
-                        <div id="kpi_win_prob" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
-                        <div id="kpi_win_prob_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">at optimal bid</div>
-                    </div>
-                    <div class="chart-wrapper" style="padding:20px; margin:0;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
-                        <div id="kpi_ev" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
-                        <div style="font-size:12px; color:#6b7280; margin-top:6px;">/MWh shaped</div>
-                    </div>
-                    <div class="chart-wrapper" style="padding:20px; margin:0;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Total Exposure</div>
-                        <div id="kpi_exposure" style="font-size:32px; font-weight:700; color:#d97706; line-height:1;">—</div>
-                        <div id="kpi_exposure_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">MWh</div>
-                    </div>
-                    <div class="chart-wrapper" style="padding:20px; margin:0;">
-                        <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Financial Liability</div>
-                        <div id="kpi_liability" style="font-size:32px; font-weight:700; color:#7c3aed; line-height:1;">—</div>
-                        <div style="font-size:12px; color:#6b7280; margin-top:6px;">at bid price</div>
-                    </div>
-                </div>
-
-                <!-- Main Content: 2 columns -->
-                <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
-                    <div class="chart-wrapper" style="margin:0;">
-                        <h4 style="margin-top:0;">Bid Profit Curve</h4>
-                        <p id="auction_bid_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Historical demand curve: past clearing prices (€/MWh) vs cumulative allocated volume (MW). Red dashed = available capacity (ATC). Green dashed = optimal bid. The <strong>clearing point</strong> is where they intersect.</p>
-                        <div id="auction_bid_curve_chart" style="width:100%; height:300px;"></div>
-                    </div>
-                    <div class="chart-wrapper" style="margin:0; margin-top:16px;">
-                        <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
-                        <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread by hour. Gray = solar suppression. Used to compute E[V].</p>
-                        <div id="auction_spread_chart" style="width:100%; height:160px;"></div>
-                        <div id="historical_profile_toggles_container" style="margin-top: 8px; margin-bottom: 12px;"></div>
-                        <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:16px;">
-                        <div class="chart-wrapper" style="margin:0;">
-                            <h4 style="margin-top:0;">Fundamental Adjustments</h4>
-                            <div id="auction_adjustments" style="font-size:13px;"></div>
-                        </div>
-                        <div class="chart-wrapper" style="margin:0;">
-                            <h4 style="margin-top:0;">Forward Curve Context</h4>
-                            <div id="auction_fwd_chart" style="width:100%; height:180px;"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bottom: Historical Clearing + Active Outages -->
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-                    <div class="chart-wrapper" style="margin:0;">
-                        <h4 style="margin-top:0;">Historical Clearing Prices</h4>
-                        <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
-                        <div id="auction_clearing_chart" style="width:100%; height:350px;"></div>
-                    </div>
-                    <div class="chart-wrapper" style="margin:0;">
-                        <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
-                        <div id="auction_outages_table"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-Tab 4: Cable Outages -->
-            <div id="CableOutages" class="inner-cables-tabcontent" style="display:none;">
-                <h2>Cable Capacity Outages & Curtailments</h2>
-                <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
-            
-            <!-- Outage Views Sub-Toggle -->
-            <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
-                <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
-                <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🕒 Daily Outages</button>
-                <button class="inner-tablinks" id="btn_search_log" onclick="toggleOutagesGridView('search')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🔍 Outage History Log</button>
-            </div>
-
-            <!-- Monthly & Yearly Section -->
-            <div id="outages_matrix_section" style="display: block;">
-                <!-- 30-Day Outage Calendar Matrix -->
-                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
-                        <div>
-                            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                                📅 30-Day Outage Calendar Matrix
-                            </h3>
-                            <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 0;">
-                                Quick visual overview of monthly & yearly capacity maintenance for the next 30 days (showing 15 days at a time). Click a cell to view details.
-                            </p>
-                        </div>
-                        <div style="display: flex; gap: 8px; align-items: center;">
-                            <button onclick="shiftOutagesGrid(-15)" id="grid_prev_btn" style="background: #e2e8f0; color: #475569; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
-                                &larr; Prev 15 Days
-                            </button>
-                            <button onclick="shiftOutagesGrid(15)" id="grid_next_btn" style="background: #4f46e5; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">
-                                Next 15 Days &rarr;
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Monthly/Yearly Filters -->
-                    <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                            <select id="matrix_country_filter" onchange="onMatrixCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                                <option value="ALL">All Countries</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
-                            <select id="matrix_corridor_filter" onchange="renderCableOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                                <option value="ALL">All Corridors</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
-                            <input type="checkbox" id="matrix_hide_full" onchange="renderCableOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
-                            <label for="matrix_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
-                        </div>
-                    </div>
-
-                    <div id="cable_outages_grid_container" style="overflow-x: auto;">
-                        <!-- Grid generated dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Daily Outages Section -->
-            <div id="outages_daily_section" style="display: none;">
-                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin-top:0; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
-                        🕒 Daily Outages
-                    </h3>
-                    <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 20px;">
-                        Hourly view (1-24 hours) of daily capacity reductions for tomorrow (D+1). Green = 100% capacity, Orange = partial reduction, Red = total outage. Click a cell to view details.
-                    </p>
-
-                    <!-- Daily Filters -->
-                    <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                            <select id="daily_country_filter" onchange="onDailyCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                                <option value="ALL">All Countries</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
-                            <select id="daily_corridor_filter" onchange="renderCableDailyOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                                <option value="ALL">All Corridors</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
-                            <input type="checkbox" id="daily_hide_full" onchange="renderCableDailyOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
-                            <label for="daily_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
-                        </div>
-                    </div>
-
-                    <div id="cable_outages_daily_grid_container" style="overflow-x: auto;">
-                        <!-- Daily grid generated dynamically -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Search Log Section -->
-            <div id="outages_search_section" style="display: none;">
-                <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <h3 style="margin-top:0; margin-bottom: 16px; font-size: 15px; font-weight: 700; color: #1e293b;">🔍 Advanced Search & Outage History Log</h3>
-                    
-                    <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 250px; flex-grow: 1;">
-                            <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                            <select id="cable_outages_country_filter" onchange="selectedSearchCorridor = null; renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                                <option value="ALL">All Countries</option>
-                            </select>
-                            <div id="country_corridors_list" style="margin-top: 8px; font-size: 13px; color: #475569; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;"></div>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 160px;">
-                            <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Type</label>
-                            <select id="cable_outages_type_filter" onchange="onSearchTypeChange()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box; background: white;">
-                                <option value="ALL">All Types</option>
-                                <option value="MONTHLY">Monthly</option>
-                                <option value="YEARLY">Yearly</option>
-                                <option value="DAILY">Daily</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
-                            <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
-                            <input type="date" id="cable_outages_start_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
-                            <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
-                            <input type="date" id="cable_outages_end_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                        </div>
-                    </div>
-
-                    <div class="table-container" style="max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                        <table style="min-width: 100%; border-collapse: collapse; background: white;">
-                            <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
-                                <tr>
-                                    <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Trade Date</th>
-                                    <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Type</th>
-                                    <th style="padding: 14px 16px; text-align: center; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Hour (Pos)</th>
-                                    <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Corridor</th>
-                                    <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Original NTC</th>
-                                    <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Remaining Capacity</th>
-                                    <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reduction</th>
-                                    <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reason / Details</th>
-                                </tr>
-                            </thead>
-                            <tbody id="cable_outages_body" style="font-weight: 500; font-size: 14px; color: #1e293b;">
-                                <!-- Dynamically populated -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div style="display: flex; gap: 24px; align-items: flex-start;">
-                <!-- Grid Details Side Panel -->
-                <div id="cable_outages_detail_panel" style="width: 320px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: none; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <!-- Populate dynamically when a cell is clicked -->
-                </div>
-            </div>
-            </div> <!-- Closes CableOutages -->
-            </div> <!-- Closes Cables parent div -->
-
-        <!-- EU Map Tab -->
-        <div id="EUMap" class="tabcontent" style="display:none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 8px;">
-                <div>
-                    <h2 style="margin:0;">EU Day-Ahead Spot Prices</h2>
-                    <p style="color:#6b7280;margin-top:6px;margin-bottom:0;font-size:14px;">Day-ahead market clearing prices by country &mdash; average &euro;/MWh. Click a country to see its 24h price profile.</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 18px;">
-                    <label for="eumap_date" style="font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap;">&#128197; Date:</label>
-                    <input type="date" id="eumap_date" onchange="renderEUMap()" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 12px; font-family: 'Inter'; font-size: 14px; color: #0f172a; font-weight: 600; background: white; cursor: pointer;">
-                    <button onclick="euMapSetLatest()" style="background: #4f46e5; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Latest</button>
-                </div>
-            </div>
-
-            <!-- Date badge -->
-            <div id="eumap_date_badge" style="display:inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(79,70,229,0.25);">
-                <span>&#128197;</span><span id="eumap_date_label">&mdash;</span>
-            </div>
-
-            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
-                <!-- Plotly Map container -->
-                <div style="flex: 1.8; min-width: 480px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <div id="eumap_container" style="width: 100%; height: 560px;"></div>
-                </div>
-
-                <!-- Country detail panel -->
-                <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
-                        <span style="font-size:48px;">&#128506;&#65039;</span>
-                        <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
-                    </div>
-                    <div id="eumap_detail_content" style="display:none;">
-                        <div id="eumap_detail_header" style="margin-bottom:14px;"></div>
-                        <div id="eumap_hourly_chart" style="width:100%; height:300px;"></div>
-                        <div id="eumap_hourly_stats" style="margin-top:12px;"></div>
-                    </div>
-                </div>
-            </div>
         </div>
+    </div>
+</div>
 
-        <!-- Historical Analogues Tab -->
-<div id="Analogues" class="tabcontent" style="display:none;">
-        <h2>Historical Analogues</h2>
-        <p style="color:#6b7280;margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
-                <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-            </div>
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Country</label>
-                <select id="analogue_country" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-                    <!-- populated by js -->
-                </select>
-            </div>
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
-                <select id="analogue_lookback" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-                    <option value="all">All Time</option>
-                    <option value="2">2 Years</option>
-                    <option value="1">1 Year</option>
-                    <option value="0.5">6 Months</option>
-                    <option value="0.25">3 Months</option>
-                    <option value="0.083">1 Month</option>
-                </select>
-            </div>
-            
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Weights</label>
-                <div style="display: flex; gap: 8px; background: white; padding: 6px 10px; border-radius: 8px; border: 1px solid #d1d5db; align-items: center; min-height: 38px; height: auto; box-sizing: border-box; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Residuals shape similarity">Res:</span>
-                        <input type="number" id="w_res" min="0" max="100" value="12" onchange="updateWeights('w_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="EUA Carbon price similarity">EUA:</span>
-                        <input type="number" id="w_eua" min="0" max="100" value="12" onchange="updateWeights('w_eua')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Residuals shape similarity">DE Res:</span>
-                        <input type="number" id="w_de_res" min="0" max="100" value="12" onchange="updateWeights('w_de_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Residuals shape similarity">BG Res:</span>
-                        <input type="number" id="w_bg_res" min="0" max="100" value="10" onchange="updateWeights('w_bg_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="TTF Gas price similarity">TTF:</span>
-                        <input type="number" id="w_ttf" min="0" max="100" value="12" onchange="updateWeights('w_ttf')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Prior Day Price shape similarity">GR Prior:</span>
-                        <input type="number" id="w_gr_prior" min="0" max="100" value="14" onchange="updateWeights('w_gr_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Prior Day Price shape similarity">DE Prior:</span>
-                        <input type="number" id="w_de_prior" min="0" max="100" value="14" onchange="updateWeights('w_de_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Prior Day Price shape similarity">BG Prior:</span>
-                        <input type="number" id="w_bg_prior" min="0" max="100" value="14" onchange="updateWeights('w_bg_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                </div>
-                <div id="weights_auto_label" style="font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 6px; min-height: 16px;"></div>
-            </div>
-            
-            <div style="margin-top: 26px;">
-                <button onclick="findAnalogues()" style="background: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Find Matches</button>
-            </div>
-        </div>
-        
-        <div id="analogues_results_container" style="display:none;">
-            <!-- Target Date Overview Panel -->
-            <div id="target_date_details_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                <!-- Target details will be dynamically populated here -->
-            </div>
-            
-            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-                <!-- Left Column: Matches list -->
-                <div style="flex: 1.3; min-width: 500px;">
-                    <h3 style="margin-top: 0; color: #1f2937;">Top 13 Closest Matches</h3>
-                    <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px; margin-top: -12px;">Click a match row to compare profiles and price curves.</p>
-                    <div class="table-container">
-                        <table id="analogues_table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Date</th>
-                                    <th>Combined</th>
-                                    <th>Res</th>
-                                    <th>EUA</th>
-                                    <th>DE Res</th>
-                                    <th>BG Res</th>
-                                    <th>TTF</th>
-                                    <th>GRp</th>
-                                    <th>DEp</th>
-                                    <th>BGp</th>
-                                    <th>Avg. Price</th>
-                                    <th>DE Price</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Right Column: Detail Panel -->
-                <div style="flex: 2; min-width: 500px;">
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                            <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 65%;">
-                                Zoom Comparison
-                            </h3>
-                            <div class="detail-tab" style="display: flex; gap: 4px;">
-                                <button class="detail-tablinks active" onclick="openDetailTab(event, 'comp_charts_tab')">📈 Charts</button>
-                                <button class="detail-tablinks" onclick="openDetailTab(event, 'comp_table_tab')">📋 Table</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Tab 1: Comparison Charts -->
-                        <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
-                            <!-- Full-Width Prices Comparison -->
-                            <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
-                            <!-- Grid for Residuals & Demand Comparisons -->
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                                <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_demand" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tab 2: Hourly Values Table -->
-                        <div id="comp_table_tab" class="detail-tabcontent" style="display: none;">
-                            <div class="table-container" style="max-height: 520px; overflow-y: auto;">
-                                <table id="hourly_comp_table">
-                                    <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
-                                        <tr>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Hour</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Res.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Res.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Dem.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Dem.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Price</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Price</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Price Diff</th>
-        <!-- EU Map Tab -->
-        <div id="EUMap" class="tabcontent" style="display:none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 8px;">
-                <div>
-                    <h2 style="margin:0;">EU Day-Ahead Spot Prices</h2>
-                    <p style="color:#6b7280;margin-top:6px;margin-bottom:0;font-size:14px;">Day-ahead market clearing prices by country &mdash; average &euro;/MWh. Click a country to see its 24h price profile.</p>
-                </div>
-                <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px 18px;">
-                    <label for="eumap_date" style="font-weight: 700; font-size: 13px; color: #374151; white-space: nowrap;">&#128197; Date:</label>
-                    <input type="date" id="eumap_date" onchange="renderEUMap()" style="border: 1px solid #cbd5e1; border-radius: 8px; padding: 7px 12px; font-family: 'Inter'; font-size: 14px; color: #0f172a; font-weight: 600; background: white; cursor: pointer;">
-                    <button onclick="euMapSetLatest()" style="background: #4f46e5; color: white; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Latest</button>
-                </div>
-            </div>
 
-            <!-- Date badge -->
-            <div id="eumap_date_badge" style="display:inline-flex; align-items: center; gap: 8px; background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; border-radius: 20px; padding: 6px 16px; font-size: 13px; font-weight: 700; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(79,70,229,0.25);">
-                <span>&#128197;</span><span id="eumap_date_label">&mdash;</span>
-            </div>
-
-            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
-                <!-- Plotly Map container -->
-                <div style="flex: 1.8; min-width: 480px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <div id="eumap_container" style="width: 100%; height: 560px;"></div>
-                </div>
-
-                <!-- Country detail panel -->
-                <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-                    <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
-                        <span style="font-size:48px;">&#128506;&#65039;</span>
-                        <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
-                    </div>
-                    <div id="eumap_detail_content" style="display:none;">
-                        <div id="eumap_detail_header" style="margin-bottom:14px;"></div>
-                        <div id="eumap_hourly_chart" style="width:100%; height:300px;"></div>
-                        <div id="eumap_hourly_stats" style="margin-top:12px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Historical Analogues Tab -->
-<div id="Analogues" class="tabcontent" style="display:none;">
-        <h2>Historical Analogues</h2>
-        <p style="color:#6b7280;margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
-                <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-            </div>
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Country</label>
-                <select id="analogue_country" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-                    <!-- populated by js -->
-                </select>
-            </div>
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
-                <select id="analogue_lookback" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-                    <option value="all">All Time</option>
-                    <option value="2">2 Years</option>
-                    <option value="1">1 Year</option>
-                    <option value="0.5">6 Months</option>
-                    <option value="0.25">3 Months</option>
-                    <option value="0.083">1 Month</option>
-                </select>
-            </div>
-            
-            <div>
-                <label style="font-weight: 600; display: block; margin-bottom: 8px;">Weights</label>
-                <div style="display: flex; gap: 8px; background: white; padding: 6px 10px; border-radius: 8px; border: 1px solid #d1d5db; align-items: center; min-height: 38px; height: auto; box-sizing: border-box; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); flex-wrap: wrap;">
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Residuals shape similarity">Res:</span>
-                        <input type="number" id="w_res" min="0" max="100" value="12" onchange="updateWeights('w_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="EUA Carbon price similarity">EUA:</span>
-                        <input type="number" id="w_eua" min="0" max="100" value="12" onchange="updateWeights('w_eua')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Residuals shape similarity">DE Res:</span>
-                        <input type="number" id="w_de_res" min="0" max="100" value="12" onchange="updateWeights('w_de_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Residuals shape similarity">BG Res:</span>
-                        <input type="number" id="w_bg_res" min="0" max="100" value="10" onchange="updateWeights('w_bg_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="TTF Gas price similarity">TTF:</span>
-                        <input type="number" id="w_ttf" min="0" max="100" value="12" onchange="updateWeights('w_ttf')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Target Country Prior Day Price shape similarity">GR Prior:</span>
-                        <input type="number" id="w_gr_prior" min="0" max="100" value="14" onchange="updateWeights('w_gr_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Germany Prior Day Price shape similarity">DE Prior:</span>
-                        <input type="number" id="w_de_prior" min="0" max="100" value="14" onchange="updateWeights('w_de_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 2px;">
-                        <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Bulgarian Prior Day Price shape similarity">BG Prior:</span>
-                        <input type="number" id="w_bg_prior" min="0" max="100" value="14" onchange="updateWeights('w_bg_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
-                        <span style="font-size: 11px; color: #6b7280;">%</span>
-                    </div>
-                </div>
-                <div id="weights_auto_label" style="font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 6px; min-height: 16px;"></div>
-            </div>
-            
-            <div style="margin-top: 26px;">
-                <button onclick="findAnalogues()" style="background: #4f46e5; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Find Matches</button>
-            </div>
-        </div>
-        
-        <div id="analogues_results_container" style="display:none;">
-            <!-- Target Date Overview Panel -->
-            <div id="target_date_details_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                <!-- Target details will be dynamically populated here -->
-            </div>
-            
-            <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-                <!-- Left Column: Matches list -->
-                <div style="flex: 1.3; min-width: 500px;">
-                    <h3 style="margin-top: 0; color: #1f2937;">Top 13 Closest Matches</h3>
-                    <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px; margin-top: -12px;">Click a match row to compare profiles and price curves.</p>
-                    <div class="table-container">
-                        <table id="analogues_table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Date</th>
-                                    <th>Combined</th>
-                                    <th>Res</th>
-                                    <th>EUA</th>
-                                    <th>DE Res</th>
-                                    <th>BG Res</th>
-                                    <th>TTF</th>
-                                    <th>GRp</th>
-                                    <th>DEp</th>
-                                    <th>BGp</th>
-                                    <th>Avg. Price</th>
-                                    <th>DE Price</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Right Column: Detail Panel -->
-                <div style="flex: 2; min-width: 500px;">
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                            <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 65%;">
-                                Zoom Comparison
-                            </h3>
-                            <div class="detail-tab" style="display: flex; gap: 4px;">
-                                <button class="detail-tablinks active" onclick="openDetailTab(event, 'comp_charts_tab')">📈 Charts</button>
-                                <button class="detail-tablinks" onclick="openDetailTab(event, 'comp_table_tab')">📋 Table</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Tab 1: Comparison Charts -->
-                        <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
-                            <!-- Full-Width Prices Comparison -->
-                            <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
-                            <!-- Grid for Residuals & Demand Comparisons -->
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                                <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                                <div id="plot_comp_demand" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tab 2: Hourly Values Table -->
-                        <div id="comp_table_tab" class="detail-tabcontent" style="display: none;">
-                            <div class="table-container" style="max-height: 520px; overflow-y: auto;">
-                                <table id="hourly_comp_table">
-                                    <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
-                                        <tr>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Hour</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Res.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Res.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Dem.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Dem.</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Target Price</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Match Price</th>
-                                            <th style="font-size: 10px; padding: 6px 8px;">Price Diff</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody style="font-size: 11px;"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-         </div>
-         
         <script>
-            // Tab switching logic
+            // === core.js ===
+﻿// Tab switching logic
             function openTab(evt, tabName) {
                 document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
                 document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
@@ -8782,6 +8574,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             }
 
 
+// === tab_eumap.js ===
+﻿
 // =====================================================================
 // EU MAP TAB — Day-Ahead Spot Price Choropleth (Plotly)
 // =====================================================================
@@ -9239,6 +9033,8 @@ function renderEUMapCountryDetail(dataKey, date) {
             });
 
 
+// === tab_cables_auctions.js ===
+﻿
 // ============================================================
 // CABLE AUCTIONS TAB ??? BIDDING OPTIMIZER
 // ============================================================
@@ -9796,7 +9592,9 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
     </table></div>`;
 }
 
-// =====================================================================
+
+// === tab_analogues.js ===
+﻿// =====================================================================
 // INTERCONNECTOR ARBITRAGE & FLOWS ENGINE (341-D GLOBAL MATCH)
 // =====================================================================
 
@@ -9967,7 +9765,6 @@ function openDetailTab(event, tabId) {
 
 
 
-
         </script>
     </body>
-    </html>
+</html>
