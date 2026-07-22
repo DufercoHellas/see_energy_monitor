@@ -7832,10 +7832,10 @@ function traversePaths(current, path, visited) {
 function isValidPathCBAM(path) {
                 const start = path[0].to;
                 const end = path[path.length - 1].to;
+                if (start === 'AL' || end === 'AL') return true; // AL unrestricted — all day
                 const startIsEU = countryEU[start] || false;
                 const endIsEU = countryEU[end] || false;
                 if (!startIsEU && endIsEU) return false; // Non-EU -> EU
-                if (start === 'AL' || end === 'AL') return false; // Albania trading restrictions
                 return true;
             }
             const cbamCompliantPaths = allTopologyPaths.filter(isValidPathCBAM);
@@ -8391,8 +8391,8 @@ function renderArbitragePanel() {
 
                 profitableHoursCount = uniqueProfitableHours.size;
 
-                // --- Calculate Special MK Peak/Middle Hours Trades (starting from MK to anywhere, excluding AL destination) ---
-                const mkPaths = allTopologyPaths.filter(p => p[0].to === 'MK' && p[p.length - 1].to !== 'AL');
+                // --- Calculate Special MK Peak/Middle Hours Trades (starting from MK to anywhere) ---
+                const mkPaths = allTopologyPaths.filter(p => p[0].to === 'MK');
                 const mkTrades = [];
 
                 mkPaths.forEach(path => {
