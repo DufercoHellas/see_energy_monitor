@@ -1207,6 +1207,58 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
     </div>
+
+    <!-- Interconnector Arbitrage & Spreads Panel -->
+    <div id="arbitrage_opportunities_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h3 style="margin: 0; color: #1e293b; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">⚡</span> Interconnector Arbitrage & Spreads Prediction (Day-Ahead)
+                </h3>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
+                    Calculates and routes optimal cross-border power flows using an inverse-distance weighted average of the top N analogues (best match = most weight). Filters out Non-EU ➔ EU imports (CBAM compliance).
+                </p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="arbitrage_top_n" style="font-size: 13px; font-weight: 600; color: #475569;">Top Matches:</label>
+                    <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; color: #0f172a; background: #fff; cursor: pointer;">
+                        <option value="1">Top 1</option>
+                        <option value="3" selected>Top 3</option>
+                        <option value="5">Top 5</option>
+                    </select>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="arbitrage_min_spread" style="font-size: 13px; font-weight: 600; color: #475569;">Min Net Margin:</label>
+                    <input type="number" id="arbitrage_min_spread" value="5" min="0" step="5" style="width: 70px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center;" onchange="renderArbitragePanel()">
+                    <span style="font-size: 13px; font-weight: 600; color: #64748b;">€/MWh</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Arbitrage Windows</h4>
+                <p id="arb_stat_windows" style="margin: 0; font-size: 24px; font-weight: 700; color: #0f172a;">0 / 24 hrs</p>
+                <p id="arb_stat_windows_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Hours exceeding threshold</p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Max Net Margin</h4>
+                <p id="arb_stat_max_spread" style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981;">0.00 €/MWh</p>
+                <p id="arb_stat_max_spread_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">No path found</p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; grid-column: span 2;">
+                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Recommended Strategy</h4>
+                <p id="arb_stat_strategy" style="margin: 0; font-size: 14px; font-weight: 600; color: #334155; line-height: 1.5;">Select or find matches to run the prediction engine.</p>
+            </div>
+        </div>
+
+        <!-- Route Cards Container -->
+        <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="padding: 32px; text-align: center; color: #94a3b8; font-size: 14px;">No data available. Run match search first.</div>
+        </div>
+    </div>
 </div>
 
 
