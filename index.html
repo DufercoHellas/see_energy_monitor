@@ -8452,16 +8452,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 }
                             }
                             let realizedCell = '<span style="color:#94a3b8;">—</span>';
-                            const rSrc = getRealizedPriceWithFallback(group.start, res.hour, targetDate);
-                            const rDst = getRealizedPriceWithFallback(group.end, res.hour, targetDate);
-                            if (rSrc > 0.01 && rDst > 0.01) {
-                                let realCable = 0.0;
-                                for (let idx = 1; idx < cor.path.length; idx++) {
-                                    if (cor.path[idx].cable) realCable += getCablePrice(cor.path[idx].cable, res.hour, targetDate);
+                            if (historicalData[group.start]?.[targetDate] && historicalData[group.end]?.[targetDate]) {
+                                const rSrc = (historicalData[group.start][targetDate].prices || [])[res.hour];
+                                const rDst = (historicalData[group.end][targetDate].prices || [])[res.hour];
+                                if (rSrc > 0.01 && rDst > 0.01) {
+                                    let realCable = 0.0;
+                                    for (let idx = 1; idx < cor.path.length; idx++) {
+                                        if (cor.path[idx].cable) realCable += getCablePrice(cor.path[idx].cable, res.hour, targetDate);
+                                    }
+                                    const realNet = (rDst - rSrc) - realCable;
+                                    const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                    realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                                 }
-                                const realNet = (rDst - rSrc) - realCable;
-                                const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
-                                realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                             }
                             const isBestForHour = bestByHour[res.hour]?.corridorKey === cor.routeKey;
                             const mCol = marginColour(res.netMargin, null);
@@ -8674,16 +8676,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             const rowBg = isPVHour ? 'background:#fffbeb;' : '';
                             
                             let realizedCell = '<span style="color:#94a3b8;">—</span>';
-                            const rSrc = getRealizedPriceWithFallback(trade.start, hd.hour, targetDate);
-                            const rDst = getRealizedPriceWithFallback(trade.end, hd.hour, targetDate);
-                            if (rSrc > 0.01 && rDst > 0.01) {
-                                let realCable = 0.0;
-                                for (let idx = 1; idx < trade.path.length; idx++) {
-                                    if (trade.path[idx].cable) realCable += getCablePrice(trade.path[idx].cable, hd.hour, targetDate);
+                            if (historicalData[trade.start]?.[targetDate] && historicalData[trade.end]?.[targetDate]) {
+                                const rSrc = (historicalData[trade.start][targetDate].prices || [])[hd.hour];
+                                const rDst = (trade.end === 'DE_LU' && historicalData['DE']?.[targetDate]?.prices ? (historicalData['DE'][targetDate].prices || [])[hd.hour] : (historicalData[trade.end]?.[targetDate]?.prices || [])[hd.hour]);
+                                if (rSrc > 0.01 && rDst > 0.01) {
+                                    let realCable = 0.0;
+                                    for (let idx = 1; idx < trade.path.length; idx++) {
+                                        if (trade.path[idx].cable) realCable += getCablePrice(trade.path[idx].cable, hd.hour, targetDate);
+                                    }
+                                    const realNet = (rDst - rSrc) - realCable;
+                                    const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                    realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                                 }
-                                const realNet = (rDst - rSrc) - realCable;
-                                const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
-                                realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                             }
                             const mCol = mkMarginColour(hd.net, null);
                             detailRows += `<tr style="border-bottom:1px solid #f1f5f9;${rowBg}">
@@ -8736,10 +8740,99 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     mkHtml += `</div></div>`;
                 }
 
+                // Local Storage key for saving predicted trade routes per target date
+                const PREDICTION_LOCK_KEY = "see_trade_predictions_history";
+                function getSavedPredictions() {
+                    try { return JSON.parse(localStorage.getItem(PREDICTION_LOCK_KEY) || "{}"); } catch(e) { return {}; }
+                }
+                function savePrediction(date, data) {
+                    try {
+                        const history = getSavedPredictions();
+                        if (!history[date]) {
+                            history[date] = data;
+                            localStorage.setItem(PREDICTION_LOCK_KEY, JSON.stringify(history));
+                        }
+                    } catch(e) {}
+                }
+
+                // Lock predictions for past dates or freeze current predictions
+                const isPastDate = (function() {
+                    if (!targetDate) return false;
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    return targetDate < `${yyyy}-${mm}-${dd}`;
+                })();
+
+                const savedHistory = getSavedPredictions();
+                let groupKeysToDisplay = Object.keys(routeGroups);
+
+                if (isPastDate && savedHistory[targetDate]) {
+                    groupKeysToDisplay = savedHistory[targetDate];
+                } else if (groupKeysToDisplay.length > 0) {
+                    savePrediction(targetDate, groupKeysToDisplay);
+                }
+
+                // Section: Top 2 Realized Winners at the VERY BOTTOM (Only for Past Dates)
+                let topWinnersHtml = '';
+                if (isPastDate) {
+                    const allRealizedEvaluations = [];
+                    cbamCompliantPaths.forEach(path => {
+                        const start = path[0].to;
+                        const end = path[path.length - 1].to;
+                        let totalRealNet = 0;
+                        let validHours = 0;
+                        for (let h = 0; h < 24; h++) {
+                            const rSrc = getRealizedPriceWithFallback(start, h, targetDate);
+                            const rDst = getRealizedPriceWithFallback(end, h, targetDate);
+                            if (rSrc > 0.01 && rDst > 0.01) {
+                                let cable = 0;
+                                for (let idx = 1; idx < path.length; idx++) {
+                                    if (path[idx].cable) cable += getCablePrice(path[idx].cable, h, targetDate);
+                                }
+                                totalRealNet += (rDst - rSrc) - cable;
+                                validHours++;
+                            }
+                        }
+                        if (validHours >= 3) {
+                            const avgRealNet = totalRealNet / validHours;
+                            const routeName = path.map(p => p.to).join(' ➔ ');
+                            allRealizedEvaluations.push({ routeName, avgRealNet, validHours });
+                        }
+                    });
+
+                    allRealizedEvaluations.sort((a, b) => b.avgRealNet - a.avgRealNet);
+                    const top2Winners = allRealizedEvaluations.slice(0, 2);
+
+                    if (top2Winners.length > 0) {
+                        topWinnersHtml += `
+                        <div style="margin-top: 32px; border-top: 3px double #cbd5e1; padding-top: 20px;">
+                            <h4 style="margin: 0 0 14px 0; color: #065f46; font-size: 16px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+                                <span style="font-size: 20px;">🏆</span> Top 2 Realized Market Winners (${targetDate})
+                            </h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">`;
+
+                        top2Winners.forEach((w, wi) => {
+                            const wCol = w.avgRealNet >= 0 ? '#059669' : '#dc2626';
+                            topWinnersHtml += `
+                            <div style="background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                                    <span style="font-weight:800;font-size:14px;color:#064e3b;">#${wi+1} ${w.routeName}</span>
+                                    <span style="font-weight:800;font-size:16px;color:${wCol};">${w.avgRealNet.toFixed(2)} €/MWh</span>
+                                </div>
+                                <div style="font-size:11px;color:#047857;font-weight:600;">Profitable Hours: ${w.validHours}/24</div>
+                            </div>`;
+                        });
+
+                        topWinnersHtml += `</div></div>`;
+                    }
+                }
+
                 if (cardsHtml === '') {
-                    container.innerHTML = `<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</div>` + mkHtml;
+                    container.innerHTML = `<div style="padding:32px;text-align:center;color:#94a3b8;font-size:14px;">No arbitrage opportunities found with net margin ≥ ${threshold} €/MWh.</div>` + mkHtml + topWinnersHtml;
                 } else {
-                    container.innerHTML = cardsHtml + mkHtml;
+                    container.innerHTML = cardsHtml + mkHtml + topWinnersHtml;
                 }
 
                 // Update summary stats
@@ -8747,7 +8840,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 if (maxSpreadVal > -900) {
                     document.getElementById("arb_stat_max_spread").innerText = `${maxSpreadVal.toFixed(2)} €/MWh`;
                     document.getElementById("arb_stat_max_spread_sub").innerText = `Top path: ${bestPathDesc}`;
-                document.getElementById("arb_stat_strategy").innerHTML = `Import/Export opportunities active. Focus flows via: <br><strong style="color:#4f46e5;">${bestPathDesc}</strong>`;
+                    document.getElementById("arb_stat_strategy").innerHTML = `Import/Export opportunities active. Focus flows via: <br><strong style="color:#4f46e5;">${bestPathDesc}</strong>`;
                 } else {
                     document.getElementById("arb_stat_max_spread").innerText = `0.00 €/MWh`;
                     document.getElementById("arb_stat_max_spread_sub").innerText = `No path found`;
