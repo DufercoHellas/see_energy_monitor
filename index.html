@@ -9019,24 +9019,21 @@ function renderEUMapCountryDetail(dataKey, date) {
                 document.getElementById("outages_start_date").value = formatD(outagesStart);
                 document.getElementById("outages_end_date").value = formatD(outagesEnd);
                 
-                document.getElementById("analogue_date").value = formatD(start);
-                document.getElementById("analogue_date").addEventListener("change", () => applyOptimizedWeights());
+                const analogueDateEl = document.getElementById("analogue_date");
+                if (analogueDateEl) {
+                    analogueDateEl.value = formatD(start);
+                    analogueDateEl.addEventListener("change", () => applyOptimizedWeights());
+                }
 
-                document.getElementById("arb_analogue_date").value = formatD(start);
-                document.getElementById("arb_analogue_date").addEventListener("change", () => {
-                    document.getElementById("analogue_date").value = document.getElementById("arb_analogue_date").value;
-                    applyOptimizedWeights();
-                });
-                
                 // Start asynchronous data fetch
                 initDashboardData();
             });
 
 
-// === tab_cables_auctions.js ===
-
 // ============================================================
 // CABLE AUCTIONS TAB ??? BIDDING OPTIMIZER
+
+// === tab_cables_auctions.js ===
 // ============================================================
 
 function initAuctionTab() {
@@ -9592,11 +9589,11 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
     </table></div>`;
 }
 
-
-// === tab_analogues.js ===
 // =====================================================================
 // INTERCONNECTOR ARBITRAGE & FLOWS ENGINE (341-D GLOBAL MATCH)
 // =====================================================================
+
+// === tab_analogues.js ===
 
 const arbitrageWeights = {
     "ttf": 0.1362,
