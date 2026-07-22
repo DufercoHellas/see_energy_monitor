@@ -164,7 +164,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 11:38</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 11:43</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -196,7 +196,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
             <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
             <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
-            <button class="tablinks" onclick="openTab(event, 'ArbitrageTab')">🔗 Arbitrage & Flows</button>
         </div>
         
         <div id="Residuals" class="tabcontent" style="display:block;">
@@ -661,7 +660,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
             <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
                 <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
-                <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CablesLongTerm')">⏳ Long-Term Cables</button>
                 <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
                 <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
             </div>
@@ -719,32 +717,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 </tfoot>
                             </table>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub-Tab 2: Long-Term Cables -->
-            <div id="CablesLongTerm" class="inner-cables-tabcontent" style="display:none;">
-                <h2>Long-Term Capacity Cables</h2>
-                <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Monthly and Yearly transmission capacity allocations, clearing prices, and decision-support valuation metrics.</p>
-                
-                <!-- Corridor Tabs Row -->
-                <div id="long_cables_corridors_tabs" class="inner-tab" style="margin-bottom: 12px; gap: 6px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
-                    <!-- Dynamically populated with corridor buttons -->
-                </div>
-
-                <!-- Horizon Tabs Row -->
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div id="long_cables_horizon_tabs" class="inner-tab" style="margin-bottom: 0; gap: 4px;">
-                        <button class="inner-tablinks active" id="long_cable_btn_monthly" onclick="changeLongCableHorizon(event, 'Monthly')">📅 Monthly</button>
-                        <button class="inner-tablinks" id="long_cable_btn_yearly" onclick="changeLongCableHorizon(event, 'Yearly')">⏳ Yearly</button>
-                    </div>
-                </div>
-
-                <!-- Main Panel for Long Term Cable Metrics -->
-                <div style="width: 100%;">
-                    <div id="long_cables_container">
-                        <!-- Dynamically generated split panel of periods list and valuation table -->
                     </div>
                 </div>
             </div>
