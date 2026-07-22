@@ -164,27 +164,27 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 15:03</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 10:39</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 06:18</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:27</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 12:02</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:36</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 04:10</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 04:10</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 06:27</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:36</td>
                     </tr>
                     <tr>
                         <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
-                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-21 06:29</td>
+                        <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-22 07:37</td>
                     </tr>
                 </table>
             </div>
@@ -8452,18 +8452,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 }
                             }
                             let realizedCell = '<span style="color:#94a3b8;">—</span>';
-                            if (historicalData[group.start]?.[targetDate] && historicalData[group.end]?.[targetDate]) {
-                                const rSrc = (historicalData[group.start][targetDate].prices || [])[res.hour];
-                                const rDst = (historicalData[group.end][targetDate].prices || [])[res.hour];
-                                if (rSrc > 0.01 && rDst > 0.01) {
-                                    let realCable = 0.0;
-                                    for (let idx = 1; idx < cor.path.length; idx++) {
-                                        if (cor.path[idx].cable) realCable += getCablePrice(cor.path[idx].cable, res.hour, targetDate);
-                                    }
-                                    const realNet = (rDst - rSrc) - realCable;
-                                    const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
-                                    realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
+                            const rSrc = getRealizedPriceWithFallback(group.start, res.hour, targetDate);
+                            const rDst = getRealizedPriceWithFallback(group.end, res.hour, targetDate);
+                            if (rSrc > 0.01 && rDst > 0.01) {
+                                let realCable = 0.0;
+                                for (let idx = 1; idx < cor.path.length; idx++) {
+                                    if (cor.path[idx].cable) realCable += getCablePrice(cor.path[idx].cable, res.hour, targetDate);
                                 }
+                                const realNet = (rDst - rSrc) - realCable;
+                                const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                             }
                             const isBestForHour = bestByHour[res.hour]?.corridorKey === cor.routeKey;
                             const mCol = marginColour(res.netMargin, null);
@@ -8676,18 +8674,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                             const rowBg = isPVHour ? 'background:#fffbeb;' : '';
                             
                             let realizedCell = '<span style="color:#94a3b8;">—</span>';
-                            if (historicalData[trade.start]?.[targetDate] && historicalData[trade.end]?.[targetDate]) {
-                                const rSrc = (historicalData[trade.start][targetDate].prices || [])[hd.hour];
-                                const rDst = (trade.end === 'DE_LU' && historicalData['DE']?.[targetDate]?.prices ? (historicalData['DE'][targetDate].prices || [])[hd.hour] : (historicalData[trade.end]?.[targetDate]?.prices || [])[hd.hour]);
-                                if (rSrc > 0.01 && rDst > 0.01) {
-                                    let realCable = 0.0;
-                                    for (let idx = 1; idx < trade.path.length; idx++) {
-                                        if (trade.path[idx].cable) realCable += getCablePrice(trade.path[idx].cable, hd.hour, targetDate);
-                                    }
-                                    const realNet = (rDst - rSrc) - realCable;
-                                    const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
-                                    realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
+                            const rSrc = getRealizedPriceWithFallback(trade.start, hd.hour, targetDate);
+                            const rDst = getRealizedPriceWithFallback(trade.end, hd.hour, targetDate);
+                            if (rSrc > 0.01 && rDst > 0.01) {
+                                let realCable = 0.0;
+                                for (let idx = 1; idx < trade.path.length; idx++) {
+                                    if (trade.path[idx].cable) realCable += getCablePrice(trade.path[idx].cable, hd.hour, targetDate);
                                 }
+                                const realNet = (rDst - rSrc) - realCable;
+                                const rcol = realNet >= 0 ? '#10b981' : '#ef4444';
+                                realizedCell = `<span style="font-weight:700;color:${rcol};">${realNet.toFixed(2)} €</span>`;
                             }
                             const mCol = mkMarginColour(hd.net, null);
                             detailRows += `<tr style="border-bottom:1px solid #f1f5f9;${rowBg}">
