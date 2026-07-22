@@ -1140,6 +1140,16 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     </div>
     
     <div id="analogues_results_container" style="display:none;">
+        <!-- ── Net Margin Summary ── -->
+        <div id="margin_summary_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px 20px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: none;">
+            <h4 style="margin: 0 0 10px 0; font-size: 13px; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 16px;">📊</span> Net Margin Summary
+            </h4>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;" id="margin_summary_body">
+                <!-- populated by JS -->
+            </div>
+        </div>
+
         <!-- ── Target Date Overview ── -->
         <div id="target_date_details_panel" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <!-- Dynamically populated -->
@@ -5961,6 +5971,7 @@ function renderArbitragePanel() {
                 // Build a unique card ID prefix for toggling
                 let cardIdx = 0;
                 let cardsHtml = '';
+                const allRouteMg = []; // collect margins for summary
 
                 sortedGroups.forEach(group => {
                     const corridorList = Object.values(group.corridors);
@@ -5977,6 +5988,13 @@ function renderArbitragePanel() {
                     });
 
                     const allHours = Object.values(bestByHour);
+                    allHours.forEach(h => allRouteMg.push({
+                        netMargin: h.netMargin,
+                        hour: h.hour,
+                        src: group.start,
+                        dst: group.end,
+                        transitCost: h.transitCost
+                    }));
                     const maxMargin = Math.max(...allHours.map(h => h.netMargin));
                     const avgMargin = allHours.reduce((s, h) => s + h.netMargin, 0) / allHours.length;
                     const bestHourEntry = allHours.reduce((best, h) => h.netMargin > best.netMargin ? h : best, allHours[0]);
@@ -6479,6 +6497,74 @@ function renderArbitragePanel() {
                     document.getElementById("arb_stat_max_spread_sub").innerText = `No path found`;
                     document.getElementById("arb_stat_strategy").innerText = "Spread threshold is too high or no profitable flows exist for tomorrow.";
                 }
+
+                // ── Update Margin Summary ──
+                const marginPanel = document.getElementById("margin_summary_panel");
+                const marginBody = document.getElementById("margin_summary_body");
+                if (marginPanel && marginBody) {
+                    if (allRouteMg.length > 0) {
+                        const avgPredicted = allRouteMg.reduce((s, m) => s + m.netMargin, 0) / allRouteMg.length;
+
+                        // Check if target date has actual price data for realised margins
+                        const hasRealisedData = historicalData['GR']?.[targetDate]?.prices?.length > 0;
+                        let avgRealised = null;
+                        if (hasRealisedData) {
+                            let sumRealised = 0;
+                            let countRealised = 0;
+                            allRouteMg.forEach(m => {
+                                const actualSrc = historicalData[m.src]?.[targetDate]?.prices?.[m.hour];
+                                const actualDst = historicalData[m.dst]?.[targetDate]?.prices?.[m.hour];
+                                if (actualSrc != null && actualDst != null && actualSrc > 0 && actualDst > 0) {
+                                    sumRealised += (actualDst - actualSrc) - (m.transitCost || 0);
+                                    countRealised++;
+                                }
+                            });
+                            if (countRealised > 0) avgRealised = sumRealised / countRealised;
+                        }
+
+                        // Save snapshot to localStorage (first time only)
+                        const marginLog = JSON.parse(localStorage.getItem('margin_log') || '{}');
+                        const logKey = `${targetDate}_${document.getElementById("analogue_country").value}`;
+                        if (!marginLog[logKey]) {
+                            marginLog[logKey] = {
+                                predicted: avgPredicted,
+                                profitableHours: allRouteMg.length,
+                                timestamp: new Date().toISOString()
+                            };
+                            localStorage.setItem('margin_log', JSON.stringify(marginLog));
+                        }
+
+                        let mHtml = `
+                            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Predicted Avg Net Margin</div>
+                                <div style="font-size:22px;font-weight:800;color:#059669;">${avgPredicted.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                                <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${allRouteMg.length} profitable hours</div>
+                            </div>`;
+
+                        if (avgRealised != null) {
+                            const diff = avgRealised - avgPredicted;
+                            const diffColor = diff >= 0 ? '#059669' : '#dc2626';
+                            const diffArrow = diff >= 0 ? '▲' : '▼';
+                            mHtml += `
+                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                    <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
+                                    <div style="font-size:22px;font-weight:800;color:#059669;">${avgRealised.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                                    <div style="font-size:11px;color:${diffColor};font-weight:600;margin-top:2px;">${diffArrow} ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs predicted</div>
+                                </div>`;
+                        } else {
+                            mHtml += `
+                                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                    <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
+                                    <div style="font-size:22px;font-weight:800;color:#94a3b8;">— <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                                    <div style="font-size:10px;color:#94a3b8;margin-top:2px;">Target date not yet settled</div>
+                                </div>`;
+                        }
+
+                        marginBody.innerHTML = mHtml;
+                        marginPanel.style.display = "block";
+                    } else {
+                        marginPanel.style.display = "none";
+                    }
                 }
 
 
