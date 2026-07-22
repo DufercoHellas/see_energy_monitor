@@ -1281,9 +1281,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         <script>
             // === utils.js ===
-// ── Tab Switching ──────────────────────────────────────────────────────────
-
-// Switch main tabs (Dashboard, Cables, EUMap, Analogues, Arbitrage)
+// ── Tab Switching �����������������������������������������������������������
 function openTab(evt, tabName) {
     document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
     document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
@@ -1298,8 +1296,6 @@ function openTab(evt, tabName) {
     }
     window.dispatchEvent(new Event('resize'));
 }
-
-// Switch inner sub-tabs within a main tab
 function openInnerTab(evt, tabName) {
     const parent = evt.currentTarget.closest(".tabcontent");
     parent.querySelectorAll(".inner-tabcontent").forEach(el => el.style.display = "none");
@@ -1308,7 +1304,6 @@ function openInnerTab(evt, tabName) {
     evt.currentTarget.classList.add("active");
     window.dispatchEvent(new Event('resize'));
 }
-// Switch detail sub-tabs within the Analogues panel
 function openDetailTab(evt, tabId) {
     try {
         let parent = evt.currentTarget.closest(".detail-tab");
@@ -1328,9 +1323,6 @@ function openDetailTab(evt, tabId) {
     }
 }
 
-// ── Date & Day-Type Utilities ─────────────────────────────────────────────
-
-// Classify a date as Weekday, Saturday, or Sunday (holidays treated as Sunday)
 function get3DayType(date, isHoliday) {
     if (isHoliday) return "Sunday";
     const day = date.getDay();
@@ -1339,7 +1331,6 @@ function get3DayType(date, isHoliday) {
     return "Weekday";
 }
 
-// Determine solar penetration state from residual/demand ratio
 function getSolarState(data, date) {
     if (!data || !data.residuals || !data.demand) return "MedSolar_Short";
     let sumRes = 0;
@@ -1355,36 +1346,29 @@ function getSolarState(data, date) {
     return "HighSolar" + (isLongDay ? "_Long" : "_Short");
 }
 
-// Parse YYYY-MM-DD string into local Date object
 function parseLocalDate(dateStr) {
     const [year, month, day] = dateStr.split('-').map(Number);
     return new Date(year, month - 1, day);
 }
 
-// ── Corridor & Outage Filtering ───────────────────────────────────────────
-
-// Check whether a corridor code should be excluded from display
 function shouldExcludeCorridor(corr) {
     if (!corr) return true;
     const parts = corr.split('-');
     return parts.some(p => ['TR', 'CH'].includes(p.trim().toUpperCase()));
 }
 
-// Check if an outage reason indicates monthly maintenance
 function isMonthlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("monthly maintenance") || r.includes("monthly outage");
 }
 
-// Check if an outage reason indicates yearly maintenance
 function isYearlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("yearly maintenance") || r.includes("yearly outage");
 }
 
-// Handle cable outage type filter change (auto-sets date range for monthly/yearly)
 function onSearchTypeChange() {
     const typeFilter = document.getElementById("cable_outages_type_filter").value;
     if (typeFilter === "MONTHLY" || typeFilter === "YEARLY") {
@@ -1399,16 +1383,12 @@ function onSearchTypeChange() {
     renderCableOutages();
 }
 
-// Check if outage is monthly or yearly maintenance
 function isMonthlyYearlyOutage(item) {
     if (!item.reason) return false;
     const r = item.reason.toLowerCase();
     return r.includes("monthly maintenance") || r.includes("monthly outage") || r.includes("yearly maintenance") || r.includes("yearly outage");
 }
 
-// ── Similarity Metrics ─────────────────────────────────────────────────────
-
-// Compute Euclidean distance between two arrays
 function euclideanDistance(arr1, arr2) {
     if (!arr1 || !arr2 || arr1.length !== arr2.length) return Infinity;
     let sum = 0;
@@ -1418,16 +1398,12 @@ function euclideanDistance(arr1, arr2) {
     return Math.sqrt(sum);
 }
 
-// Center an array by subtracting its mean (shape comparison)
 function getCenteredProfile(arr) {
     if (!arr || arr.length !== 24) return Array(24).fill(0);
     const avg = arr.reduce((a, b) => a + b, 0) / 24.0;
     return arr.map(x => x - avg);
 }
 
-// ── UI Toggles ─────────────────────────────────────────────────────────────
-
-// Toggle visibility of the hourly target details table
 function toggleHourlyTargetDetails() {
     const el = document.getElementById("target_hourly_details");
     const btn = document.getElementById("btn_toggle_target_hourly");
@@ -1440,7 +1416,6 @@ function toggleHourlyTargetDetails() {
     }
 }
 
-// Toggle visibility of any element by ID
 function toggleDetail(id) {
     const el = document.getElementById(id);
     if (el) {
@@ -1448,7 +1423,6 @@ function toggleDetail(id) {
     }
 }
 
-// Select a corridor tab in the arbitrage panel by index
 function selectCorridorTab(cid, selectedIdx, count) {
     for (let ci = 0; ci < count; ci++) {
         const body = document.getElementById(`${cid}_corridor_${ci}`);
