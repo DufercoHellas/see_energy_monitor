@@ -26,8 +26,6 @@ body {
     border-bottom: 1px solid #e5e7eb;
 }
 h2 { color: #111827; font-size: 28px; margin: 0; font-weight: 700; letter-spacing: -0.5px; }
-.header-meta { font-size: 14px; color: #6b7280; text-align: right; }
-.header-meta strong { color: #374151; }
 
 .summary-box {
     background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
@@ -68,6 +66,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 .inner-tablinks:hover { background-color: #e5e7eb; }
 .inner-tablinks.active { background-color: #0f172a; color: white; border-color: #0f172a; }
 .inner-tabcontent { display: none; }
+.inner-cables-tabcontent { display: none; }
 
 .detail-tablinks {
     background-color: #ffffff;
@@ -1272,24 +1271,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 evt.currentTarget.classList.add("active");
                 
                 if (tabName === 'Cables') {
-                    const longTabBtn = document.querySelector("button[onclick*='CablesLongTerm']");
-                    const isLongActive = longTabBtn ? longTabBtn.classList.contains("active") : false;
-                    if (isLongActive) {
-                        initLongCablesSelectors();
-                        renderLongCablesTab();
-                    } else {
-                        renderCablesMatrix();
-                    }
-                }
-                if (tabName === 'CableAuctions' && !auctionTabInitialized) {
-                    auctionTabInitialized = true;
-                    initAuctionTab();
+                    renderCablesMatrix();
                 }
                 if (tabName === 'EUMap') {
                     initEUMap();
-                }
-                if (tabName === 'ArbitrageTab') {
-                    // Tab is a mirror of Analogues — no special init needed
                 }
                 window.dispatchEvent(new Event('resize'));
             }
@@ -1303,12 +1288,22 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 window.dispatchEvent(new Event('resize'));
             }
             function openDetailTab(evt, tabId) {
-                const parent = evt.currentTarget.closest(".tabcontent") || document.getElementById("Analogues");
-                parent.querySelectorAll(".detail-tabcontent").forEach(el => el.style.display = "none");
-                parent.querySelectorAll(".detail-tablinks").forEach(el => el.classList.remove("active"));
-                document.getElementById(tabId).style.display = "block";
-                evt.currentTarget.classList.add("active");
-                window.dispatchEvent(new Event('resize'));
+                try {
+                    let parent = evt.currentTarget.closest(".detail-tab");
+                    if (parent) {
+                        parent.querySelectorAll(".detail-tablinks").forEach(el => el.classList.remove("active"));
+                        parent.querySelectorAll(".detail-tabcontent").forEach(el => el.style.display = "none");
+                    } else {
+                        parent = evt.currentTarget.closest(".tabcontent") || document.getElementById("Analogues");
+                        parent.querySelectorAll(".detail-tabcontent").forEach(el => el.style.display = "none");
+                        parent.querySelectorAll(".detail-tablinks").forEach(el => el.classList.remove("active"));
+                    }
+                    document.getElementById(tabId).style.display = "block";
+                    evt.currentTarget.classList.add("active");
+                    window.dispatchEvent(new Event('resize'));
+                } catch(e) {
+                    window.dispatchEvent(new Event('resize'));
+                }
             }
 
 
@@ -4699,6 +4694,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             let allCorridorsData = [];
 
             let selectedAuctionCorridor = "";
+            let selectedSearchCorridor = null;
 
             const OPTIMIZED_WEIGHTS = {
                 "HighSolar_Long": {
@@ -5119,10 +5115,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 document.getElementById(subTabId).style.display = "block";
                 evt.currentTarget.classList.add("active");
                 
-                if (subTabId === "CablesLongTerm") {
-                    initLongCablesSelectors();
-                    renderLongCablesTab();
-                } else if (subTabId === "CableOutages") {
+                if (subTabId === "CableOutages") {
                     initCableOutagesSelectors();
                     toggleOutagesGridView('matrix');
                 } else if (subTabId === "CableAuctionsPanel" && !auctionTabInitialized) {
@@ -5438,6 +5431,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                  }
                  
                  tbody.innerHTML = html;
+             }
+
+             function toggleSearchCorridorFilter(corridor) {
+                 if (selectedSearchCorridor === corridor) {
+                     selectedSearchCorridor = null;
+                 } else {
+                     selectedSearchCorridor = corridor;
+                 }
+                 renderCableOutages();
              }
 
             let outagesGridOffset = 0;
@@ -7779,31 +7781,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 const targetDate = document.getElementById("analogue_date").value;
                 const threshold = parseFloat(document.getElementById("arbitrage_min_spread").value) || 30.0;
 
-                function getDayAveragePrice(c, date) {
-                    const countryData = historicalData[c];
-                    if (!countryData) return 0.0;
-                    const dateData = countryData[date];
-                    if (!dateData) return 0.0;
-                    const prices = dateData.prices;
-                    if (!prices || prices.length === 0) return 0.0;
-                    const nonNull = prices.filter(p => p !== null && p !== undefined);
-                    if (nonNull.length === 0) return 0.0;
-                    const sum = nonNull.reduce((s, x) => s + x, 0);
-                    return sum / nonNull.length;
-                }
-
-                function getDayAveragePriceWithFallback(c, date) {
-                    let avg = getDayAveragePrice(c, date);
-                    if (avg === 0.0) {
-                        if (c === 'ME') avg = getDayAveragePrice('RS', date);
-                        else if (c === 'XK') avg = getDayAveragePrice('AL', date);
-                        else if (c === 'BA') avg = getDayAveragePrice('RS', date);
-                        else if (c === 'DE' && historicalData['DE_LU']) avg = getDayAveragePrice('DE_LU', date);
-                        else if (c === 'DE_LU' && historicalData['DE']) avg = getDayAveragePrice('DE', date);
-                    }
-                    return avg;
-                }
-
                 // Get solar state of target date (based on GR residuals/demand)
                 const country = "GR";
                 const targetData = historicalData[country]?.[targetDate];
@@ -9081,10 +9058,6 @@ function renderEUMapCountryDetail(dataKey, date) {
                 initDashboardData();
             });
 
-
-// ============================================================
-// CABLE AUCTIONS TAB ??? BIDDING OPTIMIZER
-
 // === tab_cables_auctions.js ===
 // ============================================================
 
@@ -9646,172 +9619,6 @@ function renderAuctionOutagesTable(corridor, yearMonth) {
 // =====================================================================
 
 // === tab_analogues.js ===
-
-const arbitrageWeights = {
-    "ttf": 0.1362,
-    "eua": 0.1737,
-    "calendar": 0.0835,
-    "DE_LU": 0.1319,
-    "AT": 0.0002,
-    "IT": 0.033,
-    "GR": 0.0864,
-    "BG": 0.0868,
-    "HU": 0.0697,
-    "RO": 0.0116,
-    "HR": 0.1869
-};
-
-// --- Topology: exact same as Analogues panel ---
-const _arbCountryEU = { 'DE': true, 'DE_LU': true, 'SK': true, 'HU': true, 'RO': true, 'BG': true, 'GR': true, 'IT': true, 'AT': true, 'SI': true, 'HR': true };
-const _arbExplicitBorders = [
-    { from: 'HU', to: 'RS', cable: 'HU-RS' }, { from: 'RS', to: 'HU', cable: 'RS-HU' },
-    { from: 'BG', to: 'RS', cable: 'BG-RS' }, { from: 'RS', to: 'BG', cable: 'RS-BG' },
-    { from: 'RS', to: 'ME', cable: 'RS-ME' }, { from: 'ME', to: 'RS', cable: 'ME-RS' },
-    { from: 'RS', to: 'MK', cable: 'RS-MK' }, { from: 'MK', to: 'RS', cable: 'MK-RS' },
-    { from: 'MK', to: 'BG', cable: 'MK-BG' }, { from: 'BG', to: 'MK', cable: 'BG-MK' },
-    { from: 'IT', to: 'ME', cable: 'IT-ME' }, { from: 'ME', to: 'IT', cable: 'ME-IT' },
-    { from: 'AL', to: 'GR', cable: 'AL-GR' }, { from: 'GR', to: 'AL', cable: 'GR-AL' },
-    { from: 'AL', to: 'ME', cable: 'AL-ME' }, { from: 'ME', to: 'AL', cable: 'ME-AL' },
-    { from: 'GR', to: 'MK', cable: 'GR-MK' }, { from: 'MK', to: 'GR', cable: 'MK-GR' },
-    { from: 'ME', to: 'XK', cable: 'ME-XK' }, { from: 'XK', to: 'ME', cable: 'XK-ME' },
-    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' }
-];
-const _arbPathCountries = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK"];
-
-var _arbCbamPaths = null;
-var _arbCorridorLookup = null;
-
-function _arbBuildTopology() {
-    if (_arbCbamPaths) return;
-    var adj = {};
-    for (var i = 0; i < _arbPathCountries.length; i++) adj[_arbPathCountries[i]] = [];
-    for (var e = 0; e < _arbExplicitBorders.length; e++) {
-        var edge = _arbExplicitBorders[e];
-        var f = edge.from === 'DE' ? 'DE_LU' : edge.from;
-        var t = edge.to === 'DE' ? 'DE_LU' : edge.to;
-        if (adj[f] && adj[t]) adj[f].push({ to: t, cable: edge.cable });
-    }
-
-    var allPaths = [];
-    function walk(node, path, visited) {
-        if (path.length > 1) allPaths.push(path.slice());
-        if (path.length - 1 >= 4) return;
-        var neighbors = adj[node] || [];
-        for (var n = 0; n < neighbors.length; n++) {
-            var nb = neighbors[n];
-            if (!visited[nb.to]) { visited[nb.to] = true; path.push(nb); walk(nb.to, path, visited); path.pop(); visited[nb.to] = false; }
-        }
-    }
-    for (var s = 0; s < _arbPathCountries.length; s++) {
-        var vis = {};
-        for (var v = 0; v < _arbPathCountries.length; v++) vis[_arbPathCountries[v]] = false;
-        vis[_arbPathCountries[s]] = true;
-        walk(_arbPathCountries[s], [{ to: _arbPathCountries[s], cable: null }], vis);
-    }
-
-    _arbCbamPaths = [];
-    _arbCorridorLookup = {};
-    for (var p = 0; p < allPaths.length; p++) {
-        var path = allPaths[p];
-        var start = path[0].to;
-        var end = path[path.length - 1].to;
-        if (!_arbCountryEU[start] && _arbCountryEU[end]) continue; // non-EU -> EU blocked
-        if (start === 'AL' || end === 'AL') continue;
-        _arbCbamPaths.push(path);
-        var key = start + '-' + end;
-        if (!_arbCorridorLookup[key]) {
-            _arbCorridorLookup[key] = { code: key, src: start, dst: end, path: path };
-        }
-    }
-}
-
-function _arbGetCorridors() {
-    _arbBuildTopology();
-    var list = [];
-    var seen = {};
-    for (var key in _arbCorridorLookup) {
-        if (!seen[key]) { seen[key] = true; list.push(_arbCorridorLookup[key]); }
-    }
-    list.sort(function(a, b) { return a.code.localeCompare(b.code); });
-    return list;
-}
-
-function _arbFixCountry(c) {
-    if (c === 'DE_LU' && (!historicalData['DE_LU'] || !historicalData['DE_LU'][Object.keys(historicalData['DE_LU'] || {})[0]])) return 'DE';
-    if (c === 'DE' && historicalData['DE_LU'] && historicalData['DE_LU'][Object.keys(historicalData['DE_LU'] || {})[0]]) return 'DE_LU';
-    if (c === 'ME' && (!historicalData['ME'] || !historicalData['ME'][Object.keys(historicalData['ME'] || {})[0]])) return 'RS';
-    if (c === 'XK' && (!historicalData['XK'] || !historicalData['XK'][Object.keys(historicalData['XK'] || {})[0]])) return 'AL';
-    if (c === 'BA' && (!historicalData['BA'] || !historicalData['BA'][Object.keys(historicalData['BA'] || {})[0]])) return 'RS';
-    return c;
-}
-
-function computeDistance(targetFeats, candFeats) {
-    let dist = 0.0;
-    for (const [cat, weight] of Object.entries(arbitrageWeights)) {
-        if (weight <= 0) continue;
-        const t_arr = targetFeats[cat];
-        const c_arr = candFeats[cat];
-        let cat_dist_sq = 0.0;
-        if (Array.isArray(t_arr)) {
-            if (cat === 'calendar') {
-                const stats = historicalStats[cat];
-                if (t_arr && c_arr && stats) {
-                    for (let j = 0; j < t_arr.length; j++) {
-                        const z_t = (t_arr[j] - stats.mean[j]) / stats.std[j];
-                        const z_c = (c_arr[j] - stats.mean[j]) / stats.std[j];
-                        cat_dist_sq += Math.pow(z_t - z_c, 2);
-                    }
-                }
-            } else {
-                const res_stats = historicalStats[cat + '_res'];
-                const dem_stats = historicalStats[cat + '_dem'];
-                if (res_stats && dem_stats) {
-                    for (let j = 0; j < 24; j++) {
-                        const z_t = (t_arr[j] - res_stats.mean[j]) / res_stats.std[j];
-                        const z_c = (c_arr[j] - res_stats.mean[j]) / res_stats.std[j];
-                        cat_dist_sq += Math.pow(z_t - z_c, 2);
-                    }
-                    for (let j = 0; j < 24; j++) {
-                        const z_t = (t_arr[j + 24] - dem_stats.mean[j]) / dem_stats.std[j];
-                        const z_c = (c_arr[j + 24] - dem_stats.mean[j]) / dem_stats.std[j];
-                        cat_dist_sq += Math.pow(z_t - z_c, 2);
-                    }
-                }
-            }
-            dist += weight * Math.sqrt(cat_dist_sq);
-        } else {
-            const stats = historicalStats[cat];
-            if (stats) {
-                const z_t = (t_arr - stats.mean) / stats.std;
-                const z_c = (c_arr - stats.mean) / stats.std;
-                dist += weight * Math.abs(z_t - z_c);
-            }
-        }
-    }
-    return dist;
-}
-
-function openDetailTab(event, tabId) {
-    try {
-        var parent = event.currentTarget.closest(".detail-tab");
-        if (parent) {
-            parent.querySelectorAll(".detail-tablinks").forEach(function(el) { el.classList.remove("active"); });
-            parent.querySelectorAll(".detail-tabcontent").forEach(function(el) { el.style.display = "none"; });
-            document.getElementById(tabId).style.display = "block";
-            event.currentTarget.classList.add("active");
-        } else {
-            parent = event.currentTarget.closest(".tabcontent") || document.getElementById("Analogues");
-            parent.querySelectorAll(".detail-tabcontent").forEach(function(el) { el.style.display = "none"; });
-            parent.querySelectorAll(".detail-tablinks").forEach(function(el) { el.classList.remove("active"); });
-            document.getElementById(tabId).style.display = "block";
-            event.currentTarget.classList.add("active");
-        }
-        window.dispatchEvent(new Event('resize'));
-    } catch(e) {
-        window.dispatchEvent(new Event('resize'));
-    }
-}
-
 
 
         </script>
