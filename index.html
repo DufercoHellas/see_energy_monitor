@@ -5286,6 +5286,10 @@ function findAnalogues() {
                             var mdff = Math.abs(tm - cm);
                             if (mdff > mdl.monthWindow && mdff !== 11) continue;
                         }
+                        if (mdl.lookbackYears !== null) {
+                            var ly = parseLocalDate(m.date).getFullYear();
+                            if (targetDateObj.getFullYear() - ly > mdl.lookbackYears) continue;
+                        }
                         var totalW = 0, weighted = 0;
                         for (var dk = 0; dk < dimKeys.length; dk++) {
                             var k = dimKeys[dk];
