@@ -1467,7 +1467,7 @@ function selectCorridorTab(cid, selectedIdx, count) {
 var MATCHING_MODELS = [
     {
         id: "Expanded",
-        label: "Expanded (9-dim +IT, no restrictions)",
+        label: "Expanded - 9-dim +IT, no restrictions",
         description: "Best validated: 71.8% win rate, 24.46 EUR/MWh. 9 dimensions + Italian residual.",
         active: true,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
@@ -1477,7 +1477,7 @@ var MATCHING_MODELS = [
     },
     {
         id: "Standard",
-        label: "Standard (8-dim legacy, solar filter)",
+        label: "Standard - legacy 8-dim, solar filter",
         description: "Original production model: per-category weights, solar-state filter.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
@@ -1486,7 +1486,7 @@ var MATCHING_MODELS = [
     },
     {
         id: "Minimal",
-        label: "Minimal (5-dim fuel+residuals only)",
+        label: "Minimal - 5-dim fuel+residuals only",
         description: "Fuel prices + residuals only. No prior prices. Fast and clean.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf"],
@@ -1496,7 +1496,7 @@ var MATCHING_MODELS = [
     },
     {
         id: "Balanced",
-        label: "Balanced (8-dim uniform, no solar)",
+        label: "Balanced - 8-dim uniform, no solar",
         description: "Uniform 8-dim weights, no solar-state filter, 2-month window.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
@@ -5263,6 +5263,11 @@ function findAnalogues() {
                     window.modelMatchesById[mdl.id] = scored.slice(0, 7);
                 });
                 window.consensusRouteMap = { totalModels: MATCHING_MODELS.length };
+                for (var ci = 0; ci < MATCHING_MODELS.length; ci++) {
+                    var mid = MATCHING_MODELS[ci].id;
+                    var mlist = window.modelMatchesById[mid] || [];
+                    console.log("Cross-check " + mid + ": " + mlist.length + " matches" + (mlist.length > 0 ? " top=" + mlist[0].combined.toFixed(1) : ""));
+                }
                 } catch(e) { console.error("Cross-check error:", e); }
                 
                 function pctColour(pct) {
@@ -6658,7 +6663,7 @@ function renderArbitragePanel() {
                 var sel = document.getElementById("analogue_model");
                 if (!sel || !MATCHING_MODELS) return;
                 sel.innerHTML = MATCHING_MODELS.map(function(m, i) {
-                    return `<option value="${i}" ${m.active ? 'selected' : ''}>${m.id} - ${m.label}</option>`;
+                    return `<option value="${i}" ${m.active ? 'selected' : ''}>${m.label}</option>`;
                 }).join('');
                 onModelChange();
             }
