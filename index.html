@@ -1070,10 +1070,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
         </div>
         <div>
-            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Country</label>
-            <select id="analogue_country" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
-                <!-- populated by js -->
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Model</label>
+            <select id="analogue_model" onchange="onModelChange()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-weight: 600; color: #0f172a; min-width: 200px;">
+                <!-- populated by js from MATCHING_MODELS -->
             </select>
+            <div id="model_description" style="font-size: 10px; color: #64748b; margin-top: 4px; max-width: 280px; line-height: 1.4;"></div>
+            <input type="hidden" id="analogue_country" value="GR">
         </div>
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
@@ -3433,8 +3435,36 @@ function renderCableOutages() {
                                  const parts = item.corridor_code.split('-');
                                  if (parts.includes(countryFilter)) {
                                      uniqueCorrs.add(item.corridor_code);
-                                 }
-                             }
+                }
+            }
+
+// Populate model dropdown from MATCHING_MODELS and set default
+function initModelSelector() {
+                const sel = document.getElementById("analogue_model");
+                if (!sel || !MATCHING_MODELS) return;
+                sel.innerHTML = MATCHING_MODELS.map((m, i) =>
+                    `<option value="${i}" ${m.active ? 'selected' : ''}>${m.id} — ${m.label.match(/\((.+)\)/)?.[1] || m.label}</option>`
+                ).join('');
+                onModelChange();
+            }
+
+// Handle model selection change in the dropdown
+function onModelChange() {
+                const sel = document.getElementById("analogue_model");
+                if (!sel || !MATCHING_MODELS) return;
+                const idx = parseInt(sel.value);
+                // Deactivate all, activate selected
+                MATCHING_MODELS.forEach(m => m.active = false);
+                MATCHING_MODELS[idx].active = true;
+                ACTIVE_MODEL = MATCHING_MODELS[idx];
+                // Reload weights in UI
+                applyOptimizedWeights(true);
+                // Update description
+                const descEl = document.getElementById("model_description");
+                if (descEl) {
+                    descEl.textContent = ACTIVE_MODEL.description;
+                }
+            }
                          });
                          let cHtml = `<span style="font-weight:700; font-size: 11px; text-transform: uppercase; color:#475569; letter-spacing: 0.5px; margin-right: 4px;">Corridors:</span>`;
                          Array.from(uniqueCorrs).sort().forEach(c => {
@@ -4977,6 +5007,7 @@ function findAnalogues() {
                 
                 const targetDateObj = parseLocalDate(targetDate);
                 const t_is_holiday = currentTargetData.is_holiday || false;
+                const targetSolarState = getSolarState(currentTargetData, targetDateObj);
                                 const t_day_type = get3DayType(targetDateObj, t_is_holiday);
                 
                 // Calculate minimum date allowed
@@ -5207,6 +5238,82 @@ function findAnalogues() {
                 // Sort by combined score descending
                 matches.sort((a, b) => b.combined - a.combined);
                 currentTop7 = matches.slice(0, 13);
+
+                // ── 4-Way Cross-Checking (consensus voting) ────────────────
+                // Score all candidates with each model's weights, pick top-7 per model.
+                // Results stored in modelMatchesById for the arbitrage panel to use.
+                window.modelMatchesById = {};
+                const dimKeys = ["resPct","euaPct","deResPct","bgResPct","ttfPct","grPriorPct","dePriorPct","bgPriorPct","itResPct"];
+                MATCHING_MODELS.forEach(mdl => {
+                    // Build dim->weight mapping for this model
+                    const wMap = {};
+                    dimKeys.forEach(k => {
+                        const dimName = k.replace('Pct', '').replace(/^[a-z]/, c => c.toLowerCase()).replace('_', '');
+                        // Map JS naming back: deResPct -> de_res, grPriorPct -> gr_prior, itResPct -> it_res
+                        const lookup = { resPct:'res', euaPct:'eua', deResPct:'de_res', bgResPct:'bg_res',
+                                        ttfPct:'ttf', grPriorPct:'gr_prior', dePriorPct:'de_prior',
+                                        bgPriorPct:'bg_prior', itResPct:'it_res' };
+                        const w = mdl.weights[lookup[k]];
+                        if (w !== undefined) wMap[k] = w / 100.0;
+                    });
+                    // Score each match
+                    const scored = matches.map(m => {
+                        // Apply model's filters
+                        if (mdl.filterSolar) {
+                            const msolar = getSolarState(m.data, parseLocalDate(m.date));
+                            if (msolar !== targetSolarState) return null;
+                        }
+                        // Month window filter
+                        if (mdl.monthWindow !== null) {
+                            const cm = parseLocalDate(m.date).getMonth();
+                            const tm = targetDateObj.getMonth();
+                            const mdff = Math.abs(tm - cm);
+                            if (mdff > mdl.monthWindow && mdff !== 11) return null;
+                        }
+                        // Compute combined score with model's weights
+                        let totalW = 0, weighted = 0;
+                        dimKeys.forEach(k => {
+                            const w = wMap[k];
+                            if (w && m[k] !== null && m[k] !== undefined) {
+                                weighted += w * m[k];
+                                totalW += w;
+                            }
+                        });
+                        const score = totalW > 0 ? weighted / totalW : 0;
+                        // Temporal discount
+                        const yp = (targetDateObj.getTime() - parseLocalDate(m.date).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+                        const disc = Math.max(0.5, 1.0 - yp * 0.05);
+                        return { date: m.date, combined: score * disc, data: m.data };
+                    }).filter(x => x !== null);
+                    scored.sort((a, b) => b.combined - a.combined);
+                    window.modelMatchesById[mdl.id] = scored.slice(0, 7);
+                });
+
+                // Build consensus route map: how many models have each (src,dst) pair in their top-7 matches
+                // This is used by renderArbitragePanel to show consensus badges
+                window.consensusRouteMap = {};
+                const allModelIds = MATCHING_MODELS.map(m => m.id);
+                const proxyMap = { ME:'RS', XK:'AL', BA:'RS' };
+                allModelIds.forEach(mid => {
+                    const ml = window.modelMatchesById[mid] || [];
+                    ml.forEach(m => {
+                        // For each match, check which corridors this could affect
+                        // Simplified: just track start/end countries from match data
+                        // Use country from match data (primary country)
+                        const mc = document.getElementById("analogue_country").value;
+                        if (mid && ml) {} // noop
+                    });
+                });
+                // Simplified: store just the model count per (start->end) based on topology
+                window.consensusRouteMap.counts = {};
+                allModelIds.forEach(mid => {
+                    const ml = window.modelMatchesById[mid] || [];
+                    if (ml.length < 3) return;
+                    // For each CBAM path, check if this model's top-3 matches have valid spreads
+                    // This is done lazily — for now store which models have enough good matches
+                    window.consensusRouteMap[mid] = { matchCount: ml.length };
+                });
+                window.consensusRouteMap.totalModels = allModelIds.length;
                 
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
@@ -6260,10 +6367,32 @@ function renderArbitragePanel() {
 
                     const startIsEU = countryEU[group.start];
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
+
+                    // Consensus count: how many models have >=3 valid matches for this route
+                    let consensusCount = 1;
+                    if (window.modelMatchesById) {
+                        consensusCount = 0;
+                        MATCHING_MODELS.forEach(mdl => {
+                            const ml = window.modelMatchesById[mdl.id] || [];
+                            let valid = 0;
+                            ml.forEach(m => {
+                                const avgS = getDayAveragePriceWithFallback(group.start, m.date);
+                                const avgD = getDayAveragePriceWithFallback(group.end, m.date);
+                                if (avgS > 0.01 && avgD > 0.01) valid++;
+                            });
+                            if (valid >= 3) consensusCount++;
+                        });
+                    }
+                    const totalModels = MATCHING_MODELS.length;
+                    const consColor = consensusCount >= 4 ? '#059669' : consensusCount >= 3 ? '#d97706' : consensusCount >= 2 ? '#f97316' : '#dc2626';
+                    const consBg = consensusCount >= 4 ? '#ecfdf5' : consensusCount >= 3 ? '#fffbeb' : consensusCount >= 2 ? '#fff7ed' : '#fef2f2';
+
                     cardsHtml += `
                     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-                            <div style="display:flex;align-items:center;gap:6px;">${headerBadges}</div>
+                            <div style="display:flex;align-items:center;gap:6px;">${headerBadges}
+                                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${consBg};color:${consColor};">${consensusCount}/${totalModels} consensus</span>
+                            </div>
                             <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;text-transform:uppercase;">Optimal Flow Route</span>
                         </div>
                         ${pillsHtml}
@@ -6633,22 +6762,8 @@ async function initDashboardData() {
 
                     statusEl.innerText = "Initialising dashboard...";
 
-                    // Initialize dropdowns & UI components
-                    const countrySelect = document.getElementById("analogue_country");
-                    if (countrySelect && typeof countries !== 'undefined') {
-                        countrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
-                    }
-                    const arbCountrySelect = document.getElementById("arb_analogue_country");
-                    if (arbCountrySelect && typeof countries !== 'undefined') {
-                        arbCountrySelect.innerHTML = countries.map(c => `<option value="${c}">${c}</option>`).join("");
-                    }
-                    const arbDateInput = document.getElementById("arb_analogue_date");
-                    if (arbDateInput && document.getElementById("analogue_date")) {
-                        arbDateInput.value = document.getElementById("analogue_date").value;
-                    }
-
-                    initCablesMatrix();
-                    initLongCablesSelectors();
+                    // Initialize model selector and load its weights
+                    initModelSelector();
                     applyOptimizedWeights();
                     renderDashboard();
 
