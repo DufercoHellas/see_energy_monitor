@@ -1067,7 +1067,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
-            <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+            <input type="date" id="analogue_date" onchange="applyOptimizedWeights(true)" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
         </div>
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Model</label>
@@ -6736,6 +6736,17 @@ async function initDashboardData() {
                     allCorridorsData = cabAll || [];
 
                     statusEl.innerText = "Initialising dashboard...";
+
+                    // Set default date to tomorrow
+                    var dateInput = document.getElementById("analogue_date");
+                    if (dateInput && !dateInput.value) {
+                        var td = new Date();
+                        td.setDate(td.getDate() + 1);
+                        var y = td.getFullYear();
+                        var m = String(td.getMonth() + 1).padStart(2, '0');
+                        var d = String(td.getDate()).padStart(2, '0');
+                        dateInput.value = y + '-' + m + '-' + d;
+                    }
 
                     // Initialize model selector and load its weights
                     try {
