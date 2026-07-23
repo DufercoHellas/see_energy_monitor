@@ -1185,46 +1185,21 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <div style="flex: 2; min-width: 500px;">
                 <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                        <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 65%;">
+                        <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 100%;">
                             Zoom Comparison
                         </h3>
-                        <div class="detail-tab" style="display: flex; gap: 4px;">
-                            <button class="detail-tablinks active" onclick="openDetailTab(event, 'comp_charts_tab')">📈 Charts</button>
-                            <button class="detail-tablinks" onclick="openDetailTab(event, 'comp_table_tab')">📋 Table</button>
-                        </div>
                     </div>
                     
                     <!-- ── Comparison Charts ── -->
                     <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
                         <!-- ── Prices Comparison ── -->
                         <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
-                        <!-- ── Residuals & Demand Grid ── -->
+                        <!-- ── Residuals Grid ── -->
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
                             <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                             <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                             <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            <div id="plot_comp_demand" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- ── Hourly Values Table ── -->
-                    <div id="comp_table_tab" class="detail-tabcontent" style="display: none;">
-                        <div class="table-container" style="max-height: 520px; overflow-y: auto;">
-                            <table id="hourly_comp_table">
-                                <thead style="position: sticky; top: 0; background: #f9fafb; z-index: 1;">
-                                    <tr>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Hour</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Target Res.</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Match Res.</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Target Dem.</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Match Dem.</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Target Price</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Match Price</th>
-                                        <th style="font-size: 10px; padding: 6px 8px;">Price Diff</th>
-                                    </tr>
-                                </thead>
-                                <tbody style="font-size: 11px;"></tbody>
-                            </table>
+                            <div id="plot_comp_it_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                         </div>
                     </div>
                 </div>
@@ -4893,27 +4868,32 @@ function renderCountryOutageTable(c, countryOutages) {
                     showlegend: false
                 }, {responsive: true});
 
-                // 2. Plot Demand Comparison
-                const demTraces = [
+                // 2. Plot Italy Residuals Comparison
+                const itDataTarget = (historicalData['IT'] && historicalData['IT'][currentTargetDate]) ? historicalData['IT'][currentTargetDate] : null;
+                const itDataMatch = (historicalData['IT'] && historicalData['IT'][date]) ? historicalData['IT'][date] : null;
+                const itTargetRes = itDataTarget ? (itDataTarget.residuals || Array(24).fill(0.0)) : Array(24).fill(0.0);
+                const itMatchRes = itDataMatch ? (itDataMatch.residuals || Array(24).fill(0.0)) : Array(24).fill(0.0);
+                
+                const itResTraces = [
                     {
                         x: hours,
-                        y: tDem,
-                        name: `Target (${currentTargetDate})`,
+                        y: itTargetRes,
+                        name: `IT Target (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#ec4899', width: 3}
+                        line: {color: '#a855f7', width: 3}
                     },
                     {
                         x: hours,
-                        y: mDem,
-                        name: `Match (${date})`,
+                        y: itMatchRes,
+                        name: `IT Match (${date})`,
                         type: 'scatter',
                         mode: 'lines',
                         line: {color: '#94a3b8', width: 2, dash: 'dash'}
                     }
                 ];
-                Plotly.newPlot('plot_comp_demand', demTraces, {
-                    title: {text: `${countryNames[country] || country} Forecasted Demand (MW)`, font: {family: 'Inter', size: 11, color: '#334155'}},
+                Plotly.newPlot('plot_comp_it_residuals', itResTraces, {
+                    title: {text: 'Italy Residual Load (MW)', font: {family: 'Inter', size: 11, color: '#334155'}},
                     xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
                     yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
                     plot_bgcolor: 'transparent',
@@ -4951,37 +4931,6 @@ function renderCountryOutageTable(c, countryOutages) {
                     showlegend: true,
                     legend: {font: {size: 9}, orientation: 'h', y: -0.15}
                 }, {responsive: true});
-                
-                // Update the 24-hour table
-                const tbody = document.querySelector("#hourly_comp_table tbody");
-                tbody.innerHTML = "";
-                for (let i = 0; i < 24; i++) {
-                    const tPriceVal = tPrices[i];
-                    const mPriceVal = mPrices[i];
-                    let diffStr = '-';
-                    let diffStyle = '';
-                    if (tPriceVal !== undefined && mPriceVal !== undefined && tPriceVal !== null && mPriceVal !== null) {
-                        const diff = Math.abs(tPriceVal - mPriceVal);
-                        let color = '#dc2626'; // Red
-                        if (diff < 5) {
-                            color = '#16a34a'; // Green
-                        } else if (diff < 15) {
-                            color = '#d97706'; // Orange
-                        }
-                        diffStr = diff.toFixed(2) + ' €';
-                        diffStyle = `style="font-weight:600; color:${color};"`;
-                    }
-                    tbody.innerHTML += `<tr>
-                        <td style="font-weight:600; text-align:center;">Hour ${i+1}</td>
-                        <td>${tRes[i] !== undefined ? tRes[i].toFixed(0) : '-'} MW</td>
-                        <td>${mRes[i] !== undefined ? mRes[i].toFixed(0) : '-'} MW</td>
-                        <td>${tDem[i] !== undefined ? tDem[i].toFixed(0) : '-'} MW</td>
-                        <td>${mDem[i] !== undefined ? mDem[i].toFixed(0) : '-'} MW</td>
-                        <td style="font-weight:600; color:#059669;">${tPriceVal !== undefined ? tPriceVal.toFixed(2) : '-'} €</td>
-                        <td style="font-weight:600; color:#10b981; opacity:0.8;">${mPriceVal !== undefined ? mPriceVal.toFixed(2) : '-'} €</td>
-                        <td ${diffStyle}>${diffStr}</td>
-                    </tr>`;
-                }
             }
 
 // ── Analogue Search Algorithm ─────────────────────────────────────────────
