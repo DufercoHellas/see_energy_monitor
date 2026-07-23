@@ -1196,10 +1196,10 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
                         <!-- ── Residuals Grid ── -->
                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                            <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                             <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                             <div id="plot_comp_it_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                            <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
+                            <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
                         </div>
                     </div>
                 </div>
@@ -1444,13 +1444,13 @@ var MATCHING_MODELS = [
     {
         id: "Standard",
         label: "Standard - legacy 8-dim, solar filter",
-        description: "Original production model: per-category weights, solar-state filter, 2yr lookback.",
+        description: "Original production model: per-category weights, solar-state filter, all time lookback.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
         useCategoryWeights: true,
         filterSolar: true,
         monthWindow: 1,
-        lookbackYears: 2
+        lookbackYears: null
     },
     {
         id: "Minimal",
@@ -4881,7 +4881,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `IT Target (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#a855f7', width: 3}
+                        line: {color: '#3b82f6', width: 3}
                     },
                     {
                         x: hours,
