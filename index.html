@@ -1471,6 +1471,7 @@ var MATCHING_MODELS = [
         description: "Original production model: per-category weights, solar-state filter.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
+        useCategoryWeights: true,
         filterSolar: true,
         monthWindow: 1
     },
@@ -1499,7 +1500,34 @@ var MATCHING_MODELS = [
 // Active model shortcut (defaults to first, which is "Expanded")
 var ACTIVE_MODEL = MATCHING_MODELS[0];
 
-// ── State (shared with core.js) ────────────────────────────────────────────
+// ── Original per-category weights (used by Standard model) ──────────────
+var OPTIMIZED_WEIGHTS = {
+    "HighSolar_Long": {
+        "Weekday": { res: 10, eua: 0, de_res: 50, bg_res: 20, ttf: 0, gr_prior: 5, de_prior: 0, bg_prior: 15 },
+        "Saturday": { res: 15, eua: 50, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 0, de_prior: 10, bg_prior: 20 },
+        "Sunday": { res: 20, eua: 0, de_res: 20, bg_res: 15, ttf: 0, gr_prior: 45, de_prior: 0, bg_prior: 0 }
+    },
+    "HighSolar_Short": {
+        "Weekday": { res: 45, eua: 0, de_res: 20, bg_res: 20, ttf: 0, gr_prior: 5, de_prior: 0, bg_prior: 10 },
+        "Saturday": { res: 55, eua: 5, de_res: 15, bg_res: 0, ttf: 5, gr_prior: 20, de_prior: 0, bg_prior: 0 },
+        "Sunday": { res: 0, eua: 0, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 25, de_prior: 10, bg_prior: 60 }
+    },
+    "MedSolar_Long": {
+        "Weekday": { res: 25, eua: 20, de_res: 10, bg_res: 5, ttf: 20, gr_prior: 5, de_prior: 10, bg_prior: 5 },
+        "Saturday": { res: 15, eua: 0, de_res: 10, bg_res: 15, ttf: 30, gr_prior: 25, de_prior: 0, bg_prior: 5 },
+        "Sunday": { res: 30, eua: 0, de_res: 10, bg_res: 5, ttf: 0, gr_prior: 0, de_prior: 55, bg_prior: 0 }
+    },
+    "MedSolar_Short": {
+        "Weekday": { res: 30, eua: 0, de_res: 20, bg_res: 0, ttf: 0, gr_prior: 0, de_prior: 35, bg_prior: 15 },
+        "Saturday": { res: 25, eua: 0, de_res: 5, bg_res: 55, ttf: 0, gr_prior: 5, de_prior: 5, bg_prior: 5 },
+        "Sunday": { res: 5, eua: 0, de_res: 15, bg_res: 0, ttf: 5, gr_prior: 45, de_prior: 0, bg_prior: 30 }
+    },
+    "LowSolar": {
+        "Weekday": { res: 20, eua: 5, de_res: 15, bg_res: 10, ttf: 35, gr_prior: 10, de_prior: 0, bg_prior: 5 },
+        "Saturday": { res: 0, eua: 0, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 25, de_prior: 50, bg_prior: 20 },
+        "Sunday": { res: 35, eua: 25, de_res: 0, bg_res: 0, ttf: 0, gr_prior: 0, de_prior: 0, bg_prior: 40 }
+    }
+};
 
 var currentTop7 = [];
 var currentTargetData = null;
@@ -2976,7 +3004,13 @@ function applyOptimizedWeights(force = false) {
                 if (!targetData) return;
                 
                 const dayType = get3DayType(targetDate, isHoliday);
-                const opt = ACTIVE_MODEL.weights;
+                var opt;
+                if (ACTIVE_MODEL.useCategoryWeights) {
+                    var solarState = getSolarState(targetData, targetDate);
+                    opt = OPTIMIZED_WEIGHTS[solarState] ? OPTIMIZED_WEIGHTS[solarState][dayType] : null;
+                } else {
+                    opt = ACTIVE_MODEL.weights;
+                }
                 if (opt) {
                     document.getElementById("w_res").value = opt.res;
                     document.getElementById("w_eua").value = opt.eua;
@@ -5218,9 +5252,15 @@ function findAnalogues() {
                                 ttfPct:'ttf', grPriorPct:'gr_prior', dePriorPct:'de_prior',
                                 bgPriorPct:'bg_prior', itResPct:'it_res' };
                 MATCHING_MODELS.forEach(function(mdl) {
+                    // Get model weights (per-category or fixed)
+                    var modelWeights = mdl.weights;
+                    if (mdl.useCategoryWeights) {
+                        var cw = OPTIMIZED_WEIGHTS[targetSolarState] ? OPTIMIZED_WEIGHTS[targetSolarState][t_day_type] : null;
+                        if (cw) modelWeights = cw;
+                    }
                     var wMap = {};
                     dimKeys.forEach(function(k) {
-                        var w = mdl.weights[lookup[k]];
+                        var w = modelWeights[lookup[k]];
                         if (w !== undefined) wMap[k] = w / 100.0;
                     });
                     var scored = [];
