@@ -1067,16 +1067,24 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
-            <input type="date" id="analogue_date" onchange="applyOptimizedWeights(true)" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+            <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
         </div>
         <div>
-            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Model</label>
-            <select id="analogue_model" onchange="onModelChange()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-weight: 600; color: #0f172a; min-width: 200px;">
-                <!-- populated by js from MATCHING_MODELS -->
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Country</label>
+            <select id="analogue_country" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+                <!-- populated by js -->
             </select>
-            <div id="model_description" style="font-size: 10px; color: #64748b; margin-top: 4px; max-width: 280px; line-height: 1.4;"></div>
-            <input type="hidden" id="analogue_country" value="GR">
-            <input type="hidden" id="analogue_lookback" value="all">
+        </div>
+        <div>
+            <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
+            <select id="analogue_lookback" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+                <option value="all">All Time</option>
+                <option value="2">2 Years</option>
+                <option value="1">1 Year</option>
+                <option value="0.5">6 Months</option>
+                <option value="0.25">3 Months</option>
+                <option value="0.083">1 Month</option>
+            </select>
         </div>
         
         <div>
@@ -1424,60 +1432,12 @@ function selectCorridorTab(cid, selectedIdx, count) {
 // All data references (historicalData, cablesData, historicalStats)
 // are closure-global from the concatenated script.
 
-// ── Matching Models for Consensus Voting ─────────────────────────────────
-// Each model defines weights, filters, and behaviour. When multiple models
-// agree on a trade, the recommendation is more reliable ("consensus").
-// The active model (used for slider defaults and primary prediction) is first.
+// ── Production Weights (backtest winner: 71.8% win rate) ──────────────
+// 9 dimensions: res, eua, de_res, bg_res, ttf, gr_prior, de_prior, bg_prior, it_res
+// No solar-state filter, no month window, no lookback limit.
+// Stored in backtest/models/expanded.json
 
-var MATCHING_MODELS = [
-    {
-        id: "Expanded",
-        label: "Expanded - 9-dim +IT, wide window",
-        description: "Best validated: 71.8% win rate. 9 dimensions + Italian residual, 2yr lookback.",
-        active: true,
-        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
-        weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 },
-        filterSolar: false,
-        monthWindow: 2,
-        lookbackYears: 2
-    },
-    {
-        id: "Standard",
-        label: "Standard - legacy 8-dim, solar filter",
-        description: "Original production model: per-category weights, solar-state filter, all time lookback.",
-        active: false,
-        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
-        useCategoryWeights: true,
-        filterSolar: true,
-        monthWindow: 1,
-        lookbackYears: null
-    },
-    {
-        id: "Minimal",
-        label: "Minimal - 5-dim fuel+residuals only",
-        description: "Fuel prices + residuals only. No prior prices. Fast and clean.",
-        active: false,
-        dims: ["res","eua","de_res","bg_res","ttf"],
-        weights: { res: 28, eua: 22, de_res: 16, bg_res: 10, ttf: 24 },
-        filterSolar: false,
-        monthWindow: 2,
-        lookbackYears: 2
-    },
-    {
-        id: "Balanced",
-        label: "Balanced - 8-dim uniform, no solar",
-        description: "Uniform 8-dim weights, no solar-state filter, 2-month window.",
-        active: false,
-        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
-        weights: { res: 24, eua: 24, de_res: 12, bg_res: 7, ttf: 10, gr_prior: 4, de_prior: 6, bg_prior: 13 },
-        filterSolar: false,
-        monthWindow: 2,
-        lookbackYears: 2
-    }
-];
-
-// Active model shortcut (defaults to first, which is "Expanded")
-var ACTIVE_MODEL = MATCHING_MODELS[0];
+var PRODUCTION_WEIGHTS = { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 };
 
 // ── Original per-category weights (used by Standard model) ──────────────
 var OPTIMIZED_WEIGHTS = {
@@ -2983,14 +2943,7 @@ function applyOptimizedWeights(force = false) {
                 if (!targetData) return;
                 
                 const dayType = get3DayType(targetDate, isHoliday);
-                var opt;
-                if (ACTIVE_MODEL.useCategoryWeights) {
-                    var solarState = getSolarState(targetData, targetDate);
-                    opt = OPTIMIZED_WEIGHTS[solarState] ? OPTIMIZED_WEIGHTS[solarState][dayType] : null;
-                    console.log("Standard weights: solar=" + solarState + " dayType=" + dayType + " opt=" + (opt ? "found" : "NULL"));
-                } else {
-                    opt = ACTIVE_MODEL.weights;
-                }
+                var opt = PRODUCTION_WEIGHTS;
                 if (opt) {
                     document.getElementById("w_res").value = opt.res || 0;
                     document.getElementById("w_eua").value = opt.eua || 0;
@@ -3004,7 +2957,7 @@ function applyOptimizedWeights(force = false) {
                     
                     const label = document.getElementById("weights_auto_label");
                     if (label) {
-                        label.innerHTML = `🎯 ${ACTIVE_MODEL.id} weights loaded`;
+                        label.innerHTML = "🎯 Production weights loaded";
                         label.style.color = "#10b981";
                     }
                 }
@@ -4952,8 +4905,7 @@ function findAnalogues() {
                 
                 const targetDateObj = parseLocalDate(targetDate);
                 const t_is_holiday = currentTargetData.is_holiday || false;
-                const targetSolarState = getSolarState(currentTargetData, targetDateObj);
-                                const t_day_type = get3DayType(targetDateObj, t_is_holiday);
+                const t_day_type = get3DayType(targetDateObj, t_is_holiday);
                 
                 // Calculate minimum date allowed
                 let minDate = new Date("1970-01-01"); 
@@ -4977,24 +4929,6 @@ function findAnalogues() {
                     const c_is_holiday = data.is_holiday || false;
                     const c_day_type = get3DayType(curD, c_is_holiday);
                     if (c_day_type !== t_day_type) continue;
-                    
-                    // Solar filter per active model
-                    if (ACTIVE_MODEL.filterSolar) {
-                        const cd_solar = getSolarState(data, curD);
-                        if (cd_solar !== targetSolarState) continue;
-                    }
-                    // Month window per active model
-                    if (ACTIVE_MODEL.monthWindow !== null) {
-                        var cd_month = curD.getMonth();
-                        var td_month = targetDateObj.getMonth();
-                        var mdff = Math.abs(td_month - cd_month);
-                        if (mdff > ACTIVE_MODEL.monthWindow && mdff !== 11) continue;
-                    }
-                    // Lookback years per active model
-                    if (ACTIVE_MODEL.lookbackYears !== null) {
-                        var yrDiff = targetDateObj.getFullYear() - curD.getFullYear();
-                        if (yrDiff > ACTIVE_MODEL.lookbackYears) continue;
-                    }
                     
                     const distRes = euclideanDistance(currentTargetData.residuals, data.residuals);
                     const targetResCentered = getCenteredProfile(currentTargetData.residuals);
@@ -5148,7 +5082,7 @@ function findAnalogues() {
                 var w_gr_prior = parseFloat(document.getElementById("w_gr_prior").value) || 0;
                 var w_de_prior = parseFloat(document.getElementById("w_de_prior").value) || 0;
                 var w_bg_prior = parseFloat(document.getElementById("w_bg_prior").value) || 0;
-                var w_it_res = (ACTIVE_MODEL && ACTIVE_MODEL.weights && ACTIVE_MODEL.weights.it_res ? ACTIVE_MODEL.weights.it_res : 0) / 100.0;
+                var w_it_res = (PRODUCTION_WEIGHTS.it_res || 0) / 100.0;
                 w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
                 w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
                 console.log("findAnalogues weights:", w_res.toFixed(2), w_eua.toFixed(2), w_de_res.toFixed(2), w_bg_res.toFixed(2), w_ttf.toFixed(2), w_gr_prior.toFixed(2), w_de_prior.toFixed(2), w_bg_prior.toFixed(2), w_it_res.toFixed(2));
@@ -5206,68 +5140,6 @@ function findAnalogues() {
                 currentTop7 = matches.slice(0, 13);
                 console.log("Top 7 matches:", matches.slice(0, 7).map(function(m) { return m.date + ":" + m.combined.toFixed(1); }).join("  "));
 
-                // ── 4-Way Cross-Checking (consensus voting) ────────────────
-                try {
-                // Score all candidates with each model's weights, pick top-7 per model.
-                window.modelMatchesById = {};
-                const dimKeys = ["resPct","euaPct","deResPct","bgResPct","ttfPct","grPriorPct","dePriorPct","bgPriorPct","itResPct"];
-                const lookup = { resPct:'res', euaPct:'eua', deResPct:'de_res', bgResPct:'bg_res',
-                                ttfPct:'ttf', grPriorPct:'gr_prior', dePriorPct:'de_prior',
-                                bgPriorPct:'bg_prior', itResPct:'it_res' };
-                MATCHING_MODELS.forEach(function(mdl) {
-                    // Get model weights (per-category or fixed)
-                    var modelWeights = mdl.weights;
-                    if (mdl.useCategoryWeights) {
-                        var cw = OPTIMIZED_WEIGHTS[targetSolarState] ? OPTIMIZED_WEIGHTS[targetSolarState][t_day_type] : null;
-                        if (cw) modelWeights = cw;
-                    }
-                    var wMap = {};
-                    dimKeys.forEach(function(k) {
-                        var w = modelWeights[lookup[k]];
-                        if (w !== undefined) wMap[k] = w / 100.0;
-                    });
-                    var scored = [];
-                    for (var mi = 0; mi < matches.length; mi++) {
-                        var m = matches[mi];
-                        if (mdl.filterSolar) {
-                            if (getSolarState(m.data, parseLocalDate(m.date)) !== targetSolarState) continue;
-                        }
-                        if (mdl.monthWindow !== null) {
-                            var cm = parseLocalDate(m.date).getMonth();
-                            var tm = targetDateObj.getMonth();
-                            var mdff = Math.abs(tm - cm);
-                            if (mdff > mdl.monthWindow && mdff !== 11) continue;
-                        }
-                        if (mdl.lookbackYears !== null) {
-                            var ly = parseLocalDate(m.date).getFullYear();
-                            if (targetDateObj.getFullYear() - ly > mdl.lookbackYears) continue;
-                        }
-                        var totalW = 0, weighted = 0;
-                        for (var dk = 0; dk < dimKeys.length; dk++) {
-                            var k = dimKeys[dk];
-                            var w = wMap[k];
-                            if (w && m[k] !== null && m[k] !== undefined) {
-                                weighted += w * m[k];
-                                totalW += w;
-                            }
-                        }
-                        var score = totalW > 0 ? weighted / totalW : 0;
-                        var yp = (targetDateObj.getTime() - parseLocalDate(m.date).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-                        var disc = Math.max(0.5, 1.0 - yp * 0.05);
-                        scored.push({ date: m.date, combined: score * disc, data: m.data });
-                    }
-                    scored.sort(function(a, b) { return b.combined - a.combined; });
-                    window.modelMatchesById[mdl.id] = scored.slice(0, 7);
-                });
-                window.consensusRouteMap = { totalModels: MATCHING_MODELS.length };
-                for (var ci = 0; ci < MATCHING_MODELS.length; ci++) {
-                    var mid = MATCHING_MODELS[ci].id;
-                    var mlist = window.modelMatchesById[mid] || [];
-                    var topScore = mlist.length > 0 ? mlist[0].combined.toFixed(1) : "none";
-                    console.log("Cross-check " + mid + ": " + mlist.length + " matches  top=" + topScore + "  useCatW=" + (MATCHING_MODELS[ci].useCategoryWeights ? "yes" : "no"));
-                }
-                } catch(e) { console.error("Cross-check error:", e); }
-                
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
                     if (pct >= 60) return '#d97706';
@@ -6321,25 +6193,10 @@ function renderArbitragePanel() {
                     const startIsEU = countryEU[group.start];
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
 
-                    // Consensus count: how many models have >=3 valid matches for this route
-                    let consensusCount = 0;
-                    if (window.modelMatchesById) {
-                        MATCHING_MODELS.forEach(function(mdl) {
-                            var ml = window.modelMatchesById[mdl.id];
-                            if (ml && ml.length >= 3) consensusCount++;
-                        });
-                    }
-                    if (consensusCount === 0) consensusCount = 1; // at least primary model works
-                    const totalModels = MATCHING_MODELS.length;
-                    const consColor = consensusCount >= 4 ? '#059669' : consensusCount >= 3 ? '#d97706' : consensusCount >= 2 ? '#f97316' : '#dc2626';
-                    const consBg = consensusCount >= 4 ? '#ecfdf5' : consensusCount >= 3 ? '#fffbeb' : consensusCount >= 2 ? '#fff7ed' : '#fef2f2';
-
                     cardsHtml += `
                     <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-                            <div style="display:flex;align-items:center;gap:6px;">${headerBadges}
-                                <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${consBg};color:${consColor};">${consensusCount}/${totalModels} consensus</span>
-                            </div>
+                            <div style="display:flex;align-items:center;gap:6px;">${headerBadges}</div>
                             <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;text-transform:uppercase;">Optimal Flow Route</span>
                         </div>
                         ${pillsHtml}
@@ -6650,29 +6507,6 @@ function renderArbitragePanel() {
 
                 }
 
-// Populate model dropdown from MATCHING_MODELS
-            function initModelSelector() {
-                var sel = document.getElementById("analogue_model");
-                if (!sel || !MATCHING_MODELS) return;
-                sel.innerHTML = MATCHING_MODELS.map(function(m, i) {
-                    return `<option value="${i}" ${m.active ? 'selected' : ''}>${m.label}</option>`;
-                }).join('');
-                onModelChange();
-            }
-
-// Handle model change in dropdown
-            function onModelChange() {
-                var sel = document.getElementById("analogue_model");
-                if (!sel || !MATCHING_MODELS) return;
-                var idx = parseInt(sel.value);
-                MATCHING_MODELS.forEach(function(m) { m.active = false; });
-                MATCHING_MODELS[idx].active = true;
-                ACTIVE_MODEL = MATCHING_MODELS[idx];
-                applyOptimizedWeights(true);
-                var descEl = document.getElementById("model_description");
-                if (descEl) descEl.textContent = ACTIVE_MODEL.description;
-            }
-
 // ── Data Loading ───────────────────────────────────────────────────────────
 
 // Fetch all JSON data files in parallel, then initialise the UI
@@ -6748,9 +6582,12 @@ async function initDashboardData() {
                         dateInput.value = y + '-' + m + '-' + d;
                     }
 
-                    // Initialize model selector and load its weights
+                    // Initialize country dropdown and load weights
                     try {
-                        initModelSelector();
+                        var cSel = document.getElementById("analogue_country");
+                        if (cSel && typeof countries !== 'undefined') {
+                            cSel.innerHTML = countries.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
+                        }
                         applyOptimizedWeights();
                     } catch (e) {
                         console.error("Init error:", e);
