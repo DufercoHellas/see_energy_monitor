@@ -5043,7 +5043,7 @@ function findAnalogues() {
                     // Lookback years per active model
                     if (ACTIVE_MODEL.lookbackYears !== null) {
                         var yrDiff = targetDateObj.getFullYear() - curD.getFullYear();
-                        if (yrDiff > ACTIVE_MODEL.lookbackYears || (yrDiff === ACTIVE_MODEL.lookbackYears && targetDateObj.getMonth() < curD.getMonth())) continue;
+                        if (yrDiff > ACTIVE_MODEL.lookbackYears) continue;
                     }
                     
                     const distRes = euclideanDistance(currentTargetData.residuals, data.residuals);
