@@ -1432,14 +1432,14 @@ function selectCorridorTab(cid, selectedIdx, count) {
 var MATCHING_MODELS = [
     {
         id: "Expanded",
-        label: "Expanded - 9-dim +IT, no restrictions",
-        description: "Best validated: 71.8% win rate, 24.46 EUR/MWh. 9 dimensions + Italian residual.",
+        label: "Expanded - 9-dim +IT, wide window",
+        description: "Best validated: 71.8% win rate. 9 dimensions + Italian residual, 2yr lookback.",
         active: true,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
         weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 },
         filterSolar: false,
-        monthWindow: null,
-        lookbackYears: null
+        monthWindow: 2,
+        lookbackYears: 2
     },
     {
         id: "Standard",
