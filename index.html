@@ -1130,6 +1130,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                     <input type="number" id="w_bg_prior" min="0" max="100" value="14" onchange="updateWeights('w_bg_prior')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
                     <span style="font-size: 11px; color: #6b7280;">%</span>
                 </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 500; color: #4b5563;" title="Italian Residuals shape similarity">IT Res:</span>
+                    <input type="number" id="w_it_res" min="0" max="100" value="9" onchange="updateWeights('w_it_res')" style="width: 38px; border: 1px solid #d1d5db; border-radius: 4px; padding: 2px; font-size: 11px; font-family: 'Inter'; text-align: center; font-weight: 600; color: #374151;">
+                    <span style="font-size: 11px; color: #6b7280;">%</span>
+                </div>
             </div>
             <div id="weights_auto_label" style="font-size: 11px; color: #6b7280; font-weight: 500; margin-top: 6px; min-height: 16px;"></div>
         </div>
@@ -2975,6 +2980,7 @@ function applyOptimizedWeights(force = false) {
                     document.getElementById("w_gr_prior").value = opt.gr_prior;
                     document.getElementById("w_de_prior").value = opt.de_prior;
                     document.getElementById("w_bg_prior").value = opt.bg_prior;
+                    document.getElementById("w_it_res").value = opt.it_res;
                     
                     const label = document.getElementById("weights_auto_label");
                     if (label) {
@@ -2993,7 +2999,7 @@ function updateWeights(changedId) {
                     label.style.color = "#d97706";
                 }
 
-                const ids = ["w_res", "w_eua", "w_de_res", "w_bg_res", "w_ttf", "w_gr_prior", "w_de_prior", "w_bg_prior"];
+                const ids = ["w_res", "w_eua", "w_de_res", "w_bg_res", "w_ttf", "w_gr_prior", "w_de_prior", "w_bg_prior", "w_it_res"];
                 const inputs = {};
                 ids.forEach(id => {
                     inputs[id] = document.getElementById(id);
