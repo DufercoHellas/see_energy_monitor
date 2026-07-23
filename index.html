@@ -6314,20 +6314,14 @@ function renderArbitragePanel() {
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
 
                     // Consensus count: how many models have >=3 valid matches for this route
-                    let consensusCount = 1;
+                    let consensusCount = 0;
                     if (window.modelMatchesById) {
-                        consensusCount = 0;
-                        MATCHING_MODELS.forEach(mdl => {
-                            const ml = window.modelMatchesById[mdl.id] || [];
-                            let valid = 0;
-                            ml.forEach(m => {
-                                const avgS = getDayAveragePriceWithFallback(group.start, m.date);
-                                const avgD = getDayAveragePriceWithFallback(group.end, m.date);
-                                if (avgS > 0.01 && avgD > 0.01) valid++;
-                            });
-                            if (valid >= 3) consensusCount++;
+                        MATCHING_MODELS.forEach(function(mdl) {
+                            var ml = window.modelMatchesById[mdl.id];
+                            if (ml && ml.length >= 3) consensusCount++;
                         });
                     }
+                    if (consensusCount === 0) consensusCount = 1; // at least primary model works
                     const totalModels = MATCHING_MODELS.length;
                     const consColor = consensusCount >= 4 ? '#059669' : consensusCount >= 3 ? '#d97706' : consensusCount >= 2 ? '#f97316' : '#dc2626';
                     const consBg = consensusCount >= 4 ? '#ecfdf5' : consensusCount >= 3 ? '#fffbeb' : consensusCount >= 2 ? '#fff7ed' : '#fef2f2';
