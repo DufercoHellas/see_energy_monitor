@@ -1461,7 +1461,7 @@ var MATCHING_MODELS = [
         description: "Best validated: 71.8% win rate, 24.46 EUR/MWh. 9 dimensions + Italian residual.",
         active: true,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
-        weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 9 },
+        weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 },
         filterSolar: false,
         monthWindow: null
     },
@@ -3012,15 +3012,15 @@ function applyOptimizedWeights(force = false) {
                     opt = ACTIVE_MODEL.weights;
                 }
                 if (opt) {
-                    document.getElementById("w_res").value = opt.res;
-                    document.getElementById("w_eua").value = opt.eua;
-                    document.getElementById("w_de_res").value = opt.de_res;
-                    document.getElementById("w_bg_res").value = opt.bg_res;
-                    document.getElementById("w_ttf").value = opt.ttf;
-                    document.getElementById("w_gr_prior").value = opt.gr_prior;
-                    document.getElementById("w_de_prior").value = opt.de_prior;
-                    document.getElementById("w_bg_prior").value = opt.bg_prior;
-                    document.getElementById("w_it_res").value = opt.it_res;
+                    document.getElementById("w_res").value = opt.res || 0;
+                    document.getElementById("w_eua").value = opt.eua || 0;
+                    document.getElementById("w_de_res").value = opt.de_res || 0;
+                    document.getElementById("w_bg_res").value = opt.bg_res || 0;
+                    document.getElementById("w_ttf").value = opt.ttf || 0;
+                    document.getElementById("w_gr_prior").value = opt.gr_prior || 0;
+                    document.getElementById("w_de_prior").value = opt.de_prior || 0;
+                    document.getElementById("w_bg_prior").value = opt.bg_prior || 0;
+                    document.getElementById("w_it_res").value = opt.it_res || 0;
                     
                     const label = document.getElementById("weights_auto_label");
                     if (label) {
@@ -5180,16 +5180,18 @@ function findAnalogues() {
                 const dePriorNormFactor = get95thPercentile(allMatches.map(m => m.distDePrior));
                 const bgPriorNormFactor = get95thPercentile(allMatches.map(m => m.distBgPrior));
                 const itResNormFactor = get95thPercentile(allMatches.map(m => m.distItRes));
-                // Get weights once
-                const w_res = parseFloat(document.getElementById("w_res").value) / 100.0;
-                const w_eua = parseFloat(document.getElementById("w_eua").value) / 100.0;
-                const w_de_res = parseFloat(document.getElementById("w_de_res").value) / 100.0;
-                const w_bg_res = parseFloat(document.getElementById("w_bg_res").value) / 100.0;
-                const w_ttf = parseFloat(document.getElementById("w_ttf").value) / 100.0;
-                const w_gr_prior = parseFloat(document.getElementById("w_gr_prior").value) / 100.0;
-                const w_de_prior = parseFloat(document.getElementById("w_de_prior").value) / 100.0;
-                const w_bg_prior = parseFloat(document.getElementById("w_bg_prior").value) / 100.0;
-                const w_it_res = (ACTIVE_MODEL && ACTIVE_MODEL.weights && ACTIVE_MODEL.weights.it_res ? ACTIVE_MODEL.weights.it_res : 9) / 100.0;
+                // Get weights once (with NaN protection for models that don't use all dims)
+                var w_res = parseFloat(document.getElementById("w_res").value) || 0;
+                var w_eua = parseFloat(document.getElementById("w_eua").value) || 0;
+                var w_de_res = parseFloat(document.getElementById("w_de_res").value) || 0;
+                var w_bg_res = parseFloat(document.getElementById("w_bg_res").value) || 0;
+                var w_ttf = parseFloat(document.getElementById("w_ttf").value) || 0;
+                var w_gr_prior = parseFloat(document.getElementById("w_gr_prior").value) || 0;
+                var w_de_prior = parseFloat(document.getElementById("w_de_prior").value) || 0;
+                var w_bg_prior = parseFloat(document.getElementById("w_bg_prior").value) || 0;
+                var w_it_res = (ACTIVE_MODEL && ACTIVE_MODEL.weights && ACTIVE_MODEL.weights.it_res ? ACTIVE_MODEL.weights.it_res : 0) / 100.0;
+                w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
+                w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
 
                 // Normalize all matches using the 95th percentile normalization factors
                 allMatches.forEach(m => {
