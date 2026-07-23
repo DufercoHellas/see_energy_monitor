@@ -3438,39 +3438,6 @@ function renderCableOutages() {
                 }
             }
 
-// Populate model dropdown from MATCHING_MODELS and set default
-function initModelSelector() {
-                const sel = document.getElementById("analogue_model");
-                if (!sel || !MATCHING_MODELS) return;
-                sel.innerHTML = MATCHING_MODELS.map((m, i) =>
-                    `<option value="${i}" ${m.active ? 'selected' : ''}>${m.id} — ${m.label.match(/\((.+)\)/)?.[1] || m.label}</option>`
-                ).join('');
-                onModelChange();
-            }
-
-// Handle model selection change in the dropdown
-function onModelChange() {
-                const sel = document.getElementById("analogue_model");
-                if (!sel || !MATCHING_MODELS) return;
-                const idx = parseInt(sel.value);
-                // Deactivate all, activate selected
-                MATCHING_MODELS.forEach(m => m.active = false);
-                MATCHING_MODELS[idx].active = true;
-                ACTIVE_MODEL = MATCHING_MODELS[idx];
-                // Reload weights in UI
-                applyOptimizedWeights(true);
-                // Update description
-                const descEl = document.getElementById("model_description");
-                if (descEl) {
-                    descEl.textContent = ACTIVE_MODEL.description;
-                }
-            }
-                         });
-                         let cHtml = `<span style="font-weight:700; font-size: 11px; text-transform: uppercase; color:#475569; letter-spacing: 0.5px; margin-right: 4px;">Corridors:</span>`;
-                         Array.from(uniqueCorrs).sort().forEach(c => {
-                             const isSelected = selectedSearchCorridor === c;
-                             const bg = isSelected ? "#4338ca" : "#e0e7ff";
-                             const color = isSelected ? "#ffffff" : "#4338ca";
                              const border = isSelected ? "1px solid #4338ca" : "1px solid #c7d2fe";
                              cHtml += `<span onclick="toggleSearchCorridorFilter('${c}')" style="background:${bg};color:${color};border:${border};padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;user-select:none;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">${c}</span>`;
                          });
@@ -6702,6 +6669,29 @@ function renderArbitragePanel() {
                 }
 
                 }
+
+// Populate model dropdown from MATCHING_MODELS
+            function initModelSelector() {
+                var sel = document.getElementById("analogue_model");
+                if (!sel || !MATCHING_MODELS) return;
+                sel.innerHTML = MATCHING_MODELS.map(function(m, i) {
+                    return `<option value="${i}" ${m.active ? 'selected' : ''}>${m.id} - ${m.label}</option>`;
+                }).join('');
+                onModelChange();
+            }
+
+// Handle model change in dropdown
+            function onModelChange() {
+                var sel = document.getElementById("analogue_model");
+                if (!sel || !MATCHING_MODELS) return;
+                var idx = parseInt(sel.value);
+                MATCHING_MODELS.forEach(function(m) { m.active = false; });
+                MATCHING_MODELS[idx].active = true;
+                ACTIVE_MODEL = MATCHING_MODELS[idx];
+                applyOptimizedWeights(true);
+                var descEl = document.getElementById("model_description");
+                if (descEl) descEl.textContent = ACTIVE_MODEL.description;
+            }
 
 // ── Data Loading ───────────────────────────────────────────────────────────
 
