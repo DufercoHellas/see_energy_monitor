@@ -6751,7 +6751,7 @@ async function initDashboardData() {
                     }
                 } catch (e) {
                     console.error("Failed to load dashboard data:", e);
-                    statusEl.innerHTML = `<span style="color: #ef4444; font-weight: 700;">Error: Failed to fetch dashboard data.</span><br><span style="font-size:11px;color:#94a3b8;margin-top:4px;display:block;">Check browser developer console.</span>`;
+                    statusEl.innerHTML = `<span style="color: #ef4444; font-weight: 700;">Error: Failed to fetch dashboard data.</span><br><span style="font-size:11px;color:#94a3b8;margin-top:4px;display:block;">Use 'python serve.py' to start a local HTTP server, then open http://localhost:8080</span>`;
                 }
             }
 
