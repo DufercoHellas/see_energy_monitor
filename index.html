@@ -6685,38 +6685,43 @@ async function initDashboardData() {
                         statusEl.innerHTML = `Loading energy data \u2014 <strong>${loaded}\u202f/\u202f${total}</strong> files\u2026 <span style="color:#94a3b8;font-size:11px;">(${label})</span>`;
                     };
 
-                    // Fetch a JSON file (supports .gz decompression via pako)
+                    // Fetch a JSON file (supports .gz decompression via pako, safe for file://)
                     const fetchJSON = (url) => {
-                        if (url.includes('.gz')) {
-                            return fetch(url)
-                                .then(r => {
-                                    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-                                    return r.arrayBuffer();
-                                })
-                                .then(buf => {
-                                    const decompressed = pako.ungzip(new Uint8Array(buf), { to: 'string' });
+                        var doFetch = function(u) {
+                            return fetch(u).then(function(r) {
+                                if (!r.ok) throw new Error('HTTP ' + r.status);
+                                return r.arrayBuffer();
+                            }).then(function(buf) {
+                                if (u.indexOf('.gz') !== -1) {
+                                    var decompressed = pako.ungzip(new Uint8Array(buf), { to: 'string' });
                                     return JSON.parse(decompressed);
-                                })
-                                .catch(err => {
-                                    // Fallback to loading uncompressed .json if .gz fails (e.g. locally via file:// scheme CORS)
-                                    console.warn(`Gzip fetch failed for ${url}, falling back to uncompressed:`, err);
-                                    const fallbackUrl = url.replace('.json.gz', '.json');
-                                    return fetch(fallbackUrl).then(r => r.json());
-                                });
+                                }
+                                var text = new TextDecoder('utf-8').decode(new Uint8Array(buf));
+                                return JSON.parse(text);
+                            });
+                        };
+                        if (url.indexOf('.gz') !== -1) {
+                            return doFetch(url).catch(function(err) {
+                                console.warn('Gzip fetch failed for ' + url + ', falling back:', err);
+                                return doFetch(url.replace('.json.gz', '.json'));
+                            });
                         }
-                        return fetch(url).then(r => r.json());
+                        return doFetch(url).catch(function(err) {
+                            console.warn('Fetch failed for ' + url + ', returning empty:', err);
+                            return null;
+                        });
                     };
                     const t = cacheBust;
 
                     // Fire all requests simultaneously
                     const [hist, out, cab, cabL, cabO, fwd, cabAll] = await Promise.all([
-                        fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d;  }),
-                        fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d;  }),
-                        fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d;  }),
-                        fetchJSON(`data/cables_long.json?t=${t}`).then(d => { tick('cables long-term');   return d;  }),
-                        fetchJSON(`data/cable_outages.json?t=${t}`).then(d => { tick('cable curtailments'); return d; }),
-                        fetchJSON(`data/auction_fwd.json?t=${t}`).then(d => { tick('forward curves');    return d;  }).catch(() => { tick('forward curves'); return {}; }),
-                        fetchJSON(`data/all_corridors.json?t=${t}`).then(d => { tick('corridors');       return d;  }).catch(() => { tick('corridors');       return []; })
+                        fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d || {};  }),
+                        fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d || [];  }),
+                        fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d || [];  }),
+                        fetchJSON(`data/cables_long.json?t=${t}`).then(d => { tick('cables long-term');   return d || [];  }),
+                        fetchJSON(`data/cable_outages.json?t=${t}`).then(d => { tick('cable curtailments'); return d || []; }),
+                        fetchJSON(`data/auction_fwd.json?t=${t}`).then(d => { tick('forward curves');    return d || {};  }),
+                        fetchJSON(`data/all_corridors.json?t=${t}`).then(d => { tick('corridors');       return d || [];  })
                     ]);
 
                     historicalData   = hist;
