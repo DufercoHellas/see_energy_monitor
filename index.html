@@ -6763,8 +6763,12 @@ async function initDashboardData() {
                     statusEl.innerText = "Initialising dashboard...";
 
                     // Initialize model selector and load its weights
-                    initModelSelector();
-                    applyOptimizedWeights();
+                    try {
+                        initModelSelector();
+                        applyOptimizedWeights();
+                    } catch (e) {
+                        console.error("Init error:", e);
+                    }
                     renderDashboard();
 
                     // Hide loading mask cleanly
