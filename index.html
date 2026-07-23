@@ -5207,80 +5207,50 @@ function findAnalogues() {
                 currentTop7 = matches.slice(0, 13);
 
                 // ── 4-Way Cross-Checking (consensus voting) ────────────────
+                try {
                 // Score all candidates with each model's weights, pick top-7 per model.
-                // Results stored in modelMatchesById for the arbitrage panel to use.
                 window.modelMatchesById = {};
                 const dimKeys = ["resPct","euaPct","deResPct","bgResPct","ttfPct","grPriorPct","dePriorPct","bgPriorPct","itResPct"];
-                MATCHING_MODELS.forEach(mdl => {
-                    // Build dim->weight mapping for this model
-                    const wMap = {};
-                    dimKeys.forEach(k => {
-                        const dimName = k.replace('Pct', '').replace(/^[a-z]/, c => c.toLowerCase()).replace('_', '');
-                        // Map JS naming back: deResPct -> de_res, grPriorPct -> gr_prior, itResPct -> it_res
-                        const lookup = { resPct:'res', euaPct:'eua', deResPct:'de_res', bgResPct:'bg_res',
-                                        ttfPct:'ttf', grPriorPct:'gr_prior', dePriorPct:'de_prior',
-                                        bgPriorPct:'bg_prior', itResPct:'it_res' };
-                        const w = mdl.weights[lookup[k]];
+                const lookup = { resPct:'res', euaPct:'eua', deResPct:'de_res', bgResPct:'bg_res',
+                                ttfPct:'ttf', grPriorPct:'gr_prior', dePriorPct:'de_prior',
+                                bgPriorPct:'bg_prior', itResPct:'it_res' };
+                MATCHING_MODELS.forEach(function(mdl) {
+                    var wMap = {};
+                    dimKeys.forEach(function(k) {
+                        var w = mdl.weights[lookup[k]];
                         if (w !== undefined) wMap[k] = w / 100.0;
                     });
-                    // Score each match
-                    const scored = matches.map(m => {
-                        // Apply model's filters
+                    var scored = [];
+                    for (var mi = 0; mi < matches.length; mi++) {
+                        var m = matches[mi];
                         if (mdl.filterSolar) {
-                            const msolar = getSolarState(m.data, parseLocalDate(m.date));
-                            if (msolar !== targetSolarState) return null;
+                            if (getSolarState(m.data, parseLocalDate(m.date)) !== targetSolarState) continue;
                         }
-                        // Month window filter
                         if (mdl.monthWindow !== null) {
-                            const cm = parseLocalDate(m.date).getMonth();
-                            const tm = targetDateObj.getMonth();
-                            const mdff = Math.abs(tm - cm);
-                            if (mdff > mdl.monthWindow && mdff !== 11) return null;
+                            var cm = parseLocalDate(m.date).getMonth();
+                            var tm = targetDateObj.getMonth();
+                            var mdff = Math.abs(tm - cm);
+                            if (mdff > mdl.monthWindow && mdff !== 11) continue;
                         }
-                        // Compute combined score with model's weights
-                        let totalW = 0, weighted = 0;
-                        dimKeys.forEach(k => {
-                            const w = wMap[k];
+                        var totalW = 0, weighted = 0;
+                        for (var dk = 0; dk < dimKeys.length; dk++) {
+                            var k = dimKeys[dk];
+                            var w = wMap[k];
                             if (w && m[k] !== null && m[k] !== undefined) {
                                 weighted += w * m[k];
                                 totalW += w;
                             }
-                        });
-                        const score = totalW > 0 ? weighted / totalW : 0;
-                        // Temporal discount
-                        const yp = (targetDateObj.getTime() - parseLocalDate(m.date).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-                        const disc = Math.max(0.5, 1.0 - yp * 0.05);
-                        return { date: m.date, combined: score * disc, data: m.data };
-                    }).filter(x => x !== null);
-                    scored.sort((a, b) => b.combined - a.combined);
+                        }
+                        var score = totalW > 0 ? weighted / totalW : 0;
+                        var yp = (targetDateObj.getTime() - parseLocalDate(m.date).getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+                        var disc = Math.max(0.5, 1.0 - yp * 0.05);
+                        scored.push({ date: m.date, combined: score * disc, data: m.data });
+                    }
+                    scored.sort(function(a, b) { return b.combined - a.combined; });
                     window.modelMatchesById[mdl.id] = scored.slice(0, 7);
                 });
-
-                // Build consensus route map: how many models have each (src,dst) pair in their top-7 matches
-                // This is used by renderArbitragePanel to show consensus badges
-                window.consensusRouteMap = {};
-                const allModelIds = MATCHING_MODELS.map(m => m.id);
-                const proxyMap = { ME:'RS', XK:'AL', BA:'RS' };
-                allModelIds.forEach(mid => {
-                    const ml = window.modelMatchesById[mid] || [];
-                    ml.forEach(m => {
-                        // For each match, check which corridors this could affect
-                        // Simplified: just track start/end countries from match data
-                        // Use country from match data (primary country)
-                        const mc = document.getElementById("analogue_country").value;
-                        if (mid && ml) {} // noop
-                    });
-                });
-                // Simplified: store just the model count per (start->end) based on topology
-                window.consensusRouteMap.counts = {};
-                allModelIds.forEach(mid => {
-                    const ml = window.modelMatchesById[mid] || [];
-                    if (ml.length < 3) return;
-                    // For each CBAM path, check if this model's top-3 matches have valid spreads
-                    // This is done lazily — for now store which models have enough good matches
-                    window.consensusRouteMap[mid] = { matchCount: ml.length };
-                });
-                window.consensusRouteMap.totalModels = allModelIds.length;
+                window.consensusRouteMap = { totalModels: MATCHING_MODELS.length };
+                } catch(e) { console.error("Cross-check error:", e); }
                 
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
