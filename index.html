@@ -5000,6 +5000,19 @@ function findAnalogues() {
                     const c_day_type = get3DayType(curD, c_is_holiday);
                     if (c_day_type !== t_day_type) continue;
                     
+                    // Solar filter per active model
+                    if (ACTIVE_MODEL.filterSolar) {
+                        const cd_solar = getSolarState(data, curD);
+                        if (cd_solar !== targetSolarState) continue;
+                    }
+                    // Month window per active model
+                    if (ACTIVE_MODEL.monthWindow !== null) {
+                        var cd_month = curD.getMonth();
+                        var td_month = targetDateObj.getMonth();
+                        var mdff = Math.abs(td_month - cd_month);
+                        if (mdff > ACTIVE_MODEL.monthWindow && mdff !== 11) continue;
+                    }
+                    
                     const distRes = euclideanDistance(currentTargetData.residuals, data.residuals);
                     const targetResCentered = getCenteredProfile(currentTargetData.residuals);
                     const candResCentered = getCenteredProfile(data.residuals);
