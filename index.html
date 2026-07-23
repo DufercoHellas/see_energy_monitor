@@ -1463,17 +1463,19 @@ var MATCHING_MODELS = [
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
         weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 },
         filterSolar: false,
-        monthWindow: null
+        monthWindow: null,
+        lookbackYears: null
     },
     {
         id: "Standard",
         label: "Standard - legacy 8-dim, solar filter",
-        description: "Original production model: per-category weights, solar-state filter.",
+        description: "Original production model: per-category weights, solar-state filter, 2yr lookback.",
         active: false,
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
         useCategoryWeights: true,
         filterSolar: true,
-        monthWindow: 1
+        monthWindow: 1,
+        lookbackYears: 2
     },
     {
         id: "Minimal",
@@ -1483,7 +1485,8 @@ var MATCHING_MODELS = [
         dims: ["res","eua","de_res","bg_res","ttf"],
         weights: { res: 28, eua: 22, de_res: 16, bg_res: 10, ttf: 24 },
         filterSolar: false,
-        monthWindow: 2
+        monthWindow: 2,
+        lookbackYears: 2
     },
     {
         id: "Balanced",
@@ -1493,7 +1496,8 @@ var MATCHING_MODELS = [
         dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
         weights: { res: 24, eua: 24, de_res: 12, bg_res: 7, ttf: 10, gr_prior: 4, de_prior: 6, bg_prior: 13 },
         filterSolar: false,
-        monthWindow: 2
+        monthWindow: 2,
+        lookbackYears: 2
     }
 ];
 
@@ -5035,6 +5039,11 @@ function findAnalogues() {
                         var td_month = targetDateObj.getMonth();
                         var mdff = Math.abs(td_month - cd_month);
                         if (mdff > ACTIVE_MODEL.monthWindow && mdff !== 11) continue;
+                    }
+                    // Lookback years per active model
+                    if (ACTIVE_MODEL.lookbackYears !== null) {
+                        var yrDiff = targetDateObj.getFullYear() - curD.getFullYear();
+                        if (yrDiff > ACTIVE_MODEL.lookbackYears || (yrDiff === ACTIVE_MODEL.lookbackYears && targetDateObj.getMonth() < curD.getMonth())) continue;
                     }
                     
                     const distRes = euclideanDistance(currentTargetData.residuals, data.residuals);
