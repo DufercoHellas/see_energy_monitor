@@ -5085,7 +5085,6 @@ function findAnalogues() {
                 var w_it_res = (PRODUCTION_WEIGHTS.it_res || 0) / 100.0;
                 w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
                 w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
-                console.log("findAnalogues weights:", w_res.toFixed(2), w_eua.toFixed(2), w_de_res.toFixed(2), w_bg_res.toFixed(2), w_ttf.toFixed(2), w_gr_prior.toFixed(2), w_de_prior.toFixed(2), w_bg_prior.toFixed(2), w_it_res.toFixed(2));
 
                 // Normalize all matches using the 95th percentile normalization factors
                 allMatches.forEach(m => {
@@ -5138,7 +5137,6 @@ function findAnalogues() {
                 // Sort by combined score descending
                 matches.sort((a, b) => b.combined - a.combined);
                 currentTop7 = matches.slice(0, 13);
-                console.log("Top 7 matches:", matches.slice(0, 7).map(function(m) { return m.date + ":" + m.combined.toFixed(1); }).join("  "));
 
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
