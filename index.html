@@ -1457,41 +1457,55 @@ function selectCorridorTab(cid, selectedIdx, count) {
 // All data references (historicalData, cablesData, historicalStats)
 // are closure-global from the concatenated script.
 
-// ── Weight Configuration ────────────────────────────────────────────────────
-// Pre-computed optimal weights per solar state / day-type for analogue scoring
+// ── Matching Models for Consensus Voting ─────────────────────────────────
+// Each model defines weights, filters, and behaviour. When multiple models
+// agree on a trade, the recommendation is more reliable ("consensus").
+// The active model (used for slider defaults and primary prediction) is first.
 
-var OPTIMIZED_WEIGHTS = {
-    "HighSolar_Long": {
-        "Weekday": { res: 10, eua: 0, de_res: 50, bg_res: 20, ttf: 0, gr_prior: 5, de_prior: 0, bg_prior: 15 },
-        "Saturday": { res: 15, eua: 50, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 0, de_prior: 10, bg_prior: 20 },
-        "Sunday": { res: 20, eua: 0, de_res: 20, bg_res: 15, ttf: 0, gr_prior: 45, de_prior: 0, bg_prior: 0 }
+var MATCHING_MODELS = [
+    {
+        id: "Expanded",
+        label: "Expanded (9-dim +IT, no restrictions)",
+        description: "Best validated: 71.8% win rate, 24.46 EUR/MWh. 9 dimensions + Italian residual.",
+        active: true,
+        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior","it_res"],
+        weights: { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 9 },
+        filterSolar: false,
+        monthWindow: null
     },
-    "HighSolar_Short": {
-        "Weekday": { res: 45, eua: 0, de_res: 20, bg_res: 20, ttf: 0, gr_prior: 5, de_prior: 0, bg_prior: 10 },
-        "Saturday": { res: 55, eua: 5, de_res: 15, bg_res: 0, ttf: 5, gr_prior: 20, de_prior: 0, bg_prior: 0 },
-        "Sunday": { res: 0, eua: 0, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 25, de_prior: 10, bg_prior: 60 }
+    {
+        id: "Standard",
+        label: "Standard (8-dim legacy, solar filter)",
+        description: "Original production model: per-category weights, solar-state filter.",
+        active: false,
+        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
+        filterSolar: true,
+        monthWindow: 1
     },
-    "MedSolar_Long": {
-        "Weekday": { res: 25, eua: 20, de_res: 10, bg_res: 5, ttf: 20, gr_prior: 5, de_prior: 10, bg_prior: 5 },
-        "Saturday": { res: 15, eua: 0, de_res: 10, bg_res: 15, ttf: 30, gr_prior: 25, de_prior: 0, bg_prior: 5 },
-        "Sunday": { res: 30, eua: 0, de_res: 10, bg_res: 5, ttf: 0, gr_prior: 0, de_prior: 55, bg_prior: 0 }
+    {
+        id: "Minimal",
+        label: "Minimal (5-dim fuel+residuals only)",
+        description: "Fuel prices + residuals only. No prior prices. Fast and clean.",
+        active: false,
+        dims: ["res","eua","de_res","bg_res","ttf"],
+        weights: { res: 28, eua: 22, de_res: 16, bg_res: 10, ttf: 24 },
+        filterSolar: false,
+        monthWindow: 2
     },
-    "MedSolar_Short": {
-        "Weekday": { res: 30, eua: 0, de_res: 20, bg_res: 0, ttf: 0, gr_prior: 0, de_prior: 35, bg_prior: 15 },
-        "Saturday": { res: 25, eua: 0, de_res: 5, bg_res: 55, ttf: 0, gr_prior: 5, de_prior: 5, bg_prior: 5 },
-        "Sunday": { res: 5, eua: 0, de_res: 15, bg_res: 0, ttf: 5, gr_prior: 45, de_prior: 0, bg_prior: 30 }
-    },
-    "LowSolar": {
-        "Weekday": { res: 20, eua: 5, de_res: 15, bg_res: 10, ttf: 35, gr_prior: 10, de_prior: 0, bg_prior: 5 },
-        "Saturday": { res: 0, eua: 0, de_res: 0, bg_res: 0, ttf: 5, gr_prior: 25, de_prior: 50, bg_prior: 20 },
-        "Sunday": { res: 35, eua: 25, de_res: 0, bg_res: 0, ttf: 0, gr_prior: 0, de_prior: 0, bg_prior: 40 }
+    {
+        id: "Balanced",
+        label: "Balanced (8-dim uniform, no solar)",
+        description: "Uniform 8-dim weights, no solar-state filter, 2-month window.",
+        active: false,
+        dims: ["res","eua","de_res","bg_res","ttf","gr_prior","de_prior","bg_prior"],
+        weights: { res: 24, eua: 24, de_res: 12, bg_res: 7, ttf: 10, gr_prior: 4, de_prior: 6, bg_prior: 13 },
+        filterSolar: false,
+        monthWindow: 2
     }
-};
+];
 
-// ── Model B Configuration (production) ───────────────────────────────────
-// Uniform 9-dimensional weights across all solar states and day types.
-// Removes solar-state filter and month-window constraint.
-var MODEL_B_WEIGHTS = { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 9 };
+// Active model shortcut (defaults to first, which is "Expanded")
+var ACTIVE_MODEL = MATCHING_MODELS[0];
 
 // ── State (shared with core.js) ────────────────────────────────────────────
 
@@ -2970,7 +2984,7 @@ function applyOptimizedWeights(force = false) {
                 if (!targetData) return;
                 
                 const dayType = get3DayType(targetDate, isHoliday);
-                const opt = MODEL_B_WEIGHTS;
+                const opt = ACTIVE_MODEL.weights;
                 if (opt) {
                     document.getElementById("w_res").value = opt.res;
                     document.getElementById("w_eua").value = opt.eua;
@@ -2984,7 +2998,7 @@ function applyOptimizedWeights(force = false) {
                     
                     const label = document.getElementById("weights_auto_label");
                     if (label) {
-                        label.innerHTML = `🎯 Model B weights loaded (uniform 9-dim)`;
+                        label.innerHTML = `🎯 ${ACTIVE_MODEL.id} weights loaded`;
                         label.style.color = "#10b981";
                     }
                 }
@@ -5140,7 +5154,7 @@ function findAnalogues() {
                 const w_gr_prior = parseFloat(document.getElementById("w_gr_prior").value) / 100.0;
                 const w_de_prior = parseFloat(document.getElementById("w_de_prior").value) / 100.0;
                 const w_bg_prior = parseFloat(document.getElementById("w_bg_prior").value) / 100.0;
-                const w_it_res = (typeof MODEL_B_WEIGHTS !== 'undefined' ? (MODEL_B_WEIGHTS.it_res || 9) : 9) / 100.0;
+                const w_it_res = (ACTIVE_MODEL && ACTIVE_MODEL.weights && ACTIVE_MODEL.weights.it_res ? ACTIVE_MODEL.weights.it_res : 9) / 100.0;
 
                 // Normalize all matches using the 95th percentile normalization factors
                 allMatches.forEach(m => {
