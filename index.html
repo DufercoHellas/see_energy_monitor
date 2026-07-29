@@ -3854,7 +3854,8 @@ function renderCableOutagesGrid() {
                 html += `
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody>`;
+
                 displayCorridors.forEach((corr, idx) => {
                     const rowBg = idx % 2 === 0 ? "#ffffff" : "#f8fafc";
                     const availPct = corridorAvail[corr];
@@ -3878,6 +3879,7 @@ function renderCableOutagesGrid() {
                         const dayEntries = rangeOutages.filter(item => item.corridor_code === corr && item.trade_date === d.dateStr);
                         const yearlyCap = getYearlyCapacityForDate(corr, d.dateStr);
                         const yearlyText = yearlyCap !== null ? `Yr: ${yearlyCap} MW` : '';
+                        
                         if (dayEntries.length === 0) {
                              const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
                              let fullNTC = null;
@@ -3886,7 +3888,12 @@ function renderCableOutagesGrid() {
                                  if (fullNTC === null || orig > fullNTC) fullNTC = orig;
                              });
                              const isFuture = d.dateStr > tomorrowStr;
-                             const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
+                             const ntcLabel = isFuture ? 'Pending D-1' : (fullNTC !== null ? `${fullNTC} MW` : '✓ Full');
+                             const bgStyle = isFuture ? 'background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;' : 'background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;';
+                             html += `
+                                 <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
+                                     <div style="${bgStyle} border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                         Mth: ${ntcLabel}
                                          ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px;">${yearlyText}</div>` : ''}
                                      </div>
                                  </td>
