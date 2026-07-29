@@ -1507,14 +1507,12 @@ const explicitBorders = [
     { from: 'GR', to: 'MK', cable: 'GR-MK' }, { from: 'MK', to: 'GR', cable: 'MK-GR' },
     { from: 'ME', to: 'XK', cable: 'ME-XK' }, { from: 'XK', to: 'ME', cable: 'XK-ME' },
     { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' },
-    { from: 'AL', to: 'XK', cable: 'AL-XK' }, { from: 'XK', to: 'AL', cable: 'XK-AL' },
-    { from: 'BA', to: 'HR', cable: 'BA-HR' }, { from: 'HR', to: 'BA', cable: 'HR-BA' },
-    { from: 'BA', to: 'ME', cable: 'BA-ME' }, { from: 'ME', to: 'BA', cable: 'ME-BA' }
+    { from: 'AL', to: 'XK', cable: 'AL-XK' }, { from: 'XK', to: 'AL', cable: 'XK-AL' }
 ];
 
 const implicitBorders = [];
 
-const pathCountriesList = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK", "BA", "HR"];
+const pathCountriesList = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK"];
 
 // Build topology once
 const arbitrageAdj = {};
@@ -3887,12 +3885,10 @@ function renderCableOutagesGrid() {
                                  const orig = parseFloat(item.original_capacity) || 0;
                                  if (fullNTC === null || orig > fullNTC) fullNTC = orig;
                              });
-                             const isFuture = d.dateStr > tomorrowStr;
-                             const ntcLabel = isFuture ? 'Pending D-1' : (fullNTC !== null ? `${fullNTC} MW` : '✓ Full');
-                             const bgStyle = isFuture ? 'background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0;' : 'background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;';
+                             const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
                              html += `
                                  <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
-                                     <div style="${bgStyle} border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                     <div style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
                                          Mth: ${ntcLabel}
                                          ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px;">${yearlyText}</div>` : ''}
                                      </div>
