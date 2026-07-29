@@ -176,27 +176,27 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 09:50</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 09:25</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 06:26</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:06</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 06:32</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:14</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 04:10</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 04:10</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 06:34</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:14</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-27 06:44</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:16</td>
             </tr>
         </table>
     </div>
@@ -1651,10 +1651,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "AL-ME": {
     "predicted": 1.234,
-    "confidence": 0.499,
+    "confidence": 0.471,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.284,
+    "mae_knn": 1.276,
     "mae_avg": 1.14,
     "features": {
       "ttf": 35.0,
@@ -1670,11 +1670,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AL-XK": {
-    "predicted": 2.773,
-    "confidence": 0.458,
+    "predicted": 1.329,
+    "confidence": 0.331,
     "n_auctions": 20,
-    "method": "knn_weighted",
-    "mae_knn": 1.126,
+    "method": "historical_avg_only",
+    "mae_knn": 1.244,
     "mae_avg": 1.189,
     "features": {
       "ttf": 35.0,
@@ -1687,18 +1687,14 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "p90": 3.5,
     "note": "normal",
-    "neighbors": [
-      "1.440",
-      "5.460",
-      "1.530"
-    ]
+    "neighbors": []
   },
   "AT-CZ": {
     "predicted": 3.608,
-    "confidence": 0.333,
+    "confidence": 0.256,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 1.21,
+    "mae_knn": 1.191,
     "mae_avg": 1.186,
     "features": {
       "ttf": 35.0,
@@ -1714,11 +1710,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AT-HU": {
-    "predicted": 12.844,
-    "confidence": 0.293,
+    "predicted": 13.395,
+    "confidence": 0.263,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 4.606,
+    "mae_knn": 4.736,
     "mae_avg": 5.412,
     "features": {
       "ttf": 35.0,
@@ -1732,17 +1728,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 21.07,
     "note": "normal",
     "neighbors": [
-      "13.250",
       "18.760",
+      "13.250",
       "15.680"
     ]
   },
   "AT-IT": {
-    "predicted": 10.869,
-    "confidence": 0.301,
+    "predicted": 11.72,
+    "confidence": 0.27,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.567,
+    "mae_knn": 9.729,
     "mae_avg": 12.295,
     "features": {
       "ttf": 35.0,
@@ -1756,17 +1752,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 37.15,
     "note": "normal",
     "neighbors": [
-      "4.030",
       "12.300",
+      "4.030",
       "8.130"
     ]
   },
   "BA-HR": {
     "predicted": 2.21,
-    "confidence": 0.639,
+    "confidence": 0.623,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.63,
+    "mae_knn": 0.61,
     "mae_avg": 0.645,
     "features": {
       "ttf": 54.4,
@@ -1782,15 +1778,15 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "2.560",
       "3.570",
-      "2.210"
+      "1.810"
     ]
   },
   "BA-ME": {
-    "predicted": 2.94,
-    "confidence": 0.64,
+    "predicted": 2.638,
+    "confidence": 0.604,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.542,
+    "mae_knn": 1.536,
     "mae_avg": 1.734,
     "features": {
       "ttf": 54.4,
@@ -1806,7 +1802,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "3.450",
       "1.780",
-      "3.450"
+      "2.220"
     ]
   },
   "BA-RS": {
@@ -1814,7 +1810,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.411,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.196,
+    "mae_knn": 1.182,
     "mae_avg": 1.213,
     "features": {
       "ttf": 54.4,
@@ -1878,11 +1874,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "BG-RO": {
-    "predicted": 0.779,
-    "confidence": 0.333,
+    "predicted": 0.696,
+    "confidence": 0.262,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.16,
+    "mae_knn": 0.758,
     "mae_avg": 1.467,
     "features": {
       "ttf": 35.0,
@@ -1896,9 +1892,9 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 5.0,
     "note": "normal",
     "neighbors": [
-      "0.980",
       "0.930",
-      "0.780"
+      "0.980",
+      "0.400"
     ]
   },
   "BG-RS": {
@@ -1906,8 +1902,8 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.234,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.625,
-    "mae_avg": 4.124,
+    "mae_knn": 2.704,
+    "mae_avg": 4.157,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1926,11 +1922,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "CZ-AT": {
-    "predicted": 6.79,
-    "confidence": 0.333,
+    "predicted": 6.515,
+    "confidence": 0.241,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.127,
+    "mae_knn": 1.088,
     "mae_avg": 1.938,
     "features": {
       "ttf": 35.0,
@@ -1942,19 +1938,19 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread_last_year": 4.955
     },
     "p90": 6.79,
-    "note": "capped_at_p90",
+    "note": "normal",
     "neighbors": [
-      "8.680",
       "6.750",
-      "6.540"
+      "8.680",
+      "6.250"
     ]
   },
   "CZ-SK": {
-    "predicted": 10.361,
-    "confidence": 0.307,
+    "predicted": 10.461,
+    "confidence": 0.26,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 2.719,
+    "mae_knn": 2.803,
     "mae_avg": 3.166,
     "features": {
       "ttf": 35.0,
@@ -1968,18 +1964,18 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 13.02,
     "note": "normal",
     "neighbors": [
-      "10.510",
       "14.540",
-      "7.390"
+      "7.390",
+      "10.510"
     ]
   },
   "FR-IT": {
-    "predicted": 63.757,
+    "predicted": 75.448,
     "confidence": 0.092,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 27.45,
-    "mae_avg": 26.201,
+    "mae_knn": 16.373,
+    "mae_avg": 13.641,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1998,7 +1994,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.499,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.796,
+    "mae_knn": 1.795,
     "mae_avg": 2.183,
     "features": {
       "ttf": 35.0,
@@ -2022,7 +2018,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.212,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 3.104,
+    "mae_knn": 3.105,
     "mae_avg": 3.842,
     "features": {
       "ttf": 35.0,
@@ -2042,11 +2038,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "GR-IT": {
-    "predicted": 4.923,
-    "confidence": 0.32,
+    "predicted": 4.558,
+    "confidence": 0.267,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.826,
+    "mae_knn": 8.873,
     "mae_avg": 10.022,
     "features": {
       "ttf": 35.0,
@@ -2060,9 +2056,9 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 29.99,
     "note": "normal",
     "neighbors": [
-      "8.620",
+      "10.130",
       "0.000",
-      "10.130"
+      "8.620"
     ]
   },
   "GR-MK": {
@@ -2070,7 +2066,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.5,
     "n_auctions": 64,
     "method": "knn_weighted",
-    "mae_knn": 1.573,
+    "mae_knn": 1.563,
     "mae_avg": 1.848,
     "features": {
       "ttf": 35.0,
@@ -2091,10 +2087,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HR-BA": {
     "predicted": 0.814,
-    "confidence": 0.558,
+    "confidence": 0.556,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 0.953,
+    "mae_knn": 0.901,
     "mae_avg": 0.742,
     "features": {
       "ttf": 35.0,
@@ -2111,10 +2107,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HR-HU": {
     "predicted": 7.71,
-    "confidence": 0.337,
+    "confidence": 0.255,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.307,
+    "mae_knn": 1.11,
     "mae_avg": 1.456,
     "features": {
       "ttf": 35.0,
@@ -2128,17 +2124,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 7.71,
     "note": "capped_at_p90",
     "neighbors": [
-      "5.650",
       "8.870",
-      "6.160"
+      "5.650",
+      "4.200"
     ]
   },
   "HR-RS": {
     "predicted": 6.27,
-    "confidence": 0.444,
+    "confidence": 0.427,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.842,
+    "mae_knn": 1.721,
     "mae_avg": 2.191,
     "features": {
       "ttf": 35.0,
@@ -2159,10 +2155,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HU-AT": {
     "predicted": 1.705,
-    "confidence": 0.288,
+    "confidence": 0.244,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 0.746,
+    "mae_knn": 0.802,
     "mae_avg": 0.669,
     "features": {
       "ttf": 35.0,
@@ -2178,11 +2174,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "HU-HR": {
-    "predicted": 1.018,
-    "confidence": 0.409,
+    "predicted": 0.851,
+    "confidence": 0.25,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.674,
+    "mae_knn": 0.82,
     "mae_avg": 1.171,
     "features": {
       "ttf": 35.0,
@@ -2196,17 +2192,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 4.0,
     "note": "normal",
     "neighbors": [
-      "1.530",
       "1.300",
-      "0.000"
+      "0.000",
+      "1.530"
     ]
   },
   "HU-RO": {
-    "predicted": 2.936,
-    "confidence": 0.336,
+    "predicted": 3.265,
+    "confidence": 0.244,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.139,
+    "mae_knn": 1.107,
     "mae_avg": 1.299,
     "features": {
       "ttf": 35.0,
@@ -2220,17 +2216,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 5.75,
     "note": "normal",
     "neighbors": [
-      "1.770",
       "4.000",
+      "1.770",
       "3.560"
     ]
   },
   "HU-RS": {
-    "predicted": 0.534,
+    "predicted": 0.489,
     "confidence": 0.262,
     "n_auctions": 42,
     "method": "knn_weighted",
-    "mae_knn": 1.314,
+    "mae_knn": 1.26,
     "mae_avg": 1.528,
     "features": {
       "ttf": 35.0,
@@ -2250,11 +2246,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-SK": {
-    "predicted": 2.083,
-    "confidence": 0.303,
+    "predicted": 2.835,
+    "confidence": 0.242,
     "n_auctions": 20,
-    "method": "historical_avg_only",
-    "mae_knn": 0.768,
+    "method": "knn_weighted",
+    "mae_knn": 0.717,
     "mae_avg": 0.722,
     "features": {
       "ttf": 35.0,
@@ -2267,14 +2263,18 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "p90": 3.2,
     "note": "normal",
-    "neighbors": []
+    "neighbors": [
+      "3.620",
+      "1.610",
+      "3.060"
+    ]
   },
   "IT-AT": {
-    "predicted": 7.565,
-    "confidence": 0.304,
+    "predicted": 7.361,
+    "confidence": 0.26,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.158,
+    "mae_knn": 0.989,
     "mae_avg": 2.157,
     "features": {
       "ttf": 35.0,
@@ -2288,9 +2288,9 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 7.87,
     "note": "normal",
     "neighbors": [
-      "8.030",
       "6.440",
-      "7.870"
+      "7.870",
+      "8.030"
     ]
   },
   "IT-FR": {
@@ -2298,7 +2298,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.092,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.059,
+    "mae_knn": 0.061,
     "mae_avg": 0.066,
     "features": {
       "ttf": 35.0,
@@ -2319,10 +2319,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-GR": {
     "predicted": 4.085,
-    "confidence": 0.32,
+    "confidence": 0.267,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 2.885,
+    "mae_knn": 2.895,
     "mae_avg": 2.775,
     "features": {
       "ttf": 35.0,
@@ -2338,11 +2338,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "IT-ME": {
-    "predicted": 3.402,
-    "confidence": 0.44,
+    "predicted": 3.4,
+    "confidence": 0.426,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.619,
+    "mae_knn": 1.595,
     "mae_avg": 1.702,
     "features": {
       "ttf": 35.0,
@@ -2366,8 +2366,8 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.353,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.499,
-    "mae_avg": 2.61,
+    "mae_knn": 1.705,
+    "mae_avg": 2.807,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2387,10 +2387,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "ME-AL": {
     "predicted": 3.62,
-    "confidence": 0.499,
+    "confidence": 0.471,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.041,
+    "mae_knn": 1.002,
     "mae_avg": 1.133,
     "features": {
       "ttf": 35.0,
@@ -2410,11 +2410,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "ME-BA": {
-    "predicted": 0.793,
-    "confidence": 0.566,
+    "predicted": 2.057,
+    "confidence": 0.564,
     "n_auctions": 68,
-    "method": "historical_avg_only",
-    "mae_knn": 0.705,
+    "method": "knn_weighted",
+    "mae_knn": 0.676,
     "mae_avg": 0.697,
     "features": {
       "ttf": 35.0,
@@ -2427,14 +2427,18 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "p90": 2.06,
     "note": "normal",
-    "neighbors": []
+    "neighbors": [
+      "4.110",
+      "0.210",
+      "0.150"
+    ]
   },
   "ME-IT": {
     "predicted": 15.07,
-    "confidence": 0.436,
+    "confidence": 0.422,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 5.011,
+    "mae_knn": 4.924,
     "mae_avg": 4.508,
     "features": {
       "ttf": 35.0,
@@ -2451,10 +2455,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "ME-RS": {
     "predicted": 6.66,
-    "confidence": 0.16,
+    "confidence": 0.161,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.663,
+    "mae_knn": 1.604,
     "mae_avg": 1.965,
     "features": {
       "ttf": 35.0,
@@ -2462,23 +2466,23 @@ function getRealizedPriceWithFallback(c, h, date) {
       "src_fwd": 119.75,
       "dst_fwd": 133.3,
       "fwd_spread": 13.55,
-      "hist_spread": 156.597,
+      "hist_spread": 154.639,
       "hist_spread_last_year": 159.628
     },
     "p90": 6.66,
     "note": "capped_at_p90",
     "neighbors": [
+      "3.600",
       "3.880",
-      "4.500",
-      "2.400"
+      "4.500"
     ]
   },
   "ME-XK": {
     "predicted": 1.962,
-    "confidence": 0.567,
+    "confidence": 0.564,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.214,
+    "mae_knn": 1.166,
     "mae_avg": 1.157,
     "features": {
       "ttf": 35.0,
@@ -2519,10 +2523,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-GR": {
     "predicted": 8.11,
-    "confidence": 0.492,
+    "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.122,
+    "mae_knn": 2.047,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
@@ -2537,16 +2541,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "note": "capped_at_p90",
     "neighbors": [
       "3.410",
-      "0.000",
-      "2.110"
+      "2.110",
+      "0.000"
     ]
   },
   "MK-RS": {
     "predicted": 5.0,
-    "confidence": 0.473,
+    "confidence": 0.462,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.263,
+    "mae_knn": 1.24,
     "mae_avg": 1.774,
     "features": {
       "ttf": 35.0,
@@ -2567,10 +2571,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-XK": {
     "predicted": 2.834,
-    "confidence": 0.517,
+    "confidence": 0.508,
     "n_auctions": 66,
     "method": "historical_avg_only",
-    "mae_knn": 1.978,
+    "mae_knn": 1.916,
     "mae_avg": 1.783,
     "features": {
       "ttf": 35.0,
@@ -2586,11 +2590,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "RO-BG": {
-    "predicted": 0.229,
-    "confidence": 0.333,
+    "predicted": 0.261,
+    "confidence": 0.262,
     "n_auctions": 20,
-    "method": "knn_weighted",
-    "mae_knn": 0.08,
+    "method": "historical_avg_only",
+    "mae_knn": 0.091,
     "mae_avg": 0.086,
     "features": {
       "ttf": 35.0,
@@ -2603,18 +2607,14 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "p90": 0.38,
     "note": "normal",
-    "neighbors": [
-      "0.110",
-      "0.330",
-      "0.310"
-    ]
+    "neighbors": []
   },
   "RO-HU": {
-    "predicted": 4.222,
-    "confidence": 0.335,
+    "predicted": 4.559,
+    "confidence": 0.243,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.472,
+    "mae_knn": 1.207,
     "mae_avg": 1.511,
     "features": {
       "ttf": 35.0,
@@ -2628,17 +2628,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 6.48,
     "note": "normal",
     "neighbors": [
-      "2.360",
       "5.820",
+      "2.360",
       "4.000"
     ]
   },
   "RS-BA": {
     "predicted": 0.125,
-    "confidence": 0.422,
+    "confidence": 0.416,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 0.156,
+    "mae_knn": 0.16,
     "mae_avg": 0.142,
     "features": {
       "ttf": 35.0,
@@ -2658,8 +2658,8 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.233,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.511,
-    "mae_avg": 0.565,
+    "mae_knn": 0.5,
+    "mae_avg": 0.557,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2678,11 +2678,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "RS-HR": {
-    "predicted": 1.582,
-    "confidence": 0.446,
+    "predicted": 1.604,
+    "confidence": 0.429,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.617,
+    "mae_knn": 0.593,
     "mae_avg": 0.638,
     "features": {
       "ttf": 35.0,
@@ -2706,7 +2706,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.247,
     "n_auctions": 49,
     "method": "historical_avg_only",
-    "mae_knn": 1.492,
+    "mae_knn": 1.614,
     "mae_avg": 1.435,
     "features": {
       "ttf": 35.0,
@@ -2723,10 +2723,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RS-ME": {
     "predicted": 4.728,
-    "confidence": 0.163,
+    "confidence": 0.165,
     "n_auctions": 60,
     "method": "historical_avg_only",
-    "mae_knn": 2.445,
+    "mae_knn": 2.35,
     "mae_avg": 2.073,
     "features": {
       "ttf": 35.0,
@@ -2734,7 +2734,7 @@ function getRealizedPriceWithFallback(c, h, date) {
       "src_fwd": 133.3,
       "dst_fwd": 119.75,
       "fwd_spread": -13.55,
-      "hist_spread": -156.597,
+      "hist_spread": -154.639,
       "hist_spread_last_year": -159.628
     },
     "p90": 7.56,
@@ -2742,11 +2742,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "RS-MK": {
-    "predicted": 0.954,
-    "confidence": 0.474,
+    "predicted": 0.959,
+    "confidence": 0.464,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.052,
+    "mae_knn": 1.044,
     "mae_avg": 1.131,
     "features": {
       "ttf": 35.0,
@@ -2767,10 +2767,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "SI-IT": {
     "predicted": 24.11,
-    "confidence": 0.37,
+    "confidence": 0.346,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 9.998,
+    "mae_knn": 11.223,
     "mae_avg": 9.45,
     "features": {
       "ttf": 35.0,
@@ -2786,11 +2786,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "SK-CZ": {
-    "predicted": 1.898,
-    "confidence": 0.307,
+    "predicted": 2.066,
+    "confidence": 0.26,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.383,
+    "mae_knn": 0.441,
     "mae_avg": 0.452,
     "features": {
       "ttf": 35.0,
@@ -2804,17 +2804,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 2.26,
     "note": "normal",
     "neighbors": [
-      "1.300",
       "2.480",
-      "2.080"
+      "2.080",
+      "1.300"
     ]
   },
   "SK-HU": {
-    "predicted": 6.361,
-    "confidence": 0.303,
+    "predicted": 6.106,
+    "confidence": 0.242,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.659,
+    "mae_knn": 1.773,
     "mae_avg": 2.539,
     "features": {
       "ttf": 35.0,
@@ -2828,17 +2828,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 12.22,
     "note": "normal",
     "neighbors": [
-      "7.710",
       "8.550",
-      "6.580"
+      "7.710",
+      "5.110"
     ]
   },
   "XK-AL": {
     "predicted": 1.16,
-    "confidence": 0.458,
+    "confidence": 0.331,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.217,
+    "mae_knn": 0.229,
     "mae_avg": 0.348,
     "features": {
       "ttf": 35.0,
@@ -2852,14 +2852,14 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 1.16,
     "note": "capped_at_p90",
     "neighbors": [
-      "0.400",
-      "0.250",
-      "0.290"
+      "0.290",
+      "0.110",
+      "0.330"
     ]
   },
   "XK-ME": {
-    "predicted": 0.667,
-    "confidence": 0.567,
+    "predicted": 0.666,
+    "confidence": 0.564,
     "n_auctions": 68,
     "method": "knn_weighted",
     "mae_knn": 0.463,
@@ -2883,10 +2883,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "XK-MK": {
     "predicted": 0.7,
-    "confidence": 0.498,
+    "confidence": 0.464,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 0.295,
+    "mae_knn": 0.301,
     "mae_avg": 0.253,
     "features": {
       "ttf": 35.0,
