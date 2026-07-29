@@ -176,7 +176,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 09:25</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 10:17</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
@@ -1506,12 +1506,15 @@ const explicitBorders = [
     { from: 'AL', to: 'ME', cable: 'AL-ME' }, { from: 'ME', to: 'AL', cable: 'ME-AL' },
     { from: 'GR', to: 'MK', cable: 'GR-MK' }, { from: 'MK', to: 'GR', cable: 'MK-GR' },
     { from: 'ME', to: 'XK', cable: 'ME-XK' }, { from: 'XK', to: 'ME', cable: 'XK-ME' },
-    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' }
+    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' },
+    { from: 'AL', to: 'XK', cable: 'AL-XK' }, { from: 'XK', to: 'AL', cable: 'XK-AL' },
+    { from: 'BA', to: 'HR', cable: 'BA-HR' }, { from: 'HR', to: 'BA', cable: 'HR-BA' },
+    { from: 'BA', to: 'ME', cable: 'BA-ME' }, { from: 'ME', to: 'BA', cable: 'ME-BA' }
 ];
 
 const implicitBorders = [];
 
-const pathCountriesList = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK"];
+const pathCountriesList = ["GR", "BG", "RO", "HU", "RS", "DE_LU", "IT", "AL", "MK", "ME", "XK", "BA", "HR"];
 
 // Build topology once
 const arbitrageAdj = {};
@@ -3852,11 +3855,13 @@ function renderCableOutagesGrid() {
                             </tr>
                         </thead>
                         <tbody>
-                `;
-
                 displayCorridors.forEach((corr, idx) => {
                     const rowBg = idx % 2 === 0 ? "#ffffff" : "#f8fafc";
                     const availPct = corridorAvail[corr];
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const tomorrowObj = new Date();
+                    tomorrowObj.setDate(tomorrowObj.getDate() + 1);
+                    const tomorrowStr = tomorrowObj.toISOString().split('T')[0];
                     const badgeColor = availPct < 100 ? "#b91c1c" : "#4338ca"; // Red for outages, blue for full
                     const badgeBg = availPct < 100 ? "#fee2e2" : "#e0e7ff";
                     
@@ -3874,18 +3879,14 @@ function renderCableOutagesGrid() {
                         const yearlyCap = getYearlyCapacityForDate(corr, d.dateStr);
                         const yearlyText = yearlyCap !== null ? `Yr: ${yearlyCap} MW` : '';
                         if (dayEntries.length === 0) {
-                             // Determine the max NTC for this corridor from all outage data
                              const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
                              let fullNTC = null;
                              allCorrEntries.forEach(item => {
                                  const orig = parseFloat(item.original_capacity) || 0;
                                  if (fullNTC === null || orig > fullNTC) fullNTC = orig;
                              });
+                             const isFuture = d.dateStr > tomorrowStr;
                              const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
-                             html += `
-                                 <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
-                                     <div style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
-                                         Mth: ${ntcLabel}
                                          ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px;">${yearlyText}</div>` : ''}
                                      </div>
                                  </td>
