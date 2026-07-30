@@ -308,13 +308,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <p id="total_records_card">0</p>
         </div>
         <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#dc2626 0%,#ef4444 100%);box-shadow:0 10px 15px -3px rgba(220,38,38,0.3);">
-            <h4>Total Unplanned Unavailable Capacity</h4>
-            <p id="unplanned_outages_card">0.00 MW</p>
-            <div id="unplanned_records_count" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+            <h4>Daily Avg Unplanned Capacity</h4>
+            <p id="unplanned_outages_card">0.0 MW / day</p>
+            <div id="unplanned_records_count" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Records: 0</div>
         </div>
         <div class="summary-box" style="min-width:220px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);box-shadow:0 10px 15px -3px rgba(15,23,42,0.3);">
-            <h4>Total Offline Capacity</h4>
-            <p id="total_offline_card">0.0 MW</p>
+            <h4>Daily Avg Offline Capacity</h4>
+            <p id="total_offline_card">0.0 MW / day</p>
         </div>
     </div>
     <!-- ── Country Sub-Tabs ── -->
@@ -4531,46 +4531,107 @@ function renderOutages(startStr, endStr, dateList) {
                     return outStart <= searchEnd && outEnd >= searchStart;
                 });
                 
-                // Update summary cards
-                const unplannedOutages = activeOutages.filter(row => row.businesstype === 'Unplanned outage');
-                const unplannedCount = unplannedOutages.length;
-                const unplannedMW = unplannedOutages.reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
-                const unplannedMWStr = unplannedMW >= 1000 ? (unplannedMW / 1000).toFixed(2) + " GW" : unplannedMW.toFixed(2) + " MW";
-                
-                const totalOfflineMW = activeOutages.reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
-                const totalOfflineStr = totalOfflineMW >= 1000 ? (totalOfflineMW / 1000).toFixed(1) + " GW" : totalOfflineMW.toFixed(0) + " MW";
-                
+                // Country installed production capacities map (MW)
+                const COUNTRY_INSTALLED_CAPACITY = {
+                    'DE_LU': 36862, 'DE': 36862,
+                    'IT': 39557,
+                    'FR': 24363,
+                    'GR': 9305,
+                    'BE': 9135,
+                    'CH': 8544,
+                    'CZ': 5335,
+                    'HU': 3775,
+                    'AT': 3661,
+                    'RS': 3082,
+                    'RO': 2588,
+                    'BG': 2247,
+                    'SK': 1263,
+                    'SI': 719
+                };
+
+                const daysCount = dateList.length || 1;
+
+                // Calculate daily average across all active outages
+                let totalDailySumAll = 0;
+                let totalDailySumUnplanned = 0;
+
+                dateList.forEach(dStr => {
+                    const dDate = parseLocalDate(dStr);
+                    const dStart = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 0, 0, 0, 0);
+                    const dEnd = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 23, 59, 59, 999);
+                    
+                    const dayAll = activeOutages
+                        .filter(row => new Date(row.start_dt) <= dEnd && new Date(row.end_dt) >= dStart)
+                        .reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
+                    
+                    const dayUnplanned = activeOutages
+                        .filter(row => row.businesstype === 'Unplanned outage' && new Date(row.start_dt) <= dEnd && new Date(row.end_dt) >= dStart)
+                        .reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
+                    
+                    totalDailySumAll += dayAll;
+                    totalDailySumUnplanned += dayUnplanned;
+                });
+
+                const avgOfflineMW = totalDailySumAll / daysCount;
+                const avgUnplannedMW = totalDailySumUnplanned / daysCount;
+
+                const avgOfflineStr = avgOfflineMW >= 1000 ? (avgOfflineMW / 1000).toFixed(2) + " GW / day" : Math.round(avgOfflineMW) + " MW / day";
+                const avgUnplannedStr = avgUnplannedMW >= 1000 ? (avgUnplannedMW / 1000).toFixed(2) + " GW / day" : Math.round(avgUnplannedMW) + " MW / day";
+
                 document.getElementById("total_records_card").innerText = activeOutages.length;
-                document.getElementById("unplanned_outages_card").innerText = unplannedMWStr;
+                document.getElementById("unplanned_outages_card").innerText = avgUnplannedStr;
                 const unplannedRecordsCountEl = document.getElementById("unplanned_records_count");
                 if (unplannedRecordsCountEl) {
-                    unplannedRecordsCountEl.innerText = `Records: ${unplannedCount}`;
+                    unplannedRecordsCountEl.innerText = `Selected Window: ${daysCount} Days`;
                 }
-                document.getElementById("total_offline_card").innerText = totalOfflineStr;
-                
+                document.getElementById("total_offline_card").innerText = avgOfflineStr;
+
                 // Render details per country
                 countries.forEach(c => {
                     const countryOutages = activeOutages.filter(row => row.Country === c);
+                    const installedCap = COUNTRY_INSTALLED_CAPACITY[c] || 0;
                     
-                    // Update country summary box
-                    const cTotalMW = countryOutages.reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
-                    const cTotalStr = cTotalMW >= 1000 ? (cTotalMW / 1000).toFixed(2) + " GW" : cTotalMW.toFixed(2) + " MW";
+                    let cDailySumAll = 0;
+                    let cDailySumUnplanned = 0;
+                    
+                    dateList.forEach(dStr => {
+                        const dDate = parseLocalDate(dStr);
+                        const dStart = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 0, 0, 0, 0);
+                        const dEnd = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 23, 59, 59, 999);
+                        
+                        const dayAll = countryOutages
+                            .filter(row => new Date(row.start_dt) <= dEnd && new Date(row.end_dt) >= dStart)
+                            .reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
+                        
+                        const dayUnplanned = countryOutages
+                            .filter(row => row.businesstype === 'Unplanned outage' && new Date(row.start_dt) <= dEnd && new Date(row.end_dt) >= dStart)
+                            .reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
+                        
+                        cDailySumAll += dayAll;
+                        cDailySumUnplanned += dayUnplanned;
+                    });
+                    
+                    const cAvgAllMW = cDailySumAll / daysCount;
+                    const cAvgUnplannedMW = cDailySumUnplanned / daysCount;
+                    
+                    const cAvgAllStr = cAvgAllMW >= 1000 ? (cAvgAllMW / 1000).toFixed(2) + " GW / day" : Math.round(cAvgAllMW) + " MW / day";
+                    const cAvgUnplannedStr = cAvgUnplannedMW >= 1000 ? (cAvgUnplannedMW / 1000).toFixed(2) + " GW / day" : Math.round(cAvgUnplannedMW) + " MW / day";
+                    
+                    const pctAll = installedCap > 0 ? ((cAvgAllMW / installedCap) * 100).toFixed(1) + "%" : "N/A";
+                    const pctUnplanned = installedCap > 0 ? ((cAvgUnplannedMW / installedCap) * 100).toFixed(1) + "%" : "N/A";
                     
                     const valEl = document.getElementById(`summary_val_${c}`);
                     const countEl = document.getElementById(`summary_count_${c}`);
-                    if (valEl) valEl.innerText = cTotalStr;
-                    if (countEl) countEl.innerText = `Records: ${countryOutages.length}`;
-                    
-                    // Calculate and display Total Unplanned Capacity
-                    const countryUnplanned = countryOutages.filter(row => row.businesstype === 'Unplanned outage');
-                    const unplannedMW = countryUnplanned.reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
-                    const unplannedMWStr = unplannedMW >= 1000 ? (unplannedMW / 1000).toFixed(2) + " GW" : unplannedMW.toFixed(2) + " MW";
+                    if (valEl) valEl.innerText = cAvgAllStr;
+                    if (countEl) countEl.innerText = `${pctAll} of ${installedCap.toLocaleString()} MW Total`;
                     
                     const unplannedMwValEl = document.getElementById(`unplanned_mw_val_${c}`);
                     const unplannedCountEl = document.getElementById(`unplanned_count_${c}`);
+                    if (unplannedMwValEl) unplannedMwValEl.innerText = cAvgUnplannedStr;
+                    if (unplannedCountEl) unplannedCountEl.innerText = `${pctUnplanned} of ${installedCap.toLocaleString()} MW Total`;
                     
-                    if (unplannedMwValEl) unplannedMwValEl.innerText = unplannedMWStr;
-                    if (unplannedCountEl) unplannedCountEl.innerText = `Records: ${countryUnplanned.length}`;
+                    const installedCapEl = document.getElementById(`installed_cap_${c}`);
+                    if (installedCapEl) installedCapEl.innerText = installedCap > 0 ? `${installedCap.toLocaleString()} MW` : "N/A";
                     
                     // Render Plotly stacked chart
                     renderCountryOutageChart(c, countryOutages, dateList);
@@ -4593,10 +4654,11 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                 
                 const fuelTypes = Array.from(new Set(countryOutages.map(row => row.display_fuel)));
                 const traces = [];
+                const totalsByDate = dateList.map(() => 0);
                 
                 fuelTypes.forEach(ft => {
                     const yVals = [];
-                    dateList.forEach(dStr => {
+                    dateList.forEach((dStr, idx) => {
                         const dDate = parseLocalDate(dStr);
                         const dStart = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 0, 0, 0, 0);
                         const dEnd = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 23, 59, 59, 999);
@@ -4604,7 +4666,9 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                         const mwSum = countryOutages
                             .filter(row => row.display_fuel === ft && new Date(row.start_dt) <= dEnd && new Date(row.end_dt) >= dStart)
                             .reduce((sum, row) => sum + parseFloat(row.unavailable_mw || 0), 0);
+                        
                         yVals.push(mwSum);
+                        totalsByDate[idx] += mwSum;
                     });
                     
                     traces.push({
@@ -4615,6 +4679,60 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                     });
                 });
                 
+                // Total sum text labels on top of each bar column
+                const textLabels = totalsByDate.map(val => val > 0 ? (val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val).toString()) : '');
+                
+                traces.push({
+                    x: dateList,
+                    y: totalsByDate,
+                    type: 'scatter',
+                    mode: 'text',
+                    text: textLabels,
+                    textposition: 'top center',
+                    textfont: { family: 'Inter', size: 10, color: '#0f172a' },
+                    showlegend: false,
+                    hoverinfo: 'none'
+                });
+                
+                // Highlight D+1 (Tomorrow) if available in dateList
+                const today = new Date();
+                const dPlus1Date = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+                const d1Y = dPlus1Date.getFullYear();
+                const d1M = String(dPlus1Date.getMonth() + 1).padStart(2, '0');
+                const d1D = String(dPlus1Date.getDate()).padStart(2, '0');
+                const dPlus1Str = `${d1Y}-${d1M}-${d1D}`;
+                
+                const shapes = [];
+                const annotations = [];
+                
+                if (dateList.includes(dPlus1Str)) {
+                    shapes.push({
+                        type: 'rect',
+                        xref: 'x',
+                        yref: 'paper',
+                        x0: dPlus1Str,
+                        x1: dPlus1Str,
+                        y0: 0,
+                        y1: 1,
+                        fillcolor: 'rgba(245, 158, 11, 0.15)',
+                        line: { color: '#f59e0b', width: 2, dash: 'dot' }
+                    });
+                    
+                    annotations.push({
+                        x: dPlus1Str,
+                        y: 1.05,
+                        xref: 'x',
+                        yref: 'paper',
+                        text: '<b>D+1 (Day-Ahead)</b>',
+                        showarrow: false,
+                        font: { family: 'Inter', size: 10, color: '#b45309' },
+                        bgcolor: '#fef3c7',
+                        bordercolor: '#f59e0b',
+                        borderwidth: 1,
+                        borderpad: 3
+                    });
+                }
+
                 const layout = {
                     title: {text: `${countryNames[c] || c} — Unavailable Capacity by Asset Type`, font: {family: 'Inter', size: 16, color: '#374151'}},
                     barmode: 'stack',
@@ -4622,9 +4740,12 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                     yaxis: {title: 'Unavailable Capacity (MW)', tickfont: {family: 'Inter', color: '#6b7280'}, gridcolor: '#f3f4f6'},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 50, l: 60, r: 20, b: 40},
-                    legend: {font: {family: 'Inter'}}
+                    margin: {t: 65, l: 60, r: 20, b: 40},
+                    legend: {font: {family: 'Inter'}},
+                    shapes: shapes,
+                    annotations: annotations
                 };
+                
                 Plotly.newPlot(plotId, traces, layout, {responsive: true});
             }
 
