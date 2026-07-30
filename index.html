@@ -4531,22 +4531,23 @@ function renderOutages(startStr, endStr, dateList) {
                     return outStart <= searchEnd && outEnd >= searchStart;
                 });
                 
-                // Country installed production capacities map (MW)
+                // Country official total grid installed production capacities map (MW)
                 const COUNTRY_INSTALLED_CAPACITY = {
-                    'DE_LU': 36862, 'DE': 36862,
-                    'IT': 39557,
-                    'FR': 24363,
-                    'GR': 9305,
-                    'BE': 9135,
-                    'CH': 8544,
-                    'CZ': 5335,
-                    'HU': 3775,
-                    'AT': 3661,
-                    'RS': 3082,
-                    'RO': 2588,
-                    'BG': 2247,
-                    'SK': 1263,
-                    'SI': 719
+                    'DE_LU': 245000, 'DE': 245000,
+                    'FR': 144000,
+                    'IT': 125000,
+                    'AT': 27500,
+                    'BE': 27000,
+                    'GR': 23500,
+                    'CH': 23000,
+                    'CZ': 22500,
+                    'RO': 19800,
+                    'HU': 13500,
+                    'BG': 13200,
+                    'RS': 8600,
+                    'SK': 8200,
+                    'HR': 5200,
+                    'SI': 4100
                 };
 
                 const daysCount = dateList.length || 1;
