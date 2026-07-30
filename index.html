@@ -176,27 +176,27 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 10:51</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 09:33</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:06</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 06:12</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:14</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 06:30</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 04:10</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 04:10</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:14</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 06:21</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-29 06:16</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-07-30 06:23</td>
             </tr>
         </table>
     </div>
@@ -248,8 +248,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 <hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_HU" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
-<div id="plot_res_FR" style="width:100%; height:400px; margin-bottom:40px;"></div>
-<hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_IT" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_GR" style="width:100%; height:400px; margin-bottom:40px;"></div>
@@ -269,8 +267,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 <div id="plot_res_SI" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_HR" style="width:100%; height:400px; margin-bottom:40px;"></div>
-<hr style="border:0; border-top:1px solid #eee;">
-<div id="plot_res_BE" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
 <div id="plot_res_EE" style="width:100%; height:400px; margin-bottom:40px;"></div>
 <hr style="border:0; border-top:1px solid #eee;">
@@ -342,14 +338,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Germany — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_DE_LU">0.00 MW</p>
-                        <div id="summary_count_DE_LU" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_DE_LU">0.0 MW / day</p>
+                        <div id="summary_count_DE_LU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_DE_LU">0.00 MW</p>
-                        <div id="unplanned_count_DE_LU" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_DE_LU">0.0 MW / day</p>
+                        <div id="unplanned_count_DE_LU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_DE_LU">0 MW</p>
+                        <div id="installed_count_DE_LU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -363,14 +364,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Hungary — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_HU">0.00 MW</p>
-                        <div id="summary_count_HU" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_HU">0.0 MW / day</p>
+                        <div id="summary_count_HU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_HU">0.00 MW</p>
-                        <div id="unplanned_count_HU" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_HU">0.0 MW / day</p>
+                        <div id="unplanned_count_HU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_HU">0 MW</p>
+                        <div id="installed_count_HU" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -384,14 +390,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>France — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_FR">0.00 MW</p>
-                        <div id="summary_count_FR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_FR">0.0 MW / day</p>
+                        <div id="summary_count_FR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_FR">0.00 MW</p>
-                        <div id="unplanned_count_FR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_FR">0.0 MW / day</p>
+                        <div id="unplanned_count_FR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_FR">0 MW</p>
+                        <div id="installed_count_FR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -405,14 +416,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Italy — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_IT">0.00 MW</p>
-                        <div id="summary_count_IT" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_IT">0.0 MW / day</p>
+                        <div id="summary_count_IT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_IT">0.00 MW</p>
-                        <div id="unplanned_count_IT" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_IT">0.0 MW / day</p>
+                        <div id="unplanned_count_IT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_IT">0 MW</p>
+                        <div id="installed_count_IT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -426,14 +442,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Greece — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_GR">0.00 MW</p>
-                        <div id="summary_count_GR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_GR">0.0 MW / day</p>
+                        <div id="summary_count_GR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_GR">0.00 MW</p>
-                        <div id="unplanned_count_GR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_GR">0.0 MW / day</p>
+                        <div id="unplanned_count_GR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_GR">0 MW</p>
+                        <div id="installed_count_GR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -447,14 +468,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Bulgaria — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_BG">0.00 MW</p>
-                        <div id="summary_count_BG" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_BG">0.0 MW / day</p>
+                        <div id="summary_count_BG" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_BG">0.00 MW</p>
-                        <div id="unplanned_count_BG" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_BG">0.0 MW / day</p>
+                        <div id="unplanned_count_BG" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_BG">0 MW</p>
+                        <div id="installed_count_BG" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -468,14 +494,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Romania — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_RO">0.00 MW</p>
-                        <div id="summary_count_RO" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_RO">0.0 MW / day</p>
+                        <div id="summary_count_RO" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_RO">0.00 MW</p>
-                        <div id="unplanned_count_RO" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_RO">0.0 MW / day</p>
+                        <div id="unplanned_count_RO" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_RO">0 MW</p>
+                        <div id="installed_count_RO" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -489,14 +520,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Serbia — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_RS">0.00 MW</p>
-                        <div id="summary_count_RS" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_RS">0.0 MW / day</p>
+                        <div id="summary_count_RS" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_RS">0.00 MW</p>
-                        <div id="unplanned_count_RS" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_RS">0.0 MW / day</p>
+                        <div id="unplanned_count_RS" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_RS">0 MW</p>
+                        <div id="installed_count_RS" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -510,14 +546,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Czech Rep. — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_CZ">0.00 MW</p>
-                        <div id="summary_count_CZ" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_CZ">0.0 MW / day</p>
+                        <div id="summary_count_CZ" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_CZ">0.00 MW</p>
-                        <div id="unplanned_count_CZ" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_CZ">0.0 MW / day</p>
+                        <div id="unplanned_count_CZ" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_CZ">0 MW</p>
+                        <div id="installed_count_CZ" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -531,14 +572,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Austria — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_AT">0.00 MW</p>
-                        <div id="summary_count_AT" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_AT">0.0 MW / day</p>
+                        <div id="summary_count_AT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_AT">0.00 MW</p>
-                        <div id="unplanned_count_AT" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_AT">0.0 MW / day</p>
+                        <div id="unplanned_count_AT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_AT">0 MW</p>
+                        <div id="installed_count_AT" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -552,14 +598,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Slovakia — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_SK">0.00 MW</p>
-                        <div id="summary_count_SK" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_SK">0.0 MW / day</p>
+                        <div id="summary_count_SK" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_SK">0.00 MW</p>
-                        <div id="unplanned_count_SK" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_SK">0.0 MW / day</p>
+                        <div id="unplanned_count_SK" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_SK">0 MW</p>
+                        <div id="installed_count_SK" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -573,14 +624,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Slovenia — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_SI">0.00 MW</p>
-                        <div id="summary_count_SI" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_SI">0.0 MW / day</p>
+                        <div id="summary_count_SI" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_SI">0.00 MW</p>
-                        <div id="unplanned_count_SI" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_SI">0.0 MW / day</p>
+                        <div id="unplanned_count_SI" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_SI">0 MW</p>
+                        <div id="installed_count_SI" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -594,14 +650,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Croatia — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_HR">0.00 MW</p>
-                        <div id="summary_count_HR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_HR">0.0 MW / day</p>
+                        <div id="summary_count_HR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_HR">0.00 MW</p>
-                        <div id="unplanned_count_HR" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_HR">0.0 MW / day</p>
+                        <div id="unplanned_count_HR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_HR">0 MW</p>
+                        <div id="installed_count_HR" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -615,14 +676,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Belgium — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_BE">0.00 MW</p>
-                        <div id="summary_count_BE" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_BE">0.0 MW / day</p>
+                        <div id="summary_count_BE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_BE">0.00 MW</p>
-                        <div id="unplanned_count_BE" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_BE">0.0 MW / day</p>
+                        <div id="unplanned_count_BE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_BE">0 MW</p>
+                        <div id="installed_count_BE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -636,14 +702,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>EE — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_EE">0.00 MW</p>
-                        <div id="summary_count_EE" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_EE">0.0 MW / day</p>
+                        <div id="summary_count_EE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_EE">0.00 MW</p>
-                        <div id="unplanned_count_EE" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_EE">0.0 MW / day</p>
+                        <div id="unplanned_count_EE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_EE">0 MW</p>
+                        <div id="installed_count_EE" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -657,14 +728,19 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 <h3>Switzerland — Generation Outages</h3>
                 <div style="display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap;">
                     <div class="summary-box" style="margin-bottom: 0;">
-                        <h4>Total Unavailable Capacity</h4>
-                        <p id="summary_val_CH">0.00 MW</p>
-                        <div id="summary_count_CH" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unavailable Capacity</h4>
+                        <p id="summary_val_CH">0.0 MW / day</p>
+                        <div id="summary_count_CH" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
                     </div>
                     <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); box-shadow: 0 10px 15px -3px rgba(220,38,38,0.3);">
-                        <h4>Total Unplanned Unavailable Capacity</h4>
-                        <p id="unplanned_mw_val_CH">0.00 MW</p>
-                        <div id="unplanned_count_CH" style="font-size: 13px; opacity: 0.8; margin-top: 5px;">Records: 0</div>
+                        <h4>Daily Avg Unplanned Capacity</h4>
+                        <p id="unplanned_mw_val_CH">0.0 MW / day</p>
+                        <div id="unplanned_count_CH" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">0.0% of Total Capacity</div>
+                    </div>
+                    <div class="summary-box" style="margin-bottom: 0; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); box-shadow: 0 10px 15px -3px rgba(3,105,161,0.3);">
+                        <h4>Total Installed Production Capacity</h4>
+                        <p id="installed_cap_CH">0 MW</p>
+                        <div id="installed_count_CH" style="font-size: 13px; opacity: 0.9; margin-top: 5px;">Registered Generation Assets</div>
                     </div>
                 </div>
                 <div class="chart-wrapper">
@@ -1647,7 +1723,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.494,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.728,
+    "mae_knn": 1.723,
     "mae_avg": 1.762,
     "features": {
       "ttf": 35.0,
@@ -1671,7 +1747,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.276,
+    "mae_knn": 1.271,
     "mae_avg": 1.14,
     "features": {
       "ttf": 35.0,
@@ -1688,10 +1764,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "AL-XK": {
     "predicted": 1.329,
-    "confidence": 0.331,
+    "confidence": 0.335,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 1.244,
+    "mae_knn": 1.248,
     "mae_avg": 1.189,
     "features": {
       "ttf": 35.0,
@@ -1708,10 +1784,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "AT-CZ": {
     "predicted": 3.608,
-    "confidence": 0.256,
+    "confidence": 0.259,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 1.191,
+    "mae_knn": 1.219,
     "mae_avg": 1.186,
     "features": {
       "ttf": 35.0,
@@ -1727,11 +1803,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AT-HU": {
-    "predicted": 13.395,
-    "confidence": 0.263,
+    "predicted": 13.424,
+    "confidence": 0.266,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 4.736,
+    "mae_knn": 4.977,
     "mae_avg": 5.412,
     "features": {
       "ttf": 35.0,
@@ -1751,11 +1827,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "AT-IT": {
-    "predicted": 11.72,
-    "confidence": 0.27,
+    "predicted": 11.755,
+    "confidence": 0.276,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.729,
+    "mae_knn": 10.533,
     "mae_avg": 12.295,
     "features": {
       "ttf": 35.0,
@@ -1824,10 +1900,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "BA-RS": {
     "predicted": 4.05,
-    "confidence": 0.411,
+    "confidence": 0.412,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.182,
+    "mae_knn": 1.179,
     "mae_avg": 1.213,
     "features": {
       "ttf": 54.4,
@@ -1848,10 +1924,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "BG-GR": {
     "predicted": 4.11,
-    "confidence": 0.212,
+    "confidence": 0.208,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.122,
+    "mae_knn": 1.056,
     "mae_avg": 1.217,
     "features": {
       "ttf": 35.0,
@@ -1872,7 +1948,7 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "BG-MK": {
     "predicted": 0.681,
-    "confidence": 0.197,
+    "confidence": 0.199,
     "n_auctions": 8,
     "method": "historical_avg_only",
     "mae_knn": 0.259,
@@ -1891,11 +1967,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "BG-RO": {
-    "predicted": 0.696,
-    "confidence": 0.262,
+    "predicted": 0.697,
+    "confidence": 0.265,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.758,
+    "mae_knn": 0.777,
     "mae_avg": 1.467,
     "features": {
       "ttf": 35.0,
@@ -1915,11 +1991,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "BG-RS": {
-    "predicted": 1.091,
-    "confidence": 0.234,
+    "predicted": 1.092,
+    "confidence": 0.235,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.704,
+    "mae_knn": 2.702,
     "mae_avg": 4.157,
     "features": {
       "ttf": 35.0,
@@ -1939,11 +2015,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "CZ-AT": {
-    "predicted": 6.515,
-    "confidence": 0.241,
+    "predicted": 6.508,
+    "confidence": 0.244,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.088,
+    "mae_knn": 1.127,
     "mae_avg": 1.938,
     "features": {
       "ttf": 35.0,
@@ -1963,11 +2039,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "CZ-SK": {
-    "predicted": 10.461,
-    "confidence": 0.26,
+    "predicted": 10.492,
+    "confidence": 0.261,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 2.803,
+    "mae_knn": 2.779,
     "mae_avg": 3.166,
     "features": {
       "ttf": 35.0,
@@ -1988,10 +2064,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "FR-IT": {
     "predicted": 75.448,
-    "confidence": 0.092,
+    "confidence": 0.091,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 16.373,
+    "mae_knn": 16.419,
     "mae_avg": 13.641,
     "features": {
       "ttf": 35.0,
@@ -2011,7 +2087,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.499,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.795,
+    "mae_knn": 1.793,
     "mae_avg": 2.183,
     "features": {
       "ttf": 35.0,
@@ -2032,10 +2108,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "GR-BG": {
     "predicted": 11.87,
-    "confidence": 0.212,
+    "confidence": 0.208,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 3.105,
+    "mae_knn": 2.999,
     "mae_avg": 3.842,
     "features": {
       "ttf": 35.0,
@@ -2055,11 +2131,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "GR-IT": {
-    "predicted": 4.558,
-    "confidence": 0.267,
+    "predicted": 4.566,
+    "confidence": 0.268,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 8.873,
+    "mae_knn": 9.323,
     "mae_avg": 10.022,
     "features": {
       "ttf": 35.0,
@@ -2083,7 +2159,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.5,
     "n_auctions": 64,
     "method": "knn_weighted",
-    "mae_knn": 1.563,
+    "mae_knn": 1.565,
     "mae_avg": 1.848,
     "features": {
       "ttf": 35.0,
@@ -2124,10 +2200,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HR-HU": {
     "predicted": 7.71,
-    "confidence": 0.255,
+    "confidence": 0.257,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.11,
+    "mae_knn": 1.192,
     "mae_avg": 1.456,
     "features": {
       "ttf": 35.0,
@@ -2142,8 +2218,8 @@ function getRealizedPriceWithFallback(c, h, date) {
     "note": "capped_at_p90",
     "neighbors": [
       "8.870",
-      "5.650",
-      "4.200"
+      "4.200",
+      "5.650"
     ]
   },
   "HR-RS": {
@@ -2151,7 +2227,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.427,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.721,
+    "mae_knn": 1.729,
     "mae_avg": 2.191,
     "features": {
       "ttf": 35.0,
@@ -2172,10 +2248,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HU-AT": {
     "predicted": 1.705,
-    "confidence": 0.244,
+    "confidence": 0.25,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 0.802,
+    "mae_knn": 0.813,
     "mae_avg": 0.669,
     "features": {
       "ttf": 35.0,
@@ -2191,11 +2267,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "HU-HR": {
-    "predicted": 0.851,
-    "confidence": 0.25,
+    "predicted": 0.867,
+    "confidence": 0.254,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.82,
+    "mae_knn": 0.779,
     "mae_avg": 1.171,
     "features": {
       "ttf": 35.0,
@@ -2209,17 +2285,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 4.0,
     "note": "normal",
     "neighbors": [
-      "1.300",
       "0.000",
-      "1.530"
+      "1.300",
+      "1.620"
     ]
   },
   "HU-RO": {
-    "predicted": 3.265,
-    "confidence": 0.244,
+    "predicted": 3.279,
+    "confidence": 0.248,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.107,
+    "mae_knn": 1.052,
     "mae_avg": 1.299,
     "features": {
       "ttf": 35.0,
@@ -2239,11 +2315,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-RS": {
-    "predicted": 0.489,
-    "confidence": 0.262,
+    "predicted": 0.488,
+    "confidence": 0.263,
     "n_auctions": 42,
     "method": "knn_weighted",
-    "mae_knn": 1.26,
+    "mae_knn": 1.267,
     "mae_avg": 1.528,
     "features": {
       "ttf": 35.0,
@@ -2263,11 +2339,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-SK": {
-    "predicted": 2.835,
-    "confidence": 0.242,
+    "predicted": 2.846,
+    "confidence": 0.249,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.717,
+    "mae_knn": 0.69,
     "mae_avg": 0.722,
     "features": {
       "ttf": 35.0,
@@ -2287,11 +2363,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "IT-AT": {
-    "predicted": 7.361,
-    "confidence": 0.26,
+    "predicted": 7.343,
+    "confidence": 0.263,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.989,
+    "mae_knn": 1.013,
     "mae_avg": 2.157,
     "features": {
       "ttf": 35.0,
@@ -2307,15 +2383,15 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "6.440",
       "7.870",
-      "8.030"
+      "8.000"
     ]
   },
   "IT-FR": {
-    "predicted": 0.113,
-    "confidence": 0.092,
+    "predicted": 0.071,
+    "confidence": 0.09,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.061,
+    "mae_knn": 0.062,
     "mae_avg": 0.066,
     "features": {
       "ttf": 35.0,
@@ -2330,16 +2406,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "note": "normal",
     "neighbors": [
       "0.020",
-      "0.230",
+      "0.100",
       "0.100"
     ]
   },
   "IT-GR": {
     "predicted": 4.085,
-    "confidence": 0.267,
+    "confidence": 0.268,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 2.895,
+    "mae_knn": 2.954,
     "mae_avg": 2.775,
     "features": {
       "ttf": 35.0,
@@ -2356,10 +2432,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-ME": {
     "predicted": 3.4,
-    "confidence": 0.426,
+    "confidence": 0.427,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.595,
+    "mae_knn": 1.588,
     "mae_avg": 1.702,
     "features": {
       "ttf": 35.0,
@@ -2380,10 +2456,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-SI": {
     "predicted": 8.88,
-    "confidence": 0.353,
+    "confidence": 0.367,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.705,
+    "mae_knn": 1.7,
     "mae_avg": 2.807,
     "features": {
       "ttf": 35.0,
@@ -2407,7 +2483,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.002,
+    "mae_knn": 1.001,
     "mae_avg": 1.133,
     "features": {
       "ttf": 35.0,
@@ -2455,7 +2531,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.422,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 4.924,
+    "mae_knn": 4.921,
     "mae_avg": 4.508,
     "features": {
       "ttf": 35.0,
@@ -2472,18 +2548,18 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "ME-RS": {
     "predicted": 6.66,
-    "confidence": 0.161,
+    "confidence": 0.162,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.604,
+    "mae_knn": 1.589,
     "mae_avg": 1.965,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
       "src_fwd": 119.75,
-      "dst_fwd": 133.3,
-      "fwd_spread": 13.55,
-      "hist_spread": 154.639,
+      "dst_fwd": 148.54,
+      "fwd_spread": 28.79,
+      "hist_spread": 153.679,
       "hist_spread_last_year": 159.628
     },
     "p90": 6.66,
@@ -2499,7 +2575,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.564,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.166,
+    "mae_knn": 1.174,
     "mae_avg": 1.157,
     "features": {
       "ttf": 35.0,
@@ -2516,10 +2592,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-BG": {
     "predicted": 1.5,
-    "confidence": 0.199,
+    "confidence": 0.2,
     "n_auctions": 8,
     "method": "knn_weighted",
-    "mae_knn": 0.349,
+    "mae_knn": 0.35,
     "mae_avg": 0.39,
     "features": {
       "ttf": 35.0,
@@ -2543,7 +2619,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.047,
+    "mae_knn": 2.049,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
@@ -2564,10 +2640,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-RS": {
     "predicted": 5.0,
-    "confidence": 0.462,
+    "confidence": 0.463,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.24,
+    "mae_knn": 1.242,
     "mae_avg": 1.774,
     "features": {
       "ttf": 35.0,
@@ -2608,10 +2684,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RO-BG": {
     "predicted": 0.261,
-    "confidence": 0.262,
+    "confidence": 0.265,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 0.091,
+    "mae_knn": 0.094,
     "mae_avg": 0.086,
     "features": {
       "ttf": 35.0,
@@ -2627,11 +2703,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "RO-HU": {
-    "predicted": 4.559,
-    "confidence": 0.243,
+    "predicted": 4.577,
+    "confidence": 0.247,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.207,
+    "mae_knn": 1.283,
     "mae_avg": 1.511,
     "features": {
       "ttf": 35.0,
@@ -2652,10 +2728,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RS-BA": {
     "predicted": 0.125,
-    "confidence": 0.416,
+    "confidence": 0.417,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 0.16,
+    "mae_knn": 0.159,
     "mae_avg": 0.142,
     "features": {
       "ttf": 35.0,
@@ -2672,10 +2748,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RS-BG": {
     "predicted": 2.2,
-    "confidence": 0.233,
+    "confidence": 0.234,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.5,
+    "mae_knn": 0.504,
     "mae_avg": 0.557,
     "features": {
       "ttf": 35.0,
@@ -2699,7 +2775,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.429,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.593,
+    "mae_knn": 0.592,
     "mae_avg": 0.638,
     "features": {
       "ttf": 35.0,
@@ -2720,10 +2796,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RS-HU": {
     "predicted": 4.04,
-    "confidence": 0.247,
+    "confidence": 0.248,
     "n_auctions": 49,
     "method": "historical_avg_only",
-    "mae_knn": 1.614,
+    "mae_knn": 1.613,
     "mae_avg": 1.435,
     "features": {
       "ttf": 35.0,
@@ -2743,15 +2819,15 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.165,
     "n_auctions": 60,
     "method": "historical_avg_only",
-    "mae_knn": 2.35,
+    "mae_knn": 2.348,
     "mae_avg": 2.073,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
-      "src_fwd": 133.3,
+      "src_fwd": 148.54,
       "dst_fwd": 119.75,
-      "fwd_spread": -13.55,
-      "hist_spread": -154.639,
+      "fwd_spread": -28.79,
+      "hist_spread": -153.679,
       "hist_spread_last_year": -159.628
     },
     "p90": 7.56,
@@ -2763,7 +2839,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.464,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.044,
+    "mae_knn": 1.049,
     "mae_avg": 1.131,
     "features": {
       "ttf": 35.0,
@@ -2784,10 +2860,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "SI-IT": {
     "predicted": 24.11,
-    "confidence": 0.346,
+    "confidence": 0.352,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 11.223,
+    "mae_knn": 11.217,
     "mae_avg": 9.45,
     "features": {
       "ttf": 35.0,
@@ -2803,11 +2879,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "SK-CZ": {
-    "predicted": 2.066,
-    "confidence": 0.26,
+    "predicted": 2.075,
+    "confidence": 0.261,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.441,
+    "mae_knn": 0.412,
     "mae_avg": 0.452,
     "features": {
       "ttf": 35.0,
@@ -2827,11 +2903,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "SK-HU": {
-    "predicted": 6.106,
-    "confidence": 0.242,
+    "predicted": 6.101,
+    "confidence": 0.249,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.773,
+    "mae_knn": 1.784,
     "mae_avg": 2.539,
     "features": {
       "ttf": 35.0,
@@ -2852,7 +2928,7 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "XK-AL": {
     "predicted": 1.16,
-    "confidence": 0.331,
+    "confidence": 0.335,
     "n_auctions": 20,
     "method": "knn_weighted",
     "mae_knn": 0.229,
@@ -2879,7 +2955,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.564,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.463,
+    "mae_knn": 0.457,
     "mae_avg": 0.536,
     "features": {
       "ttf": 35.0,
