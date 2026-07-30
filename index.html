@@ -4711,7 +4711,7 @@ function renderOutages(startStr, endStr, dateList) {
                     if (installedCapEl) installedCapEl.innerText = installedCap > 0 ? `${installedCap.toLocaleString()} MW` : "N/A";
                     
                     // Render Plotly stacked chart
-                    renderCountryOutageChart(c, countryOutages, dateList);
+                    renderCountryOutageChart(c, countryOutages, dateList, installedCap);
                     
                     // Render country details table
                     renderCountryOutageTable(c, countryOutages);
@@ -4719,7 +4719,7 @@ function renderOutages(startStr, endStr, dateList) {
             }
 
 // Render a stacked bar chart of unavailable capacity by fuel type for a country
-function renderCountryOutageChart(c, countryOutages, dateList) {
+function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                 const plotId = `plot_${c}`;
                 const div = document.getElementById(plotId);
                 if (!div) return;
@@ -4756,8 +4756,15 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                     });
                 });
                 
-                // Total sum text labels on top of each bar column
-                const textLabels = totalsByDate.map(val => val > 0 ? (val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val).toString()) : '');
+                // Outage percentage text labels on top of each bar column
+                const textLabels = totalsByDate.map(val => {
+                    if (val <= 0) return '';
+                    if (installedCap && installedCap > 0) {
+                        const pct = (val / installedCap) * 100;
+                        return pct >= 10 ? Math.round(pct) + '%' : pct.toFixed(1) + '%';
+                    }
+                    return Math.round(val) + ' MW';
+                });
                 
                 traces.push({
                     x: dateList,
@@ -4766,7 +4773,7 @@ function renderCountryOutageChart(c, countryOutages, dateList) {
                     mode: 'text',
                     text: textLabels,
                     textposition: 'top center',
-                    textfont: { family: 'Inter', size: 10, color: '#0f172a' },
+                    textfont: { family: 'Inter', size: 11, color: '#0f172a', weight: 'bold' },
                     showlegend: false,
                     hoverinfo: 'none'
                 });
