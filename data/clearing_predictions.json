@@ -892,7 +892,7 @@
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.04,
+    "mae_knn": 2.059,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
