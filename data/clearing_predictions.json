@@ -28,7 +28,7 @@
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.318,
+    "mae_knn": 1.317,
     "mae_avg": 1.14,
     "features": {
       "ttf": 35.0,
@@ -68,7 +68,7 @@
     "confidence": 0.241,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.18,
+    "mae_knn": 1.179,
     "mae_avg": 1.186,
     "features": {
       "ttf": 35.0,
@@ -92,7 +92,7 @@
     "confidence": 0.266,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 5.446,
+    "mae_knn": 5.453,
     "mae_avg": 5.412,
     "features": {
       "ttf": 35.0,
@@ -112,7 +112,7 @@
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.832,
+    "mae_knn": 9.83,
     "mae_avg": 12.295,
     "features": {
       "ttf": 35.0,
@@ -208,7 +208,7 @@
     "confidence": 0.194,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.908,
+    "mae_knn": 0.909,
     "mae_avg": 1.217,
     "features": {
       "ttf": 35.0,
@@ -324,7 +324,7 @@
     "confidence": 0.237,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 2.305,
+    "mae_knn": 2.301,
     "mae_avg": 3.166,
     "features": {
       "ttf": 35.0,
@@ -345,10 +345,10 @@
   },
   "FR-IT": {
     "predicted": 75.448,
-    "confidence": 0.082,
+    "confidence": 0.083,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 15.58,
+    "mae_knn": 15.627,
     "mae_avg": 13.641,
     "features": {
       "ttf": 35.0,
@@ -368,7 +368,7 @@
     "confidence": 0.457,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.673,
+    "mae_knn": 1.674,
     "mae_avg": 2.183,
     "features": {
       "ttf": 35.0,
@@ -388,7 +388,7 @@
     ]
   },
   "GR-BG": {
-    "predicted": 10.583,
+    "predicted": 10.582,
     "confidence": 0.194,
     "n_auctions": 20,
     "method": "knn_weighted",
@@ -412,11 +412,11 @@
     ]
   },
   "GR-IT": {
-    "predicted": 7.581,
+    "predicted": 7.586,
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.444,
+    "mae_knn": 9.059,
     "mae_avg": 10.022,
     "features": {
       "ttf": 35.0,
@@ -440,7 +440,7 @@
     "confidence": 0.455,
     "n_auctions": 64,
     "method": "knn_weighted",
-    "mae_knn": 1.689,
+    "mae_knn": 1.694,
     "mae_avg": 1.848,
     "features": {
       "ttf": 35.0,
@@ -665,7 +665,7 @@
   },
   "IT-FR": {
     "predicted": 0.071,
-    "confidence": 0.082,
+    "confidence": 0.083,
     "n_auctions": 20,
     "method": "knn_weighted",
     "mae_knn": 0.061,
@@ -692,7 +692,7 @@
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 2.997,
+    "mae_knn": 3.07,
     "mae_avg": 2.775,
     "features": {
       "ttf": 35.0,
@@ -712,7 +712,7 @@
     "confidence": 0.411,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.425,
+    "mae_knn": 1.431,
     "mae_avg": 1.702,
     "features": {
       "ttf": 35.0,
@@ -736,7 +736,7 @@
     "confidence": 0.293,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.794,
+    "mae_knn": 1.793,
     "mae_avg": 2.807,
     "features": {
       "ttf": 35.0,
@@ -760,7 +760,7 @@
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.064,
+    "mae_knn": 1.063,
     "mae_avg": 1.133,
     "features": {
       "ttf": 35.0,
@@ -808,7 +808,7 @@
     "confidence": 0.407,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 4.655,
+    "mae_knn": 4.651,
     "mae_avg": 4.508,
     "features": {
       "ttf": 35.0,
@@ -836,7 +836,7 @@
       "src_fwd": 119.75,
       "dst_fwd": 151.03,
       "fwd_spread": 31.28,
-      "hist_spread": -5.013,
+      "hist_spread": -5.017,
       "hist_spread_last_year": -5.479
     },
     "p90": 6.66,
@@ -917,10 +917,10 @@
   },
   "MK-RS": {
     "predicted": 1.778,
-    "confidence": 0.482,
+    "confidence": 0.483,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.133,
+    "mae_knn": 1.13,
     "mae_avg": 1.774,
     "features": {
       "ttf": 35.0,
@@ -1104,7 +1104,7 @@
       "src_fwd": 151.03,
       "dst_fwd": 119.75,
       "fwd_spread": -31.28,
-      "hist_spread": 5.013,
+      "hist_spread": 5.017,
       "hist_spread_last_year": 5.479
     },
     "p90": 7.56,
