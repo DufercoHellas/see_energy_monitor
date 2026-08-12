@@ -4,7 +4,7 @@
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.586,
+    "mae_knn": 1.583,
     "mae_avg": 1.762,
     "features": {
       "ttf": 35.0,
@@ -28,7 +28,7 @@
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.317,
+    "mae_knn": 1.319,
     "mae_avg": 1.14,
     "features": {
       "ttf": 35.0,
@@ -112,7 +112,7 @@
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.83,
+    "mae_knn": 9.836,
     "mae_avg": 12.295,
     "features": {
       "ttf": 35.0,
@@ -204,11 +204,11 @@
     ]
   },
   "BG-GR": {
-    "predicted": 1.59,
+    "predicted": 1.591,
     "confidence": 0.194,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.909,
+    "mae_knn": 0.91,
     "mae_avg": 1.217,
     "features": {
       "ttf": 35.0,
@@ -272,11 +272,11 @@
     ]
   },
   "BG-RS": {
-    "predicted": 0.837,
+    "predicted": 0.836,
     "confidence": 0.232,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.763,
+    "mae_knn": 2.751,
     "mae_avg": 4.157,
     "features": {
       "ttf": 35.0,
@@ -348,7 +348,7 @@
     "confidence": 0.083,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 15.627,
+    "mae_knn": 15.666,
     "mae_avg": 13.641,
     "features": {
       "ttf": 35.0,
@@ -368,7 +368,7 @@
     "confidence": 0.457,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.674,
+    "mae_knn": 1.643,
     "mae_avg": 2.183,
     "features": {
       "ttf": 35.0,
@@ -392,7 +392,7 @@
     "confidence": 0.194,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 3.104,
+    "mae_knn": 2.934,
     "mae_avg": 3.842,
     "features": {
       "ttf": 35.0,
@@ -412,11 +412,11 @@
     ]
   },
   "GR-IT": {
-    "predicted": 7.586,
+    "predicted": 7.592,
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.059,
+    "mae_knn": 9.219,
     "mae_avg": 10.022,
     "features": {
       "ttf": 35.0,
@@ -508,7 +508,7 @@
     "confidence": 0.427,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.701,
+    "mae_knn": 1.703,
     "mae_avg": 2.191,
     "features": {
       "ttf": 35.0,
@@ -600,7 +600,7 @@
     "confidence": 0.263,
     "n_auctions": 42,
     "method": "knn_weighted",
-    "mae_knn": 1.194,
+    "mae_knn": 1.195,
     "mae_avg": 1.528,
     "features": {
       "ttf": 35.0,
@@ -692,7 +692,7 @@
     "confidence": 0.276,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 3.07,
+    "mae_knn": 3.154,
     "mae_avg": 2.775,
     "features": {
       "ttf": 35.0,
@@ -708,11 +708,11 @@
     "neighbors": []
   },
   "IT-ME": {
-    "predicted": 3.408,
+    "predicted": 2.821,
     "confidence": 0.411,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.431,
+    "mae_knn": 1.415,
     "mae_avg": 1.702,
     "features": {
       "ttf": 35.0,
@@ -728,7 +728,7 @@
     "neighbors": [
       "3.560",
       "3.550",
-      "2.880"
+      "0.210"
     ]
   },
   "IT-SI": {
@@ -736,7 +736,7 @@
     "confidence": 0.293,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.793,
+    "mae_knn": 1.794,
     "mae_avg": 2.807,
     "features": {
       "ttf": 35.0,
@@ -760,7 +760,7 @@
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.063,
+    "mae_knn": 1.078,
     "mae_avg": 1.133,
     "features": {
       "ttf": 35.0,
@@ -808,7 +808,7 @@
     "confidence": 0.407,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 4.651,
+    "mae_knn": 4.646,
     "mae_avg": 4.508,
     "features": {
       "ttf": 35.0,
@@ -828,7 +828,7 @@
     "confidence": 0.162,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.656,
+    "mae_knn": 1.661,
     "mae_avg": 1.965,
     "features": {
       "ttf": 35.0,
@@ -836,7 +836,7 @@
       "src_fwd": 119.75,
       "dst_fwd": 151.03,
       "fwd_spread": 31.28,
-      "hist_spread": -5.017,
+      "hist_spread": -5.149,
       "hist_spread_last_year": -5.479
     },
     "p90": 6.66,
@@ -896,7 +896,7 @@
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.064,
+    "mae_knn": 2.061,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
@@ -916,11 +916,11 @@
     ]
   },
   "MK-RS": {
-    "predicted": 1.778,
-    "confidence": 0.483,
+    "predicted": 1.777,
+    "confidence": 0.482,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.13,
+    "mae_knn": 1.132,
     "mae_avg": 1.774,
     "features": {
       "ttf": 35.0,
@@ -944,7 +944,7 @@
     "confidence": 0.517,
     "n_auctions": 66,
     "method": "historical_avg_only",
-    "mae_knn": 1.853,
+    "mae_knn": 1.854,
     "mae_avg": 1.783,
     "features": {
       "ttf": 35.0,
@@ -1032,7 +1032,7 @@
     "confidence": 0.231,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 0.507,
+    "mae_knn": 0.506,
     "mae_avg": 0.557,
     "features": {
       "ttf": 35.0,
@@ -1076,7 +1076,7 @@
     "confidence": 0.255,
     "n_auctions": 49,
     "method": "historical_avg_only",
-    "mae_knn": 1.531,
+    "mae_knn": 1.539,
     "mae_avg": 1.435,
     "features": {
       "ttf": 35.0,
@@ -1096,7 +1096,7 @@
     "confidence": 0.165,
     "n_auctions": 60,
     "method": "historical_avg_only",
-    "mae_knn": 2.262,
+    "mae_knn": 2.269,
     "mae_avg": 2.073,
     "features": {
       "ttf": 35.0,
@@ -1104,7 +1104,7 @@
       "src_fwd": 151.03,
       "dst_fwd": 119.75,
       "fwd_spread": -31.28,
-      "hist_spread": 5.017,
+      "hist_spread": 5.149,
       "hist_spread_last_year": 5.479
     },
     "p90": 7.56,
@@ -1116,7 +1116,7 @@
     "confidence": 0.479,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 0.955,
+    "mae_knn": 0.958,
     "mae_avg": 1.131,
     "features": {
       "ttf": 35.0,
@@ -1140,7 +1140,7 @@
     "confidence": 0.275,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 10.56,
+    "mae_knn": 10.559,
     "mae_avg": 9.45,
     "features": {
       "ttf": 35.0,
