@@ -7090,37 +7090,42 @@ function drawPlotlyEUMap(selectedDate) {
         }
     }
 
-    const EU_LABEL_COORDS = {
-        'AUT': [47.5162, 14.5501], 'BGR': [42.7339, 25.4858], 'HRV': [45.1, 15.2],
-        'CZE': [49.8175, 15.473], 'DEU': [51.1657, 10.4515], 'GRC': [39.0742, 21.8243],
-        'HUN': [47.1625, 19.5033], 'ITA': [41.8719, 12.5674], 'ROU': [45.9432, 24.9668],
-        'SRB': [44.0165, 21.0059], 'SVK': [48.669, 19.699], 'SVN': [46.1512, 14.9955],
-        'ALB': [41.1533, 20.1683], 'MKD': [41.6086, 21.7453], 'MNE': [42.7087, 19.3744],
-        'TUR': [38.9637, 35.2433], 'CHE': [46.8182, 8.2275], 'FRA': [46.2276, 2.2137],
-        'ESP': [40.4637, -3.7492], 'PRT': [39.3999, -8.2245], 'GBR': [55.3781, -3.436],
-        'IRL': [53.4129, -8.2439], 'BEL': [50.5039, 4.4699], 'NLD': [52.1326, 5.2913],
-        'POL': [51.9194, 19.1451], 'DNK': [56.2639, 9.5018], 'SWE': [60.1282, 18.6435],
-        'NOR': [60.472, 8.4689], 'FIN': [61.9241, 25.7482], 'EST': [58.5953, 25.0136],
-        'LVA': [56.8796, 24.6032], 'LTU': [55.1694, 23.8813]
-    };
+    // Add missing centroids for Bosnia & Kosovo
+    EU_LABEL_COORDS['BIH'] = [43.9159, 17.6791];
+    EU_LABEL_COORDS['XKX'] = [42.6026, 20.9030];
 
+    // ── Build click-catcher markers (invisible, but reliably fire plotly_click) ──
+    // Placed at every country centroid we map. On click: pt.customdata = zone key.
+    const clickLats = [], clickLons = [], clickKeys = [];
+    for (const [dk, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
+        const ck = EU_LABEL_COORDS[dk] ? dk : (EU_LABEL_COORDS[iso3] ? iso3 : null);
+        if (!ck) continue;
+        const coords = EU_LABEL_COORDS[ck];
+        clickLats.push(coords[0]);
+        clickLons.push(coords[1]);
+        clickKeys.push(dk); // zone key e.g. 'GR', 'IT', 'DE_LU'
+    }
+
+    // ── Build visible text labels (only for countries with data, skip hidden ones) ──
     const labelLats = [], labelLons = [], labelTexts = [], labelCustom = [];
-    const hideLabels = new Set(['NO1', 'SE1', 'EE', 'LV', 'LT', 'PL', 'ES', 'PT', 'NL', 'TR', 'SWE', 'NOR', 'EST', 'LVA', 'LTU', 'POL', 'ESP', 'PRT', 'NLD', 'TUR']);
+    const hideLabels = new Set(['NO1','SE1','EE','LV','LT','PL','ES','PT','NL','TR',
+                                'SWE','NOR','EST','LVA','LTU','POL','ESP','PRT','NLD','TUR']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
         const entry = historicalData?.[repKey]?.[selectedDate];
         const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
         const code = repKey === 'DE_LU' ? 'DE' : repKey;
         const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
-        
+
         if (hideLabels.has(repKey) || hideLabels.has(code) || hideLabels.has(iso3)) continue;
-        
+
         const ck = EU_LABEL_COORDS[repKey] ? repKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
         if (!ck) continue;
         const coords = EU_LABEL_COORDS[ck];
-        labelLats.push(coords[0]); labelLons.push(coords[1]);
-        // Clean label: "GR · 184€/MWh" or "GR · —" if no data
-        labelTexts.push(price !== null ? `${code} · ${Math.round(price)}${symbol}/MWh` : `${code}`);
+        labelLats.push(coords[0]);
+        labelLons.push(coords[1]);
+        // Two-line label: code on top, price below
+        labelTexts.push(price !== null ? `${code}\n${Math.round(price)}${symbol}` : code);
         labelCustom.push(repKey);
     }
 
@@ -7128,7 +7133,7 @@ function drawPlotlyEUMap(selectedDate) {
     const GEOJSON_URL = `data/europe.geojson?t=${Date.now()}`;
 
     const traceWithData = {
-        type: 'choroplethmapbox', 
+        type: 'choroplethmapbox',
         geojson: GEOJSON_URL, featureidkey: 'id',
         locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
         hoverinfo: 'skip',
@@ -7137,40 +7142,48 @@ function drawPlotlyEUMap(selectedDate) {
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
-    // Text-only labels — no markers so they don't intercept click events on the choropleth
+
+    // Invisible click-catcher markers — large hit area, opacity 0, always fires plotly_click
+    const traceClick = {
+        type: 'scattermapbox',
+        lat: clickLats, lon: clickLons,
+        mode: 'markers',
+        customdata: clickKeys,
+        marker: { size: 38, color: 'rgba(0,0,0,0)', opacity: 0 },
+        hoverinfo: 'skip',
+        showlegend: false
+    };
+
+    // Text labels — drawn on top but non-interactive (mode:'text' doesn't create hit areas)
     const traceLabels = {
         type: 'scattermapbox',
         lat: labelLats, lon: labelLons,
         mode: 'text',
         text: labelTexts,
-        customdata: labelCustom,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 11, color: '#ffffff' },
+        textfont: { family: 'Inter, Arial, sans-serif', size: 12, color: '#1e293b' },
         hoverinfo: 'skip',
         showlegend: false
     };
 
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        mapbox: {
-            style: 'carto-positron',
-            center: { lat: 48.0, lon: 13.0 },
-            zoom: 3.2
-        },
+        mapbox: { style: 'carto-positron', center: { lat: 48.0, lon: 13.0 }, zoom: 3.2 },
         showlegend: false,
-        paper_bgcolor: 'rgba(0,0,0,0)', 
+        paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceLabels], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceClick, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (!pt) return;
-            // pt.location = ISO-3 (e.g. "GRC") for choropleth, pt.customdata = zone key for scatter labels
-            const raw = pt.location || (pt.customdata ? String(pt.customdata) : null);
+            // Click-catcher markers give pt.customdata = zone key directly
+            // Choropleth fallback gives pt.location = ISO-3
+            const raw = (pt.customdata ? String(pt.customdata) : null) || pt.location;
             if (!raw) return;
             const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
-            renderEUMapCountryDetail(key, selectedDate);
+            if (key) renderEUMapCountryDetail(key, selectedDate);
         });
     });
 }
