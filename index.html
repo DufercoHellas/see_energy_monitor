@@ -7104,7 +7104,7 @@ function drawPlotlyEUMap(selectedDate) {
         'LVA': [56.8796, 24.6032], 'LTU': [55.1694, 23.8813]
     };
 
-    const labelLats = [], labelLons = [], labelTexts = [];
+    const labelLats = [], labelLons = [], labelTexts = [], labelCustom = [];
     const hideLabels = new Set(['NO1', 'SE1', 'EE', 'LV', 'LT', 'PL', 'ES', 'PT', 'NL', 'TR', 'SWE', 'NOR', 'EST', 'LVA', 'LTU', 'POL', 'ESP', 'PRT', 'NLD', 'TUR']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
@@ -7119,7 +7119,9 @@ function drawPlotlyEUMap(selectedDate) {
         if (!ck) continue;
         const coords = EU_LABEL_COORDS[ck];
         labelLats.push(coords[0]); labelLons.push(coords[1]);
-        labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
+        // Clean label: "GR · 184€/MWh" or "GR · —" if no data
+        labelTexts.push(price !== null ? `${code} · ${Math.round(price)}${symbol}/MWh` : `${code}`);
+        labelCustom.push(repKey);
     }
 
     // Local high-resolution Natural Earth 10m GeoJSON (built by pipeline/build_geojson.py)
@@ -7136,9 +7138,12 @@ function drawPlotlyEUMap(selectedDate) {
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
     // No-data countries: completely transparent — base map shows through just like Belarus
+    // Labels: white pill background, bold code + price in one line
     const traceLabels = {
-        type: 'scattermapbox', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 14, weight: '900', color: '#1e293b' },
+        type: 'scattermapbox', lat: labelLats, lon: labelLons, mode: 'text',
+        text: labelTexts,
+        customdata: labelCustom,
+        textfont: { family: 'Inter, Arial, sans-serif', size: 11, color: '#0f172a' },
         hoverinfo: 'skip'
     };
 
@@ -7159,7 +7164,10 @@ function drawPlotlyEUMap(selectedDate) {
     Plotly.newPlot('eumap_container', [traceWithData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
-            if (pt && pt.customdata) renderEUMapCountryDetail(pt.customdata, selectedDate);
+            if (!pt) return;
+            // choroplethmapbox returns pt.location (ISO-3), scattermapbox returns pt.customdata (zone key)
+            let key = pt.customdata || (pt.location ? EU_MAP_ISO3_TO_DATA[pt.location] : null) || pt.location;
+            if (key) renderEUMapCountryDetail(key, selectedDate);
         });
     });
 }
