@@ -7122,7 +7122,8 @@ function drawPlotlyEUMap(selectedDate) {
         labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
     }
 
-    const GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+    // Local high-resolution Natural Earth 10m GeoJSON (built by pipeline/build_geojson.py)
+    const GEOJSON_URL = `data/europe.geojson?t=${Date.now()}`;
 
     const traceWithData = {
         type: 'choroplethmapbox', 
@@ -7134,15 +7135,7 @@ function drawPlotlyEUMap(selectedDate) {
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
-    const traceNoData = {
-        type: 'choroplethmapbox',
-        geojson: GEOJSON_URL, featureidkey: 'id',
-        locations: noDataLoc, z: noDataLoc.map(() => 0), text: noDataText, customdata: noDataCustom,
-        hovertemplate: '%{text}<extra></extra>',
-        colorscale: [[0,'#e2e8f0'],[1,'#e2e8f0']], showscale: false, zmin: 0, zmax: 1,
-        marker: { opacity: 0.6, line: { color: '#ffffff', width: 1.5 } },
-        hoverinfo: 'text'
-    };
+    // No-data countries: completely transparent — base map shows through just like Belarus
     const traceLabels = {
         type: 'scattermapbox', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
         textfont: { family: 'Inter, Arial, sans-serif', size: 14, weight: '900', color: '#1e293b' },
@@ -7163,7 +7156,7 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabels], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (pt && pt.customdata) renderEUMapCountryDetail(pt.customdata, selectedDate);
