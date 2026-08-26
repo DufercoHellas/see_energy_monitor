@@ -7154,24 +7154,24 @@ function drawPlotlyEUMap(selectedDate) {
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
 
-    // Invisible click-catcher markers — large hit area, opacity 0, always fires plotly_click
+    // Invisible click-catcher markers — opacity 0.001 (not 0!) to preserve Plotly hit area
     const traceClick = {
         type: 'scattermapbox',
         lat: clickLats, lon: clickLons,
         mode: 'markers',
         customdata: clickKeys,
-        marker: { size: 38, color: 'rgba(0,0,0,0)', opacity: 0 },
+        marker: { size: 40, color: '#000000', opacity: 0.001 },
         hoverinfo: 'skip',
         showlegend: false
     };
 
-    // Text labels — drawn on top but non-interactive (mode:'text' doesn't create hit areas)
+    // Text labels — white bold, large enough to read on colored countries
     const traceLabels = {
         type: 'scattermapbox',
         lat: labelLats, lon: labelLons,
         mode: 'text',
         text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 12, color: '#1e293b' },
+        textfont: { family: 'Inter, Arial, sans-serif', size: 13, color: '#ffffff' },
         hoverinfo: 'skip',
         showlegend: false
     };
@@ -7189,8 +7189,8 @@ function drawPlotlyEUMap(selectedDate) {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (!pt) return;
-            // Click-catcher markers give pt.customdata = zone key directly
-            // Choropleth fallback gives pt.location = ISO-3
+            // Click-catcher: pt.customdata = zone key (e.g. 'GR')
+            // Choropleth fallback: pt.location = ISO-3 (e.g. 'GRC') → reverse-lookup
             const raw = (pt.customdata ? String(pt.customdata) : null) || pt.location;
             if (!raw) return;
             const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
