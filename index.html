@@ -757,70 +757,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <!-- ── TAB: Cables ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
     <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
-        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
-        <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
+        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
         <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
     </div>
 
-    <!-- ── Sub-Tab: Daily Price Matrix ── -->
-    <div id="CablesDaily" class="inner-cables-tabcontent" style="display:block;">
-        <h2>Cables Daily Price Matrix</h2>
-        <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly auction prices (€/MWh) for selected corridors. Use the sidebar controls to filter and select columns.</p>
-        
-        <div style="display: flex; gap: 24px; align-items: flex-start;">
-            <!-- ── Sidebar Controls ── -->
-            <div style="width: 280px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-sizing: border-box;">
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Date</label>
-                    <input type="date" id="cables_matrix_date" onchange="renderCablesMatrix()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Filter by Country</label>
-                    <select id="cables_country_select" onchange="filterCablesCheckboxes()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                        <!-- populated dynamically -->
-                    </select>
-                </div>
-                
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Cables/Corridors</label>
-                        <div style="font-size: 11px;">
-                            <a href="javascript:void(0)" onclick="toggleAllCables(true)" style="color: #4f46e5; font-weight: 600; text-decoration: none; margin-right: 8px;">All</a>
-                            <a href="javascript:void(0)" onclick="toggleAllCables(false)" style="color: #6b7280; font-weight: 600; text-decoration: none;">None</a>
-                        </div>
-                    </div>
-                    <div id="cables_checkboxes_container" style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; background: white; box-sizing: border-box;">
-                        <!-- checkboxes populated dynamically -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- ── Price Matrix Grid ── -->
-            <div style="flex-grow: 1; overflow-x: auto;">
-                <div class="table-container" style="max-height: 650px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <table id="cables_matrix_table" style="min-width: 100%;">
-                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
-                            <tr id="cables_matrix_head">
-                                <!-- populated dynamically -->
-                            </tr>
-                        </thead>
-                        <tbody id="cables_matrix_body" style="font-weight: 500;">
-                            <!-- populated dynamically -->
-                        </tbody>
-                        <tfoot style="position: sticky; bottom: 0; background: #f8fafc; font-weight: 700; border-top: 2px solid #e2e8f0; z-index: 1;">
-                            <tr id="cables_matrix_foot">
-                                <!-- populated dynamically -->
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ── Sub-Tab: Cable Auctions Optimizer ── -->
-    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
+    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:block;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
             <div>
                 <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
@@ -7163,12 +7105,16 @@ function drawPlotlyEUMap(selectedDate) {
     };
 
     const labelLats = [], labelLons = [], labelTexts = [];
+    const hideLabels = new Set(['NO1', 'SE1', 'EE', 'LV', 'LT', 'PL', 'ES', 'PT', 'NL', 'TR', 'SWE', 'NOR', 'EST', 'LVA', 'LTU', 'POL', 'ESP', 'PRT', 'NLD', 'TUR']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
         const entry = historicalData?.[repKey]?.[selectedDate];
         const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
         const code = repKey === 'DE_LU' ? 'DE' : repKey;
         const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
+        
+        if (hideLabels.has(repKey) || hideLabels.has(code) || hideLabels.has(iso3)) continue;
+        
         const ck = EU_LABEL_COORDS[repKey] ? repKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
         if (!ck) continue;
         const coords = EU_LABEL_COORDS[ck];
@@ -7176,40 +7122,43 @@ function drawPlotlyEUMap(selectedDate) {
         labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
     }
 
+    const GEOJSON_URL = 'https://raw.githubusercontent.com/johan/world.geo.json/master/countries.geo.json';
+
     const traceWithData = {
-        type: 'choropleth', locationmode: 'ISO-3',
+        type: 'choroplethmapbox', 
+        geojson: GEOJSON_URL, featureidkey: 'id',
         locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
         hovertemplate: '%{text}<extra></extra>',
         colorscale: [[0.0,'#a1d99b'],[0.25,'#fee08b'],[0.5,'#fdae61'],[0.75,'#f46d43'],[1.0,'#d73027']],
         zmin: minP, zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
-        marker: { line: { color: '#0f172a', width: 1.5 } }
+        marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
     const traceNoData = {
-        type: 'choropleth', locationmode: 'ISO-3',
+        type: 'choroplethmapbox',
+        geojson: GEOJSON_URL, featureidkey: 'id',
         locations: noDataLoc, z: noDataLoc.map(() => 0), text: noDataText, customdata: noDataCustom,
         hovertemplate: '%{text}<extra></extra>',
         colorscale: [[0,'#e2e8f0'],[1,'#e2e8f0']], showscale: false, zmin: 0, zmax: 1,
-        marker: { line: { color: '#cbd5e1', width: 1.0 } }
+        marker: { opacity: 0.6, line: { color: '#ffffff', width: 1.5 } },
+        hoverinfo: 'text'
     };
     const traceLabels = {
-        type: 'scattergeo', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 13, weight: '800', color: '#0f172a' },
+        type: 'scattermapbox', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
+        textfont: { family: 'Inter, Arial, sans-serif', size: 14, weight: '900', color: '#1e293b' },
         hoverinfo: 'skip'
     };
+
     const layout = {
-        geo: {
-            scope: 'europe', showland: true, landcolor: '#f8fafc',
-            showocean: true, oceancolor: '#cbd5e1',
-            showlakes: true, lakecolor: '#cbd5e1',
-            showcountries: true, showcoastlines: true, coastlinecolor: '#94a3b8',
-            showframe: false,
-            projection: { type: 'natural earth' },
-            lonaxis: { range: [-12, 42] }, lataxis: { range: [35, 70] },
-            bgcolor: 'rgba(0,0,0,0)', fixedrange: true
-        },
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+        mapbox: {
+            style: 'carto-positron',
+            center: { lat: 48.0, lon: 13.0 },
+            zoom: 3.2
+        },
+        showlegend: false,
+        paper_bgcolor: 'rgba(0,0,0,0)', 
+        plot_bgcolor: 'rgba(0,0,0,0)',
         hoverlabel: { bgcolor: '#1e293b', font: { color: '#ffffff', size: 13, family: 'Inter, sans-serif' }, bordercolor: '#334155' }
     };
     const config = { displayModeBar: false, responsive: true };
