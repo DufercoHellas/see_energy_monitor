@@ -7131,27 +7131,20 @@ function drawPlotlyEUMap(selectedDate) {
         type: 'choroplethmapbox', 
         geojson: GEOJSON_URL, featureidkey: 'id',
         locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
-        hovertemplate: '%{text}<extra></extra>',
+        hoverinfo: 'skip',
         colorscale: [[0.0,'#a1d99b'],[0.25,'#fee08b'],[0.5,'#fdae61'],[0.75,'#f46d43'],[1.0,'#d73027']],
         zmin: minP, zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
-    // Labels: white pill background + bold text, always visible on map
-    // Use markers+text: a white circle marker acts as background pill for the text
+    // Text-only labels — no markers so they don't intercept click events on the choropleth
     const traceLabels = {
         type: 'scattermapbox',
         lat: labelLats, lon: labelLons,
-        mode: 'markers+text',
+        mode: 'text',
         text: labelTexts,
         customdata: labelCustom,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 11, color: '#0f172a' },
-        textposition: 'middle center',
-        marker: {
-            size: 44,
-            color: 'rgba(255,255,255,0.88)',
-            opacity: 1
-        },
+        textfont: { family: 'Inter, Arial, sans-serif', size: 11, color: '#ffffff' },
         hoverinfo: 'skip',
         showlegend: false
     };
@@ -7165,8 +7158,7 @@ function drawPlotlyEUMap(selectedDate) {
         },
         showlegend: false,
         paper_bgcolor: 'rgba(0,0,0,0)', 
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        hoverlabel: { bgcolor: '#1e293b', font: { color: '#ffffff', size: 13, family: 'Inter, sans-serif' }, bordercolor: '#334155' }
+        plot_bgcolor: 'rgba(0,0,0,0)'
     };
     const config = { displayModeBar: false, responsive: true };
 
@@ -7174,11 +7166,9 @@ function drawPlotlyEUMap(selectedDate) {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (!pt) return;
-            // For choroplethmapbox: pt.location = ISO-3 (e.g. "GRC")
-            // For scattermapbox label: pt.customdata = zone key (e.g. "GR")
-            const raw = pt.customdata || pt.location;
+            // pt.location = ISO-3 (e.g. "GRC") for choropleth, pt.customdata = zone key for scatter labels
+            const raw = pt.location || (pt.customdata ? String(pt.customdata) : null);
             if (!raw) return;
-            // Resolve ISO-3 -> zone key if needed
             const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
             renderEUMapCountryDetail(key, selectedDate);
         });
