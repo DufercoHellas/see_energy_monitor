@@ -7137,14 +7137,23 @@ function drawPlotlyEUMap(selectedDate) {
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
-    // No-data countries: completely transparent — base map shows through just like Belarus
-    // Labels: white pill background, bold code + price in one line
+    // Labels: white pill background + bold text, always visible on map
+    // Use markers+text: a white circle marker acts as background pill for the text
     const traceLabels = {
-        type: 'scattermapbox', lat: labelLats, lon: labelLons, mode: 'text',
+        type: 'scattermapbox',
+        lat: labelLats, lon: labelLons,
+        mode: 'markers+text',
         text: labelTexts,
         customdata: labelCustom,
         textfont: { family: 'Inter, Arial, sans-serif', size: 11, color: '#0f172a' },
-        hoverinfo: 'skip'
+        textposition: 'middle center',
+        marker: {
+            size: 44,
+            color: 'rgba(255,255,255,0.88)',
+            opacity: 1
+        },
+        hoverinfo: 'skip',
+        showlegend: false
     };
 
     const layout = {
@@ -7165,9 +7174,13 @@ function drawPlotlyEUMap(selectedDate) {
         gd.on('plotly_click', function(data) {
             const pt = data.points[0];
             if (!pt) return;
-            // choroplethmapbox returns pt.location (ISO-3), scattermapbox returns pt.customdata (zone key)
-            let key = pt.customdata || (pt.location ? EU_MAP_ISO3_TO_DATA[pt.location] : null) || pt.location;
-            if (key) renderEUMapCountryDetail(key, selectedDate);
+            // For choroplethmapbox: pt.location = ISO-3 (e.g. "GRC")
+            // For scattermapbox label: pt.customdata = zone key (e.g. "GR")
+            const raw = pt.customdata || pt.location;
+            if (!raw) return;
+            // Resolve ISO-3 -> zone key if needed
+            const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
+            renderEUMapCountryDetail(key, selectedDate);
         });
     });
 }
