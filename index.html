@@ -7150,7 +7150,7 @@ function drawPlotlyEUMap(selectedDate) {
         zmin: minP,
         zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
-        marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
+        marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.5 } }
     };
 
     // Text labels positioned at country centroids
@@ -7169,7 +7169,7 @@ function drawPlotlyEUMap(selectedDate) {
 
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        mapbox: { style: 'carto-positron', center: { lat: 48.0, lon: 13.0 }, zoom: 3.2 },
+        mapbox: { style: 'carto-positron-nolabels', center: { lat: 48.0, lon: 13.0 }, zoom: 3.2 },
         showlegend: false,
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
