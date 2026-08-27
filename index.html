@@ -153,22 +153,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     display: none !important;
 }
 
-/* ── EU MAP PILL BADGES & ACTIVE TARGET HIGHLIGHT ── */
 .eumap-badge-pill {
-    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease, border-color 0.22s ease, background 0.22s ease;
     cursor: pointer;
     user-select: none;
 }
-.eumap-badge-pill.active-country-badge {
-    transform: translate(-50%, -50%) scale(1.24) !important;
-    background: #ffffff !important;
-    border: 2px solid #4f46e5 !important;
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.22), 0 10px 25px -3px rgba(79, 70, 229, 0.45), 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-    z-index: 25 !important;
-}
-.eumap-badge-pill.active-country-badge span:first-child {
-    color: #4f46e5 !important;
-}
+
 
         </style>
     </head>
@@ -7172,25 +7161,6 @@ function drawPlotlyEUMap(selectedDate) {
         marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.2 } }
     };
 
-    // Dedicated highlight trace that draws a bold border outline around the targeted country
-    const traceHighlight = {
-        type: 'choroplethmapbox',
-        geojson: GEOJSON_URL,
-        featureidkey: 'id',
-        locations: [],
-        z: [],
-        colorscale: [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],
-        showscale: false,
-        hoverinfo: 'none',
-        marker: {
-            opacity: 0,
-            line: {
-                color: '#1e1b4b',
-                width: 3.5
-            }
-        }
-    };
-
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
         mapbox: { style: 'carto-positron', center: { lat: 47.8, lon: 15.0 }, zoom: 3.75 },
@@ -7200,7 +7170,7 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceHighlight], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData], layout, config).then(gd => {
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
             if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
@@ -7270,28 +7240,6 @@ function renderEUMapCountryDetail(dataKey, date) {
         date = dateInput ? dateInput.value : null;
     }
     if (!date) return;
-
-    // Pop up and highlight the targeted country badge on the map
-    document.querySelectorAll('.eumap-badge-pill').forEach(b => {
-        if (b.getAttribute('data-country-key') === dataKey) {
-            b.classList.add('active-country-badge');
-        } else {
-            b.classList.remove('active-country-badge');
-        }
-    });
-
-    // Highlight the targeted country boundary on the Mapbox map
-    const targetIso3 = EU_MAP_DATA_TO_ISO3[dataKey] || dataKey;
-    if (targetIso3 && document.getElementById('eumap_container')) {
-        try {
-            Plotly.restyle('eumap_container', {
-                locations: [[targetIso3]],
-                z: [[1]]
-            }, [1]);
-        } catch(e) {
-            console.warn('Border restyle error:', e);
-        }
-    }
 
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
     const entry = historicalData?.[dataKey]?.[date] || (dataKey === 'XK' ? historicalData?.['AL']?.[date] : null);
