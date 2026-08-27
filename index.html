@@ -7158,7 +7158,7 @@ function drawPlotlyEUMap(selectedDate) {
 
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        mapbox: { style: 'carto-positron', center: { lat: 48.0, lon: 13.0 }, zoom: 3.2 },
+        mapbox: { style: 'carto-positron', center: { lat: 47.8, lon: 15.0 }, zoom: 3.75 },
         showlegend: false,
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -7168,8 +7168,8 @@ function drawPlotlyEUMap(selectedDate) {
     Plotly.newPlot('eumap_container', [traceWithData], layout, config).then(gd => {
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
-            if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.0);
-            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.0);
+            if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
+            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.7);
         }
 
         // Render HTML Pill Badges over the map
