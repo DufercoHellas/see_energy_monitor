@@ -7144,6 +7144,14 @@ function drawPlotlyEUMap(selectedDate) {
     // Local high-resolution Natural Earth 10m GeoJSON (built by pipeline/build_geojson.py)
     const GEOJSON_URL = `data/europe.geojson?t=${Date.now()}`;
 
+    // Cache GeoJSON for instant vector border highlighting
+    if (!window._euMapGeoJsonCache) {
+        fetch(GEOJSON_URL)
+            .then(r => r.json())
+            .then(data => { window._euMapGeoJsonCache = data; })
+            .catch(() => {});
+    }
+
     const traceWithData = {
         type: 'choroplethmapbox',
         geojson: GEOJSON_URL,
@@ -7175,6 +7183,48 @@ function drawPlotlyEUMap(selectedDate) {
         if (mbMap) {
             if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
             if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.5);
+
+            // Add dedicated vector border highlight layers directly to Mapbox GL
+            function initBorderHighlight() {
+                if (!mbMap.getSource('targeted-country-src')) {
+                    mbMap.addSource('targeted-country-src', {
+                        type: 'geojson',
+                        data: { type: 'FeatureCollection', features: [] }
+                    });
+                }
+                if (!mbMap.getLayer('targeted-country-glow')) {
+                    mbMap.addLayer({
+                        id: 'targeted-country-glow',
+                        type: 'line',
+                        source: 'targeted-country-src',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': '#4f46e5',
+                            'line-width': 8,
+                            'line-opacity': 0.6
+                        }
+                    });
+                }
+                if (!mbMap.getLayer('targeted-country-border')) {
+                    mbMap.addLayer({
+                        id: 'targeted-country-border',
+                        type: 'line',
+                        source: 'targeted-country-src',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': '#1e1b4b',
+                            'line-width': 4.5,
+                            'line-opacity': 1.0
+                        }
+                    });
+                }
+            }
+
+            if (mbMap.isStyleLoaded()) {
+                initBorderHighlight();
+            } else {
+                mbMap.once('styledata', initBorderHighlight);
+            }
         }
 
         // Render HTML Pill Badges over the map
@@ -7240,6 +7290,31 @@ function renderEUMapCountryDetail(dataKey, date) {
         date = dateInput ? dateInput.value : null;
     }
     if (!date) return;
+
+    // Bold highlight the targeted country border on the Mapbox map
+    const targetIso3 = EU_MAP_DATA_TO_ISO3[dataKey] || dataKey;
+    const gd = document.getElementById('eumap_container');
+    const mbMap = gd?._fullLayout?.mapbox?._subplot?.map;
+    if (mbMap && targetIso3) {
+        function updateBorder() {
+            const src = mbMap.getSource('targeted-country-src');
+            if (src) {
+                const cache = window._euMapGeoJsonCache;
+                if (cache && cache.features) {
+                    const feat = cache.features.find(f => f.id === targetIso3);
+                    src.setData(feat ? { type: 'FeatureCollection', features: [feat] } : { type: 'FeatureCollection', features: [] });
+                }
+            }
+        }
+        if (!window._euMapGeoJsonCache) {
+            fetch(`data/europe.geojson?t=${Date.now()}`).then(r => r.json()).then(data => {
+                window._euMapGeoJsonCache = data;
+                updateBorder();
+            });
+        } else {
+            updateBorder();
+        }
+    }
 
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
     const entry = historicalData?.[dataKey]?.[date] || (dataKey === 'XK' ? historicalData?.['AL']?.[date] : null);
