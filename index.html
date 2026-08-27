@@ -7096,10 +7096,10 @@ function drawPlotlyEUMap(selectedDate) {
 
     const EU_LABEL_COORDS = {
         'AUT': [47.6, 14.3],  'BGR': [42.7, 25.3],  'HRV': [45.3, 16.2],
-        'CZE': [49.8, 15.4],  'DEU': [51.2, 10.4],  'GRC': [39.2, 22.0],
-        'HUN': [47.1, 19.3],  'ITA': [42.8, 12.8],  'ROU': [45.9, 24.8],
+        'CZE': [49.8, 15.4],  'DEU': [51.2, 10.4],  'GRC': [39.0, 21.8],
+        'HUN': [47.1, 19.4],  'ITA': [42.5, 12.8],  'ROU': [45.9, 24.8],
         'SRB': [44.0, 20.8],  'SVK': [48.7, 19.5],  'SVN': [46.1, 14.8],
-        'ALB': [41.1, 20.0],  'MKD': [41.6, 21.6],  'MNE': [42.8, 19.1],
+        'ALB': [41.0, 19.9],  'MKD': [41.6, 21.7],  'MNE': [42.9, 19.3],
         'TUR': [38.9, 35.2],  'CHE': [46.8, 8.2],   'FRA': [46.6, 2.5],
         'ESP': [40.4, -3.7],  'PRT': [39.4, -8.2],  'GBR': [55.3, -3.4],
         'IRL': [53.4, -8.2],  'BEL': [50.5, 4.4],   'NLD': [52.1, 5.3],
@@ -7113,7 +7113,7 @@ function drawPlotlyEUMap(selectedDate) {
     const badgeItems = [];
     const hideLabels = new Set(['NO1','SE1','EE','LV','LT','PL','ES','PT','NL','TR',
                                 'SWE','NOR','EST','LVA','LTU','POL','ESP','PRT','NLD','TUR',
-                                'DK1','DK2','DNK','FIN','GBR','IRL']);
+                                'DK1','DK2','DNK','FIN','GBR','IRL','BA','BIH']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
         const entry = historicalData?.[repKey]?.[selectedDate];
@@ -7187,8 +7187,8 @@ function drawPlotlyEUMap(selectedDate) {
         const badgeElements = badgeItems.map(item => {
             const el = document.createElement('div');
             el.className = 'eumap-badge-pill';
-            el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,0.92);color:#0f172a;font-family:Inter,-apple-system,sans-serif;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;box-shadow:0 2px 5px rgba(0,0,0,0.22);border:1px solid #cbd5e1;white-space:nowrap;pointer-events:none;';
-            el.innerHTML = `<span style="font-weight:800;color:#0f172a;">${item.code}</span> <span style="color:#2563eb;font-weight:700;margin-left:2px;">${item.priceStr}</span>`;
+            el.style.cssText = 'position:absolute;transform:translate(-50%,-50%);background:#ffffff;display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;box-shadow:0 3px 8px -1px rgba(15,23,42,0.18),0 1px 3px rgba(15,23,42,0.08);border:1px solid #e2e8f0;white-space:nowrap;pointer-events:none;line-height:1;';
+            el.innerHTML = `<span style="font-weight:800;font-size:10.5px;color:#0f172a;letter-spacing:0.3px;">${item.code}</span><span style="color:#cbd5e1;margin:0 4px;font-size:9px;">•</span><span style="font-weight:700;font-size:11.5px;color:#2563eb;">${item.priceStr}</span>`;
             overlay.appendChild(el);
             return { el, lat: item.lat, lon: item.lon };
         });
