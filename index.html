@@ -7169,7 +7169,26 @@ function drawPlotlyEUMap(selectedDate) {
         zmin: minP,
         zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
-        marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.5 } }
+        marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.2 } }
+    };
+
+    // Dedicated highlight trace that draws a bold border outline around the targeted country
+    const traceHighlight = {
+        type: 'choroplethmapbox',
+        geojson: GEOJSON_URL,
+        featureidkey: 'id',
+        locations: [],
+        z: [],
+        colorscale: [[0, 'rgba(0,0,0,0)'], [1, 'rgba(0,0,0,0)']],
+        showscale: false,
+        hoverinfo: 'none',
+        marker: {
+            opacity: 0,
+            line: {
+                color: '#1e1b4b',
+                width: 3.5
+            }
+        }
     };
 
     const layout = {
@@ -7181,7 +7200,7 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceHighlight], layout, config).then(gd => {
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
             if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
@@ -7260,6 +7279,19 @@ function renderEUMapCountryDetail(dataKey, date) {
             b.classList.remove('active-country-badge');
         }
     });
+
+    // Highlight the targeted country boundary on the Mapbox map
+    const targetIso3 = EU_MAP_DATA_TO_ISO3[dataKey] || dataKey;
+    if (targetIso3 && document.getElementById('eumap_container')) {
+        try {
+            Plotly.restyle('eumap_container', {
+                locations: [[targetIso3]],
+                z: [[1]]
+            }, [1]);
+        } catch(e) {
+            console.warn('Border restyle error:', e);
+        }
+    }
 
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
     const entry = historicalData?.[dataKey]?.[date] || (dataKey === 'XK' ? historicalData?.['AL']?.[date] : null);
