@@ -7180,8 +7180,8 @@ function drawPlotlyEUMap(selectedDate) {
         // Enforce maximum and minimum zoom limits
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
-            if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
-            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(2.8);
+            if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.0);
+            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.0);
         }
 
         gd.on('plotly_click', function(data) {
