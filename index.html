@@ -7013,7 +7013,6 @@ function renderEUMap() {
 function drawPlotlyEUMap(selectedDate) {
     const groups = {};
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        if (iso3 === 'XKX') continue;
         if (!groups[iso3]) groups[iso3] = [];
         groups[iso3].push(dataKey);
     }
@@ -7023,7 +7022,7 @@ function drawPlotlyEUMap(selectedDate) {
         let sum = 0, count = 0, name = iso3, repKey = dataKeys[0], avg = null;
         const zonePrices = [];
         for (const dk of dataKeys) {
-            const entry = historicalData?.[dk]?.[selectedDate];
+            const entry = historicalData?.[dk]?.[selectedDate] || (dk === 'XK' ? historicalData?.['AL']?.[selectedDate] : null);
             const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
             if (price !== null) { sum += price; count++; }
             if (EU_MAP_COUNTRY_NAMES[dk]) name = EU_MAP_COUNTRY_NAMES[dk];
@@ -7116,7 +7115,7 @@ function drawPlotlyEUMap(selectedDate) {
                                 'DK1','DK2','DNK','FIN','GBR','IRL','BA','BIH']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
-        const entry = historicalData?.[repKey]?.[selectedDate];
+        const entry = historicalData?.[repKey]?.[selectedDate] || (repKey === 'XK' ? historicalData?.['AL']?.[selectedDate] : null);
         const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
         const code = repKey === 'DE_LU' ? 'DE' : repKey;
         const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
@@ -7231,7 +7230,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     }
     if (!date) return;
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
-    const entry = historicalData?.[dataKey]?.[date];
+    const entry = historicalData?.[dataKey]?.[date] || (dataKey === 'XK' ? historicalData?.['AL']?.[date] : null);
 
     const placeholder = document.getElementById('eumap_detail_placeholder');
     const content     = document.getElementById('eumap_detail_content');
