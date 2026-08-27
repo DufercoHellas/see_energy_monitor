@@ -148,6 +148,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-weight: 500;
 }
 
+/* ── HIDE HOVER POPUP TOOLTIP ON EU MAP ── */
+#eumap_container .hoverlayer {
+    display: none !important;
+}
+
         </style>
     </head>
     <body>
@@ -1311,9 +1316,6 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.setProperty("display", "block", "important");
     evt.currentTarget.classList.add("active");
     
-    if (tabName === 'Cables') {
-        renderCablesMatrix();
-    }
     if (tabName === 'EUMap') {
         initEUMap();
     }
@@ -6901,6 +6903,8 @@ const EU_MAP_DATA_TO_ISO3 = {
     'AL':    'ALB',
     'MK':    'MKD',
     'ME':    'MNE',
+    'BA':    'BIH',
+    'LU':    'LUX',
     'TR':    'TUR',
     'CH':    'CHE',
     'XK':    'XKX',
@@ -7105,22 +7109,11 @@ function drawPlotlyEUMap(selectedDate) {
         'BIH': [43.9159, 17.6791], 'XKX': [42.6026, 20.9030]
     };
 
-    // ── Build click-catcher markers (invisible, but reliably fire plotly_click) ──
-    // Placed at every country centroid we map. On click: pt.customdata = zone key.
-    const clickLats = [], clickLons = [], clickKeys = [];
-    for (const [dk, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        const ck = EU_LABEL_COORDS[dk] ? dk : (EU_LABEL_COORDS[iso3] ? iso3 : null);
-        if (!ck) continue;
-        const coords = EU_LABEL_COORDS[ck];
-        clickLats.push(coords[0]);
-        clickLons.push(coords[1]);
-        clickKeys.push(dk); // zone key e.g. 'GR', 'IT', 'DE_LU'
-    }
-
-    // ── Build visible text labels (only for countries with data, skip hidden ones) ──
+    // ── Build visible text labels (only for countries with data, skip excluded ones) ──
     const labelLats = [], labelLons = [], labelTexts = [], labelCustom = [];
     const hideLabels = new Set(['NO1','SE1','EE','LV','LT','PL','ES','PT','NL','TR',
-                                'SWE','NOR','EST','LVA','LTU','POL','ESP','PRT','NLD','TUR']);
+                                'SWE','NOR','EST','LVA','LTU','POL','ESP','PRT','NLD','TUR',
+                                'DK1','DK2','DNK','FIN','GBR','IRL']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
         const entry = historicalData?.[repKey]?.[selectedDate];
@@ -7135,8 +7128,8 @@ function drawPlotlyEUMap(selectedDate) {
         const coords = EU_LABEL_COORDS[ck];
         labelLats.push(coords[0]);
         labelLons.push(coords[1]);
-        // Two-line label: code on top, price below
-        labelTexts.push(price !== null ? `${code}\n${Math.round(price)}${symbol}` : code);
+        const priceStr = price !== null ? `${Math.round(price)}${symbol}` : '';
+        labelTexts.push(priceStr ? `${code}: ${priceStr}` : code);
         labelCustom.push(repKey);
     }
 
@@ -7145,34 +7138,32 @@ function drawPlotlyEUMap(selectedDate) {
 
     const traceWithData = {
         type: 'choroplethmapbox',
-        geojson: GEOJSON_URL, featureidkey: 'id',
-        locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
-        hoverinfo: 'skip',
+        geojson: GEOJSON_URL,
+        featureidkey: 'id',
+        locations: withDataLoc,
+        z: withDataZ,
+        text: withDataText,
+        customdata: withDataCustom,
+        hoverinfo: 'location',
+        hovertemplate: '%{location}<extra></extra>',
         colorscale: [[0.0,'#a1d99b'],[0.25,'#fee08b'],[0.5,'#fdae61'],[0.75,'#f46d43'],[1.0,'#d73027']],
-        zmin: minP, zmax: maxP,
+        zmin: minP,
+        zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
         marker: { opacity: 0.85, line: { color: '#ffffff', width: 1.5 } }
     };
 
-    // Invisible click-catcher markers — opacity 0.001 (not 0!) to preserve Plotly hit area
-    const traceClick = {
-        type: 'scattermapbox',
-        lat: clickLats, lon: clickLons,
-        mode: 'markers',
-        customdata: clickKeys,
-        marker: { size: 40, color: '#000000', opacity: 0.001 },
-        hoverinfo: 'skip',
-        showlegend: false
-    };
-
-    // Text labels — white bold, large enough to read on colored countries
+    // Text labels positioned at country centroids
     const traceLabels = {
         type: 'scattermapbox',
-        lat: labelLats, lon: labelLons,
+        lat: labelLats,
+        lon: labelLons,
         mode: 'text',
         text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 13, color: '#ffffff' },
-        hoverinfo: 'skip',
+        customdata: labelCustom,
+        textposition: 'middle center',
+        textfont: { size: 11, color: '#0f172a' },
+        hoverinfo: 'none',
         showlegend: false
     };
 
@@ -7185,13 +7176,11 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceClick, traceLabels], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData, traceLabels], layout, config).then(gd => {
         gd.on('plotly_click', function(data) {
+            if (!data || !data.points || !data.points.length) return;
             const pt = data.points[0];
-            if (!pt) return;
-            // Click-catcher: pt.customdata = zone key (e.g. 'GR')
-            // Choropleth fallback: pt.location = ISO-3 (e.g. 'GRC') → reverse-lookup
-            const raw = (pt.customdata ? String(pt.customdata) : null) || pt.location;
+            const raw = pt.customdata || pt.location;
             if (!raw) return;
             const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
             if (key) renderEUMapCountryDetail(key, selectedDate);
