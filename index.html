@@ -7163,7 +7163,7 @@ function drawPlotlyEUMap(selectedDate) {
 
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        mapbox: { style: 'carto-positron', center: { lat: 47.8, lon: 15.0 }, zoom: 3.75 },
+        mapbox: { style: 'carto-positron', center: { lat: 45.8, lon: 15.2 }, zoom: 3.65 },
         showlegend: false,
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -7174,7 +7174,7 @@ function drawPlotlyEUMap(selectedDate) {
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
             if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
-            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.7);
+            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.5);
         }
 
         // Render HTML Pill Badges over the map
