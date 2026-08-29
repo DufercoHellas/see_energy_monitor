@@ -148,6 +148,17 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-weight: 500;
 }
 
+/* ── HIDE HOVER POPUP TOOLTIP ON EU MAP ── */
+#eumap_container .hoverlayer {
+    display: none !important;
+}
+
+.eumap-badge-pill {
+    cursor: pointer;
+    user-select: none;
+}
+
+
         </style>
     </head>
     <body>
@@ -176,27 +187,27 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 08:45</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 07:45</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 06:14</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 04:18</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 06:34</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 04:34</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 04:10</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 04:10</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 05:45</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 05:45</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-28 06:36</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-29 05:38</td>
             </tr>
         </table>
     </div>
@@ -757,70 +768,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <!-- ── TAB: Cables ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
     <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
-        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CablesDaily')">📅 Cables Daily Price Matrix</button>
-        <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
+        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
         <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
     </div>
 
-    <!-- ── Sub-Tab: Daily Price Matrix ── -->
-    <div id="CablesDaily" class="inner-cables-tabcontent" style="display:block;">
-        <h2>Cables Daily Price Matrix</h2>
-        <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly auction prices (€/MWh) for selected corridors. Use the sidebar controls to filter and select columns.</p>
-        
-        <div style="display: flex; gap: 24px; align-items: flex-start;">
-            <!-- ── Sidebar Controls ── -->
-            <div style="width: 280px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-sizing: border-box;">
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Select Date</label>
-                    <input type="date" id="cables_matrix_date" onchange="renderCablesMatrix()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <label style="font-weight: 700; font-size: 11px; display: block; margin-bottom: 8px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Filter by Country</label>
-                    <select id="cables_country_select" onchange="filterCablesCheckboxes()" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; box-sizing: border-box;">
-                        <!-- populated dynamically -->
-                    </select>
-                </div>
-                
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Cables/Corridors</label>
-                        <div style="font-size: 11px;">
-                            <a href="javascript:void(0)" onclick="toggleAllCables(true)" style="color: #4f46e5; font-weight: 600; text-decoration: none; margin-right: 8px;">All</a>
-                            <a href="javascript:void(0)" onclick="toggleAllCables(false)" style="color: #6b7280; font-weight: 600; text-decoration: none;">None</a>
-                        </div>
-                    </div>
-                    <div id="cables_checkboxes_container" style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px; background: white; box-sizing: border-box;">
-                        <!-- checkboxes populated dynamically -->
-                    </div>
-                </div>
-            </div>
-            
-            <!-- ── Price Matrix Grid ── -->
-            <div style="flex-grow: 1; overflow-x: auto;">
-                <div class="table-container" style="max-height: 650px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                    <table id="cables_matrix_table" style="min-width: 100%;">
-                        <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
-                            <tr id="cables_matrix_head">
-                                <!-- populated dynamically -->
-                            </tr>
-                        </thead>
-                        <tbody id="cables_matrix_body" style="font-weight: 500;">
-                            <!-- populated dynamically -->
-                        </tbody>
-                        <tfoot style="position: sticky; bottom: 0; background: #f8fafc; font-weight: 700; border-top: 2px solid #e2e8f0; z-index: 1;">
-                            <tr id="cables_matrix_foot">
-                                <!-- populated dynamically -->
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- ── Sub-Tab: Cable Auctions Optimizer ── -->
-    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:none;">
+    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:block;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
             <div>
                 <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
@@ -1369,9 +1322,6 @@ function openTab(evt, tabName) {
     document.getElementById(tabName).style.setProperty("display", "block", "important");
     evt.currentTarget.classList.add("active");
     
-    if (tabName === 'Cables') {
-        renderCablesMatrix();
-    }
     if (tabName === 'EUMap') {
         initEUMap();
     }
@@ -1723,7 +1673,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.582,
+    "mae_knn": 1.581,
     "mae_avg": 1.762,
     "features": {
       "ttf": 35.0,
@@ -1747,7 +1697,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "historical_avg_only",
-    "mae_knn": 1.31,
+    "mae_knn": 1.314,
     "mae_avg": 1.14,
     "features": {
       "ttf": 35.0,
@@ -1787,7 +1737,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.241,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 1.204,
+    "mae_knn": 1.205,
     "mae_avg": 1.186,
     "features": {
       "ttf": 35.0,
@@ -1807,7 +1757,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.266,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 5.61,
+    "mae_knn": 5.611,
     "mae_avg": 5.412,
     "features": {
       "ttf": 35.0,
@@ -1823,7 +1773,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AT-IT": {
-    "predicted": 6.469,
+    "predicted": 6.473,
     "confidence": 0.279,
     "n_auctions": 20,
     "method": "knn_weighted",
@@ -1947,7 +1897,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.193,
     "n_auctions": 8,
     "method": "historical_avg_only",
-    "mae_knn": 0.251,
+    "mae_knn": 0.264,
     "mae_avg": 0.239,
     "features": {
       "ttf": 35.0,
@@ -1991,7 +1941,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.23,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.828,
+    "mae_knn": 2.84,
     "mae_avg": 4.157,
     "features": {
       "ttf": 35.0,
@@ -2015,7 +1965,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.241,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.242,
+    "mae_knn": 1.243,
     "mae_avg": 1.938,
     "features": {
       "ttf": 35.0,
@@ -2035,11 +1985,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "CZ-SK": {
-    "predicted": 9.718,
+    "predicted": 9.717,
     "confidence": 0.239,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 2.348,
+    "mae_knn": 2.334,
     "mae_avg": 3.166,
     "features": {
       "ttf": 35.0,
@@ -2060,10 +2010,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "FR-IT": {
     "predicted": 71.956,
-    "confidence": 0.117,
+    "confidence": 0.115,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 17.695,
+    "mae_knn": 17.576,
     "mae_avg": 13.696,
     "features": {
       "ttf": 35.0,
@@ -2083,7 +2033,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.457,
     "n_auctions": 67,
     "method": "knn_weighted",
-    "mae_knn": 1.641,
+    "mae_knn": 1.636,
     "mae_avg": 2.183,
     "features": {
       "ttf": 35.0,
@@ -2103,7 +2053,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "GR-BG": {
-    "predicted": 10.58,
+    "predicted": 10.581,
     "confidence": 0.193,
     "n_auctions": 20,
     "method": "knn_weighted",
@@ -2127,11 +2077,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "GR-IT": {
-    "predicted": 7.629,
-    "confidence": 0.281,
+    "predicted": 7.639,
+    "confidence": 0.282,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 9.79,
+    "mae_knn": 9.8,
     "mae_avg": 10.022,
     "features": {
       "ttf": 35.0,
@@ -2155,7 +2105,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.455,
     "n_auctions": 64,
     "method": "knn_weighted",
-    "mae_knn": 1.659,
+    "mae_knn": 1.691,
     "mae_avg": 1.848,
     "features": {
       "ttf": 35.0,
@@ -2263,7 +2213,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "HU-HR": {
-    "predicted": 0.789,
+    "predicted": 0.788,
     "confidence": 0.26,
     "n_auctions": 20,
     "method": "knn_weighted",
@@ -2355,11 +2305,11 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "IT-AT": {
-    "predicted": 7.348,
+    "predicted": 7.347,
     "confidence": 0.265,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.024,
+    "mae_knn": 1.025,
     "mae_avg": 2.157,
     "features": {
       "ttf": 35.0,
@@ -2380,10 +2330,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-FR": {
     "predicted": 0.04,
-    "confidence": 0.115,
+    "confidence": 0.114,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.061,
+    "mae_knn": 0.062,
     "mae_avg": 0.068,
     "features": {
       "ttf": 35.0,
@@ -2404,7 +2354,7 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-GR": {
     "predicted": 4.085,
-    "confidence": 0.281,
+    "confidence": 0.282,
     "n_auctions": 20,
     "method": "historical_avg_only",
     "mae_knn": 3.096,
@@ -2427,7 +2377,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.412,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.4,
+    "mae_knn": 1.399,
     "mae_avg": 1.702,
     "features": {
       "ttf": 35.0,
@@ -2451,7 +2401,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.295,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.798,
+    "mae_knn": 1.812,
     "mae_avg": 2.807,
     "features": {
       "ttf": 35.0,
@@ -2475,7 +2425,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.471,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.036,
+    "mae_knn": 1.047,
     "mae_avg": 1.133,
     "features": {
       "ttf": 35.0,
@@ -2523,7 +2473,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.406,
     "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 4.685,
+    "mae_knn": 4.683,
     "mae_avg": 4.508,
     "features": {
       "ttf": 35.0,
@@ -2539,7 +2489,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "ME-RS": {
-    "predicted": 3.811,
+    "predicted": 3.81,
     "confidence": 0.161,
     "n_auctions": 61,
     "method": "knn_weighted",
@@ -2549,9 +2499,9 @@ function getRealizedPriceWithFallback(c, h, date) {
       "ttf": 35.0,
       "eua": 70.0,
       "src_fwd": 119.75,
-      "dst_fwd": 137.15,
-      "fwd_spread": 17.4,
-      "hist_spread": -6.297,
+      "dst_fwd": 137.01,
+      "fwd_spread": 17.26,
+      "hist_spread": -6.449,
       "hist_spread_last_year": -5.479
     },
     "p90": 6.66,
@@ -2587,7 +2537,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.194,
     "n_auctions": 8,
     "method": "knn_weighted",
-    "mae_knn": 0.277,
+    "mae_knn": 0.268,
     "mae_avg": 0.39,
     "features": {
       "ttf": 35.0,
@@ -2611,7 +2561,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.453,
     "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 2.07,
+    "mae_knn": 2.062,
     "mae_avg": 2.513,
     "features": {
       "ttf": 35.0,
@@ -2635,7 +2585,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.482,
     "n_auctions": 61,
     "method": "knn_weighted",
-    "mae_knn": 1.125,
+    "mae_knn": 1.13,
     "mae_avg": 1.774,
     "features": {
       "ttf": 35.0,
@@ -2656,10 +2606,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-XK": {
     "predicted": 2.274,
-    "confidence": 0.521,
+    "confidence": 0.52,
     "n_auctions": 66,
     "method": "historical_avg_only",
-    "mae_knn": 1.909,
+    "mae_knn": 1.908,
     "mae_avg": 1.783,
     "features": {
       "ttf": 35.0,
@@ -2811,15 +2761,15 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.165,
     "n_auctions": 60,
     "method": "historical_avg_only",
-    "mae_knn": 2.267,
+    "mae_knn": 2.259,
     "mae_avg": 2.073,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
-      "src_fwd": 137.15,
+      "src_fwd": 137.01,
       "dst_fwd": 119.75,
-      "fwd_spread": -17.4,
-      "hist_spread": 6.297,
+      "fwd_spread": -17.26,
+      "hist_spread": 6.449,
       "hist_spread_last_year": 5.479
     },
     "p90": 7.56,
@@ -2831,7 +2781,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.479,
     "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 0.962,
+    "mae_knn": 0.977,
     "mae_avg": 1.131,
     "features": {
       "ttf": 35.0,
@@ -2855,7 +2805,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.275,
     "n_auctions": 20,
     "method": "historical_avg_only",
-    "mae_knn": 10.189,
+    "mae_knn": 10.161,
     "mae_avg": 9.45,
     "features": {
       "ttf": 35.0,
@@ -2875,7 +2825,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.239,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 0.388,
+    "mae_knn": 0.385,
     "mae_avg": 0.452,
     "features": {
       "ttf": 35.0,
@@ -2899,7 +2849,7 @@ function getRealizedPriceWithFallback(c, h, date) {
     "confidence": 0.259,
     "n_auctions": 20,
     "method": "knn_weighted",
-    "mae_knn": 1.942,
+    "mae_knn": 1.941,
     "mae_avg": 2.539,
     "features": {
       "ttf": 35.0,
@@ -3189,7 +3139,7 @@ function renderOutagesTab() {
 function renderDashboard() {
                 renderResidualsTab();
                 renderOutagesTab();
-                renderCablesMatrix();
+
             }
 
 // ── Cables Matrix ─────────────────────────────────────────────────────────
@@ -6947,6 +6897,8 @@ const EU_MAP_DATA_TO_ISO3 = {
     'AL':    'ALB',
     'MK':    'MKD',
     'ME':    'MNE',
+    'BA':    'BIH',
+    'LU':    'LUX',
     'TR':    'TUR',
     'CH':    'CHE',
     'XK':    'XKX',
@@ -7055,7 +7007,6 @@ function renderEUMap() {
 function drawPlotlyEUMap(selectedDate) {
     const groups = {};
     for (const [dataKey, iso3] of Object.entries(EU_MAP_DATA_TO_ISO3)) {
-        if (iso3 === 'XKX') continue;
         if (!groups[iso3]) groups[iso3] = [];
         groups[iso3].push(dataKey);
     }
@@ -7065,7 +7016,7 @@ function drawPlotlyEUMap(selectedDate) {
         let sum = 0, count = 0, name = iso3, repKey = dataKeys[0], avg = null;
         const zonePrices = [];
         for (const dk of dataKeys) {
-            const entry = historicalData?.[dk]?.[selectedDate];
+            const entry = historicalData?.[dk]?.[selectedDate] || (dk === 'XK' ? historicalData?.['AL']?.[selectedDate] : null);
             const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
             if (price !== null) { sum += price; count++; }
             if (EU_MAP_COUNTRY_NAMES[dk]) name = EU_MAP_COUNTRY_NAMES[dk];
@@ -7137,75 +7088,183 @@ function drawPlotlyEUMap(selectedDate) {
     }
 
     const EU_LABEL_COORDS = {
-        'AUT': [47.5162, 14.5501], 'BGR': [42.7339, 25.4858], 'HRV': [45.1, 15.2],
-        'CZE': [49.8175, 15.473], 'DEU': [51.1657, 10.4515], 'GRC': [39.0742, 21.8243],
-        'HUN': [47.1625, 19.5033], 'ITA': [41.8719, 12.5674], 'ROU': [45.9432, 24.9668],
-        'SRB': [44.0165, 21.0059], 'SVK': [48.669, 19.699], 'SVN': [46.1512, 14.9955],
-        'ALB': [41.1533, 20.1683], 'MKD': [41.6086, 21.7453], 'MNE': [42.7087, 19.3744],
-        'TUR': [38.9637, 35.2433], 'CHE': [46.8182, 8.2275], 'FRA': [46.2276, 2.2137],
-        'ESP': [40.4637, -3.7492], 'PRT': [39.3999, -8.2245], 'GBR': [55.3781, -3.436],
-        'IRL': [53.4129, -8.2439], 'BEL': [50.5039, 4.4699], 'NLD': [52.1326, 5.2913],
-        'POL': [51.9194, 19.1451], 'DNK': [56.2639, 9.5018], 'SWE': [60.1282, 18.6435],
-        'NOR': [60.472, 8.4689], 'FIN': [61.9241, 25.7482], 'EST': [58.5953, 25.0136],
-        'LVA': [56.8796, 24.6032], 'LTU': [55.1694, 23.8813]
+        'AUT': [47.6, 14.3],  'BGR': [42.7, 25.3],  'HRV': [45.4, 16.5],
+        'CZE': [49.8, 15.4],  'DEU': [51.2, 10.4],  'GRC': [39.1, 21.8],
+        'HUN': [47.1, 19.4],  'ITA': [42.5, 12.8],  'ROU': [45.9, 24.8],
+        'SRB': [44.0, 20.9],  'SVK': [48.7, 19.5],  'SVN': [46.15, 14.8],
+        'ALB': [41.0, 19.3],  'MKD': [41.6, 21.7],  'MNE': [42.9, 18.6],
+        'TUR': [38.9, 35.2],  'CHE': [46.8, 8.2],   'FRA': [46.6, 2.5],
+        'ESP': [40.4, -3.7],  'PRT': [39.4, -8.2],  'GBR': [55.3, -3.4],
+        'IRL': [53.4, -8.2],  'BEL': [50.5, 4.4],   'NLD': [52.1, 5.3],
+        'POL': [51.9, 19.1],  'DNK': [56.2, 9.5],   'SWE': [60.1, 18.6],
+        'NOR': [60.4, 8.4],   'FIN': [61.9, 25.7],  'EST': [58.5, 25.0],
+        'LVA': [56.8, 24.6],  'LTU': [55.1, 23.8],  'BIH': [44.1, 17.8],
+        'XKX': [42.55, 20.9]
     };
 
-    const labelLats = [], labelLons = [], labelTexts = [];
+    // ── Build pill badges data (only for countries with data, skip excluded ones) ──
+    const badgeItems = [];
+    const hideLabels = new Set(['NO1','SE1','EE','LV','LT','PL','ES','PT','NL','TR',
+                                'SWE','NOR','EST','LVA','LTU','POL','ESP','PRT','NLD','TUR',
+                                'DK1','DK2','DNK','FIN','GBR','IRL','BA','BIH']);
     for (const [iso3, dataKeys] of Object.entries(groups)) {
         const repKey = dataKeys[0];
-        const entry = historicalData?.[repKey]?.[selectedDate];
+        const entry = historicalData?.[repKey]?.[selectedDate] || (repKey === 'XK' ? historicalData?.['AL']?.[selectedDate] : null);
         const price = (entry && entry.average_price != null && entry.average_price > 0) ? entry.average_price : null;
         const code = repKey === 'DE_LU' ? 'DE' : repKey;
         const symbol = repKey === 'TR' ? 'TL' : '\u20ac';
+
+        if (hideLabels.has(repKey) || hideLabels.has(code) || hideLabels.has(iso3)) continue;
+
         const ck = EU_LABEL_COORDS[repKey] ? repKey : (EU_LABEL_COORDS[iso3] ? iso3 : null);
         if (!ck) continue;
         const coords = EU_LABEL_COORDS[ck];
-        labelLats.push(coords[0]); labelLons.push(coords[1]);
-        labelTexts.push(price !== null ? `${code}\n${price.toFixed(1)}${symbol}` : `${code}\n-`);
+        const priceStr = price !== null ? `${Math.round(price)}${symbol}` : '';
+        badgeItems.push({
+            code: code,
+            priceStr: priceStr,
+            key: repKey,
+            lat: coords[0],
+            lon: coords[1]
+        });
+    }
+
+    // Local high-resolution Natural Earth 10m GeoJSON (built by pipeline/build_geojson.py)
+    const GEOJSON_URL = `data/europe.geojson?t=${Date.now()}`;
+
+    // Cache GeoJSON for instant vector border highlighting
+    if (!window._euMapGeoJsonCache) {
+        fetch(GEOJSON_URL)
+            .then(r => r.json())
+            .then(data => { window._euMapGeoJsonCache = data; })
+            .catch(() => {});
     }
 
     const traceWithData = {
-        type: 'choropleth', locationmode: 'ISO-3',
-        locations: withDataLoc, z: withDataZ, text: withDataText, customdata: withDataCustom,
-        hovertemplate: '%{text}<extra></extra>',
+        type: 'choroplethmapbox',
+        geojson: GEOJSON_URL,
+        featureidkey: 'id',
+        locations: withDataLoc,
+        z: withDataZ,
+        text: withDataText,
+        customdata: withDataCustom,
+        hoverinfo: 'location',
+        hovertemplate: '%{location}<extra></extra>',
         colorscale: [[0.0,'#a1d99b'],[0.25,'#fee08b'],[0.5,'#fdae61'],[0.75,'#f46d43'],[1.0,'#d73027']],
-        zmin: minP, zmax: maxP,
+        zmin: minP,
+        zmax: maxP,
         colorbar: { title: { text: '\u20ac/MWh', font: { size: 12, family: 'Inter, sans-serif' } }, thickness: 14, len: 0.6, x: 1.01, tickfont: { size: 11, family: 'Inter, sans-serif' }, outlinewidth: 0 },
-        marker: { line: { color: '#0f172a', width: 1.5 } }
+        marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.2 } }
     };
-    const traceNoData = {
-        type: 'choropleth', locationmode: 'ISO-3',
-        locations: noDataLoc, z: noDataLoc.map(() => 0), text: noDataText, customdata: noDataCustom,
-        hovertemplate: '%{text}<extra></extra>',
-        colorscale: [[0,'#e2e8f0'],[1,'#e2e8f0']], showscale: false, zmin: 0, zmax: 1,
-        marker: { line: { color: '#cbd5e1', width: 1.0 } }
-    };
-    const traceLabels = {
-        type: 'scattergeo', lat: labelLats, lon: labelLons, mode: 'text', text: labelTexts,
-        textfont: { family: 'Inter, Arial, sans-serif', size: 13, weight: '800', color: '#0f172a' },
-        hoverinfo: 'skip'
-    };
+
     const layout = {
-        geo: {
-            scope: 'europe', showland: true, landcolor: '#f8fafc',
-            showocean: true, oceancolor: '#cbd5e1',
-            showlakes: true, lakecolor: '#cbd5e1',
-            showcountries: true, showcoastlines: true, coastlinecolor: '#94a3b8',
-            showframe: false,
-            projection: { type: 'natural earth' },
-            lonaxis: { range: [-12, 42] }, lataxis: { range: [35, 70] },
-            bgcolor: 'rgba(0,0,0,0)', fixedrange: true
-        },
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
-        hoverlabel: { bgcolor: '#1e293b', font: { color: '#ffffff', size: 13, family: 'Inter, sans-serif' }, bordercolor: '#334155' }
+        mapbox: { style: 'carto-positron', center: { lat: 45.8, lon: 15.2 }, zoom: 3.65 },
+        showlegend: false,
+        paper_bgcolor: 'rgba(0,0,0,0)',
+        plot_bgcolor: 'rgba(0,0,0,0)'
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData, traceNoData, traceLabels], layout, config).then(gd => {
+    Plotly.newPlot('eumap_container', [traceWithData], layout, config).then(gd => {
+        const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
+        if (mbMap) {
+            if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
+            if (typeof mbMap.setMinZoom === 'function') mbMap.setMinZoom(3.5);
+
+            // Add dedicated vector border highlight layers directly to Mapbox GL
+            function initBorderHighlight() {
+                if (!mbMap.getSource('targeted-country-src')) {
+                    mbMap.addSource('targeted-country-src', {
+                        type: 'geojson',
+                        data: { type: 'FeatureCollection', features: [] }
+                    });
+                }
+                if (!mbMap.getLayer('targeted-country-glow')) {
+                    mbMap.addLayer({
+                        id: 'targeted-country-glow',
+                        type: 'line',
+                        source: 'targeted-country-src',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': '#4f46e5',
+                            'line-width': 4.5,
+                            'line-opacity': 0.35
+                        }
+                    });
+                }
+                if (!mbMap.getLayer('targeted-country-border')) {
+                    mbMap.addLayer({
+                        id: 'targeted-country-border',
+                        type: 'line',
+                        source: 'targeted-country-src',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': '#0f172a',
+                            'line-width': 2.4,
+                            'line-opacity': 1.0
+                        }
+                    });
+                }
+            }
+
+            if (mbMap.isStyleLoaded()) {
+                initBorderHighlight();
+            } else {
+                mbMap.once('styledata', initBorderHighlight);
+            }
+        }
+
+        // Render HTML Pill Badges over the map
+        const container = document.getElementById('eumap_container');
+        let overlay = document.getElementById('eumap_badges_overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'eumap_badges_overlay';
+            overlay.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:5;';
+            container.style.position = 'relative';
+            container.appendChild(overlay);
+        }
+        overlay.innerHTML = '';
+
+        const badgeElements = badgeItems.map(item => {
+            const el = document.createElement('div');
+            el.className = 'eumap-badge-pill';
+            el.setAttribute('data-country-key', item.key);
+            el.style.cssText = 'position:absolute;transform:translate(-50%,-50%) scale(0.95);background:rgba(255,255,255,0.85);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px;border-radius:5px;box-shadow:0 2px 5px -1px rgba(15,23,42,0.16),0 1px 2px rgba(15,23,42,0.06);border:1px solid rgba(226,232,240,0.85);white-space:nowrap;line-height:1.12;pointer-events:auto;cursor:pointer;min-width:26px;';
+            el.innerHTML = `<span style="font-weight:800;font-size:9.5px;color:#0f172a;letter-spacing:0.2px;">${item.code}</span><span style="font-weight:700;font-size:10px;color:#2563eb;">${item.priceStr}</span>`;
+            el.onclick = function(e) {
+                e.stopPropagation();
+                renderEUMapCountryDetail(item.key, selectedDate);
+            };
+            overlay.appendChild(el);
+            return { el, key: item.key, lat: item.lat, lon: item.lon };
+        });
+
+        function positionBadges() {
+            if (!mbMap) return;
+            badgeElements.forEach(b => {
+                const pos = mbMap.project([b.lon, b.lat]);
+                b.el.style.left = pos.x + 'px';
+                b.el.style.top = pos.y + 'px';
+            });
+        }
+
+        if (mbMap) {
+            mbMap.off('move', positionBadges);
+            mbMap.off('resize', positionBadges);
+            mbMap.on('move', positionBadges);
+            mbMap.on('resize', positionBadges);
+        }
+        positionBadges();
+
         gd.on('plotly_click', function(data) {
+            if (!data || !data.points || !data.points.length) return;
             const pt = data.points[0];
-            if (pt && pt.customdata) renderEUMapCountryDetail(pt.customdata, selectedDate);
+            const raw = pt.customdata || pt.location;
+            if (!raw) return;
+            const key = EU_MAP_ISO3_TO_DATA[raw] || raw;
+            if (key) renderEUMapCountryDetail(key, selectedDate);
         });
     });
 }
@@ -7219,8 +7278,34 @@ function renderEUMapCountryDetail(dataKey, date) {
         date = dateInput ? dateInput.value : null;
     }
     if (!date) return;
+
+    // Bold highlight the targeted country border on the Mapbox map
+    const targetIso3 = EU_MAP_DATA_TO_ISO3[dataKey] || dataKey;
+    const gd = document.getElementById('eumap_container');
+    const mbMap = gd?._fullLayout?.mapbox?._subplot?.map;
+    if (mbMap && targetIso3) {
+        function updateBorder() {
+            const src = mbMap.getSource('targeted-country-src');
+            if (src) {
+                const cache = window._euMapGeoJsonCache;
+                if (cache && cache.features) {
+                    const feat = cache.features.find(f => f.id === targetIso3);
+                    src.setData(feat ? { type: 'FeatureCollection', features: [feat] } : { type: 'FeatureCollection', features: [] });
+                }
+            }
+        }
+        if (!window._euMapGeoJsonCache) {
+            fetch(`data/europe.geojson?t=${Date.now()}`).then(r => r.json()).then(data => {
+                window._euMapGeoJsonCache = data;
+                updateBorder();
+            });
+        } else {
+            updateBorder();
+        }
+    }
+
     const name = EU_MAP_COUNTRY_NAMES[dataKey] || dataKey;
-    const entry = historicalData?.[dataKey]?.[date];
+    const entry = historicalData?.[dataKey]?.[date] || (dataKey === 'XK' ? historicalData?.['AL']?.[date] : null);
 
     const placeholder = document.getElementById('eumap_detail_placeholder');
     const content     = document.getElementById('eumap_detail_content');
