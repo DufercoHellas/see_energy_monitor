@@ -870,16 +870,13 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <!-- ── TAB: Cables ── -->
         <!-- ── TAB: Cable Outages ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
-    <div style="margin-bottom: 24px;">
+    <div style="margin-bottom: 20px;">
         <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 0 0 6px 0; letter-spacing: -0.5px;">Cable Capacity Outages & Curtailments</h2>
-        <p style="color: #64748b; margin: 0; font-size: 14px;">Hourly cross-border transmission capacity reductions and maintenance schedules compiled from JAO and SEECAO.</p>
+        <p style="color: #64748b; margin: 0; font-size: 14px;">Cross-border transmission capacity reductions and maintenance schedules compiled from JAO and SEECAO.</p>
     </div>
 
-    <!-- ── Outage View Toggle Buttons ── -->
-    <div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
-        <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 8px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">📅 Monthly & Yearly Matrix</button>
-        <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 8px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">🕒 Daily Outages</button>
-    </div>
+    <!-- ── Day-Ahead Daily Outage Notification Alert ── -->
+    <div id="cable_daily_outage_alert_container" style="margin-bottom: 24px;"></div>
 
     <!-- ── 30-Day Outage Calendar Matrix ── -->
     <div id="outages_matrix_section" style="display: block;">
@@ -925,42 +922,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
             <div id="cable_outages_grid_container" style="overflow-x: auto;">
                 <!-- Grid generated dynamically -->
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Daily Outages ── -->
-    <div id="outages_daily_section" style="display: none;">
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);">
-            <h3 style="margin-top: 0; margin-bottom: 6px; font-size: 17px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
-                🕒 Daily Outages
-            </h3>
-            <p style="color: #64748b; font-size: 13px; margin-top: 4px; margin-bottom: 20px;">
-                Hourly view of day-ahead (D+1) capacity reductions. Green = 100% capacity, Orange = partial reduction, Red = total outage.
-            </p>
-
-            <!-- ── Daily Filters ── -->
-            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px;">
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                    <select id="daily_country_filter" onchange="onDailyCountryChange()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                        <option value="ALL">All Countries</option>
-                    </select>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
-                    <select id="daily_corridor_filter" onchange="renderCableDailyOutagesGrid()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
-                        <option value="ALL">All Corridors</option>
-                    </select>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
-                    <input type="checkbox" id="daily_hide_full" onchange="renderCableDailyOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6;">
-                    <label for="daily_hide_full" style="font-size: 13px; font-weight: 600; color: #334155; cursor: pointer;">Hide 100% Capacity Corridors</label>
-                </div>
-            </div>
-
-            <div id="cable_outages_daily_grid_container" style="overflow-x: auto;">
-                <!-- Daily grid generated dynamically -->
             </div>
         </div>
     </div>
@@ -1219,9 +1180,8 @@ function openTab(evt, tabName) {
     }
     if (tabName === 'Cables') {
         if (typeof initCableOutagesSelectors === 'function') initCableOutagesSelectors();
+        if (typeof checkAndRenderDailyOutagesAlert === 'function') checkAndRenderDailyOutagesAlert();
         if (typeof renderCableOutagesGrid === 'function') renderCableOutagesGrid();
-        if (typeof renderCableDailyOutagesGrid === 'function') renderCableDailyOutagesGrid();
-        if (typeof renderRegionalFlowsContext === 'function') renderRegionalFlowsContext();
     }
     window.dispatchEvent(new Event('resize'));
 }
@@ -5704,9 +5664,8 @@ function renderDashboard() {
                 renderOutagesTab();
                 try {
                     initCableOutagesSelectors();
+                    checkAndRenderDailyOutagesAlert();
                     renderCableOutagesGrid();
-                    renderCableDailyOutagesGrid();
-                    renderRegionalFlowsContext();
                 } catch(e) {
                     console.error("Error initializing cable outages:", e);
                 }
@@ -5962,6 +5921,89 @@ function onDailyCountryChange() {
              }
 
 // One-time initialisation of cable outages country/corridor selectors
+// ── Day-Ahead Daily Cable Outages Alert ─────────────────────────────────────
+function checkAndRenderDailyOutagesAlert() {
+    const container = document.getElementById("cable_daily_outage_alert_container");
+    if (!container) return;
+
+    if (!cableOutagesData || cableOutagesData.length === 0) {
+        container.innerHTML = "";
+        return;
+    }
+
+    // 1. Compute tomorrow's date (D+1)
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const y = tomorrow.getFullYear();
+    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const d = String(tomorrow.getDate()).padStart(2, '0');
+    const tomorrowStr = `${y}-${m}-${d}`;
+    const displayDate = `${d}/${m}/${y}`;
+
+    // 2. Scan for active capacity reductions on D+1
+    const dayReductions = cableOutagesData.filter(item => {
+        if (item.trade_date !== tomorrowStr) return false;
+        const orig = parseFloat(item.original_capacity) || 0;
+        const rem = parseFloat(item.remaining_capacity) || 0;
+        return rem < orig && !shouldExcludeCorridor(item.corridor_code);
+    });
+
+    if (dayReductions.length === 0) {
+        // Normal state: all 100% full
+        container.innerHTML = `
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="background: #22c55e; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0;">✓</div>
+                <div style="font-size: 13px; color: #166534; font-weight: 500;">
+                    <strong style="color: #14532d;">Day-Ahead (D+1, ${displayDate}):</strong> All monitored cross-border interconnector corridors operating at <strong>100% full capacity</strong> (no daily outages or curtailments).
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Group reductions by corridor
+    const reductionsByCorr = {};
+    dayReductions.forEach(r => {
+        const corr = r.corridor_code;
+        if (!reductionsByCorr[corr]) {
+            reductionsByCorr[corr] = [];
+        }
+        reductionsByCorr[corr].push(r);
+    });
+
+    let itemsHtml = "";
+    Object.entries(reductionsByCorr).forEach(([corr, rows]) => {
+        const minRem = Math.min(...rows.map(r => parseFloat(r.remaining_capacity) || 0));
+        const maxOrig = Math.max(...rows.map(r => parseFloat(r.original_capacity) || 0));
+        const reducedHoursCount = rows.length;
+        const reasons = [...new Set(rows.map(r => r.reason).filter(Boolean))].join(', ') || 'Capacity curtailment';
+
+        itemsHtml += `
+            <div style="background: white; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="background: #ea580c; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">${corr}</span>
+                    <span style="font-weight: 600; color: #9a3412; font-size: 13px;">${minRem} / ${maxOrig} MW remaining</span>
+                    <span style="color: #78350f; font-size: 12px;">(${reducedHoursCount} hours affected)</span>
+                </div>
+                <div style="font-size: 12px; color: #9a3412; font-style: italic;">
+                    ${reasons}
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = `
+        <div style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 10px; padding: 16px 20px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.05);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                <span style="font-size: 18px;">⚠️</span>
+                <span style="font-size: 14px; font-weight: 700; color: #9a3412; text-transform: uppercase; letter-spacing: 0.5px;">Day-Ahead (D+1, ${displayDate}) Interconnector Outage / Reduction Alert</span>
+            </div>
+            <p style="margin: 0 0 8px 0; font-size: 13px; color: #c2410c;">Capacity reductions detected on the following cross-border lines for tomorrow:</p>
+            ${itemsHtml}
+        </div>
+    `;
+}
+
 function initCableOutagesSelectors() {
                  if (cableOutagesInitialized) return;
                  
