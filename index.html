@@ -158,6 +158,283 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     user-select: none;
 }
 
+/* ── DATA HEALTH & AUDIT MODAL STYLES ── */
+.health-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+.health-status-badge:hover {
+    transform: scale(1.04);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.health-pill-healthy {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+}
+.health-pill-warning {
+    background-color: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+.health-pill-critical {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.btn-inspect-health {
+    background: transparent;
+    border: none;
+    color: #4f46e5;
+    font-weight: 600;
+    font-size: 10px;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+}
+.btn-inspect-health:hover {
+    background-color: #eef2ff;
+    text-decoration: underline;
+}
+
+/* Modal Overlay */
+.health-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.health-modal-dialog {
+    background: #ffffff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 960px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    animation: modalFadeIn 0.2s ease-out;
+}
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.97) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.health-modal-header {
+    padding: 16px 24px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.health-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 2px 6px;
+    transition: color 0.15s;
+}
+.health-modal-close:hover {
+    color: #0f172a;
+    background: #f1f5f9;
+}
+.health-modal-body {
+    padding: 20px 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+.health-modal-footer {
+    padding: 12px 24px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.btn-modal-close-action {
+    background: #475569;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.btn-modal-close-action:hover {
+    background: #334155;
+}
+
+/* Modal Subtabs */
+.health-tabs-header {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 16px;
+}
+.health-tab-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.15s ease;
+}
+.health-tab-btn:hover {
+    color: #1e293b;
+}
+.health-tab-btn.active {
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+}
+.health-tab-content {
+    display: none;
+}
+.health-tab-content.active {
+    display: block;
+}
+
+/* Banner Alerts */
+.health-banner-info {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: #0369a1;
+    margin-bottom: 14px;
+}
+.health-alert-box {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+.health-alert-critical {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+.health-alert-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+/* Matrix Tables */
+.health-matrix-container {
+    max-height: 420px;
+    overflow-y: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+.health-matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+.health-matrix-table th {
+    background: #f8fafc;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    font-weight: 700;
+    color: #475569;
+    text-align: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 8px 6px;
+}
+.health-matrix-table th.col-country, .health-matrix-table th.col-corridor {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    background: #f1f5f9;
+}
+.health-matrix-table td {
+    padding: 6px 6px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+}
+.health-matrix-table td.col-country, .health-matrix-table td.col-corridor {
+    text-align: left;
+    font-weight: 600;
+    position: sticky;
+    left: 0;
+    background: #ffffff;
+    z-index: 1;
+    border-right: 1px solid #e2e8f0;
+}
+.cell-badge-complete {
+    background: #dcfce7;
+    color: #15803d;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.cell-badge-partial {
+    background: #fef3c7;
+    color: #b45309;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.cell-badge-pending {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.cell-badge-missing {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+.badge-pending {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
 
         </style>
     </head>
@@ -179,37 +456,119 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     </div>
     
     <!-- Metadata Update Status Table -->
-    <div style="background: #f8fafc; border: 1px solid #f1f5f9; border-radius: 6px; padding: 8px 12px; font-size: 10px; color: #475569; min-width: 240px; font-family: 'Inter', sans-serif; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.02);">
-        <div style="font-weight: 700; font-size: 9px; text-transform: uppercase; color: #94a3b8; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px;">
-            <span style="display: inline-block; width: 5px; height: 5px; background-color: #10b981; border-radius: 50%;"></span>
-            Update Status
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; font-size: 11px; color: #475569; min-width: 270px; font-family: 'Inter', sans-serif; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px;">
+            <div style="font-weight: 700; font-size: 9px; text-transform: uppercase; color: #94a3b8; display: flex; align-items: center; gap: 4px; letter-spacing: 0.5px;">
+                <span style="display: inline-block; width: 6px; height: 6px; background-color: #3b82f6; border-radius: 50%;"></span>
+                Data Freshness
+            </div>
+            <button type="button" class="health-status-badge health-pill-critical" onclick="openDataHealthModal()" title="Click to view detailed data completeness matrix">
+                <span>🔴</span>
+                <span>Gaps Detected</span>
+            </button>
         </div>
-        <table style="width: 100%; border-collapse: collapse; line-height: 1.4;">
+        <table style="width: 100%; border-collapse: collapse; line-height: 1.4; font-size: 10px;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-01 09:21</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-01 10:15</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
                 <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 06:20</td>
             </tr>
             <tr>
-                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Cable Outages:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 12:03</td>
-            </tr>
-            <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
                 <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 04:10</td>
-            </tr>
-            <tr>
-                <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Fuel / Carbon:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 05:45</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
                 <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-30 22:49</td>
             </tr>
         </table>
+        <div style="margin-top: 6px; padding-top: 4px; border-top: 1px solid #f1f5f9; text-align: center;">
+            <button type="button" class="btn-inspect-health" onclick="openDataHealthModal()">
+                🔍 Inspect Data Quality &amp; Gaps
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── DATA HEALTH & QUALITY MODAL ── -->
+<div id="data_health_modal" class="health-modal-backdrop" style="display: none;" onclick="handleHealthModalBackdrop(event)">
+    <div class="health-modal-dialog" onclick="event.stopPropagation()">
+        <div class="health-modal-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h3 style="margin: 0; font-size: 18px; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+                    <span>🛡️</span> Data Quality &amp; Completeness Audit
+                </h3>
+                <span id="health_modal_overall_badge" class="health-status-badge health-pill-critical">
+                    🔴 Gaps Detected
+                </span>
+            </div>
+            <button class="health-modal-close" onclick="closeDataHealthModal()">&times;</button>
+        </div>
+
+        <div class="health-modal-body">
+            <!-- Timing & Alert Banner -->
+            <div id="health_modal_banner" class="health-banner-info">
+                <div style="font-weight: 600; margin-bottom: 2px;">Market Timing Policy:</div>
+                <div style="font-size: 12px; line-height: 1.4;">
+                    Day-Ahead Market (DAM) spot prices for tomorrow are marked as <span class="badge-pending">⏳ Pending DA Auction</span> until <strong>18:00 local time</strong> and will not trigger false alerts. Historical dates &amp; today must be 100% complete (24/24 hrs).
+                </div>
+            </div>
+
+            <!-- Issues list (if any) -->
+            <div id="health_modal_issues" style="margin-bottom: 16px;"></div>
+
+            <!-- Modal Subtabs -->
+            <div class="health-tabs-header">
+                <button class="health-tab-btn active" onclick="switchHealthSubTab(event, 'health_tab_spot')">⚡ Spot Prices Matrix</button>
+                <button class="health-tab-btn" onclick="switchHealthSubTab(event, 'health_tab_cables')">🔌 Cable Daily Auctions</button>
+                <button class="health-tab-btn" onclick="switchHealthSubTab(event, 'health_tab_outages')">⚡ Outages &amp; Fuels</button>
+            </div>
+
+            <!-- Tab 1: Spot Prices Matrix -->
+            <div id="health_tab_spot" class="health-tab-content active">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="font-size: 12px; color: #64748b;">
+                        Showing hourly completeness across core market bidding zones:
+                    </div>
+                    <div style="display: flex; gap: 12px; font-size: 11px; color: #475569;">
+                        <span><strong style="color:#10b981;">🟢</strong> Complete (24h)</span>
+                        <span><strong style="color:#f59e0b;">🟡</strong> Partial (&lt;24h)</span>
+                        <span><strong style="color:#0284c7;">⏳</strong> Pending DA (&lt;18:00)</span>
+                        <span><strong style="color:#ef4444;">🔴</strong> Missing / Overdue</span>
+                    </div>
+                </div>
+                <div class="health-matrix-container" id="health_spot_matrix_container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Tab 2: Cables Matrix -->
+            <div id="health_tab_cables" class="health-tab-content">
+                <div style="font-size: 12px; color: #64748b; margin-bottom: 8px;">
+                    Interconnector daily explicit auction clearing status (24 positions expected per day):
+                </div>
+                <div class="health-matrix-container" id="health_cables_matrix_container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Tab 3: Outages & Fuels -->
+            <div id="health_tab_outages" class="health-tab-content">
+                <div id="health_outages_fuels_container">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <div class="health-modal-footer">
+            <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
+                Last DB Audit: 2026-09-01 10:15
+            </div>
+            <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
+        </div>
     </div>
 </div>
 
@@ -1671,10 +2030,10 @@ function getRealizedPriceWithFallback(c, h, date) {
   "AL-GR": {
     "predicted": 5.77,
     "confidence": 0.453,
-    "n_auctions": 68,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 1.646,
-    "mae_avg": 1.762,
+    "mae_knn": 1.645,
+    "mae_avg": 1.766,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1693,12 +2052,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "AL-ME": {
-    "predicted": 1.234,
-    "confidence": 0.471,
-    "n_auctions": 68,
+    "predicted": 1.316,
+    "confidence": 0.47,
+    "n_auctions": 69,
     "method": "historical_avg_only",
-    "mae_knn": 1.27,
-    "mae_avg": 1.14,
+    "mae_knn": 1.256,
+    "mae_avg": 1.218,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1708,17 +2067,17 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -55.073,
       "hist_spread_last_year": -47.38
     },
-    "p90": 3.13,
+    "p90": 3.14,
     "note": "normal",
     "neighbors": []
   },
   "AL-XK": {
-    "predicted": 1.329,
-    "confidence": 0.334,
-    "n_auctions": 20,
+    "predicted": 1.3,
+    "confidence": 0.342,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 1.243,
-    "mae_avg": 1.189,
+    "mae_knn": 1.262,
+    "mae_avg": 1.15,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1733,12 +2092,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AT-CZ": {
-    "predicted": 3.608,
-    "confidence": 0.26,
-    "n_auctions": 20,
+    "predicted": 3.535,
+    "confidence": 0.265,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 1.264,
-    "mae_avg": 1.186,
+    "mae_knn": 1.208,
+    "mae_avg": 1.181,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1753,12 +2112,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "AT-HU": {
-    "predicted": 13.406,
-    "confidence": 0.266,
-    "n_auctions": 20,
+    "predicted": 13.461,
+    "confidence": 0.271,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 5.122,
-    "mae_avg": 5.412,
+    "mae_knn": 5.169,
+    "mae_avg": 5.22,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1777,12 +2136,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "AT-IT": {
-    "predicted": 11.771,
-    "confidence": 0.28,
-    "n_auctions": 20,
+    "predicted": 10.965,
+    "confidence": 0.329,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 10.603,
-    "mae_avg": 12.295,
+    "mae_knn": 11.136,
+    "mae_avg": 12.854,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1795,18 +2154,18 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 37.15,
     "note": "normal",
     "neighbors": [
-      "12.300",
       "4.030",
+      "12.300",
       "8.130"
     ]
   },
   "BA-HR": {
     "predicted": 2.21,
-    "confidence": 0.623,
-    "n_auctions": 68,
+    "confidence": 0.621,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 0.61,
-    "mae_avg": 0.645,
+    "mae_knn": 0.595,
+    "mae_avg": 0.64,
     "features": {
       "ttf": 54.4,
       "eua": 78.3,
@@ -1826,11 +2185,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "BA-ME": {
     "predicted": 2.638,
-    "confidence": 0.604,
-    "n_auctions": 68,
+    "confidence": 0.602,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 1.536,
-    "mae_avg": 1.734,
+    "mae_knn": 1.549,
+    "mae_avg": 1.714,
     "features": {
       "ttf": 54.4,
       "eua": 78.3,
@@ -1874,11 +2233,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "BG-GR": {
     "predicted": 4.11,
-    "confidence": 0.193,
-    "n_auctions": 20,
+    "confidence": 0.206,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.949,
-    "mae_avg": 1.217,
+    "mae_knn": 1.085,
+    "mae_avg": 1.186,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1893,16 +2252,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "0.630",
       "0.750",
-      "4.110"
+      "0.760"
     ]
   },
   "BG-MK": {
-    "predicted": 0.681,
-    "confidence": 0.196,
-    "n_auctions": 8,
-    "method": "historical_avg_only",
-    "mae_knn": 0.278,
-    "mae_avg": 0.239,
+    "predicted": 0.592,
+    "confidence": 0.198,
+    "n_auctions": 9,
+    "method": "knn_weighted",
+    "mae_knn": 0.357,
+    "mae_avg": 0.407,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1912,17 +2271,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -66.528,
       "hist_spread_last_year": -74.633
     },
-    "p90": 1.11,
+    "p90": 2.0,
     "note": "normal",
-    "neighbors": []
+    "neighbors": [
+      "0.770",
+      "0.400",
+      "0.580"
+    ]
   },
   "BG-RO": {
-    "predicted": 0.696,
-    "confidence": 0.265,
-    "n_auctions": 20,
+    "predicted": 0.7,
+    "confidence": 0.27,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.771,
-    "mae_avg": 1.467,
+    "mae_knn": 0.995,
+    "mae_avg": 1.837,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1932,21 +2295,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 0.709,
       "hist_spread_last_year": 0.458
     },
-    "p90": 5.0,
+    "p90": 7.03,
     "note": "normal",
     "neighbors": [
       "0.930",
-      "0.980",
-      "0.400"
+      "0.400",
+      "0.980"
     ]
   },
   "BG-RS": {
     "predicted": 1.112,
-    "confidence": 0.233,
-    "n_auctions": 68,
+    "confidence": 0.234,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 2.601,
-    "mae_avg": 4.157,
+    "mae_knn": 2.659,
+    "mae_avg": 4.177,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1965,12 +2328,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "CZ-AT": {
-    "predicted": 6.79,
-    "confidence": 0.245,
-    "n_auctions": 20,
+    "predicted": 6.541,
+    "confidence": 0.255,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.101,
-    "mae_avg": 1.938,
+    "mae_knn": 1.617,
+    "mae_avg": 2.262,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -1980,21 +2343,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -17.691,
       "hist_spread_last_year": 4.955
     },
-    "p90": 6.79,
-    "note": "capped_at_p90",
+    "p90": 8.68,
+    "note": "normal",
     "neighbors": [
       "6.750",
       "8.680",
-      "9.510"
+      "6.540"
     ]
   },
   "CZ-SK": {
-    "predicted": 10.471,
-    "confidence": 0.259,
-    "n_auctions": 20,
+    "predicted": 10.588,
+    "confidence": 0.265,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 2.807,
-    "mae_avg": 3.166,
+    "mae_knn": 2.714,
+    "mae_avg": 3.03,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2013,12 +2376,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "FR-IT": {
-    "predicted": 71.956,
-    "confidence": 0.113,
-    "n_auctions": 20,
+    "predicted": 71.993,
+    "confidence": 0.127,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 17.43,
-    "mae_avg": 13.696,
+    "mae_knn": 15.247,
+    "mae_avg": 11.792,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2033,12 +2396,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "GR-AL": {
-    "predicted": 2.086,
-    "confidence": 0.457,
-    "n_auctions": 67,
+    "predicted": 2.088,
+    "confidence": 0.456,
+    "n_auctions": 68,
     "method": "knn_weighted",
-    "mae_knn": 1.751,
-    "mae_avg": 2.183,
+    "mae_knn": 1.835,
+    "mae_avg": 2.308,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2048,7 +2411,7 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -79.665,
       "hist_spread_last_year": -92.571
     },
-    "p90": 5.86,
+    "p90": 6.0,
     "note": "normal",
     "neighbors": [
       "1.000",
@@ -2058,11 +2421,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "GR-BG": {
     "predicted": 11.87,
-    "confidence": 0.193,
-    "n_auctions": 20,
+    "confidence": 0.206,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 3.041,
-    "mae_avg": 3.842,
+    "mae_knn": 3.004,
+    "mae_avg": 3.659,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2077,16 +2440,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "15.220",
       "19.410",
-      "8.800"
+      "9.600"
     ]
   },
   "GR-IT": {
-    "predicted": 4.555,
-    "confidence": 0.266,
-    "n_auctions": 20,
+    "predicted": 6.489,
+    "confidence": 0.273,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 9.741,
-    "mae_avg": 10.022,
+    "mae_knn": 8.915,
+    "mae_avg": 10.607,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2096,21 +2459,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 4.354,
       "hist_spread_last_year": 0.426
     },
-    "p90": 29.99,
+    "p90": 31.15,
     "note": "normal",
     "neighbors": [
       "10.130",
       "0.000",
-      "8.620"
+      "18.040"
     ]
   },
   "GR-MK": {
-    "predicted": 2.933,
-    "confidence": 0.455,
-    "n_auctions": 64,
+    "predicted": 2.898,
+    "confidence": 0.5,
+    "n_auctions": 65,
     "method": "knn_weighted",
-    "mae_knn": 1.56,
-    "mae_avg": 1.848,
+    "mae_knn": 1.584,
+    "mae_avg": 1.884,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2120,21 +2483,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -75.06,
       "hist_spread_last_year": -92.847
     },
-    "p90": 5.03,
+    "p90": 5.4,
     "note": "normal",
     "neighbors": [
       "0.760",
-      "5.030",
-      "3.660"
+      "3.660",
+      "5.030"
     ]
   },
   "HR-BA": {
-    "predicted": 0.814,
-    "confidence": 0.556,
-    "n_auctions": 68,
+    "predicted": 0.809,
+    "confidence": 0.558,
+    "n_auctions": 69,
     "method": "historical_avg_only",
-    "mae_knn": 0.901,
-    "mae_avg": 0.742,
+    "mae_knn": 0.898,
+    "mae_avg": 0.734,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2150,11 +2513,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "HR-HU": {
     "predicted": 7.71,
-    "confidence": 0.255,
-    "n_auctions": 20,
+    "confidence": 0.264,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.146,
-    "mae_avg": 1.456,
+    "mae_knn": 1.131,
+    "mae_avg": 1.422,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2169,16 +2532,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "8.870",
       "4.200",
-      "5.650"
+      "5.890"
     ]
   },
   "HR-RS": {
     "predicted": 6.27,
     "confidence": 0.427,
-    "n_auctions": 68,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 1.696,
-    "mae_avg": 2.191,
+    "mae_knn": 1.683,
+    "mae_avg": 2.175,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2197,12 +2560,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-AT": {
-    "predicted": 1.705,
-    "confidence": 0.247,
-    "n_auctions": 20,
+    "predicted": 1.767,
+    "confidence": 0.255,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 0.82,
-    "mae_avg": 0.669,
+    "mae_knn": 0.79,
+    "mae_avg": 0.699,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2212,17 +2575,17 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -30.3,
       "hist_spread_last_year": -6.278
     },
-    "p90": 2.32,
+    "p90": 3.01,
     "note": "normal",
     "neighbors": []
   },
   "HU-HR": {
-    "predicted": 0.776,
-    "confidence": 0.25,
-    "n_auctions": 20,
+    "predicted": 0.853,
+    "confidence": 0.263,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.808,
-    "mae_avg": 1.171,
+    "mae_knn": 0.756,
+    "mae_avg": 1.196,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2232,21 +2595,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -107.171,
       "hist_spread_last_year": -127.155
     },
-    "p90": 4.0,
+    "p90": 4.13,
     "note": "normal",
     "neighbors": [
       "0.000",
       "1.300",
-      "1.210"
+      "1.620"
     ]
   },
   "HU-RO": {
-    "predicted": 3.273,
-    "confidence": 0.245,
-    "n_auctions": 20,
+    "predicted": 3.324,
+    "confidence": 0.264,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.031,
-    "mae_avg": 1.299,
+    "mae_knn": 1.038,
+    "mae_avg": 1.274,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2265,12 +2628,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-RS": {
-    "predicted": 0.488,
+    "predicted": 0.533,
     "confidence": 0.264,
-    "n_auctions": 42,
+    "n_auctions": 43,
     "method": "knn_weighted",
-    "mae_knn": 1.231,
-    "mae_avg": 1.528,
+    "mae_knn": 1.147,
+    "mae_avg": 1.521,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2289,12 +2652,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "HU-SK": {
-    "predicted": 2.839,
-    "confidence": 0.246,
-    "n_auctions": 20,
+    "predicted": 2.854,
+    "confidence": 0.257,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.683,
-    "mae_avg": 0.722,
+    "mae_knn": 0.658,
+    "mae_avg": 0.688,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2313,12 +2676,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "IT-AT": {
-    "predicted": 7.347,
-    "confidence": 0.266,
-    "n_auctions": 20,
+    "predicted": 7.582,
+    "confidence": 0.327,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.118,
-    "mae_avg": 2.157,
+    "mae_knn": 1.245,
+    "mae_avg": 2.168,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2331,18 +2694,18 @@ function getRealizedPriceWithFallback(c, h, date) {
     "p90": 7.87,
     "note": "normal",
     "neighbors": [
+      "8.030",
       "6.440",
-      "7.870",
       "8.000"
     ]
   },
   "IT-FR": {
-    "predicted": 0.04,
-    "confidence": 0.114,
-    "n_auctions": 20,
+    "predicted": 0.072,
+    "confidence": 0.121,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.062,
-    "mae_avg": 0.068,
+    "mae_knn": 0.068,
+    "mae_avg": 0.074,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2357,16 +2720,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "0.020",
       "0.100",
-      "0.000"
+      "0.100"
     ]
   },
   "IT-GR": {
-    "predicted": 4.085,
-    "confidence": 0.266,
-    "n_auctions": 20,
+    "predicted": 4.047,
+    "confidence": 0.273,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 2.855,
-    "mae_avg": 2.775,
+    "mae_knn": 2.804,
+    "mae_avg": 2.679,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2382,11 +2745,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "IT-ME": {
     "predicted": 3.401,
-    "confidence": 0.425,
-    "n_auctions": 62,
+    "confidence": 0.426,
+    "n_auctions": 63,
     "method": "knn_weighted",
-    "mae_knn": 1.519,
-    "mae_avg": 1.702,
+    "mae_knn": 1.496,
+    "mae_avg": 1.677,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2405,12 +2768,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "IT-SI": {
-    "predicted": 6.593,
-    "confidence": 0.299,
-    "n_auctions": 20,
+    "predicted": 6.668,
+    "confidence": 0.313,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.647,
-    "mae_avg": 2.807,
+    "mae_knn": 1.368,
+    "mae_avg": 2.511,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2430,11 +2793,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "ME-AL": {
     "predicted": 3.62,
-    "confidence": 0.471,
-    "n_auctions": 68,
+    "confidence": 0.47,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 1.001,
-    "mae_avg": 1.133,
+    "mae_knn": 1.005,
+    "mae_avg": 1.122,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2453,12 +2816,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "ME-BA": {
-    "predicted": 2.057,
-    "confidence": 0.564,
-    "n_auctions": 68,
+    "predicted": 2.05,
+    "confidence": 0.566,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 0.676,
-    "mae_avg": 0.697,
+    "mae_knn": 0.667,
+    "mae_avg": 0.69,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2477,12 +2840,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "ME-IT": {
-    "predicted": 15.07,
-    "confidence": 0.42,
-    "n_auctions": 61,
+    "predicted": 15.56,
+    "confidence": 0.421,
+    "n_auctions": 62,
     "method": "historical_avg_only",
-    "mae_knn": 4.954,
-    "mae_avg": 4.508,
+    "mae_knn": 4.992,
+    "mae_avg": 4.564,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2492,17 +2855,17 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 139.092,
       "hist_spread_last_year": 140.378
     },
-    "p90": 15.07,
+    "p90": 15.56,
     "note": "capped_at_p90",
     "neighbors": []
   },
   "ME-RS": {
     "predicted": 6.66,
-    "confidence": 0.161,
-    "n_auctions": 61,
+    "confidence": 0.24,
+    "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.571,
-    "mae_avg": 1.965,
+    "mae_knn": 1.585,
+    "mae_avg": 1.962,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2521,12 +2884,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "ME-XK": {
-    "predicted": 1.962,
-    "confidence": 0.564,
-    "n_auctions": 68,
+    "predicted": 1.958,
+    "confidence": 0.566,
+    "n_auctions": 69,
     "method": "historical_avg_only",
-    "mae_knn": 1.159,
-    "mae_avg": 1.157,
+    "mae_knn": 1.167,
+    "mae_avg": 1.144,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2542,11 +2905,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "MK-BG": {
     "predicted": 1.5,
-    "confidence": 0.197,
-    "n_auctions": 8,
+    "confidence": 0.201,
+    "n_auctions": 9,
     "method": "knn_weighted",
-    "mae_knn": 0.255,
-    "mae_avg": 0.39,
+    "mae_knn": 0.178,
+    "mae_avg": 0.392,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2561,16 +2924,16 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": [
       "0.660",
       "1.160",
-      "0.750"
+      "1.500"
     ]
   },
   "MK-GR": {
     "predicted": 8.11,
-    "confidence": 0.453,
-    "n_auctions": 68,
+    "confidence": 0.493,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 2.086,
-    "mae_avg": 2.513,
+    "mae_knn": 2.11,
+    "mae_avg": 2.514,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2584,17 +2947,17 @@ function getRealizedPriceWithFallback(c, h, date) {
     "note": "capped_at_p90",
     "neighbors": [
       "3.410",
-      "2.110",
-      "0.000"
+      "0.000",
+      "2.110"
     ]
   },
   "MK-RS": {
-    "predicted": 5.0,
+    "predicted": 5.11,
     "confidence": 0.462,
-    "n_auctions": 61,
+    "n_auctions": 62,
     "method": "knn_weighted",
-    "mae_knn": 1.228,
-    "mae_avg": 1.774,
+    "mae_knn": 1.238,
+    "mae_avg": 1.842,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2604,7 +2967,7 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 37.892,
       "hist_spread_last_year": 45.844
     },
-    "p90": 5.0,
+    "p90": 5.11,
     "note": "capped_at_p90",
     "neighbors": [
       "2.400",
@@ -2613,12 +2976,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "MK-XK": {
-    "predicted": 2.834,
-    "confidence": 0.512,
-    "n_auctions": 66,
+    "predicted": 2.852,
+    "confidence": 0.511,
+    "n_auctions": 67,
     "method": "historical_avg_only",
-    "mae_knn": 1.928,
-    "mae_avg": 1.783,
+    "mae_knn": 1.901,
+    "mae_avg": 1.781,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2633,12 +2996,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "RO-BG": {
-    "predicted": 0.261,
-    "confidence": 0.265,
-    "n_auctions": 20,
-    "method": "historical_avg_only",
-    "mae_knn": 0.091,
-    "mae_avg": 0.086,
+    "predicted": 0.305,
+    "confidence": 0.27,
+    "n_auctions": 21,
+    "method": "knn_weighted",
+    "mae_knn": 0.087,
+    "mae_avg": 0.089,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2648,17 +3011,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -0.709,
       "hist_spread_last_year": -0.458
     },
-    "p90": 0.38,
+    "p90": 0.4,
     "note": "normal",
-    "neighbors": []
+    "neighbors": [
+      "0.330",
+      "0.450",
+      "0.110"
+    ]
   },
   "RO-HU": {
-    "predicted": 4.57,
-    "confidence": 0.244,
-    "n_auctions": 20,
+    "predicted": 4.631,
+    "confidence": 0.264,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.289,
-    "mae_avg": 1.511,
+    "mae_knn": 1.275,
+    "mae_avg": 1.562,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2698,11 +3065,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "RS-BG": {
     "predicted": 2.2,
-    "confidence": 0.232,
-    "n_auctions": 68,
+    "confidence": 0.233,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 0.526,
-    "mae_avg": 0.557,
+    "mae_knn": 0.505,
+    "mae_avg": 0.553,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2721,12 +3088,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "RS-HR": {
-    "predicted": 1.604,
-    "confidence": 0.429,
-    "n_auctions": 68,
+    "predicted": 1.603,
+    "confidence": 0.428,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 0.596,
-    "mae_avg": 0.638,
+    "mae_knn": 0.582,
+    "mae_avg": 0.654,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2736,7 +3103,7 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -76.666,
       "hist_spread_last_year": -97.005
     },
-    "p90": 2.01,
+    "p90": 2.11,
     "note": "normal",
     "neighbors": [
       "0.880",
@@ -2745,12 +3112,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "RS-HU": {
-    "predicted": 4.04,
-    "confidence": 0.247,
-    "n_auctions": 49,
-    "method": "historical_avg_only",
-    "mae_knn": 1.532,
-    "mae_avg": 1.435,
+    "predicted": 3.5,
+    "confidence": 0.249,
+    "n_auctions": 50,
+    "method": "knn_weighted",
+    "mae_knn": 1.445,
+    "mae_avg": 1.455,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2760,17 +3127,21 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 30.505,
       "hist_spread_last_year": 30.15
     },
-    "p90": 4.04,
+    "p90": 3.5,
     "note": "capped_at_p90",
-    "neighbors": []
+    "neighbors": [
+      "1.420",
+      "1.430",
+      "5.270"
+    ]
   },
   "RS-ME": {
-    "predicted": 4.728,
-    "confidence": 0.165,
-    "n_auctions": 60,
+    "predicted": 4.791,
+    "confidence": 0.253,
+    "n_auctions": 61,
     "method": "historical_avg_only",
-    "mae_knn": 2.334,
-    "mae_avg": 2.073,
+    "mae_knn": 2.296,
+    "mae_avg": 2.108,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2780,17 +3151,17 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": -130.852,
       "hist_spread_last_year": -159.628
     },
-    "p90": 7.56,
+    "p90": 7.72,
     "note": "normal",
     "neighbors": []
   },
   "RS-MK": {
-    "predicted": 0.959,
-    "confidence": 0.463,
-    "n_auctions": 62,
+    "predicted": 0.954,
+    "confidence": 0.474,
+    "n_auctions": 63,
     "method": "knn_weighted",
-    "mae_knn": 1.074,
-    "mae_avg": 1.131,
+    "mae_knn": 1.021,
+    "mae_avg": 1.132,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2810,11 +3181,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "SI-IT": {
     "predicted": 24.11,
-    "confidence": 0.356,
-    "n_auctions": 20,
+    "confidence": 0.431,
+    "n_auctions": 21,
     "method": "historical_avg_only",
-    "mae_knn": 11.385,
-    "mae_avg": 9.45,
+    "mae_knn": 10.546,
+    "mae_avg": 9.245,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2829,12 +3200,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   },
   "SK-CZ": {
-    "predicted": 2.071,
-    "confidence": 0.259,
-    "n_auctions": 20,
+    "predicted": 2.096,
+    "confidence": 0.265,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.403,
-    "mae_avg": 0.452,
+    "mae_knn": 0.38,
+    "mae_avg": 0.446,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2853,12 +3224,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "SK-HU": {
-    "predicted": 6.096,
-    "confidence": 0.246,
-    "n_auctions": 20,
+    "predicted": 6.099,
+    "confidence": 0.257,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 1.743,
-    "mae_avg": 2.539,
+    "mae_knn": 1.792,
+    "mae_avg": 2.586,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2878,11 +3249,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "XK-AL": {
     "predicted": 1.16,
-    "confidence": 0.334,
-    "n_auctions": 20,
+    "confidence": 0.342,
+    "n_auctions": 21,
     "method": "knn_weighted",
-    "mae_knn": 0.228,
-    "mae_avg": 0.348,
+    "mae_knn": 0.209,
+    "mae_avg": 0.342,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2901,12 +3272,12 @@ function getRealizedPriceWithFallback(c, h, date) {
     ]
   },
   "XK-ME": {
-    "predicted": 0.666,
-    "confidence": 0.564,
-    "n_auctions": 68,
+    "predicted": 0.667,
+    "confidence": 0.566,
+    "n_auctions": 69,
     "method": "knn_weighted",
-    "mae_knn": 0.448,
-    "mae_avg": 0.536,
+    "mae_knn": 0.459,
+    "mae_avg": 0.59,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2916,7 +3287,7 @@ function getRealizedPriceWithFallback(c, h, date) {
       "hist_spread": 0.0,
       "hist_spread_last_year": 0.0
     },
-    "p90": 1.8,
+    "p90": 1.91,
     "note": "normal",
     "neighbors": [
       "0.430",
@@ -2926,11 +3297,11 @@ function getRealizedPriceWithFallback(c, h, date) {
   },
   "XK-MK": {
     "predicted": 0.7,
-    "confidence": 0.464,
-    "n_auctions": 68,
+    "confidence": 0.463,
+    "n_auctions": 69,
     "method": "historical_avg_only",
     "mae_knn": 0.298,
-    "mae_avg": 0.253,
+    "mae_avg": 0.25,
     "features": {
       "ttf": 35.0,
       "eua": 70.0,
@@ -2945,6 +3316,2446 @@ function getRealizedPriceWithFallback(c, h, date) {
     "neighbors": []
   }
 };
+            const dataHealth = {
+  "timestamp": "2026-09-01 10:23:01",
+  "today": "2026-09-01",
+  "tomorrow": "2026-09-02",
+  "is_after_dam_cutoff": false,
+  "dam_cutoff_hour": 18,
+  "overall_status": "CRITICAL",
+  "overall_badge": "🔴",
+  "summary": [],
+  "spot_prices": {
+    "matrix": {
+      "GR": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "BG": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "RO": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "HU": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "partial",
+          "badge": "🟡",
+          "hours": 9,
+          "description": "9/24 hrs"
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "RS": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "IT": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "DE_LU": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "CZ": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "AT": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "SK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing"
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "SI": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "HR": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing"
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "AL": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing"
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "MK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "ME": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      },
+      "XK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
+        },
+        "2026-08-31": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing"
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
+        }
+      }
+    },
+    "countries": [
+      "GR",
+      "BG",
+      "RO",
+      "HU",
+      "RS",
+      "IT",
+      "DE_LU",
+      "CZ",
+      "AT",
+      "SK",
+      "SI",
+      "HR",
+      "AL",
+      "MK",
+      "ME",
+      "XK"
+    ],
+    "dates": [
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-29",
+      "2026-08-30",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02"
+    ],
+    "summary": {
+      "complete_days": 118,
+      "pending_days": 16,
+      "missing_days": 9,
+      "partial_days": 1
+    }
+  },
+  "cables_daily": {
+    "matrix": {
+      "AL-GR": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "AL-ME": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "BG-MK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "BG-RS": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "CH-IT": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "GR-AL": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "GR-MK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "HU-RS": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "IT-CH": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "IT-ME": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "ME-AL": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "ME-IT": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "ME-RS": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "ME-XK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "MK-BG": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "MK-GR": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "MK-RS": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "MK-XK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "RS-BG": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "RS-HU": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "RS-ME": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "RS-MK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "XK-ME": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      },
+      "XK-MK": {
+        "2026-08-25": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-27": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-28": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-29": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-30": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-08-31": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-01": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-02": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
+        }
+      }
+    },
+    "corridors": [
+      "AL-GR",
+      "AL-ME",
+      "BG-MK",
+      "BG-RS",
+      "CH-IT",
+      "GR-AL",
+      "GR-MK",
+      "HU-RS",
+      "IT-CH",
+      "IT-ME",
+      "ME-AL",
+      "ME-IT",
+      "ME-RS",
+      "ME-XK",
+      "MK-BG",
+      "MK-GR",
+      "MK-RS",
+      "MK-XK",
+      "RS-BG",
+      "RS-HU",
+      "RS-ME",
+      "RS-MK",
+      "XK-ME",
+      "XK-MK"
+    ],
+    "dates": [
+      "2026-08-25",
+      "2026-08-26",
+      "2026-08-27",
+      "2026-08-28",
+      "2026-08-29",
+      "2026-08-30",
+      "2026-08-31",
+      "2026-09-01",
+      "2026-09-02"
+    ]
+  },
+  "outages": {
+    "status": "healthy",
+    "total_records": 30795,
+    "unique_mrids": 12236,
+    "active_now": 983,
+    "max_end_date": "2100-01-01 01:00:00",
+    "country_breakdown": {
+      "RO": {
+        "records": 139,
+        "active_now": 41,
+        "active_unavailable_mw": 9352.0
+      },
+      "HU": {
+        "records": 3272,
+        "active_now": 37,
+        "active_unavailable_mw": 5787.6
+      },
+      "BG": {
+        "records": 114,
+        "active_now": 20,
+        "active_unavailable_mw": 4156.0
+      },
+      "GR": {
+        "records": 4262,
+        "active_now": 10,
+        "active_unavailable_mw": 3040.0
+      },
+      "DE_LU": {
+        "records": 8984,
+        "active_now": 169,
+        "active_unavailable_mw": 45408.9
+      },
+      "FR": {
+        "records": 4382,
+        "active_now": 342,
+        "active_unavailable_mw": 123092.4
+      },
+      "IT": {
+        "records": 4203,
+        "active_now": 221,
+        "active_unavailable_mw": 56732.0
+      },
+      "RS": {
+        "records": 189,
+        "active_now": 20,
+        "active_unavailable_mw": 3105.0
+      },
+      "CZ": {
+        "records": 2582,
+        "active_now": 38,
+        "active_unavailable_mw": 8027.0
+      },
+      "SK": {
+        "records": 549,
+        "active_now": 27,
+        "active_unavailable_mw": 4325.6
+      },
+      "SI": {
+        "records": 30,
+        "active_now": 6,
+        "active_unavailable_mw": 3234.0
+      },
+      "CH": {
+        "records": 824,
+        "active_now": 14,
+        "active_unavailable_mw": 2578.0
+      },
+      "BE": {
+        "records": 1123,
+        "active_now": 21,
+        "active_unavailable_mw": 11044.2
+      },
+      "AT": {
+        "records": 130,
+        "active_now": 6,
+        "active_unavailable_mw": 1532.0
+      },
+      "MK": {
+        "records": 12,
+        "active_now": 11,
+        "active_unavailable_mw": 659.5
+      }
+    }
+  },
+  "cable_outages": {},
+  "commodities": {
+    "status": "healthy",
+    "latest_trade_date": "2026-09-03",
+    "latest_ttf_price": 66.287,
+    "latest_eua_price": 82.38,
+    "days_lag": -2,
+    "fetch_time": "2026-09-01 09:42:18"
+  },
+  "issues_critical": [
+    "CRITICAL: Spot prices for HU TODAY (2026-09-01) are missing!",
+    "CRITICAL: Spot prices for SK TODAY (2026-09-01) are missing!",
+    "CRITICAL: Spot prices for HR TODAY (2026-09-01) are missing!",
+    "CRITICAL: Spot prices for AL TODAY (2026-09-01) are missing!",
+    "CRITICAL: Spot prices for XK TODAY (2026-09-01) are missing!"
+  ],
+  "issues_warning": [
+    "Spot prices for HU on 2026-08-31 has only 9/24 hours.",
+    "Historical spot prices for SK on 2026-08-31 missing.",
+    "Historical spot prices for HR on 2026-08-31 missing.",
+    "Historical spot prices for AL on 2026-08-31 missing.",
+    "Historical spot prices for XK on 2026-08-31 missing.",
+    "Cable auction for BG-MK TODAY (2026-09-01) is missing.",
+    "Cable auction for MK-BG TODAY (2026-09-01) is missing."
+  ],
+  "issues_info": []
+};
             let selectedCableCorridor = "";
             let currentSelectedMatchIdx = 0;
             let currentDetailsCardMode = 'target';
@@ -2955,6 +5766,203 @@ function getRealizedPriceWithFallback(c, h, date) {
 
             let selectedAuctionCorridor = "";
             let selectedSearchCorridor = null;
+
+// ── Data Health & Quality Modal Logic ────────────────────────────────────────
+
+function openDataHealthModal() {
+    const modal = document.getElementById("data_health_modal");
+    if (!modal) return;
+    renderDataHealthModal();
+    modal.style.display = "flex";
+}
+
+function closeDataHealthModal() {
+    const modal = document.getElementById("data_health_modal");
+    if (modal) modal.style.display = "none";
+}
+
+function handleHealthModalBackdrop(event) {
+    if (event.target && event.target.id === "data_health_modal") {
+        closeDataHealthModal();
+    }
+}
+
+function switchHealthSubTab(event, tabId) {
+    const parent = event.currentTarget.closest(".health-modal-body");
+    if (!parent) return;
+    parent.querySelectorAll(".health-tab-btn").forEach(btn => btn.classList.remove("active"));
+    parent.querySelectorAll(".health-tab-content").forEach(tab => tab.classList.remove("active"));
+    event.currentTarget.classList.add("active");
+    const target = document.getElementById(tabId);
+    if (target) target.classList.add("active");
+}
+
+function renderDataHealthModal() {
+    if (!dataHealth || typeof dataHealth !== 'object') return;
+
+    // 1. Render critical & warning alerts
+    const issuesContainer = document.getElementById("health_modal_issues");
+    if (issuesContainer) {
+        let html = "";
+        const crit = dataHealth.issues_critical || [];
+        const warn = dataHealth.issues_warning || [];
+
+        if (crit.length === 0 && warn.length === 0) {
+            html = `<div class="health-alert-box" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#065f46;">
+                <span>🟢</span>
+                <div><strong>All Systems Verified:</strong> 100% data completeness across all monitored countries and corridors.</div>
+            </div>`;
+        } else {
+            crit.forEach(msg => {
+                html += `<div class="health-alert-box health-alert-critical">
+                    <span>🔴</span>
+                    <div>${msg}</div>
+                </div>`;
+            });
+            warn.slice(0, 8).forEach(msg => {
+                html += `<div class="health-alert-box health-alert-warning">
+                    <span>🟡</span>
+                    <div>${msg}</div>
+                </div>`;
+            });
+            if (warn.length > 8) {
+                html += `<div style="font-size:11px; color:#64748b; margin-top:4px;">... and ${warn.length - 8} more minor warnings.</div>`;
+            }
+        }
+        issuesContainer.innerHTML = html;
+    }
+
+    // 2. Render Spot Prices Matrix
+    const spotContainer = document.getElementById("health_spot_matrix_container");
+    if (spotContainer && dataHealth.spot_prices && dataHealth.spot_prices.matrix) {
+        const sp = dataHealth.spot_prices;
+        const dates = sp.dates || [];
+        const countryList = sp.countries || [];
+        
+        let tableHtml = `<table class="health-matrix-table">
+            <thead>
+                <tr>
+                    <th class="col-country">Bidding Zone</th>`;
+        dates.forEach(d => {
+            const isTomorrow = (d === dataHealth.tomorrow);
+            const isToday = (d === dataHealth.today);
+            let dateLabel = d.slice(5);
+            if (isToday) dateLabel += " (Today)";
+            else if (isTomorrow) dateLabel += " (DA)";
+            tableHtml += `<th>${dateLabel}</th>`;
+        });
+        tableHtml += `</tr></thead><tbody>`;
+
+        countryList.forEach(cc => {
+            const cName = (countryNames && countryNames[cc]) ? countryNames[cc] : cc;
+            tableHtml += `<tr><td class="col-country" title="${cName}">${cc} <span style="font-weight:400; color:#94a3b8; font-size:10px;">${cName !== cc ? cName : ''}</span></td>`;
+            dates.forEach(d => {
+                const cell = (sp.matrix[cc] && sp.matrix[cc][d]) ? sp.matrix[cc][d] : { status: 'missing', badge: '🔴', description: 'Missing' };
+                let badgeClass = "cell-badge-missing";
+                if (cell.status === 'complete') badgeClass = "cell-badge-complete";
+                else if (cell.status === 'partial') badgeClass = "cell-badge-partial";
+                else if (cell.status === 'pending') badgeClass = "cell-badge-pending";
+
+                tableHtml += `<td><span class="${badgeClass}" title="${cc} on ${d}: ${cell.description}">${cell.badge} ${cell.description}</span></td>`;
+            });
+            tableHtml += `</tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        spotContainer.innerHTML = tableHtml;
+    }
+
+    // 3. Render Cables Matrix
+    const cablesContainer = document.getElementById("health_cables_matrix_container");
+    if (cablesContainer && dataHealth.cables_daily && dataHealth.cables_daily.matrix) {
+        const cd = dataHealth.cables_daily;
+        const dates = cd.dates || [];
+        const corridors = cd.corridors || [];
+
+        let tableHtml = `<table class="health-matrix-table">
+            <thead>
+                <tr>
+                    <th class="col-corridor">Interconnector</th>`;
+        dates.forEach(d => {
+            const isTomorrow = (d === dataHealth.tomorrow);
+            const isToday = (d === dataHealth.today);
+            let dateLabel = d.slice(5);
+            if (isToday) dateLabel += " (Today)";
+            else if (isTomorrow) dateLabel += " (DA)";
+            tableHtml += `<th>${dateLabel}</th>`;
+        });
+        tableHtml += `</tr></thead><tbody>`;
+
+        corridors.forEach(corr => {
+            tableHtml += `<tr><td class="col-corridor">${corr}</td>`;
+            dates.forEach(d => {
+                const cell = (cd.matrix[corr] && cd.matrix[corr][d]) ? cd.matrix[corr][d] : { status: 'missing', badge: '🔴', description: 'Missing' };
+                let badgeClass = "cell-badge-missing";
+                if (cell.status === 'complete') badgeClass = "cell-badge-complete";
+                else if (cell.status === 'partial') badgeClass = "cell-badge-partial";
+                else if (cell.status === 'pending') badgeClass = "cell-badge-pending";
+
+                tableHtml += `<td><span class="${badgeClass}" title="${corr} on ${d}: ${cell.description}">${cell.badge} ${cell.description}</span></td>`;
+            });
+            tableHtml += `</tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        cablesContainer.innerHTML = tableHtml;
+    }
+
+    // 4. Render Outages & Fuels
+    const outFuelsContainer = document.getElementById("health_outages_fuels_container");
+    if (outFuelsContainer) {
+        const out = dataHealth.outages || {};
+        const comm = dataHealth.commodities || {};
+
+        let html = `
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+            <!-- Outages Card -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+                <h4 style="margin:0 0 12px 0; font-size:14px; color:#1e293b; display:flex; align-items:center; gap:6px;">
+                    <span>⚡</span> ENTSO-E Generation Outages
+                </h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+                    <span style="color:#64748b;">Active Outages Now:</span>
+                    <strong style="color:#0f172a;">${out.active_now || 0} units</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+                    <span style="color:#64748b;">Total Tracked Events:</span>
+                    <strong style="color:#0f172a;">${out.total_records || 0} records</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:12px;">
+                    <span style="color:#64748b;">Furthest Scheduled Horizon:</span>
+                    <strong style="color:#0f172a;">${(out.max_end_date || '—').slice(0, 10)}</strong>
+                </div>
+            </div>
+
+            <!-- Fuels & Carbon Card -->
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+                <h4 style="margin:0 0 12px 0; font-size:14px; color:#1e293b; display:flex; align-items:center; gap:6px;">
+                    <span>🛢️</span> Fuel &amp; Carbon Spot Prices
+                </h4>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+                    <span style="color:#64748b;">Latest Settlement Date:</span>
+                    <strong style="color:#0f172a;">${comm.latest_trade_date || '—'}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+                    <span style="color:#64748b;">TTF Natural Gas Spot:</span>
+                    <strong style="color:#0f172a;">${comm.latest_ttf_price != null ? comm.latest_ttf_price + ' €/MWh' : '—'}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:12px;">
+                    <span style="color:#64748b;">EUA Carbon Spot:</span>
+                    <strong style="color:#0f172a;">${comm.latest_eua_price != null ? comm.latest_eua_price + ' €/t' : '—'}</strong>
+                </div>
+            </div>
+        </div>`;
+        outFuelsContainer.innerHTML = html;
+    }
+}
+
+// ESC listener to close health modal
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDataHealthModal();
+});
 
 // ── National Holidays Lookup ───────────────────────────────────────────────
 // Primary source: holidaysData injected from DB. Fallback: Easter computation.
