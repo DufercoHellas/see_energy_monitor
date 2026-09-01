@@ -585,7 +585,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <!-- ── TAB: Forecast Residuals ── -->
 <div id="Residuals" class="tabcontent" style="display:block;">
     <h2>Forecast Residuals — Net Demand by Hour</h2>
-    <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Net demand = Demand − (Wind + Solar + Hydro). Snapshot taken before 09:00 on the day prior to delivery.</p>
+    <p style="color:#6b7280;margin-top:8px;margin-bottom:16px;font-size:14px;">Net demand = Demand − (Wind + Solar + Hydro).</p>
     
     <!-- ── Date Pickers ── -->
     <div style="background: #f8fafc; padding: 16px 20px; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
@@ -7182,9 +7182,10 @@ function renderLongCableDetails(rec, corridorCode) {
 
 // ── Residuals & Outages Charts ────────────────────────────────────────────
 
-// Render residual forecast charts for all countries
+// Render residual forecast charts for countries with active forecast residuals
 function renderResiduals(dateList) {
-                countries.forEach(c => {
+                const resCountries = ['DE_LU', 'AT', 'IT', 'GR', 'BG', 'RO', 'HU', 'CZ', 'SK', 'RS'];
+                resCountries.forEach(c => {
                     const traces = [];
                     dateList.forEach(dStr => {
                         if (historicalData[c] && historicalData[c][dStr]) {
@@ -10205,9 +10206,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 // Set default date pickers and start async data fetch on page load
             document.addEventListener("DOMContentLoaded", function() {
                 const today = new Date();
-                const start = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
-                const day2 = new Date(today.getTime() + 2 * 24 * 60 * 60 * 1000);
-                const end = new Date(today.getTime() + 3 * 24 * 60 * 60 * 1000);
+                const dPlus1 = new Date(today.getTime() + 1 * 24 * 60 * 60 * 1000);
                 
                 const formatD = (d) => {
                     const y = d.getFullYear();
@@ -10216,11 +10215,12 @@ function renderEUMapCountryDetail(dataKey, date) {
                     return `${y}-${m}-${day}`;
                 };
                 
-                // Set Forecast Residuals default pickers
-                document.getElementById("res_date_1").value = formatD(start);
-                document.getElementById("res_date_2").value = formatD(day2);
-                document.getElementById("res_date_3").value = formatD(end);
-                // Date 4 & 5 remain empty by default
+                // Set Forecast Residuals default pickers (Date 1: Today, Date 2: Tomorrow, Dates 3-5: Empty)
+                if (document.getElementById("res_date_1")) document.getElementById("res_date_1").value = formatD(today);
+                if (document.getElementById("res_date_2")) document.getElementById("res_date_2").value = formatD(dPlus1);
+                if (document.getElementById("res_date_3")) document.getElementById("res_date_3").value = "";
+                if (document.getElementById("res_date_4")) document.getElementById("res_date_4").value = "";
+                if (document.getElementById("res_date_5")) document.getElementById("res_date_5").value = "";
                 
                 // Set Generation Outages default pickers (start: today - 5 days, end: today + 25 days)
                 const outagesStart = new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000);
