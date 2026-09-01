@@ -8297,6 +8297,8 @@ function findAnalogues() {
 
 // Render the target date or selected match details panel with hourly profiles
 function renderTargetDetailsCard(viewMode) {
+                const targetPanelCheck = document.getElementById('target_date_details_panel');
+                if (!targetPanelCheck) return;
                 if (viewMode) {
                     currentDetailsCardMode = viewMode;
                 }
