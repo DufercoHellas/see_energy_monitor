@@ -6025,9 +6025,11 @@ function initCableOutagesSelectors() {
                      }
                  });
                  
-                 // Set default dates (all available range)
-                 document.getElementById("cable_outages_start_date").value = minDate;
-                 document.getElementById("cable_outages_end_date").value = maxDate;
+                 // Set default dates if search inputs exist
+                 const startDateEl = document.getElementById("cable_outages_start_date");
+                 const endDateEl = document.getElementById("cable_outages_end_date");
+                 if (startDateEl) startDateEl.value = minDate;
+                 if (endDateEl) endDateEl.value = maxDate;
                  
                  cableOutagesInitialized = true;
                  
@@ -6241,27 +6243,27 @@ function getYearlyCapacityForDate(corridor, dateStr) {
 
 // Switch between matrix / daily / search views in the outages tab
 function toggleOutagesGridView(mode) {
-                document.querySelectorAll("#CableOutages .inner-tablinks").forEach(btn => btn.classList.remove("active"));
+                const parent = document.getElementById("Cables") || document.getElementById("CableOutages");
+                if (parent) {
+                    parent.querySelectorAll(".inner-tablinks").forEach(btn => btn.classList.remove("active"));
+                }
+                const matrixSec = document.getElementById("outages_matrix_section");
+                const dailySec = document.getElementById("outages_daily_section");
+                const btnMatrix = document.getElementById("btn_maint_matrix");
+                const btnDaily = document.getElementById("btn_daily_matrix");
+
                 if (mode === 'matrix') {
-                    document.getElementById("btn_maint_matrix").classList.add("active");
-                    document.getElementById("outages_matrix_section").style.display = "block";
-                    document.getElementById("outages_daily_section").style.display = "none";
-                    document.getElementById("outages_search_section").style.display = "none";
+                    if (btnMatrix) btnMatrix.classList.add("active");
+                    if (matrixSec) matrixSec.style.display = "block";
+                    if (dailySec) dailySec.style.display = "none";
                     renderCableOutagesGrid();
                 } else if (mode === 'daily') {
-                    document.getElementById("btn_daily_matrix").classList.add("active");
-                    document.getElementById("outages_matrix_section").style.display = "none";
-                    document.getElementById("outages_daily_section").style.display = "block";
-                    document.getElementById("outages_search_section").style.display = "none";
+                    if (btnDaily) btnDaily.classList.add("active");
+                    if (matrixSec) matrixSec.style.display = "none";
+                    if (dailySec) dailySec.style.display = "block";
                     renderCableDailyOutagesGrid();
-                } else if (mode === 'search') {
-                    document.getElementById("btn_search_log").classList.add("active");
-                    document.getElementById("outages_matrix_section").style.display = "none";
-                    document.getElementById("outages_daily_section").style.display = "none";
-                    document.getElementById("outages_search_section").style.display = "block";
-                    renderCableOutages();
                 }
-                renderRegionalContextFlows();
+                if (typeof renderRegionalContextFlows === 'function') renderRegionalContextFlows();
             }
 
 function renderRegionalContextFlows() {
