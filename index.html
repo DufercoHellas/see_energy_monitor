@@ -1232,6 +1232,12 @@ function openTab(evt, tabName) {
     if (tabName === 'EUMap') {
         initEUMap();
     }
+    if (tabName === 'Cables') {
+        if (typeof initCableOutagesSelectors === 'function') initCableOutagesSelectors();
+        if (typeof renderCableOutagesGrid === 'function') renderCableOutagesGrid();
+        if (typeof renderCableDailyOutagesGrid === 'function') renderCableDailyOutagesGrid();
+        if (typeof renderRegionalFlowsContext === 'function') renderRegionalFlowsContext();
+    }
     window.dispatchEvent(new Event('resize'));
 }
 function openInnerTab(evt, tabName) {
@@ -5711,7 +5717,14 @@ function renderOutagesTab() {
 function renderDashboard() {
                 renderResidualsTab();
                 renderOutagesTab();
-
+                try {
+                    initCableOutagesSelectors();
+                    renderCableOutagesGrid();
+                    renderCableDailyOutagesGrid();
+                    renderRegionalFlowsContext();
+                } catch(e) {
+                    console.error("Error initializing cable outages:", e);
+                }
             }
 
 // ── Cables Matrix ─────────────────────────────────────────────────────────
