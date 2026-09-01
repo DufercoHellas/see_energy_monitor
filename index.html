@@ -7359,6 +7359,29 @@ function renderOutages(startStr, endStr, dateList) {
             }
 
 // Render a stacked bar chart of unavailable capacity by fuel type for a country
+const FUEL_COLORS = {
+    'Nuclear': '#f97316',
+    'Fossil Gas': '#eab308',
+    'Fossil Hard coal': '#475569',
+    'Fossil Brown coal/Lignite': '#78350f',
+    'Fossil Oil': '#dc2626',
+    'Fossil Coal-derived gas': '#92400e',
+    'Fossil': '#a16207',
+    'Hydro Water Reservoir': '#38bdf8',
+    'Hydro Pumped Storage': '#0284c7',
+    'Hydro Run-of-river and poundage': '#06b6d4',
+    'Hydro': '#0ea5e9',
+    'Wind Onshore': '#059669',
+    'Wind Offshore': '#34d399',
+    'Wind': '#10b981',
+    'Solar': '#f59e0b',
+    'Biomass': '#65a30d',
+    'Waste': '#57534e',
+    'Energy storage': '#8b5cf6',
+    'Other renewable': '#22c55e',
+    'Other': '#94a3b8'
+};
+
 function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                 const plotId = `plot_${c}`;
                 const div = document.getElementById(plotId);
@@ -7369,56 +7392,69 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                     return;
                 }
                 
-                // Deduplicate overlapping filings for the same physical turbine / generator unit
-                const dedupMap = new Map();
-                countryOutages.forEach(row => {
-                    const asset = row.production_resource_psr_name || row.production_resource_name || row.mrid;
-                    const key = `${asset}|${row.start_dt}|${row.end_dt}`;
-                    const rev = parseInt(String(row.revision || '1').replace(/\D/g, '')) || 1;
-                    if (!dedupMap.has(key) || rev > dedupMap.get(key).rev) {
-                        dedupMap.set(key, { rev, row });
-                    }
+                // Group outages by physical unit / asset name
+                // If PSR name exists, use that. Otherwise use plant name.
+                const processedOutages = countryOutages.map(row => {
+                    const psr = (row.production_resource_psr_name || '').trim();
+                    const plant = (row.production_resource_name || '').trim();
+                    const unitKey = (psr && psr !== 'nan') ? psr : plant;
+                    return {
+                        ...row,
+                        unitKey: unitKey || row.mrid,
+                        startMs: new Date(row.start_dt).getTime(),
+                        endMs: new Date(row.end_dt).getTime(),
+                        mw: parseFloat(row.unavailable_mw) || 0
+                    };
                 });
-                const cleanOutages = Array.from(dedupMap.values()).map(x => x.row);
                 
-                const fuelTypes = Array.from(new Set(cleanOutages.map(row => row.display_fuel)));
+                const fuelTypes = Array.from(new Set(processedOutages.map(row => row.display_fuel))).sort();
                 const traces = [];
                 const totalsByDate = dateList.map(() => 0);
-                const dayDurationMs = 24 * 3600 * 1000;
                 
+                // For each day and each fuel type, calculate 24h average by taking max unavailable MW per physical unit in each hour
                 fuelTypes.forEach(ft => {
+                    const ftOutages = processedOutages.filter(row => row.display_fuel === ft);
                     const yVals = [];
+                    
                     dateList.forEach((dStr, idx) => {
                         const dDate = parseLocalDate(dStr);
-                        const dStart = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 0, 0, 0, 0);
-                        const dEnd = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 23, 59, 59, 999);
+                        const dayStartMs = new Date(dDate.getFullYear(), dDate.getMonth(), dDate.getDate(), 0, 0, 0, 0).getTime();
                         
-                        // 24-Hour Energy Weighted Average MW (MWh / 24h)
-                        const mwSum = cleanOutages
-                            .filter(row => row.display_fuel === ft)
-                            .reduce((sum, row) => {
-                                const rStart = new Date(row.start_dt);
-                                const rEnd = new Date(row.end_dt);
-                                if (rStart <= dEnd && rEnd >= dStart) {
-                                    const overlapStart = Math.max(rStart.getTime(), dStart.getTime());
-                                    const overlapEnd = Math.min(rEnd.getTime(), dEnd.getTime());
-                                    const overlapMs = Math.max(0, overlapEnd - overlapStart);
-                                    const weightedMw = (parseFloat(row.unavailable_mw) || 0) * (overlapMs / dayDurationMs);
-                                    return sum + weightedMw;
+                        let dailyAvgSum = 0;
+                        // 24 hourly steps
+                        for (let h = 0; h < 24; h++) {
+                            const hStartMs = dayStartMs + h * 3600000;
+                            const hEndMs = hStartMs + 3599999;
+                            
+                            // Active outages in this hour
+                            const activeInHour = ftOutages.filter(r => r.startMs <= hEndMs && r.endMs >= hStartMs);
+                            
+                            // Max unavailable MW per physical unit (avoids double counting duplicate document revisions)
+                            const unitMaxMap = {};
+                            activeInHour.forEach(r => {
+                                if (!unitMaxMap[r.unitKey] || r.mw > unitMaxMap[r.unitKey]) {
+                                    unitMaxMap[r.unitKey] = r.mw;
                                 }
-                                return sum;
-                            }, 0);
+                            });
+                            
+                            const hourTotal = Object.values(unitMaxMap).reduce((s, v) => s + v, 0);
+                            dailyAvgSum += hourTotal / 24.0;
+                        }
                         
-                        yVals.push(Math.round(mwSum * 10) / 10);
-                        totalsByDate[idx] += mwSum;
+                        yVals.push(Math.round(dailyAvgSum * 10) / 10);
+                        totalsByDate[idx] += dailyAvgSum;
                     });
                     
                     traces.push({
                         x: dateList,
                         y: yVals,
                         type: 'bar',
-                        name: ft
+                        name: ft,
+                        marker: {
+                            color: FUEL_COLORS[ft] || '#94a3b8'
+                        }
                     });
+                });
                 });
                 
                 // Outage percentage text labels on top of each bar column
