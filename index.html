@@ -10224,7 +10224,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                 
                 const analogueDateEl = document.getElementById("analogue_date");
                 if (analogueDateEl) {
-                    analogueDateEl.value = formatD(start);
+                    analogueDateEl.value = formatD(dPlus1);
                     analogueDateEl.addEventListener("change", () => applyOptimizedWeights());
                 }
 
