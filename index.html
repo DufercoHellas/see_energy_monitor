@@ -870,55 +870,56 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <!-- ── TAB: Cables ── -->
         <!-- ── TAB: Cable Outages ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
-    <h2>Cable Capacity Outages & Curtailments</h2>
-    <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
+    <div style="margin-bottom: 24px;">
+        <h2 style="font-size: 24px; font-weight: 800; color: #1e293b; margin: 0 0 6px 0; letter-spacing: -0.5px;">Cable Capacity Outages & Curtailments</h2>
+        <p style="color: #64748b; margin: 0; font-size: 14px;">Hourly cross-border transmission capacity reductions and maintenance schedules compiled from JAO and SEECAO.</p>
+    </div>
 
-    <!-- ── Outage View Toggle ── -->
-    <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
-        <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
-        <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🕒 Daily Outages</button>
-        
+    <!-- ── Outage View Toggle Buttons ── -->
+    <div style="display: flex; gap: 10px; margin-bottom: 24px; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px;">
+        <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 8px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">📅 Monthly & Yearly Matrix</button>
+        <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 8px; padding: 8px 16px; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.2s;">🕒 Daily Outages</button>
     </div>
 
     <!-- ── 30-Day Outage Calendar Matrix ── -->
     <div id="outages_matrix_section" style="display: block;">
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
                 <div>
-                    <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <h3 style="margin: 0; font-size: 17px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
                         📅 30-Day Outage Calendar Matrix
                     </h3>
-                    <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 0;">
-                        Quick visual overview of monthly & yearly capacity maintenance for the next 30 days (showing 15 days at a time). Click a cell to view details.
+                    <p style="color: #64748b; font-size: 13px; margin-top: 4px; margin-bottom: 0;">
+                        Visual overview of monthly & yearly cross-border transmission capacity maintenance for the next 30 days.
                     </p>
                 </div>
                 <div style="display: flex; gap: 8px; align-items: center;">
-                    <button onclick="shiftOutagesGrid(-15)" id="grid_prev_btn" style="background: #e2e8f0; color: #475569; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#cbd5e1'" onmouseout="this.style.background='#e2e8f0'">
+                    <button onclick="shiftOutagesGrid(-15)" id="grid_prev_btn" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
                         &larr; Prev 15 Days
                     </button>
-                    <button onclick="shiftOutagesGrid(15)" id="grid_next_btn" style="background: #4f46e5; color: white; border: none; border-radius: 6px; padding: 6px 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4f46e5'">
+                    <button onclick="shiftOutagesGrid(15)" id="grid_next_btn" style="background: #3b82f6; color: white; border: none; border-radius: 6px; padding: 6px 14px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: all 0.2s;">
                         Next 15 Days &rarr;
                     </button>
                 </div>
             </div>
 
             <!-- ── Matrix Filters ── -->
-            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                    <select id="matrix_country_filter" onchange="onMatrixCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                    <select id="matrix_country_filter" onchange="onMatrixCountryChange()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
                         <option value="ALL">All Countries</option>
                     </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
-                    <select id="matrix_corridor_filter" onchange="renderCableOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
+                    <select id="matrix_corridor_filter" onchange="renderCableOutagesGrid()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
                         <option value="ALL">All Corridors</option>
                     </select>
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
-                    <input type="checkbox" id="matrix_hide_full" onchange="renderCableOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
-                    <label for="matrix_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+                    <input type="checkbox" id="matrix_hide_full" onchange="renderCableOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6;">
+                    <label for="matrix_hide_full" style="font-size: 13px; font-weight: 600; color: #334155; cursor: pointer;">Hide 100% Capacity Corridors</label>
                 </div>
             </div>
 
@@ -930,53 +931,37 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
     <!-- ── Daily Outages ── -->
     <div id="outages_daily_section" style="display: none;">
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <h3 style="margin-top:0; margin-bottom: 12px; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
+        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 22px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);">
+            <h3 style="margin-top: 0; margin-bottom: 6px; font-size: 17px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;" id="daily_grid_title_label">
                 🕒 Daily Outages
             </h3>
-            <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 20px;">
-                Hourly view (1-24 hours) of daily capacity reductions for tomorrow (D+1). Green = 100% capacity, Orange = partial reduction, Red = total outage. Click a cell to view details.
+            <p style="color: #64748b; font-size: 13px; margin-top: 4px; margin-bottom: 20px;">
+                Hourly view of day-ahead (D+1) capacity reductions. Green = 100% capacity, Orange = partial reduction, Red = total outage.
             </p>
 
             <!-- ── Daily Filters ── -->
-            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px;">
+            <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px;">
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                    <select id="daily_country_filter" onchange="onDailyCountryChange()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
+                    <select id="daily_country_filter" onchange="onDailyCountryChange()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
                         <option value="ALL">All Countries</option>
                     </select>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
-                    <label style="font-weight: 700; font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
-                    <select id="daily_corridor_filter" onchange="renderCableDailyOutagesGrid()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
+                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Corridor</label>
+                    <select id="daily_corridor_filter" onchange="renderCableDailyOutagesGrid()" style="padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; font-family: 'Inter'; min-width: 150px; background: white;">
                         <option value="ALL">All Corridors</option>
                     </select>
                 </div>
-                <div style="display: flex; align-items: center; gap: 6px; margin-top: 18px;">
-                    <input type="checkbox" id="daily_hide_full" onchange="renderCableDailyOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer;">
-                    <label for="daily_hide_full" style="font-size: 13px; font-weight: 600; color: #475569; cursor: pointer;">Hide 100% Capacity Corridors</label>
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+                    <input type="checkbox" id="daily_hide_full" onchange="renderCableDailyOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6;">
+                    <label for="daily_hide_full" style="font-size: 13px; font-weight: 600; color: #334155; cursor: pointer;">Hide 100% Capacity Corridors</label>
                 </div>
             </div>
 
             <div id="cable_outages_daily_grid_container" style="overflow-x: auto;">
                 <!-- Daily grid generated dynamically -->
             </div>
-        </div>
-    </div>
-
-    
-
-    <!-- ── Regional Context (Flows & Major Interconnectors) ── -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-        <div style="margin-bottom: 16px;">
-            <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                🌐 Regional Context — Cross-Border Flows (Major Interconnectors)
-            </h3>
-            <p style="color:#6b7280; font-size: 13px; margin-top: 4px; margin-bottom: 0;">
-                Physical cross-border power flows (MW) on key European regional corridors influencing SEE market clearing (FR-DE, AT-DE, IT-AT, BG-RO, etc.).
-            </p>
-        </div>
-        <div id="regional_context_flows_container" style="overflow-x: auto;">
         </div>
     </div>
 
