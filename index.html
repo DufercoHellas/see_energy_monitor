@@ -877,7 +877,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
         <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
         <button class="inner-tablinks" id="btn_daily_matrix" onclick="toggleOutagesGridView('daily')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🕒 Daily Outages</button>
-        <button class="inner-tablinks" id="btn_search_log" onclick="toggleOutagesGridView('search')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">🔍 Outage History Log</button>
+        
     </div>
 
     <!-- ── 30-Day Outage Calendar Matrix ── -->
@@ -964,59 +964,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <!-- ── Outage History Log ── -->
-    <div id="outages_search_section" style="display: none;">
-        <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <h3 style="margin-top:0; margin-bottom: 16px; font-size: 15px; font-weight: 700; color: #1e293b;">🔍 Advanced Search & Outage History Log</h3>
-            
-            <!-- ── Search Filters ── -->
-            <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: center; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-sizing: border-box; margin-bottom: 20px;">
-                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 250px; flex-grow: 1;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Country</label>
-                    <select id="cable_outages_country_filter" onchange="selectedSearchCorridor = null; renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                        <option value="ALL">All Countries</option>
-                    </select>
-                    <div id="country_corridors_list" style="margin-top: 8px; font-size: 13px; color: #475569; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;"></div>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 160px;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Type</label>
-                    <select id="cable_outages_type_filter" onchange="onSearchTypeChange()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box; background: white;">
-                        <option value="ALL">All Types</option>
-                        <option value="MONTHLY">Monthly</option>
-                        <option value="YEARLY">Yearly</option>
-                        <option value="DAILY">Daily</option>
-                    </select>
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Start Date</label>
-                    <input type="date" id="cable_outages_start_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                </div>
-                <div style="display: flex; flex-direction: column; gap: 6px; min-width: 180px;">
-                    <label style="font-weight: 700; font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">End Date</label>
-                    <input type="date" id="cable_outages_end_date" onchange="renderCableOutages()" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px; font-family: 'Inter'; width: 100%; box-sizing: border-box;">
-                </div>
-            </div>
-
-            <div class="table-container" style="max-height: 500px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                <table style="min-width: 100%; border-collapse: collapse; background: white;">
-                    <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2; border-bottom: 2px solid #e2e8f0;">
-                        <tr>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Trade Date</th>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Type</th>
-                            <th style="padding: 14px 16px; text-align: center; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Hour (Pos)</th>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Corridor</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Original NTC</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Remaining Capacity</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reduction</th>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 700; font-size: 12px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0;">Reason / Details</th>
-                        </tr>
-                    </thead>
-                    <tbody id="cable_outages_body" style="font-weight: 500; font-size: 14px; color: #1e293b;">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- ── Regional Context (Flows & Major Interconnectors) ── -->
     <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
