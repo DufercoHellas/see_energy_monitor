@@ -575,7 +575,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 <div class="tab">
     <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
     <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
-    <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cables</button>
+    <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cable Outages</button>
     <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
     <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
 </div>
@@ -868,129 +868,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
 
         <!-- ── TAB: Cables ── -->
-        <!-- ── TAB: Cables ── -->
+        <!-- ── TAB: Cable Outages ── -->
 <div id="Cables" class="tabcontent" style="display:none; padding: 24px;">
-    <div class="inner-tab" style="margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; display: flex; gap: 8px;">
-        <button class="inner-tablinks active" onclick="openInnerCablesTab(event, 'CableAuctionsPanel')">🏷️ Cable Auctions</button>
-        <button class="inner-tablinks" onclick="openInnerCablesTab(event, 'CableOutages')">⚠️ Cable Outages</button>
-    </div>
+    <h2>Cable Capacity Outages & Curtailments</h2>
+    <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
 
-    <!-- ── Sub-Tab: Cable Auctions Optimizer ── -->
-    <div id="CableAuctionsPanel" class="inner-cables-tabcontent" style="display:block;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-            <div>
-                <h3 style="margin:0;">🏷️ Cable Auctions — Bidding Optimizer</h3>
-                <p style="color:#6b7280; font-size:13px; margin:4px 0 0 0;">Compute the optimal risk-adjusted bid price for explicit monthly cross-border capacity auctions.</p>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:12px; width:100%; background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;">
-                <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                    <div style="display:flex; flex-direction:column; gap:4px; min-width: 150px;">
-                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Country</label>
-                        <select id="auction_country_filter" onchange="onAuctionCountryFilterChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
-                            <option value="ALL">All Countries</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px; min-width:120px;">
-                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Product</label>
-                        <select id="auction_product_type" onchange="onAuctionProductTypeChange()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;">
-                            <option value="Monthly">Monthly</option>
-                            <option value="Yearly">Yearly</option>
-                        </select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px; min-width:140px;">
-                        <label id="auction_date_label" style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Month</label>
-                        <select id="auction_month" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 12px; font-family:'Inter'; font-size:13px; color:#374151; background:#fff;"></select>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px; min-width:80px;">
-                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Volume (MW)</label>
-                        <input type="number" id="auction_mw" value="1" min="0.1" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:4px; min-width:100px;">
-                        <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase;">Risk Margin (€)</label>
-                        <input type="number" id="auction_margin" value="1.0" min="0" step="0.1" onchange="runAuctionOptimizer()" style="border:1px solid #d1d5db; border-radius:6px; padding:6px 10px; font-family:'Inter'; font-size:13px; color:#374151; width:70px;">
-                    </div>
-                </div>
-                <div style="display:flex; flex-direction:column; gap:6px; border-top:1px solid #e2e8f0; padding-top:10px;">
-                    <label style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; margin-bottom: 2px;">Corridor</label>
-                    <div id="auction_corridors_list" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; min-height: 32px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── KPI Cards ── -->
-        <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-bottom:24px;">
-            <div class="chart-wrapper" style="padding:20px; margin:0;">
-                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Recommended Bid</div>
-                <div id="kpi_bid" style="font-size:32px; font-weight:700; color:#059669; line-height:1;">—</div>
-                <div id="kpi_bid_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">/MW</div>
-            </div>
-            <div class="chart-wrapper" style="padding:20px; margin:0;">
-                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Win Probability</div>
-                <div id="kpi_win_prob" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
-                <div id="kpi_win_prob_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">at optimal bid</div>
-            </div>
-            <div class="chart-wrapper" style="padding:20px; margin:0;">
-                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Expected Value E[V]</div>
-                <div id="kpi_ev" style="font-size:32px; font-weight:700; color:#4f46e5; line-height:1;">—</div>
-                <div style="font-size:12px; color:#6b7280; margin-top:6px;">/MWh shaped</div>
-            </div>
-            <div class="chart-wrapper" style="padding:20px; margin:0;">
-                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Total Exposure</div>
-                <div id="kpi_exposure" style="font-size:32px; font-weight:700; color:#d97706; line-height:1;">—</div>
-                <div id="kpi_exposure_sub" style="font-size:12px; color:#6b7280; margin-top:6px;">MWh</div>
-            </div>
-            <div class="chart-wrapper" style="padding:20px; margin:0;">
-                <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#9ca3af; margin-bottom:8px;">Financial Liability</div>
-                <div id="kpi_liability" style="font-size:32px; font-weight:700; color:#7c3aed; line-height:1;">—</div>
-                <div style="font-size:12px; color:#6b7280; margin-top:6px;">at bid price</div>
-            </div>
-        </div>
-
-        <!-- ── Auction Charts ── -->
-        <div style="display:grid; grid-template-columns:58% 40%; gap:16px; margin-bottom:16px;">
-            <div class="chart-wrapper" style="margin:0;">
-                <h4 style="margin-top:0;">Bid Profit Curve</h4>
-                <p id="auction_bid_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Historical demand curve: past clearing prices (€/MWh) vs cumulative allocated volume (MW). Red dashed = available capacity (ATC). Green dashed = optimal bid. The <strong>clearing point</strong> is where they intersect.</p>
-                <div id="auction_bid_curve_chart" style="width:100%; height:300px;"></div>
-            </div>
-            <div class="chart-wrapper" style="margin:0; margin-top:16px;">
-                <h4 style="margin-top:0;">Hourly Spread Shape — Historical Profile</h4>
-                <p id="auction_spread_subtitle" style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Shaped forward spread by hour. Gray = solar suppression. Used to compute E[V].</p>
-                <div id="auction_spread_chart" style="width:100%; height:160px;"></div>
-                <div id="historical_profile_toggles_container" style="margin-top: 8px; margin-bottom: 12px;"></div>
-                <div id="auction_backtest_table_container" style="margin-top: 16px;"></div>
-            </div>
-            <div style="display:flex; flex-direction:column; gap:16px;">
-                <div class="chart-wrapper" style="margin:0;">
-                    <h4 style="margin-top:0;">Fundamental Adjustments</h4>
-                    <div id="auction_adjustments" style="font-size:13px;"></div>
-                </div>
-                <div class="chart-wrapper" style="margin:0;">
-                    <h4 style="margin-top:0;">Forward Curve Context</h4>
-                    <div id="auction_fwd_chart" style="width:100%; height:180px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── Historical Data & Outages ── -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-            <div class="chart-wrapper" style="margin:0;">
-                <h4 style="margin-top:0;">Historical Clearing Prices</h4>
-                <p style="font-size:12px; color:#6b7280; margin-top:-8px; margin-bottom:12px;">Past clearing prices (€/MW) for the selected corridor and calendar month from auction records.</p>
-                <div id="auction_clearing_chart" style="width:100%; height:350px;"></div>
-            </div>
-            <div class="chart-wrapper" style="margin:0;">
-                <h4 style="margin-top:0;">Active Cable Outages — Delivery Month</h4>
-                <div id="auction_outages_table"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Sub-Tab: Cable Outages ── -->
-    <div id="CableOutages" class="inner-cables-tabcontent" style="display:none;">
-        <h2>Cable Capacity Outages & Curtailments</h2>
-        <p style="color:#6b7280;margin-top:8px;margin-bottom:20px;font-size:14px;">Hourly transmission capacity reductions (outages/curtailments) compiled from JAO and SEECAO APIs.</p>
-    
     <!-- ── Outage View Toggle ── -->
     <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px;">
         <button class="inner-tablinks active" id="btn_maint_matrix" onclick="toggleOutagesGridView('matrix')" style="border-radius: 6px; padding: 6px 12px; font-weight: 700; font-size: 13px;">📅 Monthly & Yearly Matrix</button>
@@ -1000,7 +882,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
     <!-- ── 30-Day Outage Calendar Matrix ── -->
     <div id="outages_matrix_section" style="display: block;">
-        <!-- 30-Day Outage Calendar Matrix -->
         <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
                 <div>
@@ -1131,7 +1012,6 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                         </tr>
                     </thead>
                     <tbody id="cable_outages_body" style="font-weight: 500; font-size: 14px; color: #1e293b;">
-                        <!-- Dynamically populated -->
                     </tbody>
                 </table>
             </div>
@@ -1149,18 +1029,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </p>
         </div>
         <div id="regional_context_flows_container" style="overflow-x: auto;">
-            <!-- Rendered dynamically -->
         </div>
     </div>
 
     <div style="display: flex; gap: 24px; align-items: flex-start;">
         <!-- ── Details Side Panel ── -->
         <div id="cable_outages_detail_panel" style="width: 320px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: none; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-            <!-- Populate dynamically when a cell is clicked -->
         </div>
     </div>
-    </div> <!-- ── /CableOutages ── -->
-    </div> <!-- ── /Cables ── -->
+</div>
 
 
         <!-- ── TAB: EU Map ── -->
@@ -10312,7 +10189,8 @@ function renderEUMapCountryDetail(dataKey, date) {
 // ── Auction Tab Init ───────────────────────────────────────────────────────
 
 // Initialize the cable auctions tab: populate selectors and render
-function initAuctionTab() {
+function initAuctionTab() { return; // Removed
+if(false){
     const countrySel = document.getElementById('auction_country_filter');
     const corridorsList = document.getElementById('auction_corridors_list');
     if (!countrySel || !corridorsList) return;
@@ -10474,7 +10352,8 @@ function getCorridorCountries(corridor) {
 }
 
 // Run the full auction optimisation: compute bid, EV, demand curve, and charts
-function runAuctionOptimizer() {
+function runAuctionOptimizer() { return; // Removed
+if(false){
     const corridor = selectedAuctionCorridor;
     const yearMonth = document.getElementById('auction_month')?.value;
     const bidMw = parseFloat(document.getElementById('auction_mw')?.value) || 1;
