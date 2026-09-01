@@ -5938,7 +5938,7 @@ function checkAndRenderDailyOutagesAlert() {
     const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
     const d = String(tomorrow.getDate()).padStart(2, '0');
     const tomorrowStr = `${y}-${m}-${d}`;
-    const displayDate = `${d}/${m}/${y}`;
+    const displayDate = `${d}/${m}`;
 
     // 2. Scan for active capacity reductions on D+1
     const dayReductions = cableOutagesData.filter(item => {
@@ -5949,13 +5949,11 @@ function checkAndRenderDailyOutagesAlert() {
     });
 
     if (dayReductions.length === 0) {
-        // Normal state: all 100% full
+        // Normal state: all 100% full (compact badge)
         container.innerHTML = `
-            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="background: #22c55e; color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; flex-shrink: 0;">✓</div>
-                <div style="font-size: 13px; color: #166534; font-weight: 500;">
-                    <strong style="color: #14532d;">Day-Ahead (D+1, ${displayDate}):</strong> All monitored cross-border interconnector corridors operating at <strong>100% full capacity</strong> (no daily outages or curtailments).
-                </div>
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 7px 12px; display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: #166534; font-weight: 500;">
+                <span style="color: #22c55e; font-weight: bold; font-size: 13px;">✓</span>
+                <span><strong>D+1 (${displayDate}):</strong> All cross-border interconnectors at <strong>100% full capacity</strong>.</span>
             </div>
         `;
         return;
@@ -5971,35 +5969,36 @@ function checkAndRenderDailyOutagesAlert() {
         reductionsByCorr[corr].push(r);
     });
 
-    let itemsHtml = "";
+    let chipsHtml = "";
     Object.entries(reductionsByCorr).forEach(([corr, rows]) => {
         const minRem = Math.min(...rows.map(r => parseFloat(r.remaining_capacity) || 0));
         const maxOrig = Math.max(...rows.map(r => parseFloat(r.original_capacity) || 0));
         const reducedHoursCount = rows.length;
-        const reasons = [...new Set(rows.map(r => r.reason).filter(Boolean))].join(', ') || 'Capacity curtailment';
+        const reason = rows[0].reason || 'NTC reduction';
 
-        itemsHtml += `
-            <div style="background: white; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 14px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="background: #ea580c; color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;">${corr}</span>
-                    <span style="font-weight: 600; color: #9a3412; font-size: 13px;">${minRem} / ${maxOrig} MW remaining</span>
-                    <span style="color: #78350f; font-size: 12px;">(${reducedHoursCount} hours affected)</span>
-                </div>
-                <div style="font-size: 12px; color: #9a3412; font-style: italic;">
-                    ${reasons}
-                </div>
+        chipsHtml += `
+            <div title="${reason} (${reducedHoursCount} hours affected)" style="background: white; border: 1px solid #fed7aa; border-radius: 6px; padding: 3px 8px; display: inline-flex; align-items: center; gap: 5px; font-size: 11px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
+                <span style="background: #ea580c; color: white; padding: 1px 5px; border-radius: 3px; font-weight: 700; font-size: 10px;">${corr}</span>
+                <span style="font-weight: 600; color: #9a3412;">${minRem}/${maxOrig} MW</span>
+                <span style="color: #94a3b8; font-size: 10px;">(${reducedHoursCount}h)</span>
             </div>
         `;
     });
 
+    const corrCount = Object.keys(reductionsByCorr).length;
+
     container.innerHTML = `
-        <div style="background: #fff7ed; border: 1px solid #fdba74; border-radius: 10px; padding: 16px 20px; box-shadow: 0 2px 5px rgba(234, 88, 12, 0.05);">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                <span style="font-size: 18px;">⚠️</span>
-                <span style="font-size: 14px; font-weight: 700; color: #9a3412; text-transform: uppercase; letter-spacing: 0.5px;">Day-Ahead (D+1, ${displayDate}) Interconnector Outage / Reduction Alert</span>
+        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 9px 13px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #9a3412; text-transform: uppercase; letter-spacing: 0.3px;">
+                    <span>⚠️</span>
+                    <span>Day-Ahead (${displayDate}) Reductions:</span>
+                    <span style="background: #ffedd5; color: #c2410c; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 700;">${corrCount} Corridors</span>
+                </div>
             </div>
-            <p style="margin: 0 0 8px 0; font-size: 13px; color: #c2410c;">Capacity reductions detected on the following cross-border lines for tomorrow:</p>
-            ${itemsHtml}
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+                ${chipsHtml}
+            </div>
         </div>
     `;
 }
