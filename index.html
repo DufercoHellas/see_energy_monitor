@@ -7387,15 +7387,33 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                     return;
                 }
                 
-                // Group outages by physical unit / asset name
-                // If PSR name exists, use that. Otherwise use plant name.
-                const processedOutages = countryOutages.map(row => {
+                // Clean plant and unit identifiers
+                // If a plant has specific unit/PSR records, discard duplicate parent plant-level filings to prevent double counting
+                const plantsWithPsr = new Set();
+                countryOutages.forEach(row => {
                     const psr = (row.production_resource_psr_name || '').trim();
                     const plant = (row.production_resource_name || '').trim();
-                    const unitKey = (psr && psr !== 'nan') ? psr : plant;
+                    if (psr && psr !== 'nan' && psr !== 'null') {
+                        if (plant) plantsWithPsr.add(plant);
+                    }
+                });
+
+                const cleanOutageRows = countryOutages.filter(row => {
+                    const psr = (row.production_resource_psr_name || '').trim();
+                    const plant = (row.production_resource_name || '').trim();
+                    const hasValidPsr = psr && psr !== 'nan' && psr !== 'null';
+                    // Keep if row has specific PSR, or if its parent plant never reported PSR units
+                    return hasValidPsr || !plantsWithPsr.has(plant);
+                });
+
+                const processedOutages = cleanOutageRows.map(row => {
+                    const psr = (row.production_resource_psr_name || '').trim();
+                    const plant = (row.production_resource_name || '').trim();
+                    const hasValidPsr = psr && psr !== 'nan' && psr !== 'null';
+                    const unitKey = hasValidPsr ? psr : (plant || row.mrid);
                     return {
                         ...row,
-                        unitKey: unitKey || row.mrid,
+                        unitKey: unitKey,
                         startMs: new Date(row.start_dt).getTime(),
                         endMs: new Date(row.end_dt).getTime(),
                         mw: (parseFloat(row.unavailable_mw) > 2500 ? parseFloat(row.unavailable_mw) / 1000.0 : (parseFloat(row.unavailable_mw) || 0))
