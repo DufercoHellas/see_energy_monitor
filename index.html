@@ -9536,6 +9536,9 @@ async function initDashboardData() {
                     auctionFwdData   = fwd  || {};
                     allCorridorsData = cabAll || [];
 
+                    // Pre-load EU Map GeoJSON in the background for instant rendering
+                    fetch('data/europe.geojson').then(r => r.json()).then(data => { window._euMapGeoJsonCache = data; }).catch(() => {});
+
                     statusEl.innerText = "Initialising dashboard...";
 
                     // Set default date to tomorrow
@@ -9826,20 +9829,21 @@ function drawPlotlyEUMap(selectedDate) {
         });
     }
 
-    // Local high-resolution Natural Earth 10m GeoJSON (built by pipeline/build_geojson.py)
-    const GEOJSON_URL = `data/europe.geojson?t=${Date.now()}`;
-
-    // Cache GeoJSON for instant vector border highlighting
+    // Ensure GeoJSON is cached in memory before rendering
     if (!window._euMapGeoJsonCache) {
-        fetch(GEOJSON_URL)
+        fetch('data/europe.geojson')
             .then(r => r.json())
-            .then(data => { window._euMapGeoJsonCache = data; })
-            .catch(() => {});
+            .then(data => {
+                window._euMapGeoJsonCache = data;
+                drawPlotlyEUMap(selectedDate);
+            })
+            .catch(err => console.error("Error loading europe.geojson:", err));
+        return;
     }
 
     const traceWithData = {
         type: 'choroplethmapbox',
-        geojson: GEOJSON_URL,
+        geojson: window._euMapGeoJsonCache,
         featureidkey: 'id',
         locations: withDataLoc,
         z: withDataZ,
@@ -9863,7 +9867,10 @@ function drawPlotlyEUMap(selectedDate) {
     };
     const config = { displayModeBar: false, responsive: true };
 
-    Plotly.newPlot('eumap_container', [traceWithData], layout, config).then(gd => {
+    const mapContainer = document.getElementById('eumap_container');
+    const plotFn = (mapContainer && mapContainer.data && mapContainer.data.length > 0) ? Plotly.react : Plotly.newPlot;
+
+    plotFn('eumap_container', [traceWithData], layout, config).then(gd => {
         const mbMap = gd._fullLayout?.mapbox?._subplot?.map;
         if (mbMap) {
             if (typeof mbMap.setMaxZoom === 'function') mbMap.setMaxZoom(5.5);
@@ -9992,10 +9999,10 @@ function renderEUMapCountryDetail(dataKey, date) {
             }
         }
         if (!window._euMapGeoJsonCache) {
-            fetch(`data/europe.geojson?t=${Date.now()}`).then(r => r.json()).then(data => {
+            fetch('data/europe.geojson').then(r => r.json()).then(data => {
                 window._euMapGeoJsonCache = data;
                 updateBorder();
-            });
+            }).catch(err => console.error("Error loading europe.geojson:", err));
         } else {
             updateBorder();
         }
