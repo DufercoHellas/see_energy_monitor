@@ -435,6 +435,62 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-size: 11px;
 }
 
+/* ── AUTO-DEPLOY NOTIFICATION BANNER ── */
+@keyframes slideInUp {
+    from {
+        transform: translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: 0.8; }
+}
+
+.auto-update-banner {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 99999;
+    background: #0f172a;
+    color: #f8fafc;
+    border: 1px solid #38bdf8;
+    border-radius: 12px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 13px;
+    animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-update-refresh {
+    background: linear-gradient(135deg, #0284c7, #2563eb);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s ease, filter 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-update-refresh:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+}
+
 
         </style>
     </head>
@@ -8282,10 +8338,70 @@ async function initDashboardData() {
                         mask.style.opacity = '0';
                         setTimeout(() => mask.style.display = 'none', 300);
                     }
+
+                    // Start background auto-deploy watcher (checks every 60s)
+                    startAutoUpdateWatcher(60000);
                 } catch (e) {
                     console.error("Failed to load dashboard data:", e);
                     statusEl.innerHTML = `<span style="color: #ef4444; font-weight: 700;">Error: Failed to fetch dashboard data.</span><br><span style="font-size:11px;color:#94a3b8;margin-top:4px;display:block;">Use 'python serve.py' to start a local HTTP server, then open http://localhost:8080</span>`;
                 }
+            }
+
+            // ── Auto-Deploy Watcher (Option C: Notification with Refresh Button) ──
+            function startAutoUpdateWatcher(pollIntervalMs = 60000) {
+                const currentBuildTime = "2026-09-02 10:40";
+                let notificationShown = false;
+
+                setInterval(async function() {
+                    if (notificationShown) return;
+                    try {
+                        const res = await fetch(`last_build.txt?t=${Date.now()}`, { cache: 'no-store' });
+                        if (!res.ok) return;
+                        const text = await res.text();
+                        const match = text.match(/Last Build Timestamp:\s*([^\r\n]+)/);
+                        const remoteTime = match ? match[1].trim() : null;
+
+                        if (remoteTime && currentBuildTime !== "—" && remoteTime !== currentBuildTime) {
+                            notificationShown = true;
+                            showNewDeploymentBanner(remoteTime);
+                        }
+                    } catch (e) {
+                        // Silently ignore background polling network errors
+                    }
+                }, pollIntervalMs);
+            }
+
+            function showNewDeploymentBanner(newTimestamp) {
+                if (document.getElementById("auto_update_banner")) return;
+
+                const banner = document.createElement("div");
+                banner.id = "auto_update_banner";
+                banner.className = "auto-update-banner";
+                banner.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 20px; display: inline-block; animation: pulseGlow 1.5s infinite;">⚡</span>
+                        <div>
+                            <div style="font-weight: 700; color: #ffffff; margin-bottom: 2px;">New Data Deployed</div>
+                            <div style="font-size: 11px; color: #94a3b8;">Build: <span style="color: #38bdf8; font-weight: 600;">${newTimestamp}</span></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-left: 8px;">
+                        <button class="btn-update-refresh" onclick="window.location.reload(true)">
+                            <span>↻</span> Refresh Now
+                        </button>
+                        <button onclick="document.getElementById('auto_update_banner').remove()" style="
+                            background: transparent;
+                            color: #64748b;
+                            border: none;
+                            font-size: 16px;
+                            line-height: 1;
+                            cursor: pointer;
+                            padding: 4px;
+                        " title="Dismiss">✕</button>
+                    </div>
+                `;
+
+                document.body.appendChild(banner);
             }
 
 
