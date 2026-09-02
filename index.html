@@ -1197,18 +1197,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                 </p>
             </div>
             <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="arbitrage_top_n" style="font-size: 13px; font-weight: 600; color: #475569;">Top Matches:</label>
-                    <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; color: #0f172a; background: #fff; cursor: pointer;">
-                        <option value="7" selected>Top 7 (Sniper)</option>
-                        <option value="5">Top 5 (Balanced)</option>
-                        <option value="3">Top 3 (High Volume)</option>
+                <div style="display: flex; align-items: center; gap: 10px; background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px; padding: 6px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                    <label for="arbitrage_top_n" style="font-size: 14px; font-weight: 800; color: #166534; display: flex; align-items: center; gap: 4px; letter-spacing: -0.2px;">
+                        Strategy Mode:
+                    </label>
+                    <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 7px 14px; border: 1.5px solid #22c55e; border-radius: 8px; font-size: 14px; font-weight: 800; color: #0f172a; background: #ffffff; cursor: pointer; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s ease;">
+                        <option value="7" selected style="font-weight: 700; color: #0f172a;">🎯 Sniper</option>
+                        <option value="5" style="font-weight: 700; color: #0f172a;">⚖️ Balanced</option>
+                        <option value="3" style="font-weight: 700; color: #0f172a;">🚀 High Volume</option>
                     </select>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="arbitrage_min_spread" style="font-size: 13px; font-weight: 600; color: #475569;">Min Net Margin:</label>
-                    <input type="number" id="arbitrage_min_spread" value="5" min="0" step="5" style="width: 70px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600; text-align: center;" onchange="renderArbitragePanel()">
-                    <span style="font-size: 13px; font-weight: 600; color: #64748b;">€/MWh</span>
                 </div>
             </div>
         </div>
@@ -7465,7 +7462,7 @@ function renderArbitragePanel() {
                 const matchWeights = invSims.map(v => sumInv > 0 ? v / sumInv : 1 / count);
 
                 const targetDate = document.getElementById("analogue_date").value;
-                const threshold = parseFloat(document.getElementById("arbitrage_min_spread").value) || 30.0;
+                const threshold = (document.getElementById("arbitrage_min_spread") ? parseFloat(document.getElementById("arbitrage_min_spread").value) : 5.0) || 5.0;
 
                 // Get solar state of target date (based on GR residuals/demand)
                 const country = "GR";
