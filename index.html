@@ -7826,21 +7826,13 @@ function renderArbitragePanel() {
                         : '';
 
                     const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:stretch;">
-                        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 14px;">
-                            <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Best Margin</div>
-                            <div style="font-size:18px;font-weight:800;color:${accentCol};">${maxMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
-                        </div>
                         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 14px;">
                             <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Avg Margin</div>
-                            <div style="font-size:18px;font-weight:800;color:#334155;">${avgMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                            <div style="font-size:18px;font-weight:800;color:${accentCol};">${avgMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
                         </div>
                         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 14px;">
                             <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Active Hours</div>
                             <div style="font-size:18px;font-weight:800;color:#334155;">${allHours.length} <span style="font-size:11px;font-weight:600;">/ 24</span></div>
-                        </div>
-                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:6px 14px;">
-                            <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Best Hour</div>
-                            <div style="font-size:18px;font-weight:800;color:#334155;">${bestHourEntry.hour+1}:00</div>
                         </div>
                         ${effectiveCorridorList.length > 1 ? `<div style="background:#f0f0ff;border:1px solid #c7d2fe;border-radius:8px;padding:6px 14px;">
                             <div style="font-size:9px;color:#4f46e5;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Corridors</div>
