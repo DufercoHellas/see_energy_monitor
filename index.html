@@ -1130,27 +1130,31 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     </div>
     
     <!-- ── 2. Matches Table & Zoom Comparison (BELOW ARBITRAGE) ── -->
-    <div id="analogues_results_container" style="display:none; margin-top: 24px;">
-        <div style="display: flex; gap: 24px; flex-wrap: wrap;">
-            <!-- ── Matches Table ── -->
-            <div style="flex: 1.4; min-width: 480px;">
-                <h3 style="margin-top: 0; color: #1f2937; font-size: 18px; margin-bottom: 4px;">Top 7 Closest Matches</h3>
-                <p style="font-size: 12px; color: #6b7280; margin-bottom: 10px; margin-top: 0;">Click a match row to compare profiles and price curves.</p>
-                <div class="table-container" style="overflow-x: hidden; border: 1px solid #e2e8f0; border-radius: 8px;">
+    <div id="analogues_results_container" style="display:none; margin-top: 20px;">
+        <div style="display: grid; grid-template-columns: minmax(440px, 1.2fr) minmax(520px, 1.8fr); gap: 16px; align-items: stretch;">
+            <!-- ── Matches Table Card ── -->
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); display: flex; flex-direction: column;">
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: #1e293b; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                        <span>📋</span> Top 7 Closest Matches
+                    </h3>
+                    <p style="font-size: 11.5px; color: #64748b; margin: 3px 0 0 0;">Click any match row below to inspect profiles and price curves.</p>
+                </div>
+                <div class="table-container" style="overflow-x: hidden; border: 1px solid #e2e8f0; border-radius: 8px; flex: 1;">
                     <table id="analogues_table" style="width: 100%; border-collapse: collapse; table-layout: auto;">
                         <thead>
-                            <tr style="background: #f8fafc; font-size: 11px; text-transform: uppercase; color: #475569; letter-spacing: 0.3px;">
-                                <th style="padding: 6px 4px; text-align: left;">Date</th>
-                                <th style="padding: 6px 4px; text-align: center;">Combined</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Greece Residuals">GR R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Germany Residuals">DE R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Italy Residuals">IT R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Carbon Price">EUA</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Gas Price">TTF</th>
+                            <tr style="background: #f8fafc; font-size: 10.5px; text-transform: uppercase; color: #475569; letter-spacing: 0.3px;">
+                                <th style="padding: 7px 4px; text-align: left;">Date</th>
+                                <th style="padding: 7px 4px; text-align: center;">Combined</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Greece Residuals">GR R</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Germany Residuals">DE R</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Italy Residuals">IT R</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Carbon Price">EUA</th>
+                                <th style="padding: 7px 2px; text-align: center;" title="Gas Price">TTF</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1159,25 +1163,23 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
             
             <!-- ── Comparison Detail Panel ── -->
-            <div style="flex: 2; min-width: 500px;">
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                        <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 700; max-width: 100%;">
-                            Zoom Comparison
-                        </h3>
-                    </div>
-                    
-                    <!-- ── Comparison Charts ── -->
-                    <div id="comp_charts_tab" class="detail-tabcontent" style="display: block;">
-                        <!-- ── Prices Comparison ── -->
-                        <div id="plot_comp_prices" style="width: 100%; height: 280px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; margin-bottom: 12px; box-sizing: border-box;"></div>
-                        <!-- ── Residuals Grid ── -->
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
-                            <div id="plot_comp_de_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            <div id="plot_comp_it_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            <div id="plot_comp_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                            <div id="plot_comp_bg_residuals" style="height: 220px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; padding: 8px; box-sizing: border-box;"></div>
-                        </div>
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); display: flex; flex-direction: column;">
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; min-height: 28px;">
+                    <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 13.5px; font-weight: 800;">
+                        Zoom Comparison
+                    </h3>
+                </div>
+                
+                <!-- ── Comparison Charts ── -->
+                <div id="comp_charts_tab" style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                    <!-- ── Prices Comparison ── -->
+                    <div id="plot_comp_prices" style="width: 100%; height: 180px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box;"></div>
+                    <!-- ── Residuals Grid ── -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+                        <div id="plot_comp_de_residuals" style="height: 125px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box;"></div>
+                        <div id="plot_comp_it_residuals" style="height: 125px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box;"></div>
+                        <div id="plot_comp_residuals" style="height: 125px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box;"></div>
+                        <div id="plot_comp_bg_residuals" style="height: 125px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box;"></div>
                     </div>
                 </div>
             </div>
@@ -6454,12 +6456,12 @@ function renderCountryOutageTable(c, countryOutages) {
                     }
                 ];
                 Plotly.newPlot('plot_comp_residuals', resTraces, {
-                    title: {text: `${countryNames[country] || country} Residual Load (MW)`, font: {family: 'Inter', size: 11, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
+                    title: {text: `${countryNames[country] || country} Residual (MW)`, font: {family: 'Inter', size: 10, color: '#334155'}},
+                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
+                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 30, l: 40, r: 10, b: 30},
+                    margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
                 }, {responsive: true});
                 
@@ -6474,7 +6476,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `DE Target (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#3b82f6', width: 3}
+                        line: {color: '#3b82f6', width: 2.5}
                     },
                     {
                         x: hours,
@@ -6482,16 +6484,16 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `DE Match (${date})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#94a3b8', width: 2, dash: 'dash'}
+                        line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
                 Plotly.newPlot('plot_comp_de_residuals', deResTraces, {
-                    title: {text: 'Germany Residual Load (MW)', font: {family: 'Inter', size: 11, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
+                    title: {text: 'Germany Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
+                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
+                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 30, l: 40, r: 10, b: 30},
+                    margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
                 }, {responsive: true});
                 
@@ -6508,7 +6510,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `BG Target (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#1d4ed8', width: 3}
+                        line: {color: '#1d4ed8', width: 2.5}
                     },
                     {
                         x: hours,
@@ -6516,16 +6518,16 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `BG Match (${date})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#94a3b8', width: 2, dash: 'dash'}
+                        line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
                 Plotly.newPlot('plot_comp_bg_residuals', bgResTraces, {
-                    title: {text: 'Bulgaria Residual Load (MW)', font: {family: 'Inter', size: 11, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
+                    title: {text: 'Bulgaria Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
+                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
+                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 30, l: 40, r: 10, b: 30},
+                    margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
                 }, {responsive: true});
 
@@ -6542,7 +6544,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `IT Target (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#3b82f6', width: 3}
+                        line: {color: '#3b82f6', width: 2.5}
                     },
                     {
                         x: hours,
@@ -6550,16 +6552,16 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `IT Match (${date})`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#94a3b8', width: 2, dash: 'dash'}
+                        line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
                 Plotly.newPlot('plot_comp_it_residuals', itResTraces, {
-                    title: {text: 'Italy Residual Load (MW)', font: {family: 'Inter', size: 11, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
+                    title: {text: 'Italy Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
+                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
+                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 30, l: 40, r: 10, b: 30},
+                    margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
                 }, {responsive: true});
                 
@@ -6571,7 +6573,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `Target Country`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#10b981', width: 3}
+                        line: {color: '#10b981', width: 2.5}
                     },
                     {
                         x: hours,
@@ -6579,18 +6581,18 @@ function renderCountryOutageTable(c, countryOutages) {
                         name: `Match Country`,
                         type: 'scatter',
                         mode: 'lines',
-                        line: {color: '#6ee7b7', width: 2, dash: 'dash'}
+                        line: {color: '#6ee7b7', width: 1.5, dash: 'dash'}
                     }
                 ];
                 Plotly.newPlot('plot_comp_prices', priceTraces, {
-                    title: {text: 'Spot Price (€/MWh)', font: {family: 'Inter', size: 12, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 10}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 10}},
+                    title: {text: 'Spot Price (€/MWh)', font: {family: 'Inter', size: 11, color: '#334155'}},
+                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
+                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
                     plot_bgcolor: 'transparent',
                     paper_bgcolor: 'transparent',
-                    margin: {t: 30, l: 45, r: 10, b: 30},
+                    margin: {t: 22, l: 38, r: 8, b: 24},
                     showlegend: true,
-                    legend: {font: {size: 9}, orientation: 'h', y: -0.15}
+                    legend: {font: {size: 9}, orientation: 'h', y: -0.18}
                 }, {responsive: true});
             }
 
