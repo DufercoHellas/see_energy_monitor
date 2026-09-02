@@ -6876,10 +6876,7 @@ function findAnalogues() {
                         ? available.reduce((s, d) => s + (d.w / totalW) * d.pct, 0)
                         : 0;
 
-                    // Temporal discount (-5% per year past, capped at 50%)
-                    const yearsPast = (targetDateObj.getTime() - m.curD.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
-                    const discount = Math.max(0.5, 1.0 - (yearsPast * 0.05));
-                    m.combined = baseCombined * discount;
+                    m.combined = baseCombined;
                 });
                 
                 // Now filter matches by the selected lookback window date
@@ -7524,8 +7521,8 @@ function renderArbitragePanel() {
                         }
 
                         // Re-calculate weights dynamically for these valid matches
-                        const rawSimsLocal = validMatches.map(m => m.combined);
-                        const invSimsLocal = rawSimsLocal.map(s => 1.0 / Math.max(s, 1e-6));
+                        const rawSimsLocal = validMatches.map(m => Math.max(100.0 - m.combined, 1e-4));
+                        const invSimsLocal = rawSimsLocal.map(s => 1.0 / s);
                         const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
                         const matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
 
