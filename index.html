@@ -1133,13 +1133,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <div style="display: flex; gap: 24px; flex-wrap: wrap;">
             <!-- ── Matches Table ── -->
             <div style="flex: 1.3; min-width: 500px;">
-                <h3 style="margin-top: 0; color: #1f2937;">Top 13 Closest Matches</h3>
+                <h3 style="margin-top: 0; color: #1f2937;">Top 7 Closest Matches</h3>
                 <p style="font-size: 13px; color: #6b7280; margin-bottom: 12px; margin-top: -12px;">Click a match row to compare profiles and price curves.</p>
                 <div class="table-container">
                     <table id="analogues_table">
                         <thead>
                             <tr>
-                                <th>Rank</th>
                                 <th>Date</th>
                                 <th>Combined</th>
                                 <th>Res</th>
@@ -1150,8 +1149,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
                                 <th>GRp</th>
                                 <th>DEp</th>
                                 <th>BGp</th>
-                                <th>Avg. Price</th>
-                                <th>DE Price</th>
+                                <th>IT Res</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -6871,7 +6869,7 @@ function findAnalogues() {
                 
                 // Sort by combined score descending
                 matches.sort((a, b) => b.combined - a.combined);
-                currentTop7 = matches.slice(0, 13);
+                currentTop7 = matches.slice(0, 7);
 
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
@@ -6884,120 +6882,12 @@ function findAnalogues() {
                 tbody.innerHTML = "";
                 currentTop7.forEach((m, idx) => {
                     const country = (document.getElementById("analogue_country") && ((document.getElementById("analogue_country") && document.getElementById("analogue_country").value) || "GR")) || "GR";
-                    const t_prior_date = getPriorSameDayTypeDate(currentTargetDate, country);
-                    const c_prior_date = getPriorSameDayTypeDate(m.date, country);
-                    
-                    const tRes = currentTargetData.residuals;
-                    const tDem = currentTargetData.demand;
-
-                    let ttfT = 0.0;
-                    if (t_prior_date && historicalData[country] && historicalData[country][t_prior_date]) {
-                        ttfT = historicalData[country][t_prior_date].ttf_price || 0.0;
-                    } else {
-                        ttfT = currentTargetData.ttf_price || 0.0;
-                    }
-
-                    let ttfC = 0.0;
-                    if (c_prior_date && historicalData[country] && historicalData[country][c_prior_date]) {
-                        ttfC = historicalData[country][c_prior_date].ttf_price || 0.0;
-                    } else {
-                        ttfC = m.data.ttf_price || 0.0;
-                    }
-                    
-                    let euaT = 0.0;
-                    if (t_prior_date && historicalData[country] && historicalData[country][t_prior_date]) {
-                        euaT = historicalData[country][t_prior_date].eua_price || 0.0;
-                    } else {
-                        euaT = currentTargetData.eua_price || 0.0;
-                    }
-
-                    let euaC = 0.0;
-                    if (c_prior_date && historicalData[country] && historicalData[country][c_prior_date]) {
-                        euaC = historicalData[country][c_prior_date].eua_price || 0.0;
-                    } else {
-                        euaC = m.data.eua_price || 0.0;
-                    }
-                    
-                    const mRes = m.data.residuals;
-                    
-                    // Calculate ramping differences
-                    let minT = 99999, maxT = -99999;
-                    let minM = 99999, maxM = -99999;
-                    for (let h = 0; h < 24; h++) {
-                        if (tRes[h] !== undefined) {
-                            if (tRes[h] < minT) minT = tRes[h];
-                            if (tRes[h] > maxT) maxT = tRes[h];
-                        }
-                        if (mRes && mRes[h] !== undefined) {
-                            if (mRes[h] < minM) minM = mRes[h];
-                            if (mRes[h] > maxM) maxM = mRes[h];
-                        }
-                    }
-                    const rampT = maxT - minT;
-                    const rampM = maxM - minM;
-                    const deltaRamp = rampT - rampM;
-
-                    // Compute hourly adjustments and average them for the table columns
-                    let sumAdjustedMatchPrice = 0;
-                    let countHrs = 0;
-                    const matchRawPrices = m.data.prices || [];
-                    
-                    for (let h = 0; h < 24; h++) {
-                        const p = matchRawPrices[h];
-                        if (p !== null && p !== undefined && p >= 0) {
-                            let adjustedP = p;
-                            // 1. Gas & Carbon shift
-                            if (tRes[h] !== undefined && tDem[h] > 0.001) {
-                                const solarShare = Math.max(0, Math.min(1.0, (tDem[h] - tRes[h]) / tDem[h]));
-                                const hourlyHeatRate = 1.8 * (1.0 - solarShare);
-                                const carbonIntensity = 0.37 * solarShare + 1.1 * (1.0 - solarShare);
-                                const gasShift = (ttfT > 0 && ttfC > 0) ? (ttfT - ttfC) * hourlyHeatRate : 0.0;
-                                const carbonShift = (euaT > 0 && euaC > 0) ? (euaT - euaC) * carbonIntensity : 0.0;
-                                adjustedP += (gasShift + carbonShift);
-                            }
-                            // 2. Solar shift
-                            if (h >= 9 && h <= 15 && tRes[h] !== undefined && mRes && mRes[h] !== undefined) {
-                                adjustedP += (tRes[h] - mRes[h]) * 0.012;
-                            }
-                            // 3. Ramping shift
-                            if (h >= 18 && h <= 22 && deltaRamp > 0) {
-                                adjustedP += deltaRamp * 0.018;
-                            }
-                            sumAdjustedMatchPrice += Math.max(0, adjustedP);
-                            countHrs++;
-                        }
-                    }
-                    
-                    const matchAvgPriceAdjusted = countHrs > 0 ? (sumAdjustedMatchPrice / countHrs) : (m.data.average_price || null);
-                    const matchPrice = matchAvgPriceAdjusted !== null ? matchAvgPriceAdjusted.toFixed(2) + " €" : "N/A";
-                    
-                    // Simple average shift for Germany price columns
-                    let sumGasShift = 0.0;
-                    let sumCarbonShift = 0.0;
-                    for (let h = 0; h < 24; h++) {
-                        if (tRes[h] !== undefined && tDem[h] > 0.001) {
-                            const solarShare = Math.max(0, Math.min(1.0, (tDem[h] - tRes[h]) / tDem[h]));
-                            sumGasShift += 1.8 * (1.0 - solarShare);
-                            sumCarbonShift += 0.37 * solarShare + 1.1 * (1.0 - solarShare);
-                        }
-                    }
-                    const avgGasShiftVal = (ttfT > 0 && ttfC > 0) ? (ttfT - ttfC) * (sumGasShift / 24.0) : 0.0;
-                    const avgCarbonShiftVal = (euaT > 0 && euaC > 0) ? (euaT - euaC) * (sumCarbonShift / 24.0) : 0.0;
-                    const priceShift = avgGasShiftVal + avgCarbonShiftVal;
-                    
-                    const deData = (historicalData['DE_LU'] && historicalData['DE_LU'][m.date]) ? historicalData['DE_LU'][m.date] : null;
-                    let dePrice = "N/A";
-                    if (deData !== null && deData.average_price !== undefined) {
-                        dePrice = Math.max(0, deData.average_price + priceShift).toFixed(2) + " €";
-                    }
-                    
                     const countryAvg = getDayAveragePriceWithFallback(country, m.date);
                     const isSkipped = countryAvg <= 0.01;
                     const rowStyle = isSkipped ? 'background-color: #fee2e2; color: #991b1b;' : '';
 
-                    const fmtPct = (v) => v === null ? '<span style="color:#9ca3af;font-size:11px;">N/A</span>' : `<span style="color:${pctColour(v)};font-weight:600;">${v.toFixed(0)}%</span>`;
+                    const fmtPct = (v) => v === null || v === undefined ? '<span style="color:#9ca3af;font-size:11px;">N/A</span>' : `<span style="color:${pctColour(v)};font-weight:600;">${v.toFixed(0)}%</span>`;
                     tbody.innerHTML += `<tr style="cursor: pointer; ${rowStyle}" onclick="selectMatch(${idx}, '${m.date}')">
-                        <td>#${idx + 1}</td>
                         <td style="font-weight: 600;">${m.date}</td>
                         <td style="color:${pctColour(m.combined)};font-weight:800;font-size:15px;">${m.combined.toFixed(1)}%</td>
                         <td>${fmtPct(m.resPct)}</td>
@@ -7008,8 +6898,7 @@ function findAnalogues() {
                         <td>${fmtPct(m.grPriorPct)}</td>
                         <td>${fmtPct(m.dePriorPct)}</td>
                         <td>${fmtPct(m.bgPriorPct)}</td>
-                        <td style="font-weight: 600;">${matchPrice}</td>
-                        <td style="font-weight: 600; color: #2563eb;">${dePrice}</td>
+                        <td>${fmtPct(m.itResPct)}</td>
                     </tr>`;
                 });
                 
