@@ -1058,11 +1058,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Target Date</label>
-            <input type="date" id="analogue_date" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+            <input type="date" id="analogue_date" onchange="applyOptimizedWeights(); findAnalogues();" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
         </div>
         <div>
             <label style="font-weight: 600; display: block; margin-bottom: 8px;">Lookback</label>
-            <select id="analogue_lookback" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
+            <select id="analogue_lookback" onchange="findAnalogues();" style="padding: 10px; border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;">
                 <option value="all">All Time</option>
                 <option value="2">2 Years</option>
                 <option value="1">1 Year</option>
@@ -1249,6 +1249,11 @@ function openTab(evt, tabName) {
     
     if (tabName === 'EUMap') {
         initEUMap();
+    }
+    if (tabName === 'Analogues') {
+        if (typeof findAnalogues === 'function' && (!currentTop7 || currentTop7.length === 0)) {
+            findAnalogues();
+        }
     }
     if (tabName === 'Cables') {
         if (typeof initCableOutagesSelectors === 'function') initCableOutagesSelectors();
@@ -8343,6 +8348,9 @@ async function initDashboardData() {
                             cSel.innerHTML = countries.map(function(c) { return '<option value="' + c + '">' + c + '</option>'; }).join('');
                         }
                         applyOptimizedWeights();
+                        if (typeof findAnalogues === 'function') {
+                            findAnalogues();
+                        }
                     } catch (e) {
                         console.error("Init error:", e);
                     }
