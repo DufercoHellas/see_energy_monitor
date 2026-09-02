@@ -7597,46 +7597,56 @@ function renderArbitragePanel() {
                     });
                 }
 
-                // 3. Group by (Start, End) pair — all corridors between same endpoints share one card
+                // 3. Group by (Start, End) market cluster — deduplicates AL and XK (same ALPEX exchange)
+                function getMarketCluster(code) {
+                    if (code === 'AL' || code === 'XK') return 'AL_XK';
+                    return code;
+                }
+
                 const routeGroups = {};
                 for (let h = 0; h < 24; h++) {
                     const hourPaths = filteredPathsByHour[h];
 
-                    // Track ALL corridors for this hour (not just the best per pair)
-                    const pairAllCorridors = {};
+                    // Select only the best route per market exchange cluster for this hour
+                    const bestByCluster = {};
                     hourPaths.forEach(res => {
-                        const pairKey = `${res.start}_${res.end}`;
-                        if (!pairAllCorridors[pairKey]) pairAllCorridors[pairKey] = [];
-                        pairAllCorridors[pairKey].push(res);
+                        const clusterKey = `${getMarketCluster(res.start)}_${getMarketCluster(res.end)}`;
+                        if (!bestByCluster[clusterKey] || res.netMargin > bestByCluster[clusterKey].netMargin) {
+                            bestByCluster[clusterKey] = res;
+                        } else if (Math.abs(res.netMargin - bestByCluster[clusterKey].netMargin) < 1e-4) {
+                            // If margins are identical, prefer direct route with fewer hops
+                            if (res.path.length < bestByCluster[clusterKey].path.length) {
+                                bestByCluster[clusterKey] = res;
+                            }
+                        }
                     });
 
-                    Object.entries(pairAllCorridors).forEach(([pairKey, resList]) => {
+                    Object.values(bestByCluster).forEach(res => {
+                        const pairKey = `${res.start}_${res.end}`;
                         if (!routeGroups[pairKey]) {
                             routeGroups[pairKey] = {
                                 pairKey,
-                                start: resList[0].start,
-                                end:   resList[0].end,
+                                start: res.start,
+                                end:   res.end,
                                 corridors: {}  // keyed by routeKey
                             };
                         }
-                        resList.forEach(res => {
-                            const rKey = res.routeKey;
-                            if (!routeGroups[pairKey].corridors[rKey]) {
-                                routeGroups[pairKey].corridors[rKey] = {
-                                    routeKey: rKey,
-                                    routeName: res.path.map(p => p.to).join(' ➔ '),
-                                    path: res.path,
-                                    hours: []
-                                };
-                            }
-                            routeGroups[pairKey].corridors[rKey].hours.push({
-                                hour: h,
-                                pStart: res.pStart,
-                                pEnd: res.pEnd,
-                                grossSpread: res.grossSpread,
-                                transitCost: res.transitCost,
-                                netMargin: res.netMargin
-                            });
+                        const rKey = res.routeKey;
+                        if (!routeGroups[pairKey].corridors[rKey]) {
+                            routeGroups[pairKey].corridors[rKey] = {
+                                routeKey: rKey,
+                                routeName: res.path.map(p => p.to).join(' ➔ '),
+                                path: res.path,
+                                hours: []
+                            };
+                        }
+                        routeGroups[pairKey].corridors[rKey].hours.push({
+                            hour: h,
+                            pStart: res.pStart,
+                            pEnd: res.pEnd,
+                            grossSpread: res.grossSpread,
+                            transitCost: res.transitCost,
+                            netMargin: res.netMargin
                         });
                     });
                 }
