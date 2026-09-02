@@ -470,15 +470,15 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         <table style="width: 100%; border-collapse: collapse; line-height: 1.4; font-size: 10px;">
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Dashboard Run:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-01 15:15</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-02 09:07</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Spot Prices:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 06:20</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-01 06:22</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">Daily Cables:</td>
-                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-08-31 04:10</td>
+                <td style="padding: 1px 0; text-align: right; font-weight: 600; color: #334155;">2026-09-01 04:10</td>
             </tr>
             <tr>
                 <td style="padding: 1px 0; color: #64748b; font-weight: 500;">ENTSO-E Outages:</td>
@@ -565,7 +565,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-09-01 15:15
+                Last DB Audit: 2026-09-02 09:07
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -2824,9 +2824,9 @@ function getRealizedPriceWithFallback(c, h, date) {
   }
 };
             const dataHealth = {
-  "timestamp": "2026-09-01 15:16:15",
-  "today": "2026-09-01",
-  "tomorrow": "2026-09-02",
+  "timestamp": "2026-09-02 09:07:17",
+  "today": "2026-09-02",
+  "tomorrow": "2026-09-03",
   "is_after_dam_cutoff": false,
   "dam_cutoff_hour": 18,
   "overall_status": "CRITICAL",
@@ -2835,12 +2835,6 @@ function getRealizedPriceWithFallback(c, h, date) {
   "spot_prices": {
     "matrix": {
       "GR": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -2884,6 +2878,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -2891,12 +2891,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "BG": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -2940,6 +2934,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -2947,12 +2947,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RO": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -2996,6 +2990,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3003,12 +3003,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "HU": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3049,9 +3043,15 @@ function getRealizedPriceWithFallback(c, h, date) {
           "status": "missing",
           "badge": "🔴",
           "hours": 0,
-          "description": "Missing Today"
+          "description": "Missing"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3059,12 +3059,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RS": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3108,6 +3102,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3115,12 +3115,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "IT": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3164,6 +3158,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3171,12 +3171,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "DE_LU": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3220,6 +3214,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3227,12 +3227,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "CZ": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3276,6 +3270,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3283,12 +3283,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "AT": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3332,6 +3326,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3339,12 +3339,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "SK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3385,9 +3379,15 @@ function getRealizedPriceWithFallback(c, h, date) {
           "status": "missing",
           "badge": "🔴",
           "hours": 0,
-          "description": "Missing Today"
+          "description": "Missing"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3395,12 +3395,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "SI": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3444,6 +3438,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3451,12 +3451,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "HR": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3497,9 +3491,15 @@ function getRealizedPriceWithFallback(c, h, date) {
           "status": "missing",
           "badge": "🔴",
           "hours": 0,
-          "description": "Missing Today"
+          "description": "Missing"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3507,12 +3507,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "AL": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3553,9 +3547,15 @@ function getRealizedPriceWithFallback(c, h, date) {
           "status": "missing",
           "badge": "🔴",
           "hours": 0,
-          "description": "Missing Today"
+          "description": "Missing"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3563,12 +3563,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "MK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3612,6 +3606,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3619,12 +3619,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "ME": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3668,6 +3662,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "description": "24 hrs"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3675,12 +3675,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "XK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3721,9 +3715,15 @@ function getRealizedPriceWithFallback(c, h, date) {
           "status": "missing",
           "badge": "🔴",
           "hours": 0,
-          "description": "Missing Today"
+          "description": "Missing"
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "hours": 0,
+          "description": "Missing Today"
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "hours": 0,
@@ -3750,7 +3750,6 @@ function getRealizedPriceWithFallback(c, h, date) {
       "XK"
     ],
     "dates": [
-      "2026-08-25",
       "2026-08-26",
       "2026-08-27",
       "2026-08-28",
@@ -3758,24 +3757,19 @@ function getRealizedPriceWithFallback(c, h, date) {
       "2026-08-30",
       "2026-08-31",
       "2026-09-01",
-      "2026-09-02"
+      "2026-09-02",
+      "2026-09-03"
     ],
     "summary": {
-      "complete_days": 118,
+      "complete_days": 102,
       "pending_days": 16,
-      "missing_days": 9,
+      "missing_days": 25,
       "partial_days": 1
     }
   },
   "cables_daily": {
     "matrix": {
       "AL-GR": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3819,6 +3813,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -3826,12 +3826,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "AL-ME": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3875,6 +3869,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -3882,12 +3882,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "BG-MK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3927,10 +3921,16 @@ function getRealizedPriceWithFallback(c, h, date) {
         "2026-09-01": {
           "status": "missing",
           "badge": "🔴",
-          "description": "Missing Today",
+          "description": "Missing",
           "positions": 0
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -3938,12 +3938,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "BG-RS": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -3987,6 +3981,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -3994,12 +3994,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "CH-IT": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4043,6 +4037,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4050,12 +4050,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "GR-AL": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4099,6 +4093,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4106,12 +4106,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "GR-MK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4155,6 +4149,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4162,12 +4162,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "HU-RS": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4211,6 +4205,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4218,12 +4218,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "IT-CH": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4267,6 +4261,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4274,12 +4274,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "IT-ME": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4323,6 +4317,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4330,12 +4330,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "ME-AL": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4379,6 +4373,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4386,12 +4386,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "ME-IT": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4435,6 +4429,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4442,12 +4442,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "ME-RS": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4491,6 +4485,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4498,12 +4498,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "ME-XK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4547,6 +4541,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4554,12 +4554,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "MK-BG": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4599,10 +4593,16 @@ function getRealizedPriceWithFallback(c, h, date) {
         "2026-09-01": {
           "status": "missing",
           "badge": "🔴",
-          "description": "Missing Today",
+          "description": "Missing",
           "positions": 0
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4610,12 +4610,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "MK-GR": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4659,6 +4653,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4666,12 +4666,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "MK-RS": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4715,6 +4709,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4722,12 +4722,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "MK-XK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4771,6 +4765,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4778,12 +4778,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RS-BG": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4827,6 +4821,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4834,12 +4834,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RS-HU": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4883,6 +4877,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4890,12 +4890,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RS-ME": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4939,6 +4933,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -4946,12 +4946,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "RS-MK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -4995,6 +4989,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -5002,12 +5002,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "XK-ME": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -5051,6 +5045,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -5058,12 +5058,6 @@ function getRealizedPriceWithFallback(c, h, date) {
         }
       },
       "XK-MK": {
-        "2026-08-25": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-08-26": {
           "status": "complete",
           "badge": "🟢",
@@ -5107,6 +5101,12 @@ function getRealizedPriceWithFallback(c, h, date) {
           "positions": 24
         },
         "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-03": {
           "status": "pending",
           "badge": "⏳",
           "description": "Pending DA",
@@ -5141,7 +5141,6 @@ function getRealizedPriceWithFallback(c, h, date) {
       "XK-MK"
     ],
     "dates": [
-      "2026-08-25",
       "2026-08-26",
       "2026-08-27",
       "2026-08-28",
@@ -5149,25 +5148,26 @@ function getRealizedPriceWithFallback(c, h, date) {
       "2026-08-30",
       "2026-08-31",
       "2026-09-01",
-      "2026-09-02"
+      "2026-09-02",
+      "2026-09-03"
     ]
   },
   "outages": {
     "status": "healthy",
     "total_records": 30795,
     "unique_mrids": 12236,
-    "active_now": 995,
+    "active_now": 965,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
         "records": 139,
-        "active_now": 41,
-        "active_unavailable_mw": 9352.0
+        "active_now": 39,
+        "active_unavailable_mw": 8826.0
       },
       "HU": {
         "records": 3272,
-        "active_now": 37,
-        "active_unavailable_mw": 5787.6
+        "active_now": 38,
+        "active_unavailable_mw": 6667.6
       },
       "BG": {
         "records": 114,
@@ -5181,18 +5181,18 @@ function getRealizedPriceWithFallback(c, h, date) {
       },
       "DE_LU": {
         "records": 8984,
-        "active_now": 174,
-        "active_unavailable_mw": 47032.9
+        "active_now": 162,
+        "active_unavailable_mw": 41263.9
       },
       "FR": {
         "records": 4382,
-        "active_now": 348,
-        "active_unavailable_mw": 123825.4
+        "active_now": 334,
+        "active_unavailable_mw": 121795.6
       },
       "IT": {
         "records": 4203,
-        "active_now": 225,
-        "active_unavailable_mw": 56968.0
+        "active_now": 217,
+        "active_unavailable_mw": 56900.0
       },
       "RS": {
         "records": 189,
@@ -5201,8 +5201,8 @@ function getRealizedPriceWithFallback(c, h, date) {
       },
       "CZ": {
         "records": 2582,
-        "active_now": 38,
-        "active_unavailable_mw": 8027.0
+        "active_now": 42,
+        "active_unavailable_mw": 8502.0
       },
       "SK": {
         "records": 549,
@@ -5216,8 +5216,8 @@ function getRealizedPriceWithFallback(c, h, date) {
       },
       "CH": {
         "records": 824,
-        "active_now": 14,
-        "active_unavailable_mw": 2578.0
+        "active_now": 15,
+        "active_unavailable_mw": 2682.0
       },
       "BE": {
         "records": 1123,
@@ -5242,24 +5242,62 @@ function getRealizedPriceWithFallback(c, h, date) {
     "latest_trade_date": "2026-09-03",
     "latest_ttf_price": 66.287,
     "latest_eua_price": 82.38,
-    "days_lag": -2,
+    "days_lag": -1,
     "fetch_time": "2026-09-01 09:42:18"
   },
   "issues_critical": [
-    "CRITICAL: Spot prices for HU TODAY (2026-09-01) are missing!",
-    "CRITICAL: Spot prices for SK TODAY (2026-09-01) are missing!",
-    "CRITICAL: Spot prices for HR TODAY (2026-09-01) are missing!",
-    "CRITICAL: Spot prices for AL TODAY (2026-09-01) are missing!",
-    "CRITICAL: Spot prices for XK TODAY (2026-09-01) are missing!"
+    "CRITICAL: Spot prices for GR TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for BG TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for RO TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for HU TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for RS TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for IT TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for DE_LU TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for CZ TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for AT TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for SK TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for SI TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for HR TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for AL TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for MK TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for ME TODAY (2026-09-02) are missing!",
+    "CRITICAL: Spot prices for XK TODAY (2026-09-02) are missing!"
   ],
   "issues_warning": [
     "Spot prices for HU on 2026-08-31 has only 9/24 hours.",
+    "Historical spot prices for HU on 2026-09-01 missing.",
     "Historical spot prices for SK on 2026-08-31 missing.",
+    "Historical spot prices for SK on 2026-09-01 missing.",
     "Historical spot prices for HR on 2026-08-31 missing.",
+    "Historical spot prices for HR on 2026-09-01 missing.",
     "Historical spot prices for AL on 2026-08-31 missing.",
+    "Historical spot prices for AL on 2026-09-01 missing.",
     "Historical spot prices for XK on 2026-08-31 missing.",
-    "Cable auction for BG-MK TODAY (2026-09-01) is missing.",
-    "Cable auction for MK-BG TODAY (2026-09-01) is missing."
+    "Historical spot prices for XK on 2026-09-01 missing.",
+    "Cable auction for AL-GR TODAY (2026-09-02) is missing.",
+    "Cable auction for AL-ME TODAY (2026-09-02) is missing.",
+    "Cable auction for BG-MK TODAY (2026-09-02) is missing.",
+    "Cable auction for BG-RS TODAY (2026-09-02) is missing.",
+    "Cable auction for CH-IT TODAY (2026-09-02) is missing.",
+    "Cable auction for GR-AL TODAY (2026-09-02) is missing.",
+    "Cable auction for GR-MK TODAY (2026-09-02) is missing.",
+    "Cable auction for HU-RS TODAY (2026-09-02) is missing.",
+    "Cable auction for IT-CH TODAY (2026-09-02) is missing.",
+    "Cable auction for IT-ME TODAY (2026-09-02) is missing.",
+    "Cable auction for ME-AL TODAY (2026-09-02) is missing.",
+    "Cable auction for ME-IT TODAY (2026-09-02) is missing.",
+    "Cable auction for ME-RS TODAY (2026-09-02) is missing.",
+    "Cable auction for ME-XK TODAY (2026-09-02) is missing.",
+    "Cable auction for MK-BG TODAY (2026-09-02) is missing.",
+    "Cable auction for MK-GR TODAY (2026-09-02) is missing.",
+    "Cable auction for MK-RS TODAY (2026-09-02) is missing.",
+    "Cable auction for MK-XK TODAY (2026-09-02) is missing.",
+    "Cable auction for RS-BG TODAY (2026-09-02) is missing.",
+    "Cable auction for RS-HU TODAY (2026-09-02) is missing.",
+    "Cable auction for RS-ME TODAY (2026-09-02) is missing.",
+    "Cable auction for RS-MK TODAY (2026-09-02) is missing.",
+    "Cable auction for XK-ME TODAY (2026-09-02) is missing.",
+    "Cable auction for XK-MK TODAY (2026-09-02) is missing."
   ],
   "issues_info": []
 };
