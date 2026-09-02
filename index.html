@@ -1210,23 +1210,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
         </div>
 
-        <!-- ── Summary Cards ── -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Arbitrage Windows</h4>
-                <p id="arb_stat_windows" style="margin: 0; font-size: 24px; font-weight: 700; color: #0f172a;">0 / 24 hrs</p>
-                <p id="arb_stat_windows_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">Hours exceeding threshold</p>
-            </div>
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
-                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Max Net Margin</h4>
-                <p id="arb_stat_max_spread" style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981;">0.00 €/MWh</p>
-                <p id="arb_stat_max_spread_sub" style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">No path found</p>
-            </div>
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; grid-column: span 2;">
-                <h4 style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em;">Recommended Strategy</h4>
-                <p id="arb_stat_strategy" style="margin: 0; font-size: 14px; font-weight: 600; color: #334155; line-height: 1.5;">Select or find matches to run the prediction engine.</p>
-            </div>
-        </div>
+
 
         <!-- ── Route Cards ── -->
         <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
@@ -8185,16 +8169,28 @@ function renderArbitragePanel() {
                     container.innerHTML = cardsHtml + mkHtml;
                 }
 
-                // Update summary stats
-                document.getElementById("arb_stat_windows").innerText = `${profitableHoursCount} / 24 hrs`;
-                if (maxSpreadVal > -900) {
-                    document.getElementById("arb_stat_max_spread").innerText = `${maxSpreadVal.toFixed(2)} €/MWh`;
-                    document.getElementById("arb_stat_max_spread_sub").innerText = `Top path: ${bestPathDesc}`;
-                document.getElementById("arb_stat_strategy").innerHTML = `Import/Export opportunities active. Focus flows via: <br><strong style="color:#4f46e5;">${bestPathDesc}</strong>`;
-                } else {
-                    document.getElementById("arb_stat_max_spread").innerText = `0.00 €/MWh`;
-                    document.getElementById("arb_stat_max_spread_sub").innerText = `No path found`;
-                    document.getElementById("arb_stat_strategy").innerText = "Spread threshold is too high or no profitable flows exist for tomorrow.";
+                // Update summary stats (if elements present in DOM)
+                if (document.getElementById("arb_stat_windows")) {
+                    document.getElementById("arb_stat_windows").innerText = `${profitableHoursCount} / 24 hrs`;
+                }
+                if (document.getElementById("arb_stat_max_spread")) {
+                    if (maxSpreadVal > -900) {
+                        document.getElementById("arb_stat_max_spread").innerText = `${maxSpreadVal.toFixed(2)} €/MWh`;
+                        if (document.getElementById("arb_stat_max_spread_sub")) {
+                            document.getElementById("arb_stat_max_spread_sub").innerText = `Top path: ${bestPathDesc}`;
+                        }
+                        if (document.getElementById("arb_stat_strategy")) {
+                            document.getElementById("arb_stat_strategy").innerHTML = `Import/Export opportunities active. Focus flows via: <br><strong style="color:#4f46e5;">${bestPathDesc}</strong>`;
+                        }
+                    } else {
+                        document.getElementById("arb_stat_max_spread").innerText = `0.00 €/MWh`;
+                        if (document.getElementById("arb_stat_max_spread_sub")) {
+                            document.getElementById("arb_stat_max_spread_sub").innerText = `No path found`;
+                        }
+                        if (document.getElementById("arb_stat_strategy")) {
+                            document.getElementById("arb_stat_strategy").innerText = "Spread threshold is too high or no profitable flows exist for tomorrow.";
+                        }
+                    }
                 }
 
                 // ── Update Margin Summary ──
