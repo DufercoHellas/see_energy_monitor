@@ -1037,12 +1037,12 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             <input type="date" id="analogue_date" onchange="applyOptimizedWeights();" style="padding: 8px 12px; border-radius: 6px; border: 1.5px solid #cbd5e1; font-size: 13px; font-weight: 600; color: #0f172a; background: #fff; cursor: pointer;">
         </div>
         
-        <div style="flex: 1; min-width: 320px;">
+        <div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <label style="font-size: 13px; font-weight: 700; color: #334155;">Feature Weights</label>
-                <div id="weights_auto_label" style="font-size: 11px; color: #64748b; font-weight: 600;"></div>
+                <div id="weights_auto_label" style="font-size: 11px; color: #64748b; font-weight: 600; margin-left: 10px;"></div>
             </div>
-            <div style="display: flex; gap: 6px; background: white; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #cbd5e1; align-items: center; box-sizing: border-box; flex-wrap: wrap;">
+            <div style="display: inline-flex; gap: 6px; background: white; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #cbd5e1; align-items: center; box-sizing: border-box; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 2px;">
                     <span style="font-size: 11px; font-weight: 700; color: #475569;" title="Greece Residuals (GR R)">GR R:</span>
                     <input type="number" id="w_res" min="0" max="100" value="20" onchange="updateWeights('w_res')" style="width: 32px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: #0f172a;">
@@ -8038,17 +8038,17 @@ function renderArbitragePanel() {
                     const stratName = topNVal === "7" ? "🎯 Sniper" : (topNVal === "5" ? "⚖️ Balanced" : "🚀 High Volume");
 
                     const emptyStateHtml = `
-                    <div style="position: relative; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 22px 24px; margin: 10px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                    <div style="position: relative; background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 20px 24px; margin: 10px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.03); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
                         <!-- Left explanation and quick action buttons -->
-                        <div style="flex: 1; min-width: 300px; z-index: 2;">
+                        <div style="min-width: 280px; z-index: 2;">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
                                 <span style="font-size: 20px;">🎯</span>
-                                <div style="font-size: 16px; font-weight: 800; color: #0f172a;">
+                                <div style="font-size: 15.5px; font-weight: 800; color: #0f172a;">
                                     No cross-border flows qualify under <span style="color: #2563eb;">${stratName}</span> for this date
                                 </div>
                             </div>
-                            <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #64748b; line-height: 1.4;">
-                                High-conviction threshold requiring net margin &ge; ${threshold.toFixed(0)} €/MWh. Check other modes to discover available cross-border spreads:
+                            <p style="margin: 0 0 10px 0; font-size: 12.5px; color: #64748b; line-height: 1.4;">
+                                High-conviction threshold requiring net margin &ge; ${threshold.toFixed(0)} €/MWh. Check other modes to discover flows:
                             </p>
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span style="font-size: 12px; font-weight: 700; color: #475569;">Quick Switch:</span>
@@ -8058,17 +8058,18 @@ function renderArbitragePanel() {
                             </div>
                         </div>
 
-                        <!-- Right: Amazon-style electric blue curved arrow pointing up-right to Strategy Mode -->
-                        <div style="display: flex; align-items: center; gap: 14px; z-index: 2; padding: 12px 20px; background: #f0f9ff; border: 2px solid #7dd3fc; border-radius: 12px; box-shadow: 0 2px 8px rgba(2,132,199,0.12);">
-                            <div style="text-align: right;">
-                                <div style="font-size: 14px; font-weight: 900; color: #0284c7; letter-spacing: -0.2px;">Switch Strategy Mode</div>
-                                <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-top: 2px;">Dropdown in top-right corner ↗</div>
+                        <!-- Center/Right: Wide Amazon-Style Electric Blue Arrow spanning from middle to right -->
+                        <div style="flex: 1; display: flex; align-items: center; justify-content: flex-end; min-width: 260px; z-index: 2; margin-left: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px; width: 100%; justify-content: flex-end;">
+                                <svg style="flex: 1; max-width: 260px; height: 48px; overflow: visible; filter: drop-shadow(0 3px 6px rgba(2,132,199,0.35));" viewBox="0 0 260 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M 10 38 C 80 44, 175 34, 242 14" stroke="#0284c7" stroke-width="5" stroke-linecap="round" fill="none" />
+                                    <path d="M 220 12 L 246 12 L 240 28" fill="none" stroke="#0284c7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <div style="padding: 10px 18px; background: #f0f9ff; border: 2px solid #7dd3fc; border-radius: 12px; box-shadow: 0 2px 8px rgba(2,132,199,0.12); white-space: nowrap; text-align: center;">
+                                    <div style="font-size: 13.5px; font-weight: 900; color: #0284c7; letter-spacing: -0.2px;">Switch Strategy Mode</div>
+                                    <div style="font-size: 11px; font-weight: 700; color: #64748b; margin-top: 2px;">Dropdown in top-right corner ↗</div>
+                                </div>
                             </div>
-                            <svg width="74" height="46" viewBox="0 0 74 46" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow: visible; filter: drop-shadow(0 3px 6px rgba(2,132,199,0.4));">
-                                <!-- Long, fat curved swoosh arrow -->
-                                <path d="M 6 38 C 24 44, 46 34, 60 12" stroke="#0284c7" stroke-width="5" stroke-linecap="round" fill="none" />
-                                <path d="M 44 10 L 64 9 L 60 25" fill="none" stroke="#0284c7" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
                         </div>
                     </div>`;
                     container.innerHTML = emptyStateHtml;
