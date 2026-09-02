@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-02 05:30:50",
+  "timestamp": "2026-09-02 06:30:52",
   "today": "2026-09-02",
   "tomorrow": "2026-09-03",
   "is_after_dam_cutoff": false,
@@ -2331,7 +2331,7 @@
     "status": "healthy",
     "total_records": 30795,
     "unique_mrids": 12236,
-    "active_now": 952,
+    "active_now": 950,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2366,8 +2366,8 @@
       },
       "IT": {
         "records": 4203,
-        "active_now": 219,
-        "active_unavailable_mw": 57131.0
+        "active_now": 217,
+        "active_unavailable_mw": 56897.0
       },
       "RS": {
         "records": 189,
