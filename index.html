@@ -975,9 +975,9 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
         </div>
     </div>
 
-    <div style="display: flex; gap: 24px; align-items: flex-start;">
-        <!-- ── Details Side Panel ── -->
-        <div id="cable_outages_detail_panel" style="width: 320px; flex-shrink: 0; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; display: none; box-sizing: border-box; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+    <!-- ── Centered Modal for Hourly Details ── -->
+    <div id="cable_outages_detail_modal_overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 99999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;" onclick="closeOutageDetailModal(event)">
+        <div id="cable_outages_detail_panel" style="width: 460px; max-width: 95vw; max-height: 85vh; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 22px 24px; box-sizing: border-box; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; overflow: hidden;" onclick="event.stopPropagation()">
         </div>
     </div>
 </div>
@@ -5271,15 +5271,15 @@ function renderCableOutagesGrid() {
                             });
                             if (maxOrig === 0 && fullNTC !== null) maxOrig = fullNTC;
 
-                            const isTotal24h = (dayEntries.length >= 24 || curtailedEntries.length >= 24) && maxRemaining === 0;
-                            const isAllDayReduction = curtailedEntries.length >= 24 && minRemaining > 0;
+                            const isTotal24h = (curtailedEntries.length >= 24) && (maxRemaining === 0);
+                            const isAllDayReduction = (curtailedEntries.length >= 24) && (minRemaining > 0);
 
                             if (isTotal24h) {
                                 html += `
-                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Outage (0 MW)">
-                                        <div style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 700; transition: all 0.2s;">
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Outage (0 MW all 24 hours)">
+                                        <div style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 7px 4px; font-size: 11px; font-weight: 700; transition: all 0.2s;">
                                             Mth: OUTAGE
-                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: normal;">${yearlyText}</div>` : ''}
+                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: normal;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -5287,20 +5287,23 @@ function renderCableOutagesGrid() {
                                 const remLabel = minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining}/${maxOrig} MW`;
                                 html += `
                                     <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel})">
-                                        <div style="background: #fff7ed; color: #d97706; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                        <div style="background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; border-radius: 6px; padding: 7px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
                                             Mth: ${remLabel}
-                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fed7aa; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fed7aa; padding-top: 2px;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
                             } else {
                                 const curtHours = curtailedEntries.length;
-                                const curtLabel = minRemaining === 0 ? `0/${maxOrig} MW (${curtHours}h)` : `${minRemaining}/${maxOrig} MW (${curtHours}h)`;
+                                const isZeroPartial = minRemaining === 0;
+                                const partialTitle = isZeroPartial ? `Hourly Outage (${curtHours}h)` : `Hourly Curt (${curtHours}h)`;
+                                const subCap = isZeroPartial ? `0/${maxOrig} MW` : `${minRemaining}/${maxOrig} MW`;
                                 html += `
-                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Partial curtailment for ${curtHours} hours (${curtLabel})">
-                                        <div style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
-                                            Mth: ${curtLabel}
-                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fde68a; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
+                                        <div style="background: #fffbeb; color: #b45309; border: 1.5px solid #fcd34d; border-radius: 6px; padding: 6px 3px; font-size: 10.5px; font-weight: 700; transition: all 0.2s;">
+                                            <div>Mth: ${partialTitle}</div>
+                                            <div style="font-size: 10px; opacity: 0.9; font-weight: 600; margin-top: 1px;">${subCap}</div>
+                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fcd34d; padding-top: 2px;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -5531,67 +5534,89 @@ function renderCableDailyOutagesGrid() {
                 container.innerHTML = html;
             }
 
-// ── Outage Detail Panel ───────────────────────────────────────────────────
+// ── Outage Detail Modal (Centered) ────────────────────────────────────────
 
-// Show hourly outage details for a corridor on a given date
+function closeOutageDetailModal(evt) {
+    if (evt && evt.target && evt.target.id !== "cable_outages_detail_modal_overlay" && !evt.target.closest("button")) {
+        return;
+    }
+    const overlay = document.getElementById("cable_outages_detail_modal_overlay");
+    if (overlay) overlay.style.display = "none";
+}
+
+// Close modal on Escape key
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeOutageDetailModal();
+});
+
+// Show hourly outage details for a corridor on a given date in centered popup
 function showOutageGridDetails(corridor, dateStr) {
-                const panel = document.getElementById("cable_outages_detail_panel");
-                if (!panel) return;
+    const overlay = document.getElementById("cable_outages_detail_modal_overlay");
+    const panel = document.getElementById("cable_outages_detail_panel");
+    if (!panel) return;
 
-                const dayEntries = cableOutagesData.filter(item => item.corridor_code === corridor && item.trade_date === dateStr);
-                const curtailed = dayEntries.filter(item => (parseFloat(item.remaining_capacity) || 0) < (parseFloat(item.original_capacity) || 0));
-                
-                panel.style.display = "block";
-                
-                if (dayEntries.length === 0 || curtailed.length === 0) {
-                    panel.innerHTML = `
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
-                            <h4 style="margin:0; font-size:14px; font-weight:700; color:#1e293b;">${corridor} — ${dateStr}</h4>
-                            <button onclick="document.getElementById('cable_outages_detail_panel').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer; font-weight:700; line-height:1;">&times;</button>
-                        </div>
-                        <div style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:8px; padding:16px; font-size:13px; font-weight:600; text-align:center;">
-                            ✅ Full 100% capacity available all 24 hours. No curtailments or outages.
-                        </div>
-                    `;
-                    return;
-                }
+    const dayEntries = cableOutagesData.filter(item => item.corridor_code === corridor && item.trade_date === dateStr);
+    const curtailed = dayEntries.filter(item => (parseFloat(item.remaining_capacity) || 0) < (parseFloat(item.original_capacity) || 0));
+    
+    if (overlay) overlay.style.display = "flex";
+    panel.style.display = "flex";
+    
+    if (dayEntries.length === 0 || curtailed.length === 0) {
+        panel.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;">
+                <div>
+                    <h3 style="margin:0; font-size:16px; font-weight:800; color:#0f172a; letter-spacing: -0.3px;">${corridor}</h3>
+                    <div style="font-size: 13px; color: #64748b; font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
+                </div>
+                <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
+            </div>
+            <div style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:10px; padding:20px; font-size:13.5px; font-weight:600; text-align:center;">
+                ✅ Full 100% capacity available all 24 hours. No curtailments or outages.
+            </div>
+        `;
+        return;
+    }
 
-                let listHtml = "";
-                dayEntries.forEach(item => {
-                    const orig = parseFloat(item.original_capacity) || 0;
-                    const rem = parseFloat(item.remaining_capacity) || 0;
-                    const isCurtailed = rem < orig;
-                    const isTotal = rem === 0;
-                    const severityColor = !isCurtailed ? "#059669" : (isTotal ? "#dc2626" : "#d97706");
-                    const badge = !isCurtailed ? `✓ Full ${orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${rem} MW / ${orig} MW`);
-                    const bg = !isCurtailed ? "#f8fafc" : (isTotal ? "#fef2f2" : "#fffbeb");
-                    
-                    listHtml += `
-                        <div style="background: ${bg}; border-bottom: 1px solid #e2e8f0; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:2px; font-weight:600;">
-                                <span>Hour ${item.position}</span>
-                                <span style="color: ${severityColor}; font-weight: 700;">${badge}</span>
-                            </div>
-                            <div style="color: #6b7280; font-size:11px; font-style:italic;">
-                                Reason: ${item.reason || 'No description'}
-                            </div>
-                        </div>
-                    `;
-                });
+    let listHtml = "";
+    dayEntries.forEach(item => {
+        const orig = parseFloat(item.original_capacity) || 0;
+        const rem = parseFloat(item.remaining_capacity) || 0;
+        const isCurtailed = rem < orig;
+        const isTotal = rem === 0;
+        const severityColor = !isCurtailed ? "#059669" : (isTotal ? "#dc2626" : "#d97706");
+        const badge = !isCurtailed ? `✓ Full ${orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${rem} MW / ${orig} MW`);
+        const bg = !isCurtailed ? "#f8fafc" : (isTotal ? "#fef2f2" : "#fffbeb");
+        const border = !isCurtailed ? "#f1f5f9" : (isTotal ? "#fee2e2" : "#fef3c7");
+        
+        listHtml += `
+            <div style="background: ${bg}; border: 1px solid ${border}; padding: 10px 14px; border-radius: 8px; font-size: 13px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 3px;">
+                    <span style="font-weight: 700; color: #1e293b;">Hour ${item.position}</span>
+                    <span style="color: ${severityColor}; font-weight: 800; font-size: 12.5px;">${badge}</span>
+                </div>
+                <div style="color: #64748b; font-size: 11.5px; font-style: italic; line-height: 1.4;">
+                    Reason: ${item.reason || 'No description provided'}
+                </div>
+            </div>
+        `;
+    });
 
-                panel.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-                        <h4 style="margin:0; font-size:14px; font-weight:700; color:#1e293b;">${corridor} — ${dateStr}</h4>
-                        <button onclick="document.getElementById('cable_outages_detail_panel').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer; font-weight:700; line-height:1;">&times;</button>
-                    </div>
-                    <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #9a3412; font-weight: 600;">
-                        ⚠️ ${curtailed.length} of ${dayEntries.length} hours curtailed / reduced
-                    </div>
-                    <div style="max-height: 400px; overflow-y:auto; padding-right:6px;">
-                        ${listHtml}
-                    </div>
-                `;
-            }
+    panel.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;">
+            <div>
+                <h3 style="margin:0; font-size:16px; font-weight:800; color:#0f172a; letter-spacing: -0.3px;">${corridor}</h3>
+                <div style="font-size: 13px; color: #64748b; font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
+            </div>
+            <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
+        </div>
+        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #9a3412; font-weight: 700; display:flex; align-items:center; gap:8px; flex-shrink: 0;">
+            <span>⚠️</span> <span>${curtailed.length} of ${dayEntries.length} hours curtailed / reduced</span>
+        </div>
+        <div style="overflow-y: auto; max-height: 520px; padding-right: 6px; display: flex; flex-direction: column; gap: 8px;">
+            ${listHtml}
+        </div>
+    `;
+}
 
 // ── Long-Term Cables (Monthly / Yearly) ────────────────────────────────────
 
