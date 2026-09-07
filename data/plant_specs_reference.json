@@ -227,6 +227,166 @@
         "emission_factor": 0.4,
         "fuel_cost_th": 18.0,
         "vom": 4.5
+      },
+      {
+        "id": "KREMASTA",
+        "name": "Kremasta (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Acheloos)",
+        "nominal_mw": 437.2,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "THESAVROS I_HYDRO",
+        "name": "Thisavros I (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage (Nestos)",
+        "nominal_mw": 128.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "THESAVROS II_HYDRO",
+        "name": "Thisavros II (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage (Nestos)",
+        "nominal_mw": 128.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "THESAVROS III_HYDRO",
+        "name": "Thisavros III (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage (Nestos)",
+        "nominal_mw": 128.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "POLYFYTO",
+        "name": "Polyphyto (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Aliakmonas)",
+        "nominal_mw": 375.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "KASTRAKI",
+        "name": "Kastraki (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Acheloos)",
+        "nominal_mw": 320.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "SFIKIA",
+        "name": "Sfikia (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage (Aliakmonas)",
+        "nominal_mw": 315.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "POURNARI I",
+        "name": "Pournari I (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Arachthos)",
+        "nominal_mw": 300.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "AOOS",
+        "name": "Piges Aoou (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Aoos)",
+        "nominal_mw": 210.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "STRATOS",
+        "name": "Stratos I & II (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Acheloos)",
+        "nominal_mw": 156.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "ILARIONAS",
+        "name": "Ilarionas (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Aliakmonas)",
+        "nominal_mw": 153.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "PLASTIRAS",
+        "name": "Plastiras / Tavropos (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Megdovas)",
+        "nominal_mw": 129.9,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "PLATANOVRYSI",
+        "name": "Platanovrysi (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Nestos)",
+        "nominal_mw": 116.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "ASOMATA",
+        "name": "Asomata (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Aliakmonas)",
+        "nominal_mw": 108.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "LADON",
+        "name": "Ladon (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Ladon)",
+        "nominal_mw": 70.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
+      },
+      {
+        "id": "POURNARI II",
+        "name": "Pournari II (PPC / DEI)",
+        "fuel": "hydro",
+        "tech": "Hydro Reservoir (Arachthos)",
+        "nominal_mw": 33.0,
+        "efficiency": 1.0,
+        "emission_factor": 0.0,
+        "vom": 1.5
       }
     ],
     "IT": [

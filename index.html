@@ -1378,6 +1378,50 @@ body.dark-mode [style*="color:#6b7280"] {
                 —
             </div>
         </div>
+
+        <!-- PPC Hydro Fleet Availability -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                💧 PPC Hydro Available
+            </div>
+            <div id="kpi_econ_hydro_avail" style="font-size: 20px; font-weight: 800; color: #0284c7;">
+                —
+            </div>
+            <div id="kpi_econ_hydro_sub" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                Installed: 3,107 MW
+            </div>
+        </div>
+
+        <!-- Peak Residual Deficit (Hydro Call) -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                🚨 Peak Deficit (Hydro Call)
+            </div>
+            <div id="kpi_econ_peak_deficit" style="font-size: 20px; font-weight: 800; color: #f59e0b;">
+                —
+            </div>
+            <div id="kpi_econ_deficit_sub" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                Net Demand vs. Thermal
+            </div>
+        </div>
+    </div>
+
+    <!-- Evening Peak Supply & Hydro Call Alert Banner -->
+    <div id="econ_hydro_balance_banner" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 4px solid #0284c7; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 24px;">💧</span>
+            <div>
+                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);" id="econ_hydro_banner_title">
+                    Evening Peak Supply Balance &amp; PPC Hydro Call
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;" id="econ_hydro_banner_desc">
+                    Comparing hourly residual demand against available thermal capacity...
+                </div>
+            </div>
+        </div>
+        <div id="econ_hydro_banner_badge" style="font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: rgba(2,132,199,0.12); color: #0284c7;">
+            —
+        </div>
     </div>
 
     <!-- Running Cost Breakdown Chart -->
@@ -1395,16 +1439,23 @@ body.dark-mode [style*="color:#6b7280"] {
 
     <!-- Plant Running Cost Table -->
     <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
             <div>
                 <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">
-                    📋 Plant Running Cost Table
+                    📋 Plant Dispatch &amp; Running Cost Table
                 </h3>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
-                    Ranked by Fuel &amp; Technology 1st, then by Available Capacity (MW) descending. Real-time physical outages from ENTSO-E are cross-referenced directly against active units.
+                    Ranked by Fuel &amp; Technology 1st, then by Available Capacity (MW) descending. ENTSO-E physical outages are matched in real time.
                 </div>
             </div>
-            <div>
+
+            <!-- Fleet Switcher & Filter -->
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 4px; background: var(--bg-card-subtle, rgba(255,255,255,0.03)); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <button type="button" id="btn_fleet_thermal" onclick="setEconFleetFilter('thermal')" class="inner-tablinks active" style="padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer;">🔥 Thermal</button>
+                    <button type="button" id="btn_fleet_hydro" onclick="setEconFleetFilter('hydro')" class="inner-tablinks" style="padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer;">💧 PPC Hydro</button>
+                    <button type="button" id="btn_fleet_all" onclick="setEconFleetFilter('all')" class="inner-tablinks" style="padding: 4px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer;">🌐 All Fleets</button>
+                </div>
                 <input type="text" id="econ_table_filter" oninput="filterEconTable()" placeholder="🔍 Filter plant..." style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 5px 10px; border-radius: 6px; font-size: 12px; font-family: inherit;">
             </div>
         </div>
@@ -2292,7 +2343,7 @@ function getRealizedPriceWithFallback(c, h, date) {
 
 // === tab_economics.js ===
 // === tab_economics.js ===
-// Day-Ahead Thermal Plant Running Cost Calculator (SRMC)
+// Day-Ahead Thermal & Hydro Running Costs and Peak Balance (SRMC + Hydro Call)
 
 const PLANT_SPECS_FALLBACK = {
   "hubs": {
@@ -2321,7 +2372,23 @@ const PLANT_SPECS_FALLBACK = {
       { "id": "AGIOS DIMITRIOS III", "name": "Agios Dimitrios III (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 283.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
       { "id": "AGIOS DIMITRIOS II", "name": "Agios Dimitrios II (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 274.0, "efficiency": 0.335, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
       { "id": "AGIOS DIMITRIOS I", "name": "Agios Dimitrios I (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 274.0, "efficiency": 0.335, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
-      { "id": "MEGALOPOLI IV", "name": "Megalopolis IV (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 256.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 }
+      { "id": "MEGALOPOLI IV", "name": "Megalopolis IV (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 256.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "KREMASTA", "name": "Kremasta (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Acheloos)", "nominal_mw": 437.2, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "THESAVROS I_HYDRO", "name": "Thisavros I (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Pumped Storage (Nestos)", "nominal_mw": 128.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "THESAVROS II_HYDRO", "name": "Thisavros II (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Pumped Storage (Nestos)", "nominal_mw": 128.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "THESAVROS III_HYDRO", "name": "Thisavros III (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Pumped Storage (Nestos)", "nominal_mw": 128.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "POLYFYTO", "name": "Polyphyto (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Aliakmonas)", "nominal_mw": 375.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "KASTRAKI", "name": "Kastraki (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Acheloos)", "nominal_mw": 320.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "SFIKIA", "name": "Sfikia (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Pumped Storage (Aliakmonas)", "nominal_mw": 315.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "POURNARI I", "name": "Pournari I (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Arachthos)", "nominal_mw": 300.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "AOOS", "name": "Piges Aoou (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Aoos)", "nominal_mw": 210.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "STRATOS", "name": "Stratos I & II (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Acheloos)", "nominal_mw": 156.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "ILARIONAS", "name": "Ilarionas (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Aliakmonas)", "nominal_mw": 153.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "PLASTIRAS", "name": "Plastiras / Tavropos (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Megdovas)", "nominal_mw": 129.9, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "PLATANOVRYSI", "name": "Platanovrysi (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Nestos)", "nominal_mw": 116.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "ASOMATA", "name": "Asomata (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Aliakmonas)", "nominal_mw": 108.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "LADON", "name": "Ladon (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Ladon)", "nominal_mw": 70.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 },
+      { "id": "POURNARI II", "name": "Pournari II (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Arachthos)", "nominal_mw": 33.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 }
     ],
     "IT": [
       { "id": "IT_CCGT_CLASS_H", "name": "Porto Marghera / Tavazzano", "fuel": "gas", "tech": "CCGT Class H (Ansaldo GT36)", "nominal_mw": 800.0, "efficiency": 0.630, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
@@ -2357,6 +2424,7 @@ const PLANT_SPECS_FALLBACK = {
 };
 
 let plantSpecsData = PLANT_SPECS_FALLBACK;
+let currentEconFleetFilter = 'thermal'; // 'thermal' | 'hydro' | 'all'
 
 function initPlantEconomics() {
     fetch('data/plant_specs_reference.json')
@@ -2397,6 +2465,18 @@ function setEconDatePreset(preset) {
         now.setDate(now.getDate() - 1);
         dateInput.value = now.toISOString().slice(0, 10);
     }
+    renderPlantEconomicsTab();
+}
+
+function setEconFleetFilter(filter) {
+    currentEconFleetFilter = filter || 'thermal';
+    ['thermal', 'hydro', 'all'].forEach(f => {
+        const btn = document.getElementById(`btn_fleet_${f}`);
+        if (btn) {
+            if (f === currentEconFleetFilter) btn.classList.add('active');
+            else btn.classList.remove('active');
+        }
+    });
     renderPlantEconomicsTab();
 }
 
@@ -2510,7 +2590,7 @@ function renderPlantEconomicsTab() {
     const dateInput = document.getElementById("econ_date");
     const countrySelect = document.getElementById("econ_country");
     const hubSelect = document.getElementById("econ_gas_hub");
-    const ligniteInput = document.getElementById("econ_lignite_cost");
+    const ligniteCostTh = 18.00;
 
     if (!dateInput || !countrySelect || !hubSelect) return;
 
@@ -2522,7 +2602,6 @@ function renderPlantEconomicsTab() {
 
     const country = countrySelect.value || 'GR';
     const hubKey = hubSelect.value || 'TTF';
-    const ligniteCostTh = parseFloat(ligniteInput ? ligniteInput.value : 18.0) || 18.0;
 
     // Hub Basis
     const hubConfig = (plantSpecsData.hubs && plantSpecsData.hubs[hubKey]) || { name: 'TTF', basis_eur: 0.0 };
@@ -2604,7 +2683,7 @@ function renderPlantEconomicsTab() {
         }
     }
 
-    // Calculate Running Cost and Outages for each thermal plant
+    // Calculate Running Cost and Outages for each plant
     const plantList = (plantSpecsData.plants && plantSpecsData.plants[country]) || (PLANT_SPECS_FALLBACK.plants[country]) || [];
     const calculatedUnits = [];
 
@@ -2631,10 +2710,13 @@ function renderPlantEconomicsTab() {
             const coalCostTh = spec.fuel_cost_th || 16.00;
             fuelCostEur = coalCostTh / eta;
             carbonCostEur = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+        } else if (spec.fuel === 'hydro') {
+            fuelCostEur = 0.0;
+            carbonCostEur = 0.0;
         }
 
         const totalRunningCost = fuelCostEur + carbonCostEur + vom;
-        const diffToDam = avgPrice > 0 ? (totalRunningCost - avgPrice) : null;
+        const diffToDam = (avgPrice > 0 && spec.fuel !== 'hydro') ? (totalRunningCost - avgPrice) : null;
 
         // Cross-reference physical outage status for this date
         const outageInfo = getPlantOutageInfo(spec, country, targetDate);
@@ -2654,6 +2736,10 @@ function renderPlantEconomicsTab() {
         });
     });
 
+    // Thermal vs Hydro separation
+    const thermalUnits = calculatedUnits.filter(u => u.spec.fuel !== 'hydro');
+    const hydroUnits = calculatedUnits.filter(u => u.spec.fuel === 'hydro');
+
     // DOM Elements for KPI Overview Cards
     const baseEl = document.getElementById("kpi_econ_power_base");
     const peakEl = document.getElementById("kpi_econ_power_peak");
@@ -2666,43 +2752,46 @@ function renderPlantEconomicsTab() {
     const avgSubEl = document.getElementById("kpi_econ_avg_sub");
     const highestCostEl = document.getElementById("kpi_econ_highest_cost");
     const highestNameEl = document.getElementById("kpi_econ_highest_name");
+    const hydroAvailEl = document.getElementById("kpi_econ_hydro_avail");
+    const hydroSubEl = document.getElementById("kpi_econ_hydro_sub");
+    const deficitEl = document.getElementById("kpi_econ_peak_deficit");
+    const deficitSubEl = document.getElementById("kpi_econ_deficit_sub");
 
-    // Lowest & Highest cost units for KPI overview cards
-    const sortedByCost = [...calculatedUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
-    if (sortedByCost.length > 0) {
-        const lowest = sortedByCost[0];
-        const highest = sortedByCost[sortedByCost.length - 1];
+    // Lowest & Highest cost units for Thermal fleet
+    const sortedThermal = [...thermalUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
+    if (sortedThermal.length > 0) {
+        const lowest = sortedThermal[0];
+        const highest = sortedThermal[sortedThermal.length - 1];
         if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
         if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
         if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
         if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
     }
 
-    // Capacity-Weighted Average running cost (Available fleet vs Nominal fleet)
-    let sumNomMw = 0;
-    let sumAvailMw = 0;
+    // Capacity-Weighted Average running cost for Thermal fleet
+    let sumNomThermalMw = 0;
+    let sumAvailThermalMw = 0;
     let sumNomWeightedCost = 0;
     let sumAvailWeightedCost = 0;
 
-    calculatedUnits.forEach(u => {
+    thermalUnits.forEach(u => {
         const nom = u.spec.nominal_mw || 0;
         const avail = u.avail_mw || 0;
-        sumNomMw += nom;
-        sumAvailMw += avail;
+        sumNomThermalMw += nom;
+        sumAvailThermalMw += avail;
         sumNomWeightedCost += u.total_running_cost * nom;
         if (avail > 0) {
             sumAvailWeightedCost += u.total_running_cost * avail;
         }
     });
 
-    const nomWeightedAvg = sumNomMw > 0 ? (sumNomWeightedCost / sumNomMw) : 0;
-    const availWeightedAvg = sumAvailMw > 0 ? (sumAvailWeightedCost / sumAvailMw) : nomWeightedAvg;
+    const nomWeightedAvg = sumNomThermalMw > 0 ? (sumNomWeightedCost / sumNomThermalMw) : 0;
+    const availWeightedAvg = sumAvailThermalMw > 0 ? (sumAvailWeightedCost / sumAvailThermalMw) : nomWeightedAvg;
 
-    // Available Capacity-Weighted Average is the primary metric
     if (avgCostEl) avgCostEl.innerText = `${availWeightedAvg.toFixed(2)} €/MWh`;
     if (avgSubEl) {
-        avgSubEl.innerText = `Avail: ${Math.round(sumAvailMw).toLocaleString()} MW / Fleet: ${Math.round(sumNomMw).toLocaleString()} MW (Nom Avg: ${nomWeightedAvg.toFixed(2)} €/MWh)`;
-        avgSubEl.title = `Weighted by available dispatchable capacity. If nominal fleet was fully available, average would be ${nomWeightedAvg.toFixed(2)} €/MWh.`;
+        avgSubEl.innerText = `Avail: ${Math.round(sumAvailThermalMw).toLocaleString()} MW / Fleet: ${Math.round(sumNomThermalMw).toLocaleString()} MW (Nom Avg: ${nomWeightedAvg.toFixed(2)} €/MWh)`;
+        avgSubEl.title = `Weighted by available dispatchable thermal capacity. Nominal fleet average would be ${nomWeightedAvg.toFixed(2)} €/MWh.`;
     }
 
     if (baseEl) baseEl.innerText = avgPrice > 0 ? `${avgPrice.toFixed(2)} €/MWh` : "— (Pending)";
@@ -2711,22 +2800,120 @@ function renderPlantEconomicsTab() {
     if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
     if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
 
+    // Hydro fleet metrics
+    let sumNomHydroMw = 0;
+    let sumAvailHydroMw = 0;
+    let hydroOutageCount = 0;
+    hydroUnits.forEach(u => {
+        sumNomHydroMw += u.spec.nominal_mw || 0;
+        sumAvailHydroMw += u.avail_mw || 0;
+        if (u.unavail_mw > 0) hydroOutageCount++;
+    });
+
+    if (hydroAvailEl) {
+        hydroAvailEl.innerText = `${Math.round(sumAvailHydroMw).toLocaleString()} MW`;
+    }
+    if (hydroSubEl) {
+        hydroSubEl.innerText = `Installed: ${Math.round(sumNomHydroMw).toLocaleString()} MW (${hydroOutageCount} on outage)`;
+    }
+
+    // Calculate Hourly Peak Residual Demand & Deficit (Hydro Call)
+    let hourlyResiduals = [];
+    if (window.historicalData && window.historicalData[country] && window.historicalData[country][targetDate]) {
+        hourlyResiduals = window.historicalData[country][targetDate].residuals || [];
+    }
+
+    let maxResidual = 0;
+    let maxResHour = 0;
+    let maxDeficit = 0;
+    let deficitHour = 0;
+    let deficitHoursCount = 0;
+    let totalDeficitMwh = 0;
+
+    if (hourlyResiduals && hourlyResiduals.length === 24) {
+        hourlyResiduals.forEach((r, idx) => {
+            const h = idx + 1;
+            if (r > maxResidual) {
+                maxResidual = r;
+                maxResHour = h;
+            }
+            const diff = r - sumAvailThermalMw;
+            if (diff > 0) {
+                deficitHoursCount++;
+                totalDeficitMwh += diff;
+                if (diff > maxDeficit) {
+                    maxDeficit = diff;
+                    deficitHour = h;
+                }
+            }
+        });
+    }
+
+    if (deficitEl) {
+        if (maxDeficit > 0) {
+            deficitEl.innerText = `+${Math.round(maxDeficit).toLocaleString()} MW`;
+            deficitEl.style.color = '#f59e0b';
+            if (deficitSubEl) {
+                deficitSubEl.innerText = `Peak at H${deficitHour} (${Math.round(maxResidual).toLocaleString()} MW vs ${Math.round(sumAvailThermalMw).toLocaleString()} MW thermal)`;
+            }
+        } else {
+            deficitEl.innerText = '0 MW (Covered)';
+            deficitEl.style.color = '#10b981';
+            if (deficitSubEl) {
+                deficitSubEl.innerText = maxResidual > 0 
+                    ? `Max Net: ${Math.round(maxResidual).toLocaleString()} MW (H${maxResHour}) | Margin: +${Math.round(sumAvailThermalMw - maxResidual).toLocaleString()} MW`
+                    : 'Thermal fleet sufficient';
+            }
+        }
+    }
+
+    // Update Evening Peak Supply Balance Banner
+    const bannerTitle = document.getElementById("econ_hydro_banner_title");
+    const bannerDesc = document.getElementById("econ_hydro_banner_desc");
+    const bannerBadge = document.getElementById("econ_hydro_banner_badge");
+    const bannerContainer = document.getElementById("econ_hydro_balance_banner");
+
+    if (bannerContainer && bannerTitle && bannerDesc && bannerBadge) {
+        if (maxDeficit > 0) {
+            bannerContainer.style.borderLeftColor = '#f59e0b';
+            bannerTitle.innerHTML = `🚨 Evening Peak Deficit (<strong>+${Math.round(maxDeficit).toLocaleString()} MW</strong> at H${deficitHour}) — PPC Hydro Peaking Active`;
+            bannerDesc.innerHTML = `Hourly residual demand reaches <strong>${Math.round(maxResidual).toLocaleString()} MW</strong>, exceeding the available thermal capacity (<strong>${Math.round(sumAvailThermalMw).toLocaleString()} MW</strong>). PPC Hydro Reservoirs (<strong>${Math.round(sumAvailHydroMw).toLocaleString()} MW available</strong>) must be dispatched to cover this <strong>${Math.round(totalDeficitMwh).toLocaleString()} MWh</strong> deficit across ${deficitHoursCount} peak hours (18:00–22:00), setting the clearing price at peak water opportunity values (<strong>€230 – €270/MWh</strong>).`;
+            bannerBadge.style.background = 'rgba(245, 158, 11, 0.15)';
+            bannerBadge.style.color = '#f59e0b';
+            bannerBadge.innerText = `⚠️ Deficit +${Math.round(maxDeficit).toLocaleString()} MW (Hydro Call)`;
+        } else {
+            bannerContainer.style.borderLeftColor = '#10b981';
+            bannerTitle.innerHTML = `🟢 Evening Peak Demand Fully Covered by Thermal Fleet`;
+            bannerDesc.innerHTML = `Max residual demand (<strong>${Math.round(maxResidual).toLocaleString()} MW</strong>) remains within available thermal capacity (<strong>${Math.round(sumAvailThermalMw).toLocaleString()} MW</strong>). Domestic hydro is not under mandatory peak call, leaving a thermal margin of <strong>+${Math.round(sumAvailThermalMw - maxResidual).toLocaleString()} MW</strong>.`;
+            bannerBadge.style.background = 'rgba(16, 185, 129, 0.15)';
+            bannerBadge.style.color = '#10b981';
+            bannerBadge.innerText = `✅ Thermal Margin: +${Math.round(sumAvailThermalMw - maxResidual).toLocaleString()} MW`;
+        }
+    }
+
+    // Filter units based on active fleet switcher
+    let unitsToDisplay = calculatedUnits;
+    if (currentEconFleetFilter === 'thermal') {
+        unitsToDisplay = calculatedUnits.filter(u => u.spec.fuel !== 'hydro');
+    } else if (currentEconFleetFilter === 'hydro') {
+        unitsToDisplay = calculatedUnits.filter(u => u.spec.fuel === 'hydro');
+    }
+
     // Rank 1st by Fuel & Technology, then by Available Capacity (MW) descending, then Nominal MW
-    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
-    calculatedUnits.sort((a, b) => {
+    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3, 'hydro': 4 };
+    unitsToDisplay.sort((a, b) => {
         const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
         if (fuelDiff !== 0) return fuelDiff;
-        // Within same fuel, available capacity first, then nominal
         const availDiff = (b.avail_mw || 0) - (a.avail_mw || 0);
         if (availDiff !== 0) return availDiff;
         return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
     });
 
     // Render Cost Stack Chart
-    renderCostStackChart(calculatedUnits, avgPrice, targetDate);
+    renderCostStackChart(unitsToDisplay, avgPrice, targetDate);
 
     // Render Plant Table
-    renderRunningCostTable(calculatedUnits, avgPrice);
+    renderRunningCostTable(unitsToDisplay, avgPrice);
 }
 
 // ── Chart: Running Cost Stack ──────────────────────────────────────────────
@@ -2735,7 +2922,7 @@ function renderCostStackChart(units, avgPrice, targetDate) {
     if (!container || !window.Plotly) return;
 
     if (!units || units.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No thermal generating units found.</div>';
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No generating units found for this filter.</div>';
         return;
     }
 
@@ -2750,7 +2937,8 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         avail: u.avail_mw,
         nom: u.spec.nominal_mw,
         status: u.status_text,
-        runningCost: u.total_running_cost
+        runningCost: u.total_running_cost,
+        fuel: u.spec.fuel
     }));
 
     const traces = [
@@ -2779,13 +2967,13 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             type: 'bar',
             marker: { color: '#6366f1' },
             customdata: customHover,
-            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br>Total: <b>%{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
+            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br>Cash Cost: <b>%{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
         }
     ];
 
     // Reference horizontal line for Day-Ahead Base Price
     const shapes = [];
-    if (avgPrice > 0) {
+    if (avgPrice > 0 && currentEconFleetFilter !== 'hydro') {
         shapes.push({
             type: 'line',
             xref: 'paper',
@@ -2801,10 +2989,14 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         });
     }
 
+    const chartTitle = currentEconFleetFilter === 'hydro'
+        ? `PPC Hydro Reservoir Available Capacity & Cash Cost — ${targetDate}`
+        : `Plant Running Cost Breakdown (€/MWh) — ${targetDate}${avgPrice > 0 ? ` (DAM Base: ${avgPrice.toFixed(2)} €/MWh)` : ''}`;
+
     const layout = getPlotlyThemeLayout({
         barmode: 'stack',
         title: {
-            text: `Plant Running Cost Breakdown (€/MWh) — ${targetDate}${avgPrice > 0 ? ` (DAM Base: ${avgPrice.toFixed(2)} €/MWh)` : ''}`,
+            text: chartTitle,
             font: { size: 14, weight: 700 }
         },
         xaxis: {
@@ -2833,7 +3025,7 @@ function renderRunningCostTable(units, avgPrice) {
     if (!tbody) return;
 
     if (!units || units.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">No thermal generating units found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">No generating units found for this filter.</td></tr>';
         return;
     }
 
@@ -2844,16 +3036,20 @@ function renderRunningCostTable(units, avgPrice) {
             ? '<span style="background:rgba(217,119,6,0.15); color:#d97706; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🔥 Gas</span>'
             : spec.fuel === 'lignite'
             ? '<span style="background:rgba(139,92,246,0.15); color:#8b5cf6; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">⛏️ Lignite</span>'
+            : spec.fuel === 'hydro'
+            ? '<span style="background:rgba(2,132,199,0.15); color:#0284c7; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">💧 Hydro</span>'
             : '<span style="background:rgba(100,116,139,0.15); color:#64748b; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🪨 Coal</span>';
 
         let vsDamHtml = '—';
-        if (avgPrice > 0 && u.diff_to_dam !== null) {
+        if (spec.fuel !== 'hydro' && avgPrice > 0 && u.diff_to_dam !== null) {
             const diff = u.diff_to_dam;
             if (diff <= 0) {
                 vsDamHtml = `<span style="color:#10b981; font-weight:700;">${diff.toFixed(2)} € (Lower)</span>`;
             } else {
                 vsDamHtml = `<span style="color:#ef4444; font-weight:700;">+${diff.toFixed(2)} € (Higher)</span>`;
             }
+        } else if (spec.fuel === 'hydro') {
+            vsDamHtml = '<span style="font-size:11px; color:var(--text-muted);" title="Hydro is dispatched during peak hours at Water Opportunity Value">Water Value</span>';
         }
 
         const isOffline = u.avail_mw <= 0.01;
@@ -2866,6 +3062,22 @@ function renderRunningCostTable(units, avgPrice) {
             : (u.avail_mw < spec.nominal_mw)
             ? `<span style="color: #f97316; font-weight: 700;">${u.avail_mw.toFixed(1)}</span>`
             : `<span style="color: #10b981; font-weight: 700;">${u.avail_mw.toFixed(1)}</span>`;
+
+        const efficiencyHtml = spec.fuel === 'hydro'
+            ? '<span style="color:var(--text-muted); font-size:11px;">— (Reservoir)</span>'
+            : `${(spec.efficiency * 100).toFixed(1)}%`;
+
+        const fuelCostHtml = spec.fuel === 'hydro'
+            ? '<span style="color:var(--text-muted);">0.00</span>'
+            : u.fuel_cost.toFixed(2);
+
+        const carbonCostHtml = spec.fuel === 'hydro'
+            ? '<span style="color:var(--text-muted);">0.00</span>'
+            : u.carbon_cost.toFixed(2);
+
+        const totalCostHtml = spec.fuel === 'hydro'
+            ? `<span style="color:#0284c7; font-weight:700;" title="Accounting cash cost is ~1.50 €/MWh VOM; dispatched at Water Opportunity Value during peak hours">1.50 €*</span>`
+            : u.total_running_cost.toFixed(2);
 
         rowsHtml += `
         <tr style="${rowStyle}" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='${isOffline ? 'rgba(239, 68, 68, 0.02)' : 'transparent'}'">
@@ -2884,12 +3096,12 @@ function renderRunningCostTable(units, avgPrice) {
             </td>
             <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${spec.nominal_mw.toFixed(1)}</td>
             <td style="padding: 10px 12px; text-align: right; font-weight: 700;">${availMwHtml}</td>
-            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${(spec.efficiency * 100).toFixed(1)}%</td>
-            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.fuel_cost.toFixed(2)}</td>
-            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.carbon_cost.toFixed(2)}</td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${efficiencyHtml}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${fuelCostHtml}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${carbonCostHtml}</td>
             <td style="padding: 10px 12px; text-align: right; color: var(--text-muted);">${u.vom.toFixed(2)}</td>
             <td style="padding: 10px 12px; text-align: right; font-weight: 800; color: var(--accent-primary); font-size: 13px;">
-                ${u.total_running_cost.toFixed(2)}
+                ${totalCostHtml}
             </td>
             <td style="padding: 10px 12px; text-align: right;">
                 ${vsDamHtml}
