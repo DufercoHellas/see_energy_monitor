@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-07 10:26:56",
+  "timestamp": "2026-09-07 10:32:19",
   "today": "2026-09-07",
   "tomorrow": "2026-09-08",
   "is_after_dam_cutoff": false,
   "dam_cutoff_hour": 18,
-  "overall_status": "WARNING",
-  "overall_badge": "🟡",
+  "overall_status": "HEALTHY",
+  "overall_badge": "🟢",
   "summary": [],
   "spot_prices": {
     "matrix": {
@@ -2356,13 +2356,13 @@
       },
       "DE_LU": {
         "records": 9517,
-        "active_now": 176,
-        "active_unavailable_mw": 47282.9
+        "active_now": 175,
+        "active_unavailable_mw": 46355.9
       },
       "FR": {
         "records": 4609,
-        "active_now": 335,
-        "active_unavailable_mw": 107337.1
+        "active_now": 336,
+        "active_unavailable_mw": 107367.1
       },
       "IT": {
         "records": 4448,
@@ -2413,16 +2413,14 @@
   },
   "cable_outages": {},
   "commodities": {
-    "status": "warning",
-    "latest_trade_date": "2026-09-03",
-    "latest_ttf_price": 66.287,
-    "latest_eua_price": 82.38,
-    "days_lag": 4,
-    "fetch_time": "2026-09-01 09:42:18"
+    "status": "healthy",
+    "latest_trade_date": "2026-09-09",
+    "latest_ttf_price": 71.599,
+    "latest_eua_price": 83.5,
+    "days_lag": -2,
+    "fetch_time": "2026-09-07 10:28:31"
   },
   "issues_critical": [],
-  "issues_warning": [
-    "TTF/EUA commodity prices are 4 days old (latest: 2026-09-03)."
-  ],
+  "issues_warning": [],
   "issues_info": []
 }
