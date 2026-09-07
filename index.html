@@ -1353,6 +1353,19 @@ body.dark-mode [style*="color:#6b7280"] {
             </div>
         </div>
 
+        <!-- Average Running Cost -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                ⚖️ Average Running Cost
+            </div>
+            <div id="kpi_econ_avg_cost" style="font-size: 20px; font-weight: 800; color: var(--accent-primary);">
+                —
+            </div>
+            <div id="kpi_econ_avg_sub" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                Capacity Weighted: —
+            </div>
+        </div>
+
         <!-- Highest Cost Plant -->
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
@@ -1388,7 +1401,7 @@ body.dark-mode [style*="color:#6b7280"] {
                     📋 Plant Running Cost Table
                 </h3>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
-                    Sorted from lowest running cost to highest. Exact formulas: Fuel Cost = Fuel Price / η, Carbon Cost = (EUA × Emission Factor) / η.
+                    Ranked by Fuel &amp; Technology 1st, then by Capacity (MW) descending. Exact formulas: Fuel Cost = Fuel Price / η, Carbon Cost = (EUA × Emission Factor) / η.
                 </div>
             </div>
             <div>
@@ -2294,6 +2307,7 @@ const PLANT_SPECS_FALLBACK = {
       { "id": "ALIVERI V", "name": "Aliveri V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (Alstom GT26)", "nominal_mw": 417.0, "efficiency": 0.585, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
       { "id": "MEGALOPOLI V", "name": "Megalopolis V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (GE 9FB 2x1)", "nominal_mw": 811.0, "efficiency": 0.582, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
       { "id": "LAVRIO V", "name": "Lavrio V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (Alstom GT26)", "nominal_mw": 378.0, "efficiency": 0.578, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "HERON_II", "name": "Heron II (GEK TERNA - Thisvi)", "fuel": "gas", "tech": "CCGT (GE 9FB)", "nominal_mw": 435.0, "efficiency": 0.575, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
       { "id": "KORINTHOS_POWER", "name": "Korinthos Power (Motor Oil / Metlen)", "fuel": "gas", "tech": "CCGT (GE 9FB)", "nominal_mw": 433.4, "efficiency": 0.575, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
       { "id": "PROTERGIA_CC", "name": "Protergia CC (Metlen)", "fuel": "gas", "tech": "CCGT (GE 9FB)", "nominal_mw": 432.7, "efficiency": 0.565, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
       { "id": "ALOUMINIO", "name": "Alouminio CHP (Metlen)", "fuel": "gas", "tech": "CCGT Cogeneration (CHP)", "nominal_mw": 334.0, "efficiency": 0.540, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
@@ -2547,8 +2561,24 @@ function renderPlantEconomicsTab() {
         });
     });
 
-    // Sort ascending by running cost
-    calculatedUnits.sort((a, b) => a.total_running_cost - b.total_running_cost);
+    // Record Lowest & Highest cost units for KPI overview cards
+    const sortedByCost = [...calculatedUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
+    if (sortedByCost.length > 0) {
+        const lowest = sortedByCost[0];
+        const highest = sortedByCost[sortedByCost.length - 1];
+        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
+        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
+        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
+        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
+    }
+
+    // Rank 1st by Fuel & Technology, then by Capacity (MW) descending
+    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
+    calculatedUnits.sort((a, b) => {
+        const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
+        if (fuelDiff !== 0) return fuelDiff;
+        return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
+    });
 
     // Update Top Overview Cards
     const baseEl = document.getElementById("kpi_econ_power_base");
@@ -2558,8 +2588,26 @@ function renderPlantEconomicsTab() {
     const euaEl = document.getElementById("kpi_econ_eua_price");
     const lowestCostEl = document.getElementById("kpi_econ_lowest_cost");
     const lowestNameEl = document.getElementById("kpi_econ_lowest_name");
+    const avgCostEl = document.getElementById("kpi_econ_avg_cost");
+    const avgSubEl = document.getElementById("kpi_econ_avg_sub");
     const highestCostEl = document.getElementById("kpi_econ_highest_cost");
     const highestNameEl = document.getElementById("kpi_econ_highest_name");
+
+    // Compute simple average and capacity-weighted average running cost
+    let sumCost = 0;
+    let sumMw = 0;
+    let sumWeightedCost = 0;
+    calculatedUnits.forEach(u => {
+        sumCost += u.total_running_cost;
+        const mw = u.spec.nominal_mw || 0;
+        sumMw += mw;
+        sumWeightedCost += u.total_running_cost * mw;
+    });
+    const simpleAvg = calculatedUnits.length > 0 ? (sumCost / calculatedUnits.length) : 0;
+    const weightedAvg = sumMw > 0 ? (sumWeightedCost / sumMw) : 0;
+
+    if (avgCostEl) avgCostEl.innerText = `${simpleAvg.toFixed(2)} €/MWh`;
+    if (avgSubEl) avgSubEl.innerText = `Weighted: ${weightedAvg.toFixed(2)} €/MWh`;
 
     if (baseEl) baseEl.innerText = avgPrice > 0 ? `${avgPrice.toFixed(2)} €/MWh` : "— (Pending)";
     if (peakEl) peakEl.innerText = peakAvgPrice > 0 ? `Peak (08-20h): ${peakAvgPrice.toFixed(2)} €/MWh` : "Peak: —";
@@ -2567,14 +2615,7 @@ function renderPlantEconomicsTab() {
     if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
     if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
 
-    if (calculatedUnits.length > 0) {
-        const lowest = calculatedUnits[0];
-        const highest = calculatedUnits[calculatedUnits.length - 1];
-        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
-        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
-        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
-        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
-    }
+// KPI cards already updated from sortedByCost
 
     // Render Cost Stack Chart
     renderCostStackChart(calculatedUnits, avgPrice, targetDate);

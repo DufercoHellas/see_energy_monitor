@@ -86,6 +86,17 @@
         "hub_default": "VTP_GR"
       },
       {
+        "id": "HERON_II",
+        "name": "Heron II (GEK TERNA - Thisvi)",
+        "fuel": "gas",
+        "tech": "CCGT (GE 9FB)",
+        "nominal_mw": 435.0,
+        "efficiency": 0.575,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
         "id": "KORINTHOS_POWER",
         "name": "Korinthos Power (Motor Oil / Metlen)",
         "fuel": "gas",
