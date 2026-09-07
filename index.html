@@ -917,6 +917,7 @@ body.dark-mode [style*="color:#6b7280"] {
 <div class="tab">
     <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
     <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
+    <button class="tablinks" onclick="openTab(event, 'Economics')">⚡ Day-Ahead Economics</button>
     <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cable Outages</button>
     <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
     <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
@@ -1209,6 +1210,258 @@ body.dark-mode [style*="color:#6b7280"] {
             
 </div>
 
+
+
+        <!-- ── TAB: Day-Ahead Plant Economics ── -->
+        <!-- ── TAB: Day-Ahead Plant Running Costs ── -->
+<div id="Economics" class="tabcontent" style="display: none;">
+    <!-- Tab Top Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px 0; letter-spacing: -0.4px; display: flex; align-items: center; gap: 8px;">
+                <span>⚡</span> Day-Ahead Thermal Plant Running Costs
+            </h2>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+                Breakdown of fuel, carbon, and operational running costs (€/MWh) for each thermal power plant based on Day-Ahead commodity prices.
+            </div>
+        </div>
+
+        <button type="button" class="btn-inspect-health" onclick="openEconomicsFormulaModal()" style="display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 5px 10px; font-weight: 600; cursor: pointer;">
+            <span>📐</span> Formula &amp; Efficiencies
+        </button>
+    </div>
+
+    <!-- Filter & Commodity Inputs -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
+            <!-- Day-Ahead Date Selector -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="econ_date" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    📅 Date
+                </label>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="date" id="econ_date" onchange="renderPlantEconomicsTab()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit;">
+                    <button type="button" onclick="setEconDatePreset('today')" class="inner-tablinks" style="padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer;">Today</button>
+                    <button type="button" onclick="setEconDatePreset('tomorrow')" class="inner-tablinks" style="padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer;">D+1 (Tomorrow)</button>
+                    <button type="button" onclick="setEconDatePreset('yesterday')" class="inner-tablinks" style="padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer;">Yesterday</button>
+                </div>
+            </div>
+
+            <!-- Country Selector -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="econ_country" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    🌍 Country
+                </label>
+                <select id="econ_country" onchange="onEconCountryChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;">
+                    <option value="GR" selected>🇬🇷 Greece</option>
+                    <option value="IT">🇮🇹 Italy</option>
+                    <option value="BG">🇧🇬 Bulgaria</option>
+                    <option value="DE_LU">🇩🇪 Germany</option>
+                    <option value="RO">🇷🇴 Romania</option>
+                    <option value="HU">🇭🇺 Hungary</option>
+                </select>
+            </div>
+
+            <!-- Gas Hub Basis Selector -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="econ_gas_hub" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    🔥 Gas Hub
+                </label>
+                <select id="econ_gas_hub" onchange="renderPlantEconomicsTab()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit; cursor: pointer;">
+                    <option value="VTP_GR" selected>Greece VTP (TTF + €2.20)</option>
+                    <option value="TTF">Dutch TTF Spot (€0.00)</option>
+                    <option value="PSV_IT">Italy PSV (TTF + €1.50)</option>
+                    <option value="THE_DE">Germany THE (TTF + €0.40)</option>
+                    <option value="BG_VTP">Bulgaria VTP (TTF + €2.50)</option>
+                </select>
+            </div>
+
+            <!-- Lignite Extraction Cost Benchmark -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <label for="econ_lignite_cost" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    ⛏️ Lignite Fuel Cost
+                </label>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="number" id="econ_lignite_cost" step="0.5" value="18.00" onchange="renderPlantEconomicsTab()" style="width: 75px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit;">
+                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">€/MWh_th</span>
+                </div>
+            </div>
+
+            <!-- Price Status Badge -->
+            <div style="margin-left: auto; text-align: right;">
+                <span id="econ_status_badge" class="health-status-badge badge-healthy" style="font-size: 11px; padding: 3px 8px;">
+                    🟢 Cleared Day-Ahead
+                </span>
+                <div id="econ_price_updated_info" style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                    Prices from x.spot_prices &amp; x.ttf_prices
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Commodity & Benchmark Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        <!-- Day-Ahead Power Price -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                ⚡ Day-Ahead Baseload
+            </div>
+            <div id="kpi_econ_power_base" style="font-size: 20px; font-weight: 800; color: #2563eb;">
+                —
+            </div>
+            <div id="kpi_econ_power_peak" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                Peak (08-20h): —
+            </div>
+        </div>
+
+        <!-- Gas Price -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                🔥 Gas Price
+            </div>
+            <div id="kpi_econ_gas_price" style="font-size: 20px; font-weight: 800; color: #d97706;">
+                —
+            </div>
+            <div id="kpi_econ_gas_basis" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                TTF: —
+            </div>
+        </div>
+
+        <!-- EUA Carbon Price -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                🌿 Carbon EUA
+            </div>
+            <div id="kpi_econ_eua_price" style="font-size: 20px; font-weight: 800; color: #059669;">
+                —
+            </div>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                EU ETS benchmark
+            </div>
+        </div>
+
+        <!-- Lowest Cost Plant -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                🥇 Lowest Running Cost
+            </div>
+            <div id="kpi_econ_lowest_cost" style="font-size: 20px; font-weight: 800; color: #10b981;">
+                —
+            </div>
+            <div id="kpi_econ_lowest_name" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                —
+            </div>
+        </div>
+
+        <!-- Highest Cost Plant -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
+                🔺 Highest Running Cost
+            </div>
+            <div id="kpi_econ_highest_cost" style="font-size: 20px; font-weight: 800; color: #ef4444;">
+                —
+            </div>
+            <div id="kpi_econ_highest_name" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
+                —
+            </div>
+        </div>
+    </div>
+
+    <!-- Running Cost Breakdown Chart -->
+    <div class="chart-wrapper" style="padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: var(--shadow-sm); margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                📊 Plant Running Cost Stack (€/MWh) vs. Day-Ahead Price
+            </h3>
+            <div style="font-size: 11px; color: var(--text-muted);">
+                Bars show Fuel Cost + Carbon Cost + VOM per MWh produced
+            </div>
+        </div>
+        <div id="plot_econ_cost_stack" style="width: 100%; height: 360px;"></div>
+    </div>
+
+    <!-- Plant Running Cost Table -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                    📋 Plant Running Cost Table
+                </h3>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                    Sorted from lowest running cost to highest. Exact formulas: Fuel Cost = Fuel Price / η, Carbon Cost = (EUA × Emission Factor) / η.
+                </div>
+            </div>
+            <div>
+                <input type="text" id="econ_table_filter" oninput="filterEconTable()" placeholder="🔍 Filter plant..." style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 5px 10px; border-radius: 6px; font-size: 12px; font-family: inherit;">
+            </div>
+        </div>
+
+        <div class="table-container" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: inherit;">
+                <thead>
+                    <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
+                        <th style="padding: 10px 12px; font-weight: 700;">#</th>
+                        <th style="padding: 10px 12px; font-weight: 700;">Plant Name</th>
+                        <th style="padding: 10px 12px; font-weight: 700;">Fuel &amp; Technology</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Capacity (MW)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Net Efficiency η</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Fuel Cost (€/MWh)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Carbon Cost (€/MWh)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">VOM (€/MWh)</th>
+                        <th style="padding: 10px 12px; font-weight: 800; text-align: right; color: var(--accent-primary); font-size: 13px;">Total Running Cost (€/MWh)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">vs. DAM Base</th>
+                    </tr>
+                </thead>
+                <tbody id="econ_merit_tbody">
+                    <!-- Populated dynamically by tab_economics.js -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ── FORMULA & EFFICIENCIES MODAL ── -->
+<div id="econ_formula_modal" class="health-modal-backdrop" style="display: none;" onclick="closeEconomicsFormulaModal()">
+    <div class="health-modal-dialog" onclick="event.stopPropagation()" style="max-width: 650px;">
+        <div class="health-modal-header">
+            <h3 style="margin: 0; font-size: 17px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📐</span> Plant Running Cost Formulas (SRMC)
+            </h3>
+            <button class="health-modal-close" onclick="closeEconomicsFormulaModal()">&times;</button>
+        </div>
+
+        <div class="health-modal-body" style="line-height: 1.6; font-size: 13px; color: var(--text-primary);">
+            <div style="margin-bottom: 14px; background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <strong style="color: var(--accent-primary);">1. Gas Plant Running Cost Formula:</strong>
+                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
+                    Running Cost (€/MWh) = (Gas_Price / η) + (EUA × 0.202 / η) + VOM
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    • <strong>0.202 tCO2/MWh_th:</strong> Natural gas stoichiometric emission factor.<br>
+                    • <strong>η:</strong> Plant net electrical efficiency (e.g. 63.5% Komotini Power, 63.0% Ag. Nikolaos II, 58.2% Megalopolis V, 52.5% Lavrio IV).<br>
+                    • <strong>VOM:</strong> Variable Operation &amp; Maintenance (€2.50/MWh).
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <strong style="color: var(--accent-primary);">2. Lignite Plant Running Cost Formula:</strong>
+                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
+                    Running Cost (€/MWh) = (Lignite_Cost / η) + (EUA × 0.400 / η) + VOM
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    • <strong>0.400 tCO2/MWh_th:</strong> Greek lignite carbon intensity (~0.96 t/MWh_e for Ptolemaida V).<br>
+                    • <strong>Lignite Fuel Cost:</strong> €18.00/MWh_th (PPC audited mine-mouth cost).<br>
+                    • <strong>η:</strong> 41.5% (Ptolemaida V Ultra-supercritical), 34.0% (Ag. Dimitrios / Megalopolis IV).<br>
+                    • <strong>VOM:</strong> €4.50/MWh.
+                </div>
+            </div>
+        </div>
+
+        <div class="health-modal-footer">
+            <button class="btn-modal-close-action" onclick="closeEconomicsFormulaModal()">Close</button>
+        </div>
+    </div>
+</div>
 
 
         <!-- ── TAB: Cables ── -->
@@ -1681,6 +1934,9 @@ function openTab(evt, tabName) {
     if (tabName === 'EUMap') {
         initEUMap();
     }
+    if (tabName === 'Economics') {
+        if (typeof renderPlantEconomicsTab === 'function') renderPlantEconomicsTab();
+    }
     if (tabName === 'Analogues') {
         if (typeof findAnalogues === 'function' && (!currentTop7 || currentTop7.length === 0)) {
             findAnalogues();
@@ -2016,6 +2272,469 @@ function getRealizedPriceWithFallback(c, h, date) {
     else if (c === 'DE_LU' && historicalData['DE'])      prices = historicalData['DE']?.[date]?.prices;
     else return 0.0;
     return (prices && prices[h] > 0) ? prices[h] : 0.0;
+}
+
+
+// === tab_economics.js ===
+// === tab_economics.js ===
+// Day-Ahead Thermal Plant Running Cost Calculator (SRMC)
+
+const PLANT_SPECS_FALLBACK = {
+  "hubs": {
+    "TTF": { "name": "Dutch TTF Spot", "basis_eur": 0.0 },
+    "VTP_GR": { "name": "Greece DESFA VTP (TTF + €2.20)", "basis_eur": 2.20 },
+    "PSV_IT": { "name": "Italy PSV Hub (TTF + €1.50)", "basis_eur": 1.50 },
+    "THE_DE": { "name": "Germany THE Hub (TTF + €0.40)", "basis_eur": 0.40 },
+    "BG_VTP": { "name": "Bulgaria VTP (TTF + €2.50)", "basis_eur": 2.50 }
+  },
+  "plants": {
+    "GR": [
+      { "id": "KOMOTINI_POWER", "name": "Komotini Power (GEK TERNA / Motor Oil)", "fuel": "gas", "tech": "CCGT (Siemens SGT5-9000HL)", "nominal_mw": 858.0, "efficiency": 0.635, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "AG_NIKOLAOS2", "name": "Agios Nikolaos II (Metlen Energy)", "fuel": "gas", "tech": "CCGT (Ansaldo GT36)", "nominal_mw": 803.0, "efficiency": 0.630, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "ALIVERI V", "name": "Aliveri V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (Alstom GT26)", "nominal_mw": 417.0, "efficiency": 0.585, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "MEGALOPOLI V", "name": "Megalopolis V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (GE 9FB 2x1)", "nominal_mw": 811.0, "efficiency": 0.582, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "LAVRIO V", "name": "Lavrio V (PPC / DEI)", "fuel": "gas", "tech": "CCGT (Alstom GT26)", "nominal_mw": 378.0, "efficiency": 0.578, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "KORINTHOS_POWER", "name": "Korinthos Power (Motor Oil / Metlen)", "fuel": "gas", "tech": "CCGT (GE 9FB)", "nominal_mw": 433.4, "efficiency": 0.575, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "PROTERGIA_CC", "name": "Protergia CC (Metlen)", "fuel": "gas", "tech": "CCGT (GE 9FB)", "nominal_mw": 432.7, "efficiency": 0.565, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "ALOUMINIO", "name": "Alouminio CHP (Metlen)", "fuel": "gas", "tech": "CCGT Cogeneration (CHP)", "nominal_mw": 334.0, "efficiency": 0.540, "emission_factor": 0.202, "vom": 2.50, "hub_default": "VTP_GR" },
+      { "id": "LAVRIO IV", "name": "Lavrio IV (PPC / DEI)", "fuel": "gas", "tech": "CCGT (ABB GT13E2)", "nominal_mw": 536.0, "efficiency": 0.525, "emission_factor": 0.202, "vom": 2.75, "hub_default": "VTP_GR" },
+      { "id": "KOMOTINI", "name": "Komotini CCGT (PPC / DEI)", "fuel": "gas", "tech": "CCGT (Alstom GT13E2)", "nominal_mw": 472.0, "efficiency": 0.520, "emission_factor": 0.202, "vom": 2.75, "hub_default": "VTP_GR" },
+      { "id": "PTOLEMAIDA5", "name": "Ptolemaida V (PPC / DEI)", "fuel": "lignite", "tech": "Ultra-supercritical Lignite", "nominal_mw": 616.0, "efficiency": 0.415, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "AGIOS DIMITRIOS V", "name": "Agios Dimitrios V (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 342.0, "efficiency": 0.345, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "AGIOS DIMITRIOS IV", "name": "Agios Dimitrios IV (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 283.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "AGIOS DIMITRIOS III", "name": "Agios Dimitrios III (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 283.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "AGIOS DIMITRIOS II", "name": "Agios Dimitrios II (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 274.0, "efficiency": 0.335, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "AGIOS DIMITRIOS I", "name": "Agios Dimitrios I (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 274.0, "efficiency": 0.335, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 },
+      { "id": "MEGALOPOLI IV", "name": "Megalopolis IV (PPC / DEI)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 256.0, "efficiency": 0.340, "emission_factor": 0.400, "fuel_cost_th": 18.00, "vom": 4.50 }
+    ],
+    "IT": [
+      { "id": "IT_CCGT_CLASS_H", "name": "Porto Marghera / Tavazzano", "fuel": "gas", "tech": "CCGT Class H (Ansaldo GT36)", "nominal_mw": 800.0, "efficiency": 0.630, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
+      { "id": "IT_CCGT_TURBIGO", "name": "Turbigo 4 (Iren / Ansaldo GT36)", "fuel": "gas", "tech": "CCGT (Ansaldo GT36)", "nominal_mw": 850.0, "efficiency": 0.605, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
+      { "id": "IT_CCGT_MODERN_F", "name": "Italian CCGT Fleet Benchmark 58%", "fuel": "gas", "tech": "CCGT Modern Class F", "nominal_mw": 750.0, "efficiency": 0.580, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
+      { "id": "IT_CCGT_STANDARD_F", "name": "Italian CCGT Standard 55% (Enel / Eni)", "fuel": "gas", "tech": "CCGT Standard Class F", "nominal_mw": 400.0, "efficiency": 0.550, "emission_factor": 0.202, "vom": 2.75, "hub_default": "PSV_IT" },
+      { "id": "IT_CCGT_OLDER", "name": "Italian CCGT Older / Cogen 50%", "fuel": "gas", "tech": "CCGT Early Generation", "nominal_mw": 350.0, "efficiency": 0.500, "emission_factor": 0.202, "vom": 3.00, "hub_default": "PSV_IT" },
+      { "id": "IT_COAL_USC", "name": "Torrevaldaliga Nord / Brindisi Sud (Enel)", "fuel": "coal", "tech": "Hard Coal Supercritical", "nominal_mw": 660.0, "efficiency": 0.410, "emission_factor": 0.340, "fuel_cost_th": 16.00, "vom": 3.50 }
+    ],
+    "BG": [
+      { "id": "AES_MI1", "name": "AES Galabovo (Maritsa East 1)", "fuel": "lignite", "tech": "CFB Lignite", "nominal_mw": 686.0, "efficiency": 0.380, "emission_factor": 0.410, "fuel_cost_th": 16.00, "vom": 4.00 },
+      { "id": "TPP_MI_2", "name": "Maritsa East 2 (Units 1-8)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 1610.0, "efficiency": 0.340, "emission_factor": 0.430, "fuel_cost_th": 16.00, "vom": 4.50 },
+      { "id": "TEC_BOBOVDOL_EAD", "name": "Bobov Dol (Units 1-3)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 570.0, "efficiency": 0.330, "emission_factor": 0.430, "fuel_cost_th": 16.00, "vom": 4.50 },
+      { "id": "BG_CCGT_BENCHMARK", "name": "Bulgaria CCGT Benchmark 58%", "fuel": "gas", "tech": "CCGT Class F", "nominal_mw": 400.0, "efficiency": 0.580, "emission_factor": 0.202, "vom": 2.50, "hub_default": "BG_VTP" }
+    ],
+    "DE_LU": [
+      { "id": "DE_CCGT_MODERN", "name": "German CCGT Modern 60%", "fuel": "gas", "tech": "CCGT Class H (SGT5-8000H)", "nominal_mw": 800.0, "efficiency": 0.600, "emission_factor": 0.202, "vom": 2.50, "hub_default": "THE_DE" },
+      { "id": "DE_CCGT_STANDARD", "name": "German CCGT Standard 55%", "fuel": "gas", "tech": "CCGT Standard Class F", "nominal_mw": 450.0, "efficiency": 0.550, "emission_factor": 0.202, "vom": 2.75, "hub_default": "THE_DE" },
+      { "id": "DE_LIGNITE_BOA", "name": "Lignite BoA (Neurath / Niederaußem)", "fuel": "lignite", "tech": "Lignite BoA Supercritical", "nominal_mw": 1050.0, "efficiency": 0.430, "emission_factor": 0.390, "fuel_cost_th": 15.00, "vom": 4.00 },
+      { "id": "DE_LIGNITE_LEAG", "name": "Lignite Standard (Boxberg / LEAG)", "fuel": "lignite", "tech": "Lignite Subcritical", "nominal_mw": 800.0, "efficiency": 0.380, "emission_factor": 0.410, "fuel_cost_th": 15.00, "vom": 4.50 },
+      { "id": "DE_COAL_DATTELN", "name": "Hard Coal USC (Datteln 4 / Uniper)", "fuel": "coal", "tech": "Hard Coal Ultra-Supercritical", "nominal_mw": 1052.0, "efficiency": 0.450, "emission_factor": 0.335, "fuel_cost_th": 16.00, "vom": 3.20 },
+      { "id": "DE_COAL_STANDARD", "name": "German Hard Coal Standard 38%", "fuel": "coal", "tech": "Hard Coal Subcritical", "nominal_mw": 600.0, "efficiency": 0.380, "emission_factor": 0.340, "fuel_cost_th": 16.00, "vom": 3.50 }
+    ],
+    "RO": [
+      { "id": "RO_CCGT_BRAZI", "name": "OMV Petrom Brazi CCGT", "fuel": "gas", "tech": "CCGT (GE 9FB 2x1)", "nominal_mw": 860.0, "efficiency": 0.570, "emission_factor": 0.202, "vom": 2.50, "hub_default": "TTF" },
+      { "id": "RO_LIGNITE_OLTENIA", "name": "CE Oltenia (Rovinari / Turceni)", "fuel": "lignite", "tech": "Lignite Subcritical 330MW", "nominal_mw": 660.0, "efficiency": 0.330, "emission_factor": 0.420, "fuel_cost_th": 17.00, "vom": 4.50 }
+    ],
+    "HU": [
+      { "id": "HU_CCGT_DUNAMENTI", "name": "Dunamenti CCGT (MET Group)", "fuel": "gas", "tech": "CCGT Class F", "nominal_mw": 400.0, "efficiency": 0.560, "emission_factor": 0.202, "vom": 2.50, "hub_default": "TTF" },
+      { "id": "HU_LIGNITE_MATRA", "name": "Mátra Lignite (MVM)", "fuel": "lignite", "tech": "Lignite Subcritical", "nominal_mw": 440.0, "efficiency": 0.320, "emission_factor": 0.430, "fuel_cost_th": 17.00, "vom": 4.50 }
+    ]
+  }
+};
+
+let plantSpecsData = PLANT_SPECS_FALLBACK;
+
+function initPlantEconomics() {
+    fetch('data/plant_specs_reference.json')
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.plants) {
+                plantSpecsData = data;
+            }
+        })
+        .catch(() => {
+            plantSpecsData = PLANT_SPECS_FALLBACK;
+        })
+        .finally(() => {
+            initEconDateDefault();
+        });
+}
+
+function initEconDateDefault() {
+    const dateInput = document.getElementById("econ_date");
+    if (dateInput && !dateInput.value) {
+        const todayStr = new Date().toISOString().slice(0, 10);
+        dateInput.value = todayStr;
+    }
+}
+
+function setEconDatePreset(preset) {
+    const dateInput = document.getElementById("econ_date");
+    if (!dateInput) return;
+    const now = new Date();
+
+    if (preset === 'today') {
+        dateInput.value = now.toISOString().slice(0, 10);
+    } else if (preset === 'tomorrow') {
+        now.setDate(now.getDate() + 1);
+        dateInput.value = now.toISOString().slice(0, 10);
+    } else if (preset === 'yesterday') {
+        now.setDate(now.getDate() - 1);
+        dateInput.value = now.toISOString().slice(0, 10);
+    }
+    renderPlantEconomicsTab();
+}
+
+function onEconCountryChange() {
+    const country = document.getElementById("econ_country").value;
+    const hubSelect = document.getElementById("econ_gas_hub");
+    if (hubSelect) {
+        if (country === 'GR') hubSelect.value = 'VTP_GR';
+        else if (country === 'IT') hubSelect.value = 'PSV_IT';
+        else if (country === 'DE_LU' || country === 'DE') hubSelect.value = 'THE_DE';
+        else if (country === 'BG') hubSelect.value = 'BG_VTP';
+        else hubSelect.value = 'TTF';
+    }
+    renderPlantEconomicsTab();
+}
+
+function openEconomicsFormulaModal() {
+    const modal = document.getElementById("econ_formula_modal");
+    if (modal) modal.style.display = "flex";
+}
+
+function closeEconomicsFormulaModal() {
+    const modal = document.getElementById("econ_formula_modal");
+    if (modal) modal.style.display = "none";
+}
+
+// ── Main Render Function ───────────────────────────────────────────────────
+function renderPlantEconomicsTab() {
+    const dateInput = document.getElementById("econ_date");
+    const countrySelect = document.getElementById("econ_country");
+    const hubSelect = document.getElementById("econ_gas_hub");
+    const ligniteInput = document.getElementById("econ_lignite_cost");
+
+    if (!dateInput || !countrySelect || !hubSelect) return;
+
+    let targetDate = dateInput.value;
+    if (!targetDate) {
+        targetDate = new Date().toISOString().slice(0, 10);
+        dateInput.value = targetDate;
+    }
+
+    const country = countrySelect.value || 'GR';
+    const hubKey = hubSelect.value || 'TTF';
+    const ligniteCostTh = parseFloat(ligniteInput ? ligniteInput.value : 18.0) || 18.0;
+
+    // Hub Basis
+    const hubConfig = (plantSpecsData.hubs && plantSpecsData.hubs[hubKey]) || { name: 'TTF', basis_eur: 0.0 };
+    const hubBasis = hubConfig.basis_eur || 0.0;
+
+    // Fetch Commodity Prices (TTF & EUA) from historicalData
+    let ttfPrice = 0.0;
+    let euaPrice = 0.0;
+    let spotPrices = [];
+    let avgPrice = 0.0;
+    let isCleared = false;
+
+    if (window.historicalData) {
+        const countryData = window.historicalData[country] || window.historicalData['GR'] || window.historicalData['DE_LU'] || {};
+        let entry = countryData[targetDate];
+
+        if (!entry || !entry.ttf_price || !entry.eua_price) {
+            const allDates = Object.keys(countryData).sort();
+            for (let i = allDates.length - 1; i >= 0; i--) {
+                const d = allDates[i];
+                if (d <= targetDate && countryData[d] && countryData[d].ttf_price > 0) {
+                    ttfPrice = countryData[d].ttf_price;
+                    euaPrice = countryData[d].eua_price;
+                    break;
+                }
+            }
+        } else {
+            ttfPrice = entry.ttf_price;
+            euaPrice = entry.eua_price;
+        }
+
+        const exactCountryData = window.historicalData[country] || {};
+        if (exactCountryData[targetDate] && exactCountryData[targetDate].prices) {
+            const pr = exactCountryData[targetDate].prices;
+            if (pr.some(p => p > 0.01)) {
+                spotPrices = pr;
+                avgPrice = exactCountryData[targetDate].average_price || (pr.reduce((a,b)=>a+b,0) / pr.length);
+                isCleared = true;
+            }
+        }
+    }
+
+    if (ttfPrice <= 0) ttfPrice = 71.60;
+    if (euaPrice <= 0) euaPrice = 83.50;
+
+    const effectiveGasPrice = ttfPrice + hubBasis;
+
+    if (!isCleared || spotPrices.length !== 24) {
+        isCleared = false;
+        if (typeof window.getAnalogueForecastPrices === 'function') {
+            spotPrices = window.getAnalogueForecastPrices(country, targetDate) || [];
+        }
+        if (spotPrices && spotPrices.length === 24 && spotPrices.some(p => p > 0.01)) {
+            avgPrice = spotPrices.reduce((a,b)=>a+b,0) / 24;
+        } else {
+            avgPrice = 0.0;
+        }
+    }
+
+    // Peak power price (hours 9 to 20)
+    let peakAvgPrice = 0.0;
+    if (spotPrices && spotPrices.length === 24 && isCleared) {
+        const peakPrices = spotPrices.slice(8, 20);
+        peakAvgPrice = peakPrices.reduce((a, b) => a + b, 0) / peakPrices.length;
+    }
+
+    // Status Badge
+    const badgeEl = document.getElementById("econ_status_badge");
+    const infoEl = document.getElementById("econ_price_updated_info");
+    if (badgeEl) {
+        if (isCleared) {
+            badgeEl.className = "health-status-badge badge-healthy";
+            badgeEl.innerHTML = "🟢 Cleared Day-Ahead";
+            if (infoEl) infoEl.innerText = `Spot & commodity prices for ${targetDate}`;
+        } else {
+            badgeEl.className = "health-status-badge badge-pending";
+            badgeEl.innerHTML = "⏳ Pre-Auction (Awaiting Clearing)";
+            if (infoEl) infoEl.innerText = "Running costs computed from latest gas/carbon";
+        }
+    }
+
+    // Calculate Running Cost for each thermal plant
+    const plantList = (plantSpecsData.plants && plantSpecsData.plants[country]) || (PLANT_SPECS_FALLBACK.plants[country]) || [];
+    const calculatedUnits = [];
+
+    plantList.forEach(spec => {
+        const nominal = spec.nominal_mw || 0;
+        const vom = spec.vom || 2.50;
+        const eta = spec.efficiency || 0.55;
+
+        let fuelCostEur = 0;
+        let carbonCostEur = 0;
+
+        if (spec.fuel === 'gas') {
+            const plantHubKey = spec.hub_default || hubKey;
+            const plantHubBasis = (plantSpecsData.hubs && plantSpecsData.hubs[plantHubKey]) ? plantSpecsData.hubs[plantHubKey].basis_eur : hubBasis;
+            const plantGasPrice = ttfPrice + plantHubBasis;
+
+            fuelCostEur = plantGasPrice / eta;
+            carbonCostEur = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+        } else if (spec.fuel === 'lignite') {
+            const ligCostTh = spec.fuel_cost_th || ligniteCostTh;
+            fuelCostEur = ligCostTh / eta;
+            carbonCostEur = (euaPrice * (spec.emission_factor || 0.400)) / eta;
+        } else if (spec.fuel === 'coal') {
+            const coalCostTh = spec.fuel_cost_th || 16.00;
+            fuelCostEur = coalCostTh / eta;
+            carbonCostEur = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+        }
+
+        const totalRunningCost = fuelCostEur + carbonCostEur + vom;
+        const diffToDam = avgPrice > 0 ? (totalRunningCost - avgPrice) : null;
+
+        calculatedUnits.push({
+            spec: spec,
+            fuel_cost: fuelCostEur,
+            carbon_cost: carbonCostEur,
+            vom: vom,
+            total_running_cost: totalRunningCost,
+            diff_to_dam: diffToDam
+        });
+    });
+
+    // Sort ascending by running cost
+    calculatedUnits.sort((a, b) => a.total_running_cost - b.total_running_cost);
+
+    // Update Top Overview Cards
+    const baseEl = document.getElementById("kpi_econ_power_base");
+    const peakEl = document.getElementById("kpi_econ_power_peak");
+    const gasEl = document.getElementById("kpi_econ_gas_price");
+    const gasBasisEl = document.getElementById("kpi_econ_gas_basis");
+    const euaEl = document.getElementById("kpi_econ_eua_price");
+    const lowestCostEl = document.getElementById("kpi_econ_lowest_cost");
+    const lowestNameEl = document.getElementById("kpi_econ_lowest_name");
+    const highestCostEl = document.getElementById("kpi_econ_highest_cost");
+    const highestNameEl = document.getElementById("kpi_econ_highest_name");
+
+    if (baseEl) baseEl.innerText = avgPrice > 0 ? `${avgPrice.toFixed(2)} €/MWh` : "— (Pending)";
+    if (peakEl) peakEl.innerText = peakAvgPrice > 0 ? `Peak (08-20h): ${peakAvgPrice.toFixed(2)} €/MWh` : "Peak: —";
+    if (gasEl) gasEl.innerText = `${effectiveGasPrice.toFixed(2)} €/MWh`;
+    if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
+    if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
+
+    if (calculatedUnits.length > 0) {
+        const lowest = calculatedUnits[0];
+        const highest = calculatedUnits[calculatedUnits.length - 1];
+        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
+        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
+        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
+        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
+    }
+
+    // Render Cost Stack Chart
+    renderCostStackChart(calculatedUnits, avgPrice, targetDate);
+
+    // Render Plant Table
+    renderRunningCostTable(calculatedUnits, avgPrice);
+}
+
+// ── Chart: Running Cost Stack ──────────────────────────────────────────────
+function renderCostStackChart(units, avgPrice, targetDate) {
+    const container = document.getElementById("plot_econ_cost_stack");
+    if (!container || !window.Plotly) return;
+
+    if (!units || units.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);">No thermal generating units found.</div>';
+        return;
+    }
+
+    const plantNames = units.map(u => u.spec.name.replace(/\(.*?\)/g, '').trim());
+    const fuelCosts = units.map(u => u.fuel_cost);
+    const carbonCosts = units.map(u => u.carbon_cost);
+    const vomCosts = units.map(u => u.vom);
+
+    const traces = [
+        {
+            x: plantNames,
+            y: fuelCosts,
+            name: 'Fuel Cost (€/MWh)',
+            type: 'bar',
+            marker: { color: '#f59e0b' },
+            hovertemplate: '<b>%{x}</b><br>Fuel: <b>%{y:.2f} €/MWh</b><extra></extra>'
+        },
+        {
+            x: plantNames,
+            y: carbonCosts,
+            name: 'Carbon Cost (€/MWh)',
+            type: 'bar',
+            marker: { color: '#10b981' },
+            hovertemplate: '<b>%{x}</b><br>Carbon: <b>%{y:.2f} €/MWh</b><extra></extra>'
+        },
+        {
+            x: plantNames,
+            y: vomCosts,
+            name: 'VOM (€/MWh)',
+            type: 'bar',
+            marker: { color: '#6366f1' },
+            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><extra></extra>'
+        }
+    ];
+
+    // Reference horizontal line for Day-Ahead Base Price
+    const shapes = [];
+    if (avgPrice > 0) {
+        shapes.push({
+            type: 'line',
+            xref: 'paper',
+            x0: 0,
+            x1: 1,
+            y0: avgPrice,
+            y1: avgPrice,
+            line: {
+                color: '#2563eb',
+                width: 2.5,
+                dash: 'dash'
+            }
+        });
+    }
+
+    const layout = getPlotlyThemeLayout({
+        barmode: 'stack',
+        title: {
+            text: `Plant Running Cost Breakdown (€/MWh) — ${targetDate}${avgPrice > 0 ? ` (DAM Base: ${avgPrice.toFixed(2)} €/MWh)` : ''}`,
+            font: { size: 14, weight: 700 }
+        },
+        xaxis: {
+            tickangle: -30,
+            tickfont: { size: 10 }
+        },
+        yaxis: {
+            title: 'Running Cost (€/MWh)',
+            showgrid: true
+        },
+        legend: {
+            orientation: 'h',
+            y: 1.15,
+            x: 0.0
+        },
+        shapes: shapes,
+        margin: { l: 50, r: 25, t: 55, b: 90 }
+    });
+
+    Plotly.react(container, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+// ── Table: Running Cost Table ──────────────────────────────────────────────
+function renderRunningCostTable(units, avgPrice) {
+    const tbody = document.getElementById("econ_merit_tbody");
+    if (!tbody) return;
+
+    if (!units || units.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:var(--text-muted);">No thermal generating units found.</td></tr>';
+        return;
+    }
+
+    let rowsHtml = '';
+    units.forEach((u, idx) => {
+        const spec = u.spec;
+        const fuelBadge = spec.fuel === 'gas' 
+            ? '<span style="background:rgba(217,119,6,0.15); color:#d97706; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🔥 Gas</span>'
+            : spec.fuel === 'lignite'
+            ? '<span style="background:rgba(139,92,246,0.15); color:#8b5cf6; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">⛏️ Lignite</span>'
+            : '<span style="background:rgba(100,116,139,0.15); color:#64748b; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🪨 Coal</span>';
+
+        let vsDamHtml = '—';
+        if (avgPrice > 0 && u.diff_to_dam !== null) {
+            const diff = u.diff_to_dam;
+            if (diff <= 0) {
+                vsDamHtml = `<span style="color:#10b981; font-weight:700;">${diff.toFixed(2)} € (Lower)</span>`;
+            } else {
+                vsDamHtml = `<span style="color:#ef4444; font-weight:700;">+${diff.toFixed(2)} € (Higher)</span>`;
+            }
+        }
+
+        rowsHtml += `
+        <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.15s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 10px 12px; font-weight: 700; color: var(--text-muted);">${idx + 1}</td>
+            <td style="padding: 10px 12px; font-weight: 700; color: var(--text-primary);">
+                ${spec.name}
+            </td>
+            <td style="padding: 10px 12px;">
+                <div style="display:flex; align-items:center; gap:6px;">
+                    ${fuelBadge}
+                    <span style="font-size:11px; color:var(--text-secondary);">${spec.tech}</span>
+                </div>
+            </td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-primary);">${spec.nominal_mw.toFixed(1)}</td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${(spec.efficiency * 100).toFixed(1)}%</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.fuel_cost.toFixed(2)}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.carbon_cost.toFixed(2)}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-muted);">${u.vom.toFixed(2)}</td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 800; color: var(--accent-primary); font-size: 13px;">
+                ${u.total_running_cost.toFixed(2)}
+            </td>
+            <td style="padding: 10px 12px; text-align: right;">
+                ${vsDamHtml}
+            </td>
+        </tr>
+        `;
+    });
+
+    tbody.innerHTML = rowsHtml;
+}
+
+function filterEconTable() {
+    const query = (document.getElementById("econ_table_filter")?.value || "").toLowerCase().trim();
+    const rows = document.querySelectorAll("#econ_merit_tbody tr");
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? "" : "none";
+    });
 }
 
 
@@ -8995,6 +9714,9 @@ async function initDashboardData() {
                         console.error("Init error:", e);
                     }
                     renderDashboard();
+                    if (typeof initPlantEconomics === 'function') {
+                        initPlantEconomics();
+                    }
 
                     // Hide loading mask cleanly
                     const mask = document.getElementById("loading_mask");
@@ -9059,6 +9781,7 @@ async function initDashboardData() {
                     }
                     if (typeof renderTargetHourlyChart === 'function') renderTargetHourlyChart();
                     if (typeof renderRegionalContextFlows === 'function') renderRegionalContextFlows();
+                    if (typeof renderPlantEconomicsTab === 'function') renderPlantEconomicsTab();
                 } catch (e) {
                     console.error("Error refreshing theme charts:", e);
                 }

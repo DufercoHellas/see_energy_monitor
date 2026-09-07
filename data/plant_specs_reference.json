@@ -1,0 +1,452 @@
+{
+  "hubs": {
+    "TTF": {
+      "name": "Dutch TTF Hub (Base)",
+      "basis_eur": 0.0
+    },
+    "VTP_GR": {
+      "name": "Greece DESFA VTP (TTF + €2.20 entry/tariff)",
+      "basis_eur": 2.2
+    },
+    "PSV_IT": {
+      "name": "Italy PSV Hub (TTF + €1.50)",
+      "basis_eur": 1.5
+    },
+    "THE_DE": {
+      "name": "Germany THE Hub (TTF + €0.40)",
+      "basis_eur": 0.4
+    },
+    "BG_VTP": {
+      "name": "Bulgaria Bulgartransgaz VTP (TTF + €2.50)",
+      "basis_eur": 2.5
+    }
+  },
+  "emission_factors": {
+    "gas": 0.202,
+    "lignite_gr": 0.4,
+    "lignite_bg": 0.425,
+    "lignite_de": 0.4,
+    "hard_coal": 0.34
+  },
+  "plants": {
+    "GR": [
+      {
+        "id": "KOMOTINI_POWER",
+        "name": "Komotini Power (GEK TERNA / Motor Oil)",
+        "fuel": "gas",
+        "tech": "CCGT (Siemens SGT5-9000HL)",
+        "nominal_mw": 858.0,
+        "efficiency": 0.635,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "AG_NIKOLAOS2",
+        "name": "Agios Nikolaos II (Metlen Energy & Metals)",
+        "fuel": "gas",
+        "tech": "CCGT (Ansaldo GT36)",
+        "nominal_mw": 803.0,
+        "efficiency": 0.63,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "ALIVERI V",
+        "name": "Aliveri V (PPC / DEI)",
+        "fuel": "gas",
+        "tech": "CCGT (Alstom GT26)",
+        "nominal_mw": 417.0,
+        "efficiency": 0.585,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "MEGALOPOLI V",
+        "name": "Megalopolis V (PPC / DEI)",
+        "fuel": "gas",
+        "tech": "CCGT (GE 9FB 2x1)",
+        "nominal_mw": 811.0,
+        "efficiency": 0.582,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "LAVRIO V",
+        "name": "Lavrio V (PPC / DEI)",
+        "fuel": "gas",
+        "tech": "CCGT (Alstom GT26)",
+        "nominal_mw": 378.0,
+        "efficiency": 0.578,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "KORINTHOS_POWER",
+        "name": "Korinthos Power (Motor Oil / Metlen)",
+        "fuel": "gas",
+        "tech": "CCGT (GE 9FB)",
+        "nominal_mw": 433.4,
+        "efficiency": 0.575,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "PROTERGIA_CC",
+        "name": "Protergia CC (Metlen)",
+        "fuel": "gas",
+        "tech": "CCGT (GE 9FB)",
+        "nominal_mw": 432.7,
+        "efficiency": 0.565,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "ALOUMINIO",
+        "name": "Alouminio CHP (Metlen)",
+        "fuel": "gas",
+        "tech": "CCGT Cogeneration (CHP)",
+        "nominal_mw": 334.0,
+        "efficiency": 0.54,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "LAVRIO IV",
+        "name": "Lavrio IV (PPC / DEI)",
+        "fuel": "gas",
+        "tech": "CCGT (ABB GT13E2)",
+        "nominal_mw": 536.0,
+        "efficiency": 0.525,
+        "emission_factor": 0.202,
+        "vom": 2.75,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "KOMOTINI",
+        "name": "Komotini CCGT (PPC / DEI)",
+        "fuel": "gas",
+        "tech": "CCGT (Alstom GT13E2)",
+        "nominal_mw": 472.0,
+        "efficiency": 0.52,
+        "emission_factor": 0.202,
+        "vom": 2.75,
+        "hub_default": "VTP_GR"
+      },
+      {
+        "id": "PTOLEMAIDA5",
+        "name": "Ptolemaida V (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Ultra-supercritical Lignite",
+        "nominal_mw": 616.0,
+        "efficiency": 0.415,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "AGIOS DIMITRIOS V",
+        "name": "Agios Dimitrios V (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 342.0,
+        "efficiency": 0.345,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "AGIOS DIMITRIOS IV",
+        "name": "Agios Dimitrios IV (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 283.0,
+        "efficiency": 0.34,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "AGIOS DIMITRIOS III",
+        "name": "Agios Dimitrios III (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 283.0,
+        "efficiency": 0.34,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "AGIOS DIMITRIOS II",
+        "name": "Agios Dimitrios II (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 274.0,
+        "efficiency": 0.335,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "AGIOS DIMITRIOS I",
+        "name": "Agios Dimitrios I (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 274.0,
+        "efficiency": 0.335,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      },
+      {
+        "id": "MEGALOPOLI IV",
+        "name": "Megalopolis IV (PPC / DEI)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite",
+        "nominal_mw": 256.0,
+        "efficiency": 0.34,
+        "emission_factor": 0.4,
+        "fuel_cost_th": 18.0,
+        "vom": 4.5
+      }
+    ],
+    "IT": [
+      {
+        "id": "IT_CCGT_CLASS_H",
+        "name": "Porto Marghera / Tavazzano (Ansaldo GT36)",
+        "fuel": "gas",
+        "tech": "CCGT Class H (Ansaldo GT36)",
+        "nominal_mw": 800.0,
+        "efficiency": 0.63,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "PSV_IT"
+      },
+      {
+        "id": "IT_CCGT_TURBIGO",
+        "name": "Turbigo 4 (Iren / Ansaldo GT36 Repowered)",
+        "fuel": "gas",
+        "tech": "CCGT (Ansaldo GT36)",
+        "nominal_mw": 850.0,
+        "efficiency": 0.605,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "PSV_IT"
+      },
+      {
+        "id": "IT_CCGT_MODERN_F",
+        "name": "Italian CCGT Fleet Benchmark 58%",
+        "fuel": "gas",
+        "tech": "CCGT Modern Class F",
+        "nominal_mw": 750.0,
+        "efficiency": 0.58,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "PSV_IT"
+      },
+      {
+        "id": "IT_CCGT_STANDARD_F",
+        "name": "Italian CCGT Standard 55% (Enel / Eni)",
+        "fuel": "gas",
+        "tech": "CCGT Standard Class F",
+        "nominal_mw": 400.0,
+        "efficiency": 0.55,
+        "emission_factor": 0.202,
+        "vom": 2.75,
+        "hub_default": "PSV_IT"
+      },
+      {
+        "id": "IT_CCGT_OLDER",
+        "name": "Italian CCGT Older / Cogen 50%",
+        "fuel": "gas",
+        "tech": "CCGT Early Generation",
+        "nominal_mw": 350.0,
+        "efficiency": 0.5,
+        "emission_factor": 0.202,
+        "vom": 3.0,
+        "hub_default": "PSV_IT"
+      },
+      {
+        "id": "IT_COAL_USC",
+        "name": "Torrevaldaliga Nord / Brindisi Sud (Enel)",
+        "fuel": "coal",
+        "tech": "Hard Coal Supercritical",
+        "nominal_mw": 660.0,
+        "efficiency": 0.41,
+        "emission_factor": 0.34,
+        "fuel_cost_th": 16.0,
+        "vom": 3.5
+      }
+    ],
+    "BG": [
+      {
+        "id": "AES_MI1",
+        "name": "AES Galabovo (Maritsa East 1)",
+        "fuel": "lignite",
+        "tech": "Circulating Fluidized Bed Lignite",
+        "nominal_mw": 686.0,
+        "efficiency": 0.38,
+        "emission_factor": 0.41,
+        "fuel_cost_th": 16.0,
+        "vom": 4.0
+      },
+      {
+        "id": "TPP_MI_2",
+        "name": "Maritsa East 2 (TPP MI-2 EAD)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite Units 1-8",
+        "nominal_mw": 1610.0,
+        "efficiency": 0.34,
+        "emission_factor": 0.43,
+        "fuel_cost_th": 16.0,
+        "vom": 4.5
+      },
+      {
+        "id": "TEC_BOBOVDOL_EAD",
+        "name": "Bobov Dol (TEC Bobov Dol)",
+        "fuel": "lignite",
+        "tech": "Subcritical Lignite Units 1-3",
+        "nominal_mw": 570.0,
+        "efficiency": 0.33,
+        "emission_factor": 0.43,
+        "fuel_cost_th": 16.0,
+        "vom": 4.5
+      },
+      {
+        "id": "BG_CCGT_BENCHMARK",
+        "name": "Bulgaria Gas CCGT Benchmark 58%",
+        "fuel": "gas",
+        "tech": "CCGT Class F",
+        "nominal_mw": 400.0,
+        "efficiency": 0.58,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "BG_VTP"
+      }
+    ],
+    "DE_LU": [
+      {
+        "id": "DE_CCGT_MODERN",
+        "name": "German CCGT Modern 60% (Siemens H-Class)",
+        "fuel": "gas",
+        "tech": "CCGT Class H (SGT5-8000H)",
+        "nominal_mw": 800.0,
+        "efficiency": 0.6,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "THE_DE"
+      },
+      {
+        "id": "DE_CCGT_STANDARD",
+        "name": "German CCGT Standard 55% (F-Class)",
+        "fuel": "gas",
+        "tech": "CCGT Standard Class F",
+        "nominal_mw": 450.0,
+        "efficiency": 0.55,
+        "emission_factor": 0.202,
+        "vom": 2.75,
+        "hub_default": "THE_DE"
+      },
+      {
+        "id": "DE_LIGNITE_BOA",
+        "name": "Lignite BoA (Neurath / Niederaußem / RWE)",
+        "fuel": "lignite",
+        "tech": "Lignite BoA Supercritical",
+        "nominal_mw": 1050.0,
+        "efficiency": 0.43,
+        "emission_factor": 0.39,
+        "fuel_cost_th": 15.0,
+        "vom": 4.0
+      },
+      {
+        "id": "DE_LIGNITE_LEAG",
+        "name": "Lignite Standard (Boxberg / Schwarze Pumpe / LEAG)",
+        "fuel": "lignite",
+        "tech": "Lignite Subcritical",
+        "nominal_mw": 800.0,
+        "efficiency": 0.38,
+        "emission_factor": 0.41,
+        "fuel_cost_th": 15.0,
+        "vom": 4.5
+      },
+      {
+        "id": "DE_COAL_DATTELN",
+        "name": "Hard Coal Ultra-Supercritical (Datteln 4 / Uniper)",
+        "fuel": "coal",
+        "tech": "Hard Coal Ultra-Supercritical",
+        "nominal_mw": 1052.0,
+        "efficiency": 0.45,
+        "emission_factor": 0.335,
+        "fuel_cost_th": 16.0,
+        "vom": 3.2
+      },
+      {
+        "id": "DE_COAL_STANDARD",
+        "name": "German Hard Coal Standard 38%",
+        "fuel": "coal",
+        "tech": "Hard Coal Subcritical",
+        "nominal_mw": 600.0,
+        "efficiency": 0.38,
+        "emission_factor": 0.34,
+        "fuel_cost_th": 16.0,
+        "vom": 3.5
+      }
+    ],
+    "RO": [
+      {
+        "id": "RO_CCGT_BRAZI",
+        "name": "OMV Petrom Brazi CCGT",
+        "fuel": "gas",
+        "tech": "CCGT (GE 9FB 2x1)",
+        "nominal_mw": 860.0,
+        "efficiency": 0.57,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "TTF"
+      },
+      {
+        "id": "RO_LIGNITE_OLTENIA",
+        "name": "CE Oltenia (Rovinari / Turceni)",
+        "fuel": "lignite",
+        "tech": "Lignite Subcritical 330MW",
+        "nominal_mw": 660.0,
+        "efficiency": 0.33,
+        "emission_factor": 0.42,
+        "fuel_cost_th": 17.0,
+        "vom": 4.5
+      }
+    ],
+    "HU": [
+      {
+        "id": "HU_CCGT_DUNAMENTI",
+        "name": "Dunamenti CCGT (MET Group)",
+        "fuel": "gas",
+        "tech": "CCGT Class F",
+        "nominal_mw": 400.0,
+        "efficiency": 0.56,
+        "emission_factor": 0.202,
+        "vom": 2.5,
+        "hub_default": "TTF"
+      },
+      {
+        "id": "HU_LIGNITE_MATRA",
+        "name": "Mátra Lignite (MVM)",
+        "fuel": "lignite",
+        "tech": "Lignite Subcritical",
+        "nominal_mw": 440.0,
+        "efficiency": 0.32,
+        "emission_factor": 0.43,
+        "fuel_cost_th": 17.0,
+        "vom": 4.5
+      }
+    ]
+  }
+}
