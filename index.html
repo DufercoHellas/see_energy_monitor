@@ -10,16 +10,81 @@
         <style>
             /* ── SEE Energy Dashboard — Styles ── */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── CSS THEME VARIABLES ── */
+:root {
+    --bg-body: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-subtle: #f8fafc;
+    --bg-card-subtle-2: #f1f5f9;
+    --bg-hover: #f9fafb;
+    --border-color: #e2e8f0;
+    --border-color-subtle: #f1f5f9;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --accent-primary: #4f46e5;
+    --accent-gradient: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    --input-bg: #ffffff;
+    --input-border: #cbd5e1;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    --modal-backdrop: rgba(15, 23, 42, 0.6);
+    --tab-inactive-bg: #ffffff;
+    --tab-inactive-color: #475569;
+    --tab-inactive-border: #e2e8f0;
+    --inner-tab-bg: #f3f4f6;
+    --inner-tab-border: #e5e7eb;
+    --inner-tab-color: #4b5563;
+    --table-header-bg: #f8fafc;
+    --table-header-color: #475569;
+    --table-border: #f3f4f6;
+    --table-row-hover: #f9fafb;
+}
+
+body.dark-mode {
+    --bg-body: #0b0f19;
+    --bg-card: #131b2e;
+    --bg-card-subtle: #1a233a;
+    --bg-card-subtle-2: #212d4a;
+    --bg-hover: #1e293b;
+    --border-color: #273552;
+    --border-color-subtle: #1e2a44;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --accent-primary: #6366f1;
+    --accent-gradient: linear-gradient(135deg, #4338ca 0%, #2563eb 100%);
+    --input-bg: #1a233a;
+    --input-border: #334155;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+    --modal-backdrop: rgba(3, 7, 18, 0.75);
+    --tab-inactive-bg: #1a233a;
+    --tab-inactive-color: #cbd5e1;
+    --tab-inactive-border: #273552;
+    --inner-tab-bg: #1a233a;
+    --inner-tab-border: #273552;
+    --inner-tab-color: #94a3b8;
+    --table-header-bg: #1a233a;
+    --table-header-color: #cbd5e1;
+    --table-border: #273552;
+    --table-row-hover: #1c2742;
+}
 
 /* ── LAYOUT ── */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     margin: 0;
     padding: 16px 24px;
-    background-color: #f8fafc;
-    color: #1f2937;
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
+
 /* ── HEADER ── */
 .header-container {
     display: flex;
@@ -27,13 +92,38 @@ body {
     align-items: center;
     margin-bottom: 14px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
 }
-h2 { color: #111827; font-size: 22px; margin: 0; font-weight: 800; letter-spacing: -0.4px; }
+h2 { color: var(--text-primary); font-size: 22px; margin: 0; font-weight: 800; letter-spacing: -0.4px; }
+
+/* ── THEME TOGGLE BUTTON ── */
+.theme-toggle-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    user-select: none;
+    box-shadow: var(--shadow-sm);
+}
+.theme-toggle-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    transform: translateY(-1px);
+}
 
 /* ── SUMMARY BOX ── */
 .summary-box {
-    background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    background: var(--accent-gradient);
     color: #ffffff;
     border-radius: 12px;
     padding: 18px;
@@ -46,11 +136,11 @@ h2 { color: #111827; font-size: 22px; margin: 0; font-weight: 800; letter-spacin
 .summary-box p { margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
 
 /* ── TABLES ── */
-.table-container { overflow-x: auto; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); }
-table { border-collapse: collapse; width: 100%; background-color: #ffffff; border: none; }
-th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid #f3f4f6; word-break: keep-all; }
-tbody tr:hover { background-color: #f9fafb; transition: background-color 0.2s ease; }
-tr.selected-match-row { background-color: #eeebff !important; border-left: 4px solid #4f46e5; }
+.table-container { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
+table { border-collapse: collapse; width: 100%; background-color: var(--bg-card); border: none; }
+th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--table-border); word-break: keep-all; color: var(--text-primary); }
+tbody tr:hover { background-color: var(--table-row-hover); transition: background-color 0.2s ease; }
+tr.selected-match-row { background-color: rgba(79, 70, 229, 0.2) !important; border-left: 4px solid var(--accent-primary); }
 
 #analogues_table th, #analogues_table td { white-space: nowrap; padding: 6px 3px; font-size: 11.5px; text-align: center; }
 #analogues_table th:first-child, #analogues_table td:first-child { text-align: left; padding-left: 6px; }
@@ -59,46 +149,48 @@ tr.selected-match-row { background-color: #eeebff !important; border-left: 4px s
 /* ── TABS ── */
 .tab { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
 .tab::-webkit-scrollbar { display: none; }
-.tab button { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; padding: 8px 16px; transition: all 0.2s ease; font-size: 13px; font-weight: 700; color: #475569; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04); }
-.tab button:hover { background-color: #f8fafc; border-color: #cbd5e1; }
-.tab button.active { background-color: #4f46e5; color: white; border-color: #4f46e5; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); transform: translateY(-1px); }
+.tab button { background-color: var(--tab-inactive-bg); border: 1px solid var(--tab-inactive-border); border-radius: 8px; cursor: pointer; padding: 8px 16px; transition: all 0.2s ease; font-size: 13px; font-weight: 700; color: var(--tab-inactive-color); box-shadow: var(--shadow-sm); }
+.tab button:hover { background-color: var(--bg-hover); border-color: var(--border-color); color: var(--text-primary); }
+.tab button.active { background-color: var(--accent-primary); color: white; border-color: var(--accent-primary); box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3); transform: translateY(-1px); }
 
 /* ── TAB CONTENT ── */
-.tabcontent { display: none; padding: 20px 24px; background-color: #ffffff; border-radius: 14px; box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.04); border: 1px solid #e2e8f0; }
+.tabcontent { display: none; padding: 20px 24px; background-color: var(--bg-card); border-radius: 14px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
 
 /* ── HEADINGS ── */
-h3 { font-size: 22px; color: #111827; margin-top: 0; margin-bottom: 24px; font-weight: 600; letter-spacing: -0.5px; }
-h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
+h3 { font-size: 22px; color: var(--text-primary); margin-top: 0; margin-bottom: 24px; font-weight: 700; letter-spacing: -0.5px; }
+h4 { font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; font-weight: 600; }
 
 /* ── CHARTS & INNER TABS ── */
-.chart-wrapper { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.05); }
+.chart-wrapper { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 30px; box-shadow: var(--shadow-sm); }
 .inner-tab { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
-.inner-tablinks { background-color: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer; padding: 7px 16px; font-size: 13px; font-weight: 600; color: #4b5563; transition: all 0.2s ease; }
-.inner-tablinks:hover { background-color: #e5e7eb; }
+.inner-tablinks { background-color: var(--inner-tab-bg); border: 1px solid var(--inner-tab-border); border-radius: 6px; cursor: pointer; padding: 7px 16px; font-size: 13px; font-weight: 600; color: var(--inner-tab-color); transition: all 0.2s ease; }
+.inner-tablinks:hover { background-color: var(--bg-hover); color: var(--text-primary); }
 .inner-tablinks.active { background-color: #0f172a; color: white; border-color: #0f172a; }
+body.dark-mode .inner-tablinks.active { background-color: #3b82f6; color: white; border-color: #3b82f6; }
 .inner-tabcontent { display: none; }
 .inner-cables-tabcontent { display: none; }
 
 /* ── DETAIL TABS ── */
 .detail-tablinks {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
+    background-color: var(--tab-inactive-bg);
+    border: 1px solid var(--tab-inactive-border);
     border-radius: 6px;
     cursor: pointer;
     padding: 4px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: #475569;
+    color: var(--tab-inactive-color);
     transition: all 0.2s ease;
 }
 .detail-tablinks:hover {
-    background-color: #f1f5f9;
+    background-color: var(--bg-hover);
+    color: var(--text-primary);
 }
 .detail-tablinks.active {
-    background-color: #4f46e5;
+    background-color: var(--accent-primary);
     color: white;
-    border-color: #4f46e5;
-    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+    border-color: var(--accent-primary);
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
 }
 .detail-tabcontent {
     animation: fadeIn 0.3s ease-out;
@@ -122,19 +214,22 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-family: 'Inter', sans-serif;
     transition: opacity 0.3s ease;
 }
+body.dark-mode #loading_mask {
+    background: rgba(11, 15, 25, 0.85);
+}
 .spinner-container {
     text-align: center;
-    background: #ffffff;
+    background: var(--bg-card);
     padding: 30px 40px;
     border-radius: 16px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
 }
 .spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid #e2e8f0;
-    border-top-color: #4f46e5;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--accent-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 16px auto;
@@ -145,7 +240,7 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 }
 #loading_status {
     font-size: 14px;
-    color: #475569;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -217,8 +312,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
+    background: var(--modal-backdrop);
+    backdrop-filter: blur(6px);
     z-index: 99999;
     display: flex;
     align-items: center;
@@ -226,17 +321,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     padding: 20px;
 }
 .health-modal-dialog {
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 16px;
     width: 100%;
     max-width: 960px;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    border: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
     overflow: hidden;
     animation: modalFadeIn 0.2s ease-out;
+    color: var(--text-primary);
 }
 @keyframes modalFadeIn {
     from { opacity: 0; transform: scale(0.97) translateY(8px); }
@@ -244,8 +340,8 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 }
 .health-modal-header {
     padding: 16px 24px;
-    background: #f8fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--bg-card-subtle);
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -255,31 +351,32 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     border: none;
     font-size: 24px;
     line-height: 1;
-    color: #94a3b8;
+    color: var(--text-muted);
     cursor: pointer;
     border-radius: 6px;
     padding: 2px 6px;
     transition: color 0.15s;
 }
 .health-modal-close:hover {
-    color: #0f172a;
-    background: #f1f5f9;
+    color: var(--text-primary);
+    background: var(--bg-hover);
 }
 .health-modal-body {
     padding: 20px 24px;
     overflow-y: auto;
     flex: 1;
+    background: var(--bg-card);
 }
 .health-modal-footer {
     padding: 12px 24px;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
+    background: var(--bg-card-subtle);
+    border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 .btn-modal-close-action {
-    background: #475569;
+    background: var(--accent-primary);
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -287,17 +384,17 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: filter 0.15s;
 }
 .btn-modal-close-action:hover {
-    background: #334155;
+    filter: brightness(1.1);
 }
 
 /* Modal Subtabs */
 .health-tabs-header {
     display: flex;
     gap: 8px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--border-color);
     margin-bottom: 16px;
 }
 .health-tab-btn {
@@ -306,18 +403,18 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     padding: 8px 14px;
     font-size: 13px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-muted);
     cursor: pointer;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     transition: all 0.15s ease;
 }
 .health-tab-btn:hover {
-    color: #1e293b;
+    color: var(--text-primary);
 }
 .health-tab-btn.active {
-    color: #4f46e5;
-    border-bottom-color: #4f46e5;
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
 }
 .health-tab-content {
     display: none;
@@ -335,6 +432,11 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     color: #0369a1;
     margin-bottom: 14px;
 }
+body.dark-mode .health-banner-info {
+    background: #082f49;
+    border-color: #0369a1;
+    color: #7dd3fc;
+}
 .health-alert-box {
     border-radius: 8px;
     padding: 10px 14px;
@@ -349,18 +451,29 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     border: 1px solid #fecaca;
     color: #991b1b;
 }
+body.dark-mode .health-alert-critical {
+    background: #450a0a;
+    border-color: #991b1b;
+    color: #fca5a5;
+}
 .health-alert-warning {
     background: #fffbeb;
     border: 1px solid #fde68a;
     color: #92400e;
+}
+body.dark-mode .health-alert-warning {
+    background: #451a03;
+    border-color: #b45309;
+    color: #fcd34d;
 }
 
 /* Matrix Tables */
 .health-matrix-container {
     max-height: 420px;
     overflow-y: auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
+    background: var(--bg-card);
 }
 .health-matrix-table {
     width: 100%;
@@ -368,14 +481,14 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     font-size: 11px;
 }
 .health-matrix-table th {
-    background: #f8fafc;
+    background: var(--table-header-bg);
     position: sticky;
     top: 0;
     z-index: 2;
     font-weight: 700;
-    color: #475569;
+    color: var(--table-header-color);
     text-align: center;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 2px solid var(--border-color);
     padding: 8px 6px;
 }
 .health-matrix-table th.col-country, .health-matrix-table th.col-corridor {
@@ -383,21 +496,22 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     position: sticky;
     left: 0;
     z-index: 3;
-    background: #f1f5f9;
+    background: var(--bg-card-subtle);
+    border-right: 1px solid var(--border-color);
 }
 .health-matrix-table td {
     padding: 6px 6px;
     text-align: center;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--border-color-subtle);
 }
 .health-matrix-table td.col-country, .health-matrix-table td.col-corridor {
     text-align: left;
     font-weight: 600;
     position: sticky;
     left: 0;
-    background: #ffffff;
+    background: var(--bg-card);
     z-index: 1;
-    border-right: 1px solid #e2e8f0;
+    border-right: 1px solid var(--border-color);
 }
 .cell-badge-complete {
     background: #dcfce7;
@@ -406,12 +520,20 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     border-radius: 4px;
     font-weight: 600;
 }
+body.dark-mode .cell-badge-complete {
+    background: #064e3b;
+    color: #6ee7b7;
+}
 .cell-badge-partial {
     background: #fef3c7;
     color: #b45309;
     padding: 3px 6px;
     border-radius: 4px;
     font-weight: 600;
+}
+body.dark-mode .cell-badge-partial {
+    background: #78350f;
+    color: #fde68a;
 }
 .cell-badge-pending {
     background: #e0f2fe;
@@ -420,12 +542,20 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     border-radius: 4px;
     font-weight: 600;
 }
+body.dark-mode .cell-badge-pending {
+    background: #0c4a6e;
+    color: #7dd3fc;
+}
 .cell-badge-missing {
     background: #fee2e2;
     color: #b91c1c;
     padding: 3px 6px;
     border-radius: 4px;
     font-weight: 600;
+}
+body.dark-mode .cell-badge-missing {
+    background: #7f1d1d;
+    color: #fca5a5;
 }
 .badge-pending {
     background: #e0f2fe;
@@ -434,6 +564,24 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     border-radius: 4px;
     font-weight: 600;
     font-size: 11px;
+}
+body.dark-mode .badge-pending {
+    background: #0c4a6e;
+    color: #7dd3fc;
+}
+
+/* ── FORM CONTROLS & INPUTS IN DARK MODE ── */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="date"],
+body.dark-mode select {
+    background-color: var(--input-bg) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--input-border) !important;
+}
+
+body.dark-mode select option {
+    background-color: var(--bg-card);
+    color: var(--text-primary);
 }
 
 /* ── AUTO-DEPLOY NOTIFICATION BANNER ── */
@@ -506,39 +654,47 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         <!-- ── NAVIGATION BAR ── -->
         <!-- ── NAVIGATION BAR ── -->
-<div class="header-container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e5e7eb;">
+<div class="header-container">
     <div>
-        <h2 style="font-size: 22px; margin: 0; font-weight: 800; color: #0f172a; letter-spacing: -0.4px;">SEE Energy Monitor</h2>
-        <div style="font-size:12px;color:#64748b;margin-top:2px;font-weight:500;">Generation Outages &bull; Forecast Residuals &bull; Historical Analogues</div>
+        <h2>SEE Energy Monitor</h2>
+        <div style="font-size:12px; color: var(--text-muted); margin-top:2px; font-weight:500;">Generation Outages &bull; Forecast Residuals &bull; Historical Analogues</div>
     </div>
     
-    <!-- Compact Metadata Update Status -->
-    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; font-size: 11px; color: #475569; font-family: 'Inter', sans-serif; box-shadow: 0 1px 3px rgba(0,0,0,0.04); display: flex; align-items: center; gap: 12px;">
-        <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
-            <span style="color: #64748b; font-weight: 500;">Run:</span>
-            <span style="font-weight: 700; color: #0f172a;">2026-09-07 11:05</span>
-        </div>
-
-        <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()" title="Click to view detailed data completeness matrix" style="margin: 0;">
-            <span>🟢</span>
-            <span>All Verified</span>
-        </button>
-
-        <button type="button" class="btn-inspect-health" onclick="openDataHealthModal()" style="font-size: 10px; padding: 3px 6px; margin: 0;">
-            🔍 Inspect
-        </button>
-        
-        <!-- Auto-Deploy Alert (appears automatically when a new build is detected) -->
-        <div id="freshness_update_alert" style="display: none; padding: 4px 8px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 6px; color: #f8fafc; font-size: 10px; animation: slideInUp 0.3s ease;">
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <!-- Compact Metadata Update Status -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; font-size: 11px; color: var(--text-secondary); font-family: 'Inter', sans-serif; box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 12px; animation: pulseGlow 1.5s infinite;">⚡</span>
-                <span style="font-weight: 700; color: #ffffff;">New Data</span>
-                <button type="button" onclick="window.location.reload(true)" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: 700; cursor: pointer;">
-                    ↻ Refresh
-                </button>
+                <span style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
+                <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-09-07 11:05</span>
+            </div>
+
+            <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()" title="Click to view detailed data completeness matrix" style="margin: 0;">
+                <span>🟢</span>
+                <span>All Verified</span>
+            </button>
+
+            <button type="button" class="btn-inspect-health" onclick="openDataHealthModal()" style="font-size: 10px; padding: 3px 6px; margin: 0;">
+                🔍 Inspect
+            </button>
+            
+            <!-- Auto-Deploy Alert (appears automatically when a new build is detected) -->
+            <div id="freshness_update_alert" style="display: none; padding: 4px 8px; background: #0f172a; border: 1px solid #38bdf8; border-radius: 6px; color: #f8fafc; font-size: 10px; animation: slideInUp 0.3s ease;">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 12px; animation: pulseGlow 1.5s infinite;">⚡</span>
+                    <span style="font-weight: 700; color: #ffffff;">New Data</span>
+                    <button type="button" onclick="window.location.reload(true)" style="background: linear-gradient(135deg, #0284c7, #2563eb); color: #ffffff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 9px; font-weight: 700; cursor: pointer;">
+                        ↻ Refresh
+                    </button>
+                </div>
             </div>
         </div>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button type="button" id="theme_toggle_btn" class="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
+            <span id="theme_toggle_icon">🌙</span>
+            <span id="theme_toggle_text">Dark</span>
+        </button>
     </div>
 </div>
 
@@ -1206,7 +1362,97 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
 
         <script>
             // === utils.js ===
-// ── Tab Switching �����������������������������������������������������������
+// ── Theme Management (Dark / Light Mode) ───────────────────────────────────
+
+function isDarkMode() {
+    return document.body.classList.contains('dark-mode');
+}
+
+function updateThemeUI(isDark) {
+    const icon = document.getElementById("theme_toggle_icon");
+    const text = document.getElementById("theme_toggle_text");
+    if (icon) icon.innerText = isDark ? "☀️" : "🌙";
+    if (text) text.innerText = isDark ? "Light" : "Dark";
+}
+
+function toggleDarkMode() {
+    const isDark = document.body.classList.toggle('dark-mode');
+    localStorage.setItem('see_energy_theme', isDark ? 'dark' : 'light');
+    updateThemeUI(isDark);
+    
+    // Notify all active charts & components to re-render in new theme
+    if (typeof refreshAllThemeCharts === 'function') {
+        refreshAllThemeCharts();
+    }
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('see_energy_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldBeDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    
+    if (document.body) {
+        if (shouldBeDark) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    }
+    updateThemeUI(shouldBeDark);
+}
+
+// Auto-run theme initialization
+if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initTheme);
+    } else {
+        initTheme();
+    }
+}
+
+
+// Get Plotly theme-aware layout parameters
+function getPlotlyThemeLayout(customLayout = {}) {
+    const dark = isDarkMode();
+    const baseTheme = {
+        font: { family: 'Inter, sans-serif', color: dark ? '#cbd5e1' : '#374151' },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        xaxis: {
+            gridcolor: dark ? '#273552' : '#f1f5f9',
+            tickfont: { family: 'Inter, sans-serif', color: dark ? '#94a3b8' : '#6b7280' },
+            linecolor: dark ? '#334155' : '#e2e8f0',
+            zerolinecolor: dark ? '#334155' : '#e2e8f0'
+        },
+        yaxis: {
+            gridcolor: dark ? '#273552' : '#f1f5f9',
+            tickfont: { family: 'Inter, sans-serif', color: dark ? '#94a3b8' : '#6b7280' },
+            linecolor: dark ? '#334155' : '#e2e8f0',
+            zerolinecolor: dark ? '#334155' : '#e2e8f0'
+        },
+        legend: {
+            font: { family: 'Inter, sans-serif', color: dark ? '#cbd5e1' : '#374151' }
+        },
+        hoverlabel: {
+            bgcolor: dark ? '#1e293b' : '#ffffff',
+            bordercolor: dark ? '#475569' : '#cbd5e1',
+            font: { family: 'Inter, sans-serif', size: 12, color: dark ? '#f8fafc' : '#0f172a' }
+        }
+    };
+    
+    // Merge custom layout on top of base theme
+    const merged = JSON.parse(JSON.stringify(baseTheme));
+    for (const key in customLayout) {
+        if (typeof customLayout[key] === 'object' && customLayout[key] !== null && !Array.isArray(customLayout[key])) {
+            merged[key] = Object.assign(merged[key] || {}, customLayout[key]);
+        } else {
+            merged[key] = customLayout[key];
+        }
+    }
+    return merged;
+}
+
+// ── Tab Switching ──────────────────────────────────────────────────────────
 function openTab(evt, tabName) {
     document.querySelectorAll(".tabcontent").forEach(el => el.style.display = "none");
     document.querySelectorAll(".tablinks").forEach(el => el.classList.remove("active"));
@@ -5302,19 +5548,21 @@ function renderCableOutagesGrid() {
                     return;
                 }
 
+                const dark = isDarkMode();
+
                 // 5. Build Table with 10-day view
                 let html = `
                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12.5px; table-layout: fixed;">
                         <thead>
-                            <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
-                                <th style="padding: 10px 6px; text-align: center; font-weight: 700; color: #475569; font-size: 11.5px; text-transform: uppercase; position: sticky; left: 0; background: #f8fafc; z-index: 3; box-shadow: 2px 0 5px rgba(0,0,0,0.06); width: 96px; min-width: 96px; max-width: 96px; box-sizing: border-box;">Corridor</th>
+                            <tr style="background: var(--table-header-bg); border-bottom: 2px solid var(--border-color);">
+                                <th style="padding: 10px 6px; text-align: center; font-weight: 700; color: var(--table-header-color); font-size: 11.5px; text-transform: uppercase; position: sticky; left: 0; background: var(--table-header-bg); z-index: 3; box-shadow: 2px 0 5px rgba(0,0,0,0.1); width: 96px; min-width: 96px; max-width: 96px; box-sizing: border-box; border-right: 1px solid var(--border-color);">Corridor</th>
                 `;
                 
                 displayDates.forEach(d => {
                     html += `
-                        <th style="padding: 8px 4px; font-weight: 700; color: #475569; font-size: 11.5px; text-transform: uppercase; box-sizing: border-box; text-align: center;">
+                        <th style="padding: 8px 4px; font-weight: 700; color: var(--table-header-color); font-size: 11.5px; text-transform: uppercase; box-sizing: border-box; text-align: center;">
                             <div>${d.dayName}</div>
-                            <div style="font-size: 10px; color: #64748b; font-weight: 600; margin-top: 2px;">${d.day}/${d.month}</div>
+                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">${d.day}/${d.month}</div>
                         </th>
                     `;
                 });
@@ -5325,14 +5573,14 @@ function renderCableOutagesGrid() {
                         <tbody>`;
 
                 displayCorridors.forEach((corr, idx) => {
-                    const rowBg = idx % 2 === 0 ? "#ffffff" : "#f8fafc";
+                    const rowBg = idx % 2 === 0 ? (dark ? "#131b2e" : "#ffffff") : (dark ? "#1a233a" : "#f8fafc");
                     const availPct = corridorAvail[corr];
-                    const badgeColor = availPct < 100 ? "#b91c1c" : "#4338ca"; // Red for outages, blue for full
-                    const badgeBg = availPct < 100 ? "#fee2e2" : "#e0e7ff";
+                    const badgeColor = availPct < 100 ? (dark ? "#fca5a5" : "#b91c1c") : (dark ? "#a5b4fc" : "#4338ca");
+                    const badgeBg = availPct < 100 ? (dark ? "#450a0a" : "#fee2e2") : (dark ? "#1e1b4b" : "#e0e7ff");
                     
                     html += `
-                        <tr style="background: ${rowBg}; border-bottom: 1px solid #e2e8f0;">
-                            <td style="padding: 4px 5px; text-align: center; font-weight: 700; color: ${badgeColor}; border-right: 1px solid #e2e8f0; position: sticky; left: 0; background: ${rowBg}; z-index: 2; box-shadow: 2px 0 5px rgba(0,0,0,0.06); width: 96px; min-width: 96px; max-width: 96px; box-sizing: border-box;">
+                        <tr style="background: ${rowBg}; border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 4px 5px; text-align: center; font-weight: 700; color: ${badgeColor}; border-right: 1px solid var(--border-color); position: sticky; left: 0; background: ${rowBg}; z-index: 2; box-shadow: 2px 0 5px rgba(0,0,0,0.1); width: 96px; min-width: 96px; max-width: 96px; box-sizing: border-box;">
                                 <span style="background:${badgeBg}; padding: 4px 6px; border-radius: 5px; font-size: 11px; display: block; width: 100%; text-align: center; box-sizing: border-box; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${corr} (${availPct}%)">
                                     ${corr} (${availPct}%)
                                 </span>
@@ -5359,11 +5607,14 @@ function renderCableOutagesGrid() {
                         });
 
                         if (curtailedEntries.length === 0) {
+                            const bgCol = dark ? '#064e3b33' : '#ecfdf5';
+                            const textCol = dark ? '#34d399' : '#059669';
+                            const borderCol = dark ? '#065f46' : '#a7f3d0';
                             html += `
-                                <td style="padding: 3px 2px; border-right: 1px solid #f1f5f9; cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 100% Full Capacity (${ntcLabel})">
-                                    <div style="background: #ecfdf5; color: #059669; border: 1.5px solid #a7f3d0; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
+                                <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 100% Full Capacity (${ntcLabel})">
+                                    <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${ntcLabel}</div>
-                                        ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
+                                        ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
                                     </div>
                                 </td>
                             `;
@@ -5385,20 +5636,26 @@ function renderCableOutagesGrid() {
                             const isAllDayReduction = (curtailedEntries.length >= 24) && (minRemaining > 0);
 
                             if (isTotal24h) {
+                                const bgCol = dark ? '#7f1d1d33' : '#fef2f2';
+                                const textCol = dark ? '#f87171' : '#dc2626';
+                                const borderCol = dark ? '#991b1b' : '#fca5a5';
                                 html += `
-                                    <td style="padding: 3px 2px; border-right: 1px solid #f1f5f9; cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
-                                        <div style="background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
+                                    <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
+                                        <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                             <div>Mth/Yr: OUTAGE</div>
                                         </div>
                                     </td>
                                 `;
                             } else if (isAllDayReduction) {
                                 const remLabel = minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining} MW`;
+                                const bgCol = dark ? '#7c2d1233' : '#fff7ed';
+                                const textCol = dark ? '#fb923c' : '#c2410c';
+                                const borderCol = dark ? '#9a3412' : '#fed7aa';
                                 html += `
-                                    <td style="padding: 3px 2px; border-right: 1px solid #f1f5f9; cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel} / ${maxOrig} MW)">
-                                        <div style="background: #fff7ed; color: #c2410c; border: 1.5px solid #fed7aa; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
+                                    <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel} / ${maxOrig} MW)">
+                                        <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                             <div style="white-space: nowrap;">Mth: ${remLabel}</div>
-                                            ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed #fed7aa; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
+                                            ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -5406,11 +5663,14 @@ function renderCableOutagesGrid() {
                                 const curtHours = curtailedEntries.length;
                                 const isZeroPartial = minRemaining === 0;
                                 const subCap = isZeroPartial ? `0/${maxOrig} MW` : (minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining} MW`);
+                                const bgCol = dark ? '#4c1d9533' : '#f5f3ff';
+                                const textCol = dark ? '#a78bfa' : '#6d28d9';
+                                const borderCol = dark ? '#5b21b6' : '#c4b5fd';
                                 html += `
-                                    <td style="padding: 3px 2px; border-right: 1px solid #f1f5f9; cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
-                                        <div style="background: #f5f3ff; color: #6d28d9; border: 1.5px solid #c4b5fd; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
+                                    <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
+                                        <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                             <div style="white-space: nowrap;">Mth: ${subCap} (${curtHours}h)</div>
-                                            ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed #c4b5fd; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
+                                            ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -6122,17 +6382,14 @@ function renderResiduals(dateList) {
                         return;
                     }
                     
-                    const layout = {
-                        title: {text: '', font: {family: 'Inter', size: 16, color: '#374151'}},
+                    const layout = getPlotlyThemeLayout({
+                        title: {text: '', font: {size: 16}},
                         barmode: 'group',
-                        xaxis: {title: 'Hour of Day', tickfont: {family: 'Inter', color: '#6b7280'}, gridcolor: '#f3f4f6', tickmode: 'linear', dtick: 1},
-                        yaxis: {title: 'Net Demand (MW)', tickfont: {family: 'Inter', color: '#6b7280'}, gridcolor: '#f3f4f6'},
-                        plot_bgcolor: 'transparent',
-                        paper_bgcolor: 'transparent',
+                        xaxis: {title: 'Hour of Day', tickmode: 'linear', dtick: 1},
+                        yaxis: {title: 'Net Demand (MW)'},
                         margin: {t: 50, l: 60, r: 20, b: 40},
-                        legend: {font: {family: 'Inter'}, orientation: 'h', y: -0.2},
-                        hoverlabel: {font: {family: 'Inter', size: 12}, align: 'left'}
-                    };
+                        legend: {orientation: 'h', y: -0.2}
+                    });
                     Plotly.newPlot(plotId, traces, layout, {responsive: true});
                 });
             }
@@ -6443,18 +6700,15 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                     });
                 }
 
-                const layout = {
-                    title: {text: '', font: {family: 'Inter', size: 16, color: '#374151'}},
+                const layout = getPlotlyThemeLayout({
+                    title: {text: '', font: {size: 16}},
                     barmode: 'stack',
-                    xaxis: {title: '', tickfont: {family: 'Inter', color: '#6b7280'}, gridcolor: '#f3f4f6'},
-                    yaxis: {title: 'Unavailable Capacity (MW)', tickfont: {family: 'Inter', color: '#6b7280'}, gridcolor: '#f3f4f6'},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                    xaxis: {title: ''},
+                    yaxis: {title: 'Unavailable Capacity (MW)'},
                     margin: {t: 65, l: 60, r: 20, b: 40},
-                    legend: {font: {family: 'Inter'}},
                     shapes: shapes,
                     annotations: annotations
-                };
+                });
                 
                 Plotly.newPlot(plotId, traces, layout, {responsive: true});
             }
@@ -6712,15 +6966,13 @@ function renderCountryOutageTable(c, countryOutages) {
                         line: {color: '#94a3b8', width: 2, dash: 'dash'}
                     }
                 ];
-                Plotly.newPlot('plot_comp_residuals', resTraces, {
-                    title: {text: `${countryNames[country] || country} Residual (MW)`, font: {family: 'Inter', size: 10, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                Plotly.newPlot('plot_comp_residuals', resTraces, getPlotlyThemeLayout({
+                    title: {text: `${countryNames[country] || country} Residual (MW)`, font: {size: 10}},
+                    xaxis: {tickfont: {size: 8}},
+                    yaxis: {tickfont: {size: 8}},
                     margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
-                }, {responsive: true});
+                }), {responsive: true});
                 
                 // 2.2 Plot Germany Residuals Comparison
                 const deTargetRes = deDataTarget ? (deDataTarget.residuals || Array(24).fill(0.0)) : Array(24).fill(0.0);
@@ -6744,15 +6996,13 @@ function renderCountryOutageTable(c, countryOutages) {
                         line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
-                Plotly.newPlot('plot_comp_de_residuals', deResTraces, {
-                    title: {text: 'Germany Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                Plotly.newPlot('plot_comp_de_residuals', deResTraces, getPlotlyThemeLayout({
+                    title: {text: 'Germany Residual (MW)', font: {size: 10}},
+                    xaxis: {tickfont: {size: 8}},
+                    yaxis: {tickfont: {size: 8}},
                     margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
-                }, {responsive: true});
+                }), {responsive: true});
                 
                 // 2.3 Plot Bulgaria Residuals Comparison
                 const bgDataTarget = (historicalData['BG'] && historicalData['BG'][currentTargetDate]) ? historicalData['BG'][currentTargetDate] : null;
@@ -6778,15 +7028,13 @@ function renderCountryOutageTable(c, countryOutages) {
                         line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
-                Plotly.newPlot('plot_comp_bg_residuals', bgResTraces, {
-                    title: {text: 'Bulgaria Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                Plotly.newPlot('plot_comp_bg_residuals', bgResTraces, getPlotlyThemeLayout({
+                    title: {text: 'Bulgaria Residual (MW)', font: {size: 10}},
+                    xaxis: {tickfont: {size: 8}},
+                    yaxis: {tickfont: {size: 8}},
                     margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
-                }, {responsive: true});
+                }), {responsive: true});
 
                 // 2. Plot Italy Residuals Comparison
                 const itDataTarget = (historicalData['IT'] && historicalData['IT'][currentTargetDate]) ? historicalData['IT'][currentTargetDate] : null;
@@ -6812,15 +7060,13 @@ function renderCountryOutageTable(c, countryOutages) {
                         line: {color: '#94a3b8', width: 1.5, dash: 'dash'}
                     }
                 ];
-                Plotly.newPlot('plot_comp_it_residuals', itResTraces, {
-                    title: {text: 'Italy Residual (MW)', font: {family: 'Inter', size: 10, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 8}},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                Plotly.newPlot('plot_comp_it_residuals', itResTraces, getPlotlyThemeLayout({
+                    title: {text: 'Italy Residual (MW)', font: {size: 10}},
+                    xaxis: {tickfont: {size: 8}},
+                    yaxis: {tickfont: {size: 8}},
                     margin: {t: 22, l: 30, r: 6, b: 18},
                     showlegend: false
-                }, {responsive: true});
+                }), {responsive: true});
                 
                 // 3. Plot Prices Comparison
                 const priceTraces = [];
@@ -6844,16 +7090,14 @@ function renderCountryOutageTable(c, countryOutages) {
                 });
 
                 const priceTitle = hasTargetPrices ? 'Spot Price (€/MWh)' : 'Spot Price Forecast (€/MWh) — Target Pending DA Auction';
-                Plotly.newPlot('plot_comp_prices', priceTraces, {
-                    title: {text: priceTitle, font: {family: 'Inter', size: 11, color: '#334155'}},
-                    xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
-                    plot_bgcolor: 'transparent',
-                    paper_bgcolor: 'transparent',
+                Plotly.newPlot('plot_comp_prices', priceTraces, getPlotlyThemeLayout({
+                    title: {text: priceTitle, font: {size: 11}},
+                    xaxis: {tickfont: {size: 9}},
+                    yaxis: {tickfont: {size: 9}},
                     margin: {t: 22, l: 38, r: 8, b: 24},
                     showlegend: true,
                     legend: {font: {size: 9}, orientation: 'h', y: -0.18}
-                }, {responsive: true, displayModeBar: false});
+                }), {responsive: true, displayModeBar: false});
 
                 requestAnimationFrame(() => {
                     ['plot_comp_prices', 'plot_comp_de_residuals', 'plot_comp_it_residuals', 'plot_comp_residuals', 'plot_comp_bg_residuals'].forEach(id => {
@@ -8560,6 +8804,24 @@ async function initDashboardData() {
                 }
             }
 
+            function refreshAllThemeCharts() {
+                try {
+                    if (typeof renderResidualsTab === 'function') renderResidualsTab();
+                    if (typeof renderOutagesTab === 'function') renderOutagesTab();
+                    if (typeof checkAndRenderDailyOutagesAlert === 'function') checkAndRenderDailyOutagesAlert();
+                    if (typeof renderCableOutagesGrid === 'function') renderCableOutagesGrid();
+                    if (typeof renderCableDailyOutagesGrid === 'function') renderCableDailyOutagesGrid();
+                    if (typeof renderCableOutages === 'function') renderCableOutages();
+                    if (typeof renderEUMap === 'function') renderEUMap();
+                    if (typeof renderComparisonTab === 'function') renderComparisonTab();
+                    if (typeof renderTargetHourlyChart === 'function') renderTargetHourlyChart();
+                    if (typeof renderRegionalContextFlows === 'function') renderRegionalContextFlows();
+                } catch (e) {
+                    console.error("Error refreshing theme charts:", e);
+                }
+            }
+
+
 
 // === tab_eumap.js ===
 // ── EU Map Tab: Day-Ahead Spot Price Choropleth (Plotly) ─────────────────
@@ -8842,9 +9104,10 @@ function drawPlotlyEUMap(selectedDate) {
         marker: { opacity: 1.0, line: { color: '#ffffff', width: 1.2 } }
     };
 
+    const dark = isDarkMode();
     const layout = {
         margin: { t: 0, b: 0, l: 0, r: 0 },
-        mapbox: { style: 'carto-positron', center: { lat: 45.8, lon: 15.2 }, zoom: 3.65 },
+        mapbox: { style: dark ? 'carto-darkmatter' : 'carto-positron', center: { lat: 45.8, lon: 15.2 }, zoom: 3.65 },
         showlegend: false,
         paper_bgcolor: 'rgba(0,0,0,0)',
         plot_bgcolor: 'rgba(0,0,0,0)'
@@ -8888,7 +9151,7 @@ function drawPlotlyEUMap(selectedDate) {
                         source: 'targeted-country-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': '#0f172a',
+                            'line-color': dark ? '#f8fafc' : '#0f172a',
                             'line-width': 2.4,
                             'line-opacity': 1.0
                         }
@@ -8915,12 +9178,17 @@ function drawPlotlyEUMap(selectedDate) {
         }
         overlay.innerHTML = '';
 
+        const badgeBg = dark ? 'rgba(19, 27, 46, 0.92)' : 'rgba(255, 255, 255, 0.88)';
+        const badgeBorder = dark ? '1px solid #334155' : '1px solid rgba(226, 232, 240, 0.85)';
+        const codeColor = dark ? '#f8fafc' : '#0f172a';
+        const priceColor = dark ? '#60a5fa' : '#2563eb';
+
         const badgeElements = badgeItems.map(item => {
             const el = document.createElement('div');
             el.className = 'eumap-badge-pill';
             el.setAttribute('data-country-key', item.key);
-            el.style.cssText = 'position:absolute;transform:translate(-50%,-50%) scale(0.95);background:rgba(255,255,255,0.85);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px;border-radius:5px;box-shadow:0 2px 5px -1px rgba(15,23,42,0.16),0 1px 2px rgba(15,23,42,0.06);border:1px solid rgba(226,232,240,0.85);white-space:nowrap;line-height:1.12;pointer-events:auto;cursor:pointer;min-width:26px;';
-            el.innerHTML = `<span style="font-weight:800;font-size:9.5px;color:#0f172a;letter-spacing:0.2px;">${item.code}</span><span style="font-weight:700;font-size:10px;color:#2563eb;">${item.priceStr}</span>`;
+            el.style.cssText = `position:absolute;transform:translate(-50%,-50%) scale(0.95);background:${badgeBg};backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 4px;border-radius:5px;box-shadow:0 2px 5px -1px rgba(0,0,0,0.3);border:${badgeBorder};white-space:nowrap;line-height:1.12;pointer-events:auto;cursor:pointer;min-width:26px;`;
+            el.innerHTML = `<span style="font-weight:800;font-size:9.5px;color:${codeColor};letter-spacing:0.2px;">${item.code}</span><span style="font-weight:700;font-size:10px;color:${priceColor};">${item.priceStr}</span>`;
             el.onclick = function(e) {
                 e.stopPropagation();
                 renderEUMapCountryDetail(item.key, selectedDate);
@@ -9003,17 +9271,18 @@ function renderEUMapCountryDetail(dataKey, date) {
     const [yr, mo, dy] = date.split('-');
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const dateStr = `${dy} ${months[parseInt(mo)-1]} ${yr}`;
+    const dark = isDarkMode();
 
     if (!entry || !entry.prices || entry.prices.length === 0 ||
         entry.prices.every(p => !p && p !== 0)) {
         document.getElementById('eumap_detail_header').innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
-                <span style="font-size:20px;font-weight:800;color:#1e293b;">${name}</span>
-                <span style="background:#e2e8f0;color:#64748b;border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">${dataKey}</span>
+                <span style="font-size:20px;font-weight:800;color:var(--text-primary);">${name}</span>
+                <span style="background:var(--bg-card-subtle-2);color:var(--text-muted);border-radius:20px;padding:2px 10px;font-size:11px;font-weight:700;">${dataKey}</span>
             </div>
-            <div style="font-size:12px;color:#94a3b8;">${dateStr}</div>`;
+            <div style="font-size:12px;color:var(--text-muted);">${dateStr}</div>`;
         document.getElementById('eumap_hourly_chart').innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:8px;color:#94a3b8;">
+            <div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:8px;color:var(--text-muted);">
                 <span style="font-size:32px;">📭</span>
                 <span style="font-size:13px;font-weight:600;">No hourly data available</span>
             </div>`;
@@ -9032,7 +9301,6 @@ function renderEUMapCountryDetail(dataKey, date) {
     function barColor(p) {
         if (maxHr === minHr) return '#fb6a4a';
         const t = (p - minHr) / (maxHr - minHr);
-        // Lerping between light red (#fee5d9 = rgb(254,229,217)) and deep red (#a50f15 = rgb(165,15,21))
         const r = Math.round(254 + t * (165 - 254));
         const g = Math.round(229 + t * (15 - 229));
         const b = Math.round(217 + t * (21 - 217));
@@ -9040,7 +9308,6 @@ function renderEUMapCountryDetail(dataKey, date) {
     }
 
     const colors = prices.map(p => barColor(p || 0));
-
     const symbol = dataKey === 'TR' ? 'TL' : '\u20ac';
 
     // Header
@@ -9048,12 +9315,12 @@ function renderEUMapCountryDetail(dataKey, date) {
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:18px;font-weight:800;color:#1e293b;">${name}</span>
-                    <span style="background:#ede9fe;color:#6d28d9;border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${dataKey}</span>
+                    <span style="font-size:18px;font-weight:800;color:var(--text-primary);">${name}</span>
+                    <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${dataKey}</span>
                 </div>
-                <div style="font-size:12px;color:#64748b;margin-top:2px;">${dateStr}</div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${dateStr}</div>
             </div>
-            <div style="background:linear-gradient(135deg,#4f46e5,#3b82f6);color:white;border-radius:10px;padding:8px 14px;text-align:center;">
+            <div style="background:var(--accent-gradient);color:white;border-radius:10px;padding:8px 14px;text-align:center;box-shadow:var(--shadow-sm);">
                 <div style="font-size:10px;font-weight:600;opacity:0.85;letter-spacing:0.5px;">AVG</div>
                 <div style="font-size:18px;font-weight:800;">${avgP.toFixed(1)} <span style="font-size:11px;">${symbol}/MWh</span></div>
             </div>
@@ -9061,12 +9328,32 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // Plotly bar chart
     const hours = Array.from({length: 24}, (_, i) => `${String(i).padStart(2,'0')}:00`);
+    const chartLayout = getPlotlyThemeLayout({
+        margin: { t: 10, b: 60, l: 50, r: 10 },
+        showlegend: false,
+        xaxis: {
+            tickfont: { size: 9 },
+            tickangle: -45
+        },
+        yaxis: {
+            title: { text: `${symbol}/MWh`, font: { size: 10 } },
+            tickfont: { size: 10 },
+            zeroline: false
+        },
+        shapes: [{
+            type: 'line',
+            x0: hours[0], x1: hours[23],
+            y0: avgP, y1: avgP,
+            line: { color: '#10b981', width: 1.5, dash: 'dash' }
+        }]
+    });
+
     Plotly.newPlot('eumap_hourly_chart', [{
         type: 'bar',
         x: hours,
         y: prices,
         name: 'Spot Price',
-        marker: { color: colors, line: { color: 'rgba(0,0,0,0.08)', width: 0.5 } },
+        marker: { color: colors, line: { color: dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)', width: 0.5 } },
         hovertemplate: `<b>%{x}</b><br>%{y:.2f} ${symbol}/MWh<extra></extra>`,
         text: prices.map(p => p.toFixed(0)),
         textposition: 'none'
@@ -9075,57 +9362,43 @@ function renderEUMapCountryDetail(dataKey, date) {
         mode: 'lines',
         x: hours,
         y: prices,
-        line: { color: '#4f46e5', width: 2, dash: 'dot' },
+        line: { color: dark ? '#818cf8' : '#4f46e5', width: 2, dash: 'dot' },
         hoverinfo: 'skip',
         showlegend: false
-    }], {
-        margin: { t: 10, b: 60, l: 50, r: 10 },
-        paper_bgcolor: 'rgba(0,0,0,0)',
-        plot_bgcolor: 'rgba(0,0,0,0)',
-        showlegend: false,
-        xaxis: {
-            tickfont: { size: 9, family: 'Inter,sans-serif' },
-            gridcolor: '#f1f5f9',
-            tickangle: -45
-        },
-        yaxis: {
-            title: { text: `${symbol}/MWh`, font: { size: 10, family: 'Inter,sans-serif' } },
-            tickfont: { size: 10, family: 'Inter,sans-serif' },
-            gridcolor: '#f1f5f9',
-            zeroline: false
-        },
-        hoverlabel: {
-            bgcolor: '#1e293b',
-            font: { color: '#ffffff', size: 12, family: 'Inter, sans-serif' },
-            bordercolor: '#334155'
-        },
-        shapes: [{
-            type: 'line',
-            x0: hours[0], x1: hours[23],
-            y0: avgP, y1: avgP,
-            line: { color: '#10b981', width: 1.5, dash: 'dash' }
-        }]
-    }, { displayModeBar: false, responsive: true });
+    }], chartLayout, { displayModeBar: false, responsive: true });
 
     // Stats row
+    const valleyBg = dark ? '#052e16' : '#f0fdf4';
+    const valleyBorder = dark ? '#14532d' : '#bbf7d0';
+    const valleyColor = dark ? '#4ade80' : '#15803d';
+
+    const avgBg = dark ? '#172554' : '#eff6ff';
+    const avgBorder = dark ? '#1e40af' : '#bfdbfe';
+    const avgColor = dark ? '#60a5fa' : '#1d4ed8';
+
+    const peakBg = dark ? '#451a03' : '#fff7ed';
+    const peakBorder = dark ? '#7c2d12' : '#fed7aa';
+    const peakColor = dark ? '#fb923c' : '#9a3412';
+
     document.getElementById('eumap_hourly_stats').innerHTML = `
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:#16a34a;letter-spacing:0.4px;">VALLEY</div>
-                <div style="font-size:15px;font-weight:800;color:#15803d;">${minHr.toFixed(1)}</div>
-                <div style="font-size:10px;color:#4ade80;">Hr ${String(valHr).padStart(2,'0')}</div>
+            <div style="background:${valleyBg};border:1px solid ${valleyBorder};border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:${dark ? '#86efac' : '#16a34a'};letter-spacing:0.4px;">VALLEY</div>
+                <div style="font-size:15px;font-weight:800;color:${valleyColor};">${minHr.toFixed(1)}</div>
+                <div style="font-size:10px;color:var(--text-muted);">Hr ${String(valHr).padStart(2,'0')}</div>
             </div>
-            <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:#2563eb;letter-spacing:0.4px;">AVERAGE</div>
-                <div style="font-size:15px;font-weight:800;color:#1d4ed8;">${avgP.toFixed(1)}</div>
-                <div style="font-size:10px;color:#93c5fd;">${symbol}/MWh</div>
+            <div style="background:${avgBg};border:1px solid ${avgBorder};border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:${dark ? '#93c5fd' : '#2563eb'};letter-spacing:0.4px;">AVERAGE</div>
+                <div style="font-size:15px;font-weight:800;color:${avgColor};">${avgP.toFixed(1)}</div>
+                <div style="font-size:10px;color:var(--text-muted);">${symbol}/MWh</div>
             </div>
-            <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:#c2410c;letter-spacing:0.4px;">PEAK</div>
-                <div style="font-size:15px;font-weight:800;color:#9a3412;">${maxHr.toFixed(1)}</div>
-                <div style="font-size:10px;color:#fb923c;">Hr ${String(peakHr).padStart(2,'0')}</div>
+            <div style="background:${peakBg};border:1px solid ${peakBorder};border-radius:8px;padding:8px;text-align:center;">
+                <div style="font-size:10px;font-weight:600;color:${dark ? '#fdba74' : '#c2410c'};letter-spacing:0.4px;">PEAK</div>
+                <div style="font-size:15px;font-weight:800;color:${peakColor};">${maxHr.toFixed(1)}</div>
+                <div style="font-size:10px;color:var(--text-muted);">Hr ${String(peakHr).padStart(2,'0')}</div>
             </div>
         </div>`;
+}
 }
 
 // ── Initialisation ─────────────────────────────────────────────────────────
