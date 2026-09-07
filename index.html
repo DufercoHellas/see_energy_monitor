@@ -6368,17 +6368,21 @@ function renderCountryOutageTable(c, countryOutages) {
                     return Math.max(0, adjustedP);
                 });
 
+                const hasTargetPrices = tPrices && tPrices.some(p => p !== 0 && p !== null && p !== undefined);
+
                 // Calculate average absolute difference and average target price for percentages
                 let totalDiff = 0;
                 let totalTargetVal = 0;
                 let validCount = 0;
-                for (let i = 0; i < 24; i++) {
-                    const tPriceVal = tPrices[i];
-                    const mPriceVal = mPrices[i];
-                    if (tPriceVal !== undefined && mPriceVal !== undefined && tPriceVal !== null && mPriceVal !== null) {
-                        totalDiff += Math.abs(tPriceVal - mPriceVal);
-                        totalTargetVal += Math.abs(tPriceVal);
-                        validCount++;
+                if (hasTargetPrices) {
+                    for (let i = 0; i < 24; i++) {
+                        const tPriceVal = tPrices[i];
+                        const mPriceVal = mPrices[i];
+                        if (tPriceVal !== undefined && mPriceVal !== undefined && tPriceVal !== null && mPriceVal !== null) {
+                            totalDiff += Math.abs(tPriceVal - mPriceVal);
+                            totalTargetVal += Math.abs(tPriceVal);
+                            validCount++;
+                        }
                     }
                 }
                 const avgDiff = validCount > 0 ? (totalDiff / validCount) : 0;
@@ -6399,7 +6403,13 @@ function renderCountryOutageTable(c, countryOutages) {
                 const avgCarbonShiftVal = (euaT > 0 && euaC > 0) ? (euaT - euaC) * (sumCarbonShift / 24.0) : 0.0;
                 const avgCombinedShift = avgGasShiftVal + avgCarbonShiftVal;
                 const adjLabel = avgCombinedShift !== 0 ? ` [Adj: ${avgCombinedShift > 0 ? '+' : ''}${avgCombinedShift.toFixed(1)} €]` : '';
-                document.getElementById("comparison_header").innerText = `Match #${idx + 1} (${date}) | Score: ${match.combined.toFixed(1)}% | Avg Diff: ${avgDiff.toFixed(2)} € (${avgDiffPct.toFixed(0)}%)${adjLabel}`;
+                
+                const avgMatchVal = mPrices.reduce((a, b) => a + (b || 0), 0) / 24.0;
+                if (hasTargetPrices) {
+                    document.getElementById("comparison_header").innerText = `Match #${idx + 1} (${date}) | Score: ${match.combined.toFixed(1)}% | Avg Diff: ${avgDiff.toFixed(2)} € (${avgDiffPct.toFixed(0)}%)${adjLabel}`;
+                } else {
+                    document.getElementById("comparison_header").innerText = `Match #${idx + 1} (${date}) | Score: ${match.combined.toFixed(1)}% | Analogue Forecast: ${avgMatchVal.toFixed(2)} €/MWh${adjLabel} (Target Prices Pending DA Clearing)`;
+                }
                 
                 // Germany prices
                 const deDataTarget = (historicalData['DE_LU'] && historicalData['DE_LU'][currentTargetDate]) ? historicalData['DE_LU'][currentTargetDate] : null;
@@ -6551,26 +6561,29 @@ function renderCountryOutageTable(c, countryOutages) {
                 }, {responsive: true});
                 
                 // 3. Plot Prices Comparison
-                const priceTraces = [
-                    {
+                const priceTraces = [];
+                if (hasTargetPrices) {
+                    priceTraces.push({
                         x: hours,
                         y: tPrices,
-                        name: `Target Country`,
+                        name: `Target Country (${currentTargetDate})`,
                         type: 'scatter',
                         mode: 'lines',
                         line: {color: '#10b981', width: 2.5}
-                    },
-                    {
-                        x: hours,
-                        y: mPrices,
-                        name: `Match Country`,
-                        type: 'scatter',
-                        mode: 'lines',
-                        line: {color: '#6ee7b7', width: 1.5, dash: 'dash'}
-                    }
-                ];
+                    });
+                }
+                priceTraces.push({
+                    x: hours,
+                    y: mPrices,
+                    name: hasTargetPrices ? `Match Country (${date})` : `Analogue Match (${date})`,
+                    type: 'scatter',
+                    mode: 'lines',
+                    line: {color: hasTargetPrices ? '#6ee7b7' : '#10b981', width: hasTargetPrices ? 1.5 : 2.5, dash: hasTargetPrices ? 'dash' : 'solid'}
+                });
+
+                const priceTitle = hasTargetPrices ? 'Spot Price (€/MWh)' : 'Spot Price Forecast (€/MWh) — Target Pending DA Auction';
                 Plotly.newPlot('plot_comp_prices', priceTraces, {
-                    title: {text: 'Spot Price (€/MWh)', font: {family: 'Inter', size: 11, color: '#334155'}},
+                    title: {text: priceTitle, font: {family: 'Inter', size: 11, color: '#334155'}},
                     xaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
                     yaxis: {gridcolor: '#f1f5f9', tickfont: {size: 9}},
                     plot_bgcolor: 'transparent',
