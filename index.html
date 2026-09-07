@@ -2916,7 +2916,7 @@ function renderPlantEconomicsTab() {
     renderRunningCostTable(unitsToDisplay, avgPrice);
 }
 
-// ── Chart: Running Cost Stack ──────────────────────────────────────────────
+// ── Chart: Running Cost Stack / Hydro Capacity (MW) ────────────────────────
 function renderCostStackChart(units, avgPrice, targetDate) {
     const container = document.getElementById("plot_econ_cost_stack");
     if (!container || !window.Plotly) return;
@@ -2926,19 +2926,86 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         return;
     }
 
-    const plantNames = units.map(u => {
+    // When viewing Hydro, show REAL AVAILABLE CAPACITY (MW) instead of a misleading €1.50 cost bar
+    if (currentEconFleetFilter === 'hydro') {
+        const plantNames = units.map(u => {
+            const cleanName = u.spec.name.replace(/\(.*?\)/g, '').trim();
+            return u.avail_mw === 0 ? `⚠️ ${cleanName}` : cleanName;
+        });
+        const availMws = units.map(u => u.avail_mw);
+        const unavailMws = units.map(u => u.unavail_mw);
+        const customHover = units.map(u => ({
+            nom: u.spec.nominal_mw,
+            status: u.status_text,
+            avail: u.avail_mw,
+            unavail: u.unavail_mw,
+            tech: u.spec.tech
+        }));
+
+        const totalAvail = Math.round(availMws.reduce((a,b)=>a+b,0));
+        const totalNom = Math.round(units.reduce((a,b)=>a+(b.spec.nominal_mw||0),0));
+
+        const traces = [
+            {
+                x: plantNames,
+                y: availMws,
+                name: 'Available Capacity (MW)',
+                type: 'bar',
+                marker: { color: '#0284c7' },
+                customdata: customHover,
+                hovertemplate: '<b>%{x}</b><br>Available: <b>%{y:.1f} MW</b> (%{customdata.avail:.0f} / %{customdata.nom:.0f} MW)<br>Type: %{customdata.tech}<br>Status: %{customdata.status}<extra></extra>'
+            },
+            {
+                x: plantNames,
+                y: unavailMws,
+                name: 'Unavailable / Outage (MW)',
+                type: 'bar',
+                marker: { color: '#ef4444' },
+                customdata: customHover,
+                hovertemplate: '<b>%{x}</b><br>Unavailable: <b>%{y:.1f} MW</b><br>Status: %{customdata.status}<extra></extra>'
+            }
+        ];
+
+        const layout = getPlotlyThemeLayout({
+            barmode: 'stack',
+            title: {
+                text: `💧 PPC Hydro Stations: Available Dispatch Capacity (MW) — ${targetDate} (Available: ${totalAvail.toLocaleString()} MW / ${totalNom.toLocaleString()} MW)`,
+                font: { size: 14, weight: 700 }
+            },
+            xaxis: {
+                tickangle: -30,
+                tickfont: { size: 10 }
+            },
+            yaxis: {
+                title: 'Available Capacity (MW)',
+                showgrid: true
+            },
+            legend: {
+                orientation: 'h',
+                y: 1.15,
+                x: 0.0
+            },
+            margin: { l: 50, r: 25, t: 55, b: 90 }
+        });
+
+        Plotly.react(container, traces, layout, { responsive: true, displayModeBar: false });
+        return;
+    }
+
+    // For Thermal or All Fleets, plot Fuel + Carbon + VOM Running Cost Stack
+    const thermalUnits = units.filter(u => u.spec.fuel !== 'hydro');
+    const plantNames = thermalUnits.map(u => {
         const cleanName = u.spec.name.replace(/\(.*?\)/g, '').trim();
         return u.avail_mw === 0 ? `⚠️ ${cleanName}` : cleanName;
     });
-    const fuelCosts = units.map(u => u.fuel_cost);
-    const carbonCosts = units.map(u => u.carbon_cost);
-    const vomCosts = units.map(u => u.vom);
-    const customHover = units.map(u => ({
+    const fuelCosts = thermalUnits.map(u => u.fuel_cost);
+    const carbonCosts = thermalUnits.map(u => u.carbon_cost);
+    const vomCosts = thermalUnits.map(u => u.vom);
+    const customHover = thermalUnits.map(u => ({
         avail: u.avail_mw,
         nom: u.spec.nominal_mw,
         status: u.status_text,
-        runningCost: u.total_running_cost,
-        fuel: u.spec.fuel
+        runningCost: u.total_running_cost
     }));
 
     const traces = [
@@ -2967,13 +3034,12 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             type: 'bar',
             marker: { color: '#6366f1' },
             customdata: customHover,
-            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br>Cash Cost: <b>%{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
+            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br>Total Running Cost: <b>%{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
         }
     ];
 
-    // Reference horizontal line for Day-Ahead Base Price
     const shapes = [];
-    if (avgPrice > 0 && currentEconFleetFilter !== 'hydro') {
+    if (avgPrice > 0) {
         shapes.push({
             type: 'line',
             xref: 'paper',
@@ -2989,14 +3055,10 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         });
     }
 
-    const chartTitle = currentEconFleetFilter === 'hydro'
-        ? `PPC Hydro Reservoir Available Capacity & Cash Cost — ${targetDate}`
-        : `Plant Running Cost Breakdown (€/MWh) — ${targetDate}${avgPrice > 0 ? ` (DAM Base: ${avgPrice.toFixed(2)} €/MWh)` : ''}`;
-
     const layout = getPlotlyThemeLayout({
         barmode: 'stack',
         title: {
-            text: chartTitle,
+            text: `Thermal Plant Running Cost Stack (€/MWh) vs. Day-Ahead Price — ${targetDate}${avgPrice > 0 ? ` (DAM Base: ${avgPrice.toFixed(2)} €/MWh)` : ''}`,
             font: { size: 14, weight: 700 }
         },
         xaxis: {
@@ -3049,7 +3111,7 @@ function renderRunningCostTable(units, avgPrice) {
                 vsDamHtml = `<span style="color:#ef4444; font-weight:700;">+${diff.toFixed(2)} € (Higher)</span>`;
             }
         } else if (spec.fuel === 'hydro') {
-            vsDamHtml = '<span style="font-size:11px; color:var(--text-muted);" title="Hydro is dispatched during peak hours at Water Opportunity Value">Water Value</span>';
+            vsDamHtml = '<span style="font-size:11px; color:#0284c7; font-weight:600;" title="Hydro is dispatched at Water Opportunity Value during peak hours">Water Value</span>';
         }
 
         const isOffline = u.avail_mw <= 0.01;
@@ -3068,15 +3130,19 @@ function renderRunningCostTable(units, avgPrice) {
             : `${(spec.efficiency * 100).toFixed(1)}%`;
 
         const fuelCostHtml = spec.fuel === 'hydro'
-            ? '<span style="color:var(--text-muted);">0.00</span>'
+            ? '<span style="color:var(--text-muted);">— (Water)</span>'
             : u.fuel_cost.toFixed(2);
 
         const carbonCostHtml = spec.fuel === 'hydro'
-            ? '<span style="color:var(--text-muted);">0.00</span>'
+            ? '<span style="color:var(--text-muted);">0.00 (Zero CO₂)</span>'
             : u.carbon_cost.toFixed(2);
 
+        const vomHtml = spec.fuel === 'hydro'
+            ? '<span style="color:var(--text-muted);">—</span>'
+            : u.vom.toFixed(2);
+
         const totalCostHtml = spec.fuel === 'hydro'
-            ? `<span style="color:#0284c7; font-weight:700;" title="Accounting cash cost is ~1.50 €/MWh VOM; dispatched at Water Opportunity Value during peak hours">1.50 €*</span>`
+            ? `<span style="color:#0284c7; font-weight:700; font-size:11px;" title="Hydro has zero fuel cost; PPC bids hydro at peak water opportunity value (€230–€270/MWh) during evening hours">Water Value (Peaking)</span>`
             : u.total_running_cost.toFixed(2);
 
         rowsHtml += `
@@ -3099,7 +3165,7 @@ function renderRunningCostTable(units, avgPrice) {
             <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${efficiencyHtml}</td>
             <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${fuelCostHtml}</td>
             <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${carbonCostHtml}</td>
-            <td style="padding: 10px 12px; text-align: right; color: var(--text-muted);">${u.vom.toFixed(2)}</td>
+            <td style="padding: 10px 12px; text-align: right; color: var(--text-muted);">${vomHtml}</td>
             <td style="padding: 10px 12px; text-align: right; font-weight: 800; color: var(--accent-primary); font-size: 13px;">
                 ${totalCostHtml}
             </td>
