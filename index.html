@@ -138,9 +138,17 @@ h2 { color: var(--text-primary); font-size: 22px; margin: 0; font-weight: 800; l
 /* ── TABLES ── */
 .table-container { overflow-x: auto; border-radius: 12px; box-shadow: var(--shadow-md); border: 1px solid var(--border-color); }
 table { border-collapse: collapse; width: 100%; background-color: var(--bg-card); border: none; }
+th { background-color: var(--table-header-bg); color: var(--table-header-color); font-weight: 700; }
 th, td { padding: 10px 12px; text-align: left; font-size: 13px; border-bottom: 1px solid var(--table-border); word-break: keep-all; color: var(--text-primary); }
 tbody tr:hover { background-color: var(--table-row-hover); transition: background-color 0.2s ease; }
 tr.selected-match-row { background-color: rgba(79, 70, 229, 0.2) !important; border-left: 4px solid var(--accent-primary); }
+
+/* Unplanned outages row styling */
+tr.outage-unplanned-row { background-color: #fee2e2 !important; }
+tr.outage-unplanned-row td { color: #991b1b !important; }
+body.dark-mode tr.outage-unplanned-row { background-color: rgba(239, 68, 68, 0.22) !important; }
+body.dark-mode tr.outage-unplanned-row td { color: #fca5a5 !important; }
+body.dark-mode tr.outage-unplanned-row:hover { background-color: rgba(239, 68, 68, 0.32) !important; }
 
 #analogues_table th, #analogues_table td { white-space: nowrap; padding: 6px 3px; font-size: 11.5px; text-align: center; }
 #analogues_table th:first-child, #analogues_table td:first-child { text-align: left; padding-left: 6px; }
@@ -606,16 +614,41 @@ body.dark-mode hr {
 /* Override hardcoded inline light backgrounds */
 body.dark-mode [style*="background: white"],
 body.dark-mode [style*="background:white"],
+body.dark-mode [style*="background-color: white"],
+body.dark-mode [style*="background-color:white"],
 body.dark-mode [style*="background: #fff"],
 body.dark-mode [style*="background:#fff"],
+body.dark-mode [style*="background-color: #fff"],
+body.dark-mode [style*="background-color:#fff"],
 body.dark-mode [style*="background: #ffffff"],
 body.dark-mode [style*="background:#ffffff"],
+body.dark-mode [style*="background-color: #ffffff"],
+body.dark-mode [style*="background-color:#ffffff"],
 body.dark-mode [style*="background: #f8fafc"],
 body.dark-mode [style*="background:#f8fafc"],
+body.dark-mode [style*="background-color: #f8fafc"],
+body.dark-mode [style*="background-color:#f8fafc"],
 body.dark-mode [style*="background: #f1f5f9"],
-body.dark-mode [style*="background:#f1f5f9"] {
+body.dark-mode [style*="background:#f1f5f9"],
+body.dark-mode [style*="background-color: #f1f5f9"],
+body.dark-mode [style*="background-color:#f1f5f9"] {
     background-color: var(--bg-card) !important;
     border-color: var(--border-color) !important;
+}
+
+/* Specific override for unplanned outages light pink in dark mode */
+body.dark-mode [style*="background-color: #fee2e2"],
+body.dark-mode [style*="background-color:#fee2e2"],
+body.dark-mode [style*="background: #fee2e2"],
+body.dark-mode [style*="background:#fee2e2"] {
+    background-color: rgba(239, 68, 68, 0.22) !important;
+    color: #fca5a5 !important;
+}
+body.dark-mode [style*="background-color: #fee2e2"] td,
+body.dark-mode [style*="background-color:#fee2e2"] td,
+body.dark-mode [style*="background: #fee2e2"] td,
+body.dark-mode [style*="background:#fee2e2"] td {
+    color: #fca5a5 !important;
 }
 
 /* Override hardcoded dark text on dark mode */
@@ -1476,24 +1509,39 @@ if (typeof document !== 'undefined') {
 // Get Plotly theme-aware layout parameters
 function getPlotlyThemeLayout(customLayout = {}) {
     const dark = isDarkMode();
+    const textColor = dark ? '#f1f5f9' : '#0f172a';
+    const textSubtle = dark ? '#cbd5e1' : '#475569';
+    const textMuted = dark ? '#94a3b8' : '#64748b';
+    const gridColor = dark ? '#273552' : '#f1f5f9';
+    const lineColor = dark ? '#334155' : '#e2e8f0';
+
     const baseTheme = {
-        font: { family: 'Inter, sans-serif', color: dark ? '#cbd5e1' : '#374151' },
+        font: { family: 'Inter, sans-serif', color: textSubtle },
         paper_bgcolor: 'transparent',
         plot_bgcolor: 'transparent',
+        title: {
+            font: { family: 'Inter, sans-serif', color: textColor, size: 14 }
+        },
         xaxis: {
-            gridcolor: dark ? '#273552' : '#f1f5f9',
-            tickfont: { family: 'Inter, sans-serif', color: dark ? '#94a3b8' : '#6b7280' },
-            linecolor: dark ? '#334155' : '#e2e8f0',
-            zerolinecolor: dark ? '#334155' : '#e2e8f0'
+            gridcolor: gridColor,
+            linecolor: lineColor,
+            zerolinecolor: lineColor,
+            tickfont: { family: 'Inter, sans-serif', color: textMuted },
+            title: {
+                font: { family: 'Inter, sans-serif', color: textSubtle }
+            }
         },
         yaxis: {
-            gridcolor: dark ? '#273552' : '#f1f5f9',
-            tickfont: { family: 'Inter, sans-serif', color: dark ? '#94a3b8' : '#6b7280' },
-            linecolor: dark ? '#334155' : '#e2e8f0',
-            zerolinecolor: dark ? '#334155' : '#e2e8f0'
+            gridcolor: gridColor,
+            linecolor: lineColor,
+            zerolinecolor: lineColor,
+            tickfont: { family: 'Inter, sans-serif', color: textMuted },
+            title: {
+                font: { family: 'Inter, sans-serif', color: textSubtle }
+            }
         },
         legend: {
-            font: { family: 'Inter, sans-serif', color: dark ? '#cbd5e1' : '#374151' }
+            font: { family: 'Inter, sans-serif', color: textSubtle }
         },
         hoverlabel: {
             bgcolor: dark ? '#1e293b' : '#ffffff',
@@ -1501,16 +1549,66 @@ function getPlotlyThemeLayout(customLayout = {}) {
             font: { family: 'Inter, sans-serif', size: 12, color: dark ? '#f8fafc' : '#0f172a' }
         }
     };
-    
-    // Merge custom layout on top of base theme
+
+    function deepMerge(target, source) {
+        for (const key of Object.keys(source)) {
+            if (source[key] instanceof Object && !Array.isArray(source[key])) {
+                if (!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])) {
+                    target[key] = {};
+                }
+                deepMerge(target[key], source[key]);
+            } else {
+                target[key] = source[key];
+            }
+        }
+        return target;
+    }
+
     const merged = JSON.parse(JSON.stringify(baseTheme));
-    for (const key in customLayout) {
-        if (typeof customLayout[key] === 'object' && customLayout[key] !== null && !Array.isArray(customLayout[key])) {
-            merged[key] = Object.assign(merged[key] || {}, customLayout[key]);
-        } else {
-            merged[key] = customLayout[key];
+    const clonedCustom = JSON.parse(JSON.stringify(customLayout));
+
+    if (typeof clonedCustom.title === 'string') {
+        clonedCustom.title = { text: clonedCustom.title };
+    }
+    if (clonedCustom.xaxis && typeof clonedCustom.xaxis.title === 'string') {
+        clonedCustom.xaxis.title = { text: clonedCustom.xaxis.title };
+    }
+    if (clonedCustom.yaxis && typeof clonedCustom.yaxis.title === 'string') {
+        clonedCustom.yaxis.title = { text: clonedCustom.yaxis.title };
+    }
+
+    deepMerge(merged, clonedCustom);
+
+    if (merged.title) {
+        if (!merged.title.font) merged.title.font = {};
+        if (!merged.title.font.color) merged.title.font.color = textColor;
+        if (!merged.title.font.family) merged.title.font.family = 'Inter, sans-serif';
+    }
+    if (merged.xaxis) {
+        if (!merged.xaxis.tickfont) merged.xaxis.tickfont = {};
+        if (!merged.xaxis.tickfont.color) merged.xaxis.tickfont.color = textMuted;
+        if (!merged.xaxis.tickfont.family) merged.xaxis.tickfont.family = 'Inter, sans-serif';
+        if (merged.xaxis.title && typeof merged.xaxis.title === 'object') {
+            if (!merged.xaxis.title.font) merged.xaxis.title.font = {};
+            if (!merged.xaxis.title.font.color) merged.xaxis.title.font.color = textSubtle;
+            if (!merged.xaxis.title.font.family) merged.xaxis.title.font.family = 'Inter, sans-serif';
         }
     }
+    if (merged.yaxis) {
+        if (!merged.yaxis.tickfont) merged.yaxis.tickfont = {};
+        if (!merged.yaxis.tickfont.color) merged.yaxis.tickfont.color = textMuted;
+        if (!merged.yaxis.tickfont.family) merged.yaxis.tickfont.family = 'Inter, sans-serif';
+        if (merged.yaxis.title && typeof merged.yaxis.title === 'object') {
+            if (!merged.yaxis.title.font) merged.yaxis.title.font = {};
+            if (!merged.yaxis.title.font.color) merged.yaxis.title.font.color = textSubtle;
+            if (!merged.yaxis.title.font.family) merged.yaxis.title.font.family = 'Inter, sans-serif';
+        }
+    }
+    if (merged.legend) {
+        if (!merged.legend.font) merged.legend.font = {};
+        if (!merged.legend.font.color) merged.legend.font.color = textSubtle;
+    }
+
     return merged;
 }
 
@@ -6707,12 +6805,14 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                         type: 'bar',
                         name: ft,
                         marker: {
-                            color: FUEL_COLORS[ft] || '#94a3b8'
+                            color: FUEL_COLORS[ft] || '#94a3b8',
+                            line: { color: (typeof isDarkMode === 'function' && isDarkMode()) ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)', width: 0.5 }
                         }
                     });
                 });
                 
                 // Outage percentage text labels on top of each bar column
+                const dark = typeof isDarkMode === 'function' && isDarkMode();
                 const textLabels = totalsByDate.map(val => {
                     if (val <= 0) return '';
                     if (installedCap && installedCap > 0) {
@@ -6729,7 +6829,7 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                     mode: 'text',
                     text: textLabels,
                     textposition: 'top center',
-                    textfont: { family: 'Inter', size: 11, color: '#0f172a', weight: 'bold' },
+                    textfont: { family: 'Inter', size: 11, color: dark ? '#f8fafc' : '#0f172a', weight: 'bold' },
                     showlegend: false,
                     hoverinfo: 'none'
                 });
@@ -6754,7 +6854,7 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                         x1: dPlus1Str,
                         y0: 0,
                         y1: 1,
-                        fillcolor: 'rgba(245, 158, 11, 0.15)',
+                        fillcolor: dark ? 'rgba(245, 158, 11, 0.22)' : 'rgba(245, 158, 11, 0.15)',
                         line: { color: '#f59e0b', width: 2, dash: 'dot' }
                     });
                     
@@ -6765,8 +6865,8 @@ function renderCountryOutageChart(c, countryOutages, dateList, installedCap) {
                         yref: 'paper',
                         text: '<b>D+1 (Day-Ahead)</b>',
                         showarrow: false,
-                        font: { family: 'Inter', size: 10, color: '#b45309' },
-                        bgcolor: '#fef3c7',
+                        font: { family: 'Inter', size: 10, color: dark ? '#fef08a' : '#b45309' },
+                        bgcolor: dark ? '#78350f' : '#fef3c7',
                         bordercolor: '#f59e0b',
                         borderwidth: 1,
                         borderpad: 3
@@ -6818,7 +6918,8 @@ function renderCountryOutageTable(c, countryOutages) {
                 
                 countryOutages.forEach(row => {
                     const isUnplanned = row.businesstype === 'Unplanned outage';
-                    const bgStyle = isUnplanned ? 'style="background-color: #fee2e2;"' : '';
+                    const dark = typeof isDarkMode === 'function' && isDarkMode();
+                    const bgStyle = isUnplanned ? `style="background-color: ${dark ? '#450a0a' : '#fee2e2'}; color: ${dark ? '#fca5a5' : 'inherit'};"` : '';
                     
                     const formatDTStr = (isoStr) => {
                         if (!isoStr) return '';
@@ -6831,7 +6932,7 @@ function renderCountryOutageTable(c, countryOutages) {
                         return `${y}-${m}-${day} ${hr}:${min}`;
                     };
                     
-                    htmlTable += `<tr ${bgStyle}>
+                    htmlTable += `<tr class="${isUnplanned ? 'outage-unplanned-row' : ''}" ${bgStyle}>
                         <td>${row.Country || ''}</td>
                         <td style="font-weight: 600;">${row.production_resource_name || ''}</td>
                         <td>${row.display_fuel || ''}</td>
@@ -8355,8 +8456,8 @@ function renderArbitragePanel() {
                             </div>
                             <table style="width:100%;border-collapse:collapse;font-size:12px;">
                                 <thead>
-                                    <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
-                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:left;">Hour</th>
+                                    <tr style="background:${isDarkMode() ? '#0f172a' : '#f8fafc'};border-bottom:2px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};">
+                                        <th style="padding:6px 12px;color:${isDarkMode() ? '#94a3b8' : '#475569'};font-weight:700;text-align:left;">Hour</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Buy</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Sell</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Gross</th>
@@ -8377,7 +8478,7 @@ function renderArbitragePanel() {
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
 
                     cardsHtml += `
-                    <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
+                    <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
                             <div style="display:flex;align-items:center;gap:6px;">${headerBadges}</div>
                             <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;text-transform:uppercase;">Optimal Flow Route</span>
@@ -8501,12 +8602,12 @@ function renderArbitragePanel() {
                 let mkHtml = '';
                 if (top3MkTrades.length > 0) {
                     mkHtml += `
-                    <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
-                        <div style="border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
-                            <h4 style="margin: 0; color: #1e293b; font-size: 16px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
+                    <div style="background: ${isDarkMode() ? '#1e293b' : '#ffffff'}; border: 1px solid ${isDarkMode() ? '#334155' : '#e5e7eb'}; border-radius: 12px; padding: 20px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                        <div style="border-bottom: 2px solid ${isDarkMode() ? '#334155' : '#f1f5f9'}; padding-bottom: 12px; margin-bottom: 16px;">
+                            <h4 style="margin: 0; color: ${isDarkMode() ? '#f1f5f9' : '#1e293b'}; font-size: 16px; display: flex; align-items: center; gap: 8px; font-weight: 800;">
                                 <span style="font-size: 20px;">☀️</span> MK PV Export Opportunities (Peak Hours 09:00 - 17:00)
                             </h4>
-                            <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">
+                            <p style="margin: 4px 0 0 0; font-size: 12px; color: ${isDarkMode() ? '#94a3b8' : '#64748b'};">
                                 Top 3 highest-margin physical export routes for North Macedonia solar producers during peak solar generation window.
                             </p>
                         </div>
@@ -8580,8 +8681,8 @@ function renderArbitragePanel() {
                             </div>
                             <table style="width:100%;border-collapse:collapse;font-size:12px;">
                                 <thead>
-                                    <tr style="background:#f8fafc;border-bottom:2px solid #e2e8f0;">
-                                        <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:left;">Hour</th>
+                                    <tr style="background:${isDarkMode() ? '#0f172a' : '#f8fafc'};border-bottom:2px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};">
+                                        <th style="padding:6px 12px;color:${isDarkMode() ? '#94a3b8' : '#475569'};font-weight:700;text-align:left;">Hour</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Buy (MK)</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Sell (${trade.end})</th>
                                         <th style="padding:6px 12px;color:#475569;font-weight:700;text-align:right;">Gross</th>
@@ -8597,10 +8698,10 @@ function renderArbitragePanel() {
                         const toggleBtnHtml = `<button onclick="toggleDetail('mk_card_${ti}_details');const t=this;setTimeout(()=>{t.textContent=document.getElementById('mk_card_${ti}_details').style.display==='none'?'📊 Show hour details':'📊 Hide details';},50);" style="width:100%;margin-top:12px;padding:10px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,0.3);transition:box-shadow 0.15s,transform 0.1s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(99,102,241,0.45)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(99,102,241,0.3)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">📊 Show hour details</button>`;
 
                         mkHtml += `
-                        <div style="background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid #f59e0b;">
+                        <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid #f59e0b;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
                                 <div style="display:flex;align-items:center;gap:6px;">${routeBadges} ${cbamBadge}</div>
-                                <div style="font-size:16px;font-weight:800;color:${avgColor};">${avgPvMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;color:#64748b;">€ avg PV</span></div>
+                                <div style="font-size:16px;font-weight:800;color:${avgColor};">${avgPvMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;color:${isDarkMode() ? '#94a3b8' : '#64748b'};">€ avg PV</span></div>
                             </div>
                             ${hourBarHtml}
                             ${detailTableHtml}
@@ -8621,19 +8722,20 @@ function renderArbitragePanel() {
                     const topNVal = (document.getElementById("arbitrage_top_n") && document.getElementById("arbitrage_top_n").value) || "7";
                     const stratName = topNVal === "7" ? "🎯 Sniper" : (topNVal === "5" ? "⚖️ Balanced" : "🚀 High Volume");
 
+                    const dark = typeof isDarkMode === 'function' && isDarkMode();
                     const emptyStateHtml = `
-                    <div style="background: #ffffff; border: 1.5px dashed #cbd5e1; border-radius: 12px; padding: 22px 20px; text-align: center; margin: 8px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                    <div style="background: var(--bg-card); border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 22px 20px; text-align: center; margin: 8px 0; box-shadow: var(--shadow-sm);">
                         <div style="font-size: 22px; margin-bottom: 6px;">🎯</div>
-                        <div style="font-size: 15px; font-weight: 800; color: #1e293b; margin-bottom: 4px;">
-                            No cross-border flows qualify under <span style="color: #2563eb;">${stratName}</span> for this date
+                        <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+                            No cross-border flows qualify under <span style="color: #3b82f6;">${stratName}</span> for this date
                         </div>
-                        <p style="margin: 0 auto 14px auto; font-size: 12.5px; color: #64748b; max-width: 500px; line-height: 1.4;">
+                        <p style="margin: 0 auto 14px auto; font-size: 12.5px; color: var(--text-secondary); max-width: 500px; line-height: 1.4;">
                             High-conviction threshold requiring net margin &ge; ${threshold.toFixed(0)} €/MWh across candidate days. Explore wider market opportunities by switching strategy:
                         </p>
-                        <div style="display: inline-flex; align-items: center; gap: 10px; background: #f8fafc; padding: 6px 12px; border-radius: 10px; border: 1px solid #e2e8f0; flex-wrap: wrap; justify-content: center;">
-                            ${topNVal !== '7' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='7'; renderArbitragePanel();" style="background: #ffffff; border: 1.5px solid #cbd5e1; color: #334155; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: all 0.15s ease;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#ffffff'">🎯 Switch to Sniper (Top 7)</button>` : ''}
-                            ${topNVal !== '5' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='5'; renderArbitragePanel();" style="background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: all 0.15s ease;" onmouseover="this.style.background='#dcfce7'" onmouseout="this.style.background='#f0fdf4'">⚖️ Switch to Balanced (Top 5)</button>` : ''}
-                            ${topNVal !== '3' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='3'; renderArbitragePanel();" style="background: #eff6ff; border: 1.5px solid #93c5fd; color: #1d4ed8; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: all 0.15s ease;" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">🚀 Switch to High Volume (Top 3)</button>` : ''}
+                        <div style="display: inline-flex; align-items: center; gap: 10px; background: var(--bg-card-subtle); padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border-color); flex-wrap: wrap; justify-content: center;">
+                            ${topNVal !== '7' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='7'; renderArbitragePanel();" style="background: var(--bg-card); border: 1.5px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🎯 Switch to Sniper (Top 7)</button>` : ''}
+                            ${topNVal !== '5' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='5'; renderArbitragePanel();" style="background: ${dark ? 'rgba(5, 150, 105, 0.2)' : '#f0fdf4'}; border: 1.5px solid ${dark ? '#059669' : '#86efac'}; color: ${dark ? '#6ee7b7' : '#166534'}; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">⚖️ Switch to Balanced (Top 5)</button>` : ''}
+                            ${topNVal !== '3' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='3'; renderArbitragePanel();" style="background: ${dark ? 'rgba(37, 99, 235, 0.2)' : '#eff6ff'}; border: 1.5px solid ${dark ? '#2563eb' : '#93c5fd'}; color: ${dark ? '#93c5fd' : '#1d4ed8'}; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🚀 Switch to High Volume (Top 3)</button>` : ''}
                         </div>
                     </div>`;
                     container.innerHTML = emptyStateHtml;
@@ -8701,27 +8803,33 @@ function renderArbitragePanel() {
                             localStorage.setItem('margin_log', JSON.stringify(marginLog));
                         }
 
+                        const dark = typeof isDarkMode === 'function' && isDarkMode();
+                        const greenBoxBg = dark ? 'rgba(5, 150, 105, 0.18)' : '#f0fdf4';
+                        const greenBoxBorder = dark ? 'rgba(5, 150, 105, 0.35)' : '#bbf7d0';
+                        const grayBoxBg = dark ? 'var(--bg-card-subtle)' : '#f8fafc';
+                        const grayBoxBorder = dark ? 'var(--border-color)' : '#e2e8f0';
+
                         let mHtml = `
-                            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
-                                <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Predicted Avg Net Margin</div>
-                                <div style="font-size:22px;font-weight:800;color:#059669;">${avgPredicted.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                            <div style="background:${greenBoxBg};border:1px solid ${greenBoxBorder};border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Predicted Avg Net Margin</div>
+                                <div style="font-size:22px;font-weight:800;color:${dark ? '#34d399' : '#059669'};">${avgPredicted.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
                                 <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${allRouteMg.length} profitable hours</div>
                             </div>`;
 
                         if (avgRealised != null) {
                             const diff = avgRealised - avgPredicted;
-                            const diffColor = diff >= 0 ? '#059669' : '#dc2626';
+                            const diffColor = diff >= 0 ? (dark ? '#34d399' : '#059669') : '#ef4444';
                             const diffArrow = diff >= 0 ? '▲' : '▼';
                             mHtml += `
-                                <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
-                                    <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
-                                    <div style="font-size:22px;font-weight:800;color:#059669;">${avgRealised.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
+                                <div style="background:${greenBoxBg};border:1px solid ${greenBoxBorder};border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                    <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
+                                    <div style="font-size:22px;font-weight:800;color:${dark ? '#34d399' : '#059669'};">${avgRealised.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
                                     <div style="font-size:11px;color:${diffColor};font-weight:600;margin-top:2px;">${diffArrow} ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs predicted</div>
                                 </div>`;
                         } else {
                             mHtml += `
-                                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
-                                    <div style="font-size:9px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
+                                <div style="background:${grayBoxBg};border:1px solid ${grayBoxBorder};border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
+                                    <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
                                     <div style="font-size:22px;font-weight:800;color:#94a3b8;">— <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
                                     <div style="font-size:10px;color:#94a3b8;margin-top:2px;">Target date not yet settled</div>
                                 </div>`;
@@ -8886,7 +8994,10 @@ async function initDashboardData() {
                     if (typeof renderCableDailyOutagesGrid === 'function') renderCableDailyOutagesGrid();
                     if (typeof renderCableOutages === 'function') renderCableOutages();
                     if (typeof renderEUMap === 'function') renderEUMap();
-                    if (typeof renderComparisonTab === 'function') renderComparisonTab();
+                    if (typeof renderArbitragePanel === 'function') renderArbitragePanel();
+                    if (typeof currentSelectedMatchIdx !== 'undefined' && currentSelectedMatchIdx !== null && typeof currentTop7 !== 'undefined' && currentTop7 && currentTop7[currentSelectedMatchIdx]) {
+                        selectMatch(currentSelectedMatchIdx, currentTop7[currentSelectedMatchIdx].date);
+                    }
                     if (typeof renderTargetHourlyChart === 'function') renderTargetHourlyChart();
                     if (typeof renderRegionalContextFlows === 'function') renderRegionalContextFlows();
                 } catch (e) {
