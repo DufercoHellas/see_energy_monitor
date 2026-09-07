@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-07 09:37:31",
+  "timestamp": "2026-09-07 09:47:23",
   "today": "2026-09-07",
   "tomorrow": "2026-09-08",
   "is_after_dam_cutoff": false,
   "dam_cutoff_hour": 18,
-  "overall_status": "CRITICAL",
-  "overall_badge": "🔴",
+  "overall_status": "WARNING",
+  "overall_badge": "🟡",
   "summary": [],
   "spot_prices": {
     "matrix": {
@@ -725,10 +725,10 @@
           "description": "24 hrs"
         },
         "2026-09-07": {
-          "status": "partial",
-          "badge": "🟡",
-          "hours": 1,
-          "description": "1/24 hrs"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-08": {
           "status": "pending",
@@ -775,16 +775,16 @@
           "description": "24 hrs"
         },
         "2026-09-06": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-07": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-08": {
           "status": "pending",
@@ -837,10 +837,10 @@
           "description": "24 hrs"
         },
         "2026-09-07": {
-          "status": "partial",
-          "badge": "🟡",
-          "hours": 1,
-          "description": "1/24 hrs"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-08": {
           "status": "pending",
@@ -893,10 +893,10 @@
           "description": "24 hrs"
         },
         "2026-09-07": {
-          "status": "partial",
-          "badge": "🟡",
-          "hours": 1,
-          "description": "1/24 hrs"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-08": {
           "status": "pending",
@@ -936,10 +936,10 @@
       "2026-09-08"
     ],
     "summary": {
-      "complete_days": 123,
+      "complete_days": 128,
       "pending_days": 16,
-      "missing_days": 2,
-      "partial_days": 3
+      "missing_days": 0,
+      "partial_days": 0
     }
   },
   "cables_daily": {
@@ -2420,14 +2420,8 @@
     "days_lag": 4,
     "fetch_time": "2026-09-01 09:42:18"
   },
-  "issues_critical": [
-    "CRITICAL: Spot prices for MK TODAY (2026-09-07) are missing!"
-  ],
+  "issues_critical": [],
   "issues_warning": [
-    "Spot prices for AL on 2026-09-07 has only 1/24 hours.",
-    "Historical spot prices for MK on 2026-09-06 missing.",
-    "Spot prices for ME on 2026-09-07 has only 1/24 hours.",
-    "Spot prices for XK on 2026-09-07 has only 1/24 hours.",
     "TTF/EUA commodity prices are 4 days old (latest: 2026-09-03)."
   ],
   "issues_info": []
