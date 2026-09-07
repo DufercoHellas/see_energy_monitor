@@ -1131,30 +1131,30 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
     
     <!-- ── 2. Matches Table & Zoom Comparison (BELOW ARBITRAGE) ── -->
     <div id="analogues_results_container" style="display:none; margin-top: 20px;">
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; width: 100%; box-sizing: border-box;">
             <!-- ── Matches Table Card ── -->
-            <div style="flex: 1.3; min-width: 460px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); box-sizing: border-box;">
-                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 12px;">
-                    <h3 style="margin: 0; color: #1e293b; font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+            <div style="flex: 1 1 440px; min-width: 0; max-width: 48%; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); box-sizing: border-box; align-self: flex-start;">
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: #1e293b; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
                         <span>📋</span> Top 7 Closest Matches
                     </h3>
-                    <p style="font-size: 11.5px; color: #64748b; margin: 3px 0 0 0;">Click any match row below to inspect profiles and price curves.</p>
+                    <p style="font-size: 11px; color: #64748b; margin: 3px 0 0 0;">Click any match row below to inspect profiles and price curves.</p>
                 </div>
-                <div class="table-container" style="overflow-x: hidden; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div class="table-container" style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
                     <table id="analogues_table" style="width: 100%; border-collapse: collapse; table-layout: auto;">
                         <thead>
-                            <tr style="background: #f8fafc; font-size: 10.5px; text-transform: uppercase; color: #475569; letter-spacing: 0.3px;">
-                                <th style="padding: 7px 4px; text-align: left;">Date</th>
-                                <th style="padding: 7px 4px; text-align: center;">Combined</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Greece Residuals">GR R</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Germany Residuals">DE R</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Italy Residuals">IT R</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Carbon Price">EUA</th>
-                                <th style="padding: 7px 2px; text-align: center;" title="Gas Price">TTF</th>
+                            <tr style="background: #f8fafc; font-size: 10px; text-transform: uppercase; color: #475569; letter-spacing: 0.3px;">
+                                <th style="padding: 6px 4px; text-align: left;">Date</th>
+                                <th style="padding: 6px 4px; text-align: center;">Combined</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Greece Residuals">GR R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Germany Residuals">DE R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Italy Residuals">IT R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Carbon Price">EUA</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Gas Price">TTF</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -1163,23 +1163,23 @@ h4 { font-size: 16px; color: #374151; margin-bottom: 16px; font-weight: 600; }
             </div>
             
             <!-- ── Comparison Detail Panel ── -->
-            <div style="flex: 2; min-width: 480px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); box-sizing: border-box;">
-                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                    <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 13.5px; font-weight: 800;">
+            <div style="flex: 1.2 1 520px; min-width: 0; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); box-sizing: border-box; overflow: hidden;">
+                <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="comparison_header" style="margin: 0; color: #1e293b; font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                         Zoom Comparison
                     </h3>
                 </div>
                 
                 <!-- ── Comparison Charts ── -->
-                <div id="comp_charts_tab">
+                <div id="comp_charts_tab" style="width: 100%; min-width: 0; box-sizing: border-box;">
                     <!-- ── Prices Comparison ── -->
-                    <div id="plot_comp_prices" style="width: 100%; height: 220px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px; margin-bottom: 10px; box-sizing: border-box;"></div>
+                    <div id="plot_comp_prices" style="width: 100%; height: 210px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; margin-bottom: 8px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
                     <!-- ── Residuals Grid (2x2) ── -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div id="plot_comp_de_residuals" style="height: 160px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px; box-sizing: border-box;"></div>
-                        <div id="plot_comp_it_residuals" style="height: 160px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px; box-sizing: border-box;"></div>
-                        <div id="plot_comp_residuals" style="height: 160px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px; box-sizing: border-box;"></div>
-                        <div id="plot_comp_bg_residuals" style="height: 160px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 4px; box-sizing: border-box;"></div>
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; width: 100%; min-width: 0; box-sizing: border-box;">
+                        <div id="plot_comp_de_residuals" style="height: 150px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_it_residuals" style="height: 150px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_residuals" style="height: 150px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_bg_residuals" style="height: 150px; background: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
                     </div>
                 </div>
             </div>
@@ -5236,58 +5236,78 @@ function renderCableOutagesGrid() {
                         const yearlyCap = getYearlyCapacityForDate(corr, d.dateStr);
                         const yearlyText = yearlyCap !== null ? `Yr: ${yearlyCap} MW` : '';
                         
-                        if (dayEntries.length === 0) {
-                             const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
-                             let fullNTC = null;
-                             allCorrEntries.forEach(item => {
-                                 const orig = parseFloat(item.original_capacity) || 0;
-                                 if (fullNTC === null || orig > fullNTC) fullNTC = orig;
-                             });
-                             const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
-                             html += `
-                                 <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
-                                     <div style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
-                                         Mth: ${ntcLabel}
-                                         ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px;">${yearlyText}</div>` : ''}
-                                     </div>
-                                 </td>
-                             `;
-                         } else {
-                             let minRemaining = null;
-                             let maxOrig = 0;
-                             
-                             dayEntries.forEach(item => {
-                                 const rem = parseFloat(item.remaining_capacity) || 0;
-                                 const orig = parseFloat(item.original_capacity) || 0;
-                                 if (minRemaining === null || rem < minRemaining) {
-                                     minRemaining = rem;
-                                     maxOrig = orig;
-                                 }
-                             });
-                             
-                             const isTotal = minRemaining === 0;
-                             
-                             if (isTotal) {
-                                 html += `
-                                     <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
-                                         <div style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 700; transition: all 0.2s;">
-                                             Mth: OUTAGE
-                                             ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: normal;">${yearlyText}</div>` : ''}
-                                         </div>
-                                     </td>
-                                 `;
-                             } else {
-                                 const remLabel = maxOrig > 0 ? `${minRemaining}/${maxOrig} MW` : `${minRemaining} MW`;
-                                 html += `
-                                     <td style="padding: 6px; border-right: 1px solid #f1f5f9;">
-                                         <div style="background: #fff7ed; color: #d97706; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
-                                             Mth: ${remLabel}
-                                             ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fed7aa; padding-top: 2px;">${yearlyText}</div>` : ''}
-                                         </div>
-                                     </td>
-                                 `;
-                             }
-                         }
+                        const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
+                        let fullNTC = null;
+                        allCorrEntries.forEach(item => {
+                            const orig = parseFloat(item.original_capacity) || 0;
+                            if (fullNTC === null || orig > fullNTC) fullNTC = orig;
+                        });
+                        const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
+
+                        const curtailedEntries = dayEntries.filter(item => {
+                            const rem = parseFloat(item.remaining_capacity) || 0;
+                            const orig = parseFloat(item.original_capacity) || 0;
+                            return rem < orig;
+                        });
+
+                        if (curtailedEntries.length === 0) {
+                            html += `
+                                <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 100% Full Capacity (${ntcLabel})">
+                                    <div style="background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                        Mth: ${ntcLabel}
+                                        ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #a7f3d0; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                    </div>
+                                </td>
+                            `;
+                        } else {
+                            let minRemaining = null;
+                            let maxRemaining = null;
+                            let maxOrig = 0;
+                            
+                            curtailedEntries.forEach(item => {
+                                const rem = parseFloat(item.remaining_capacity) || 0;
+                                const orig = parseFloat(item.original_capacity) || 0;
+                                if (minRemaining === null || rem < minRemaining) minRemaining = rem;
+                                if (maxRemaining === null || rem > maxRemaining) maxRemaining = rem;
+                                if (orig > maxOrig) maxOrig = orig;
+                            });
+                            if (maxOrig === 0 && fullNTC !== null) maxOrig = fullNTC;
+
+                            const isTotal24h = (dayEntries.length >= 24 || curtailedEntries.length >= 24) && maxRemaining === 0;
+                            const isAllDayReduction = curtailedEntries.length >= 24 && minRemaining > 0;
+
+                            if (isTotal24h) {
+                                html += `
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Outage (0 MW)">
+                                        <div style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 700; transition: all 0.2s;">
+                                            Mth: OUTAGE
+                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: normal;">${yearlyText}</div>` : ''}
+                                        </div>
+                                    </td>
+                                `;
+                            } else if (isAllDayReduction) {
+                                const remLabel = minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining}/${maxOrig} MW`;
+                                html += `
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel})">
+                                        <div style="background: #fff7ed; color: #d97706; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                            Mth: ${remLabel}
+                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fed7aa; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                        </div>
+                                    </td>
+                                `;
+                            } else {
+                                const curtHours = curtailedEntries.length;
+                                const curtLabel = minRemaining === 0 ? `0/${maxOrig} MW (${curtHours}h)` : `${minRemaining}/${maxOrig} MW (${curtHours}h)`;
+                                html += `
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Partial curtailment for ${curtHours} hours (${curtLabel})">
+                                        <div style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 4px; font-size: 11px; font-weight: 600; transition: all 0.2s;">
+                                            Mth: ${curtLabel}
+                                            ${yearlyText ? `<div style="font-size: 11px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fde68a; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                        </div>
+                                    </td>
+                                `;
+                            }
+                        }
                     });
 
                     html += `</tr>`;
@@ -5324,7 +5344,7 @@ function renderCableDailyOutagesGrid() {
  
                  // 2. Filter daily outages matching tomorrow
                  const dayOutages = cableOutagesData.filter(item => {
-                     return item.trade_date === tomorrowStr && !isMonthlyYearlyOutage(item);
+                     return item.trade_date === tomorrowStr;
                  });
  
                  // Find all unique corridors in the entire cableOutagesData dataset
@@ -5521,17 +5541,18 @@ function showOutageGridDetails(corridor, dateStr) {
                 if (!panel) return;
 
                 const dayEntries = cableOutagesData.filter(item => item.corridor_code === corridor && item.trade_date === dateStr);
+                const curtailed = dayEntries.filter(item => (parseFloat(item.remaining_capacity) || 0) < (parseFloat(item.original_capacity) || 0));
                 
                 panel.style.display = "block";
                 
-                if (dayEntries.length === 0) {
+                if (dayEntries.length === 0 || curtailed.length === 0) {
                     panel.innerHTML = `
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
                             <h4 style="margin:0; font-size:14px; font-weight:700; color:#1e293b;">${corridor} — ${dateStr}</h4>
                             <button onclick="document.getElementById('cable_outages_detail_panel').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer; font-weight:700; line-height:1;">&times;</button>
                         </div>
                         <div style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:8px; padding:16px; font-size:13px; font-weight:600; text-align:center;">
-                            ✅ Full 100% capacity available all hours. No outages.
+                            ✅ Full 100% capacity available all 24 hours. No curtailments or outages.
                         </div>
                     `;
                     return;
@@ -5541,17 +5562,19 @@ function showOutageGridDetails(corridor, dateStr) {
                 dayEntries.forEach(item => {
                     const orig = parseFloat(item.original_capacity) || 0;
                     const rem = parseFloat(item.remaining_capacity) || 0;
+                    const isCurtailed = rem < orig;
                     const isTotal = rem === 0;
-                    const severityColor = isTotal ? "#dc2626" : "#d97706";
-                    const badge = isTotal ? "TOTAL OUTAGE" : `${rem} MW / ${orig} MW`;
+                    const severityColor = !isCurtailed ? "#059669" : (isTotal ? "#dc2626" : "#d97706");
+                    const badge = !isCurtailed ? `✓ Full ${orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${rem} MW / ${orig} MW`);
+                    const bg = !isCurtailed ? "#f8fafc" : (isTotal ? "#fef2f2" : "#fffbeb");
                     
                     listHtml += `
-                        <div style="border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 13px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-weight:600;">
+                        <div style="background: ${bg}; border-bottom: 1px solid #e2e8f0; padding: 8px 10px; margin-bottom: 4px; border-radius: 4px; font-size: 13px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:2px; font-weight:600;">
                                 <span>Hour ${item.position}</span>
-                                <span style="color: ${severityColor};">${badge}</span>
+                                <span style="color: ${severityColor}; font-weight: 700;">${badge}</span>
                             </div>
-                            <div style="color: #6b7280; font-size:12px; font-style:italic;">
+                            <div style="color: #6b7280; font-size:11px; font-style:italic;">
                                 Reason: ${item.reason || 'No description'}
                             </div>
                         </div>
@@ -5559,11 +5582,13 @@ function showOutageGridDetails(corridor, dateStr) {
                 });
 
                 panel.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
                         <h4 style="margin:0; font-size:14px; font-weight:700; color:#1e293b;">${corridor} — ${dateStr}</h4>
                         <button onclick="document.getElementById('cable_outages_detail_panel').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:20px; cursor:pointer; font-weight:700; line-height:1;">&times;</button>
                     </div>
-                    <p style="font-size:12px; color:#6b7280; margin-top:0; margin-bottom:12px;">Active capacity reductions:</p>
+                    <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 6px; padding: 8px 12px; margin-bottom: 12px; font-size: 12px; color: #9a3412; font-weight: 600;">
+                        ⚠️ ${curtailed.length} of ${dayEntries.length} hours curtailed / reduced
+                    </div>
                     <div style="max-height: 400px; overflow-y:auto; padding-right:6px;">
                         ${listHtml}
                     </div>
@@ -6591,7 +6616,14 @@ function renderCountryOutageTable(c, countryOutages) {
                     margin: {t: 22, l: 38, r: 8, b: 24},
                     showlegend: true,
                     legend: {font: {size: 9}, orientation: 'h', y: -0.18}
-                }, {responsive: true});
+                }, {responsive: true, displayModeBar: false});
+
+                requestAnimationFrame(() => {
+                    ['plot_comp_prices', 'plot_comp_de_residuals', 'plot_comp_it_residuals', 'plot_comp_residuals', 'plot_comp_bg_residuals'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && el.data) Plotly.Plots.resize(el);
+                    });
+                });
             }
 
 // ── Analogue Search Algorithm ─────────────────────────────────────────────
