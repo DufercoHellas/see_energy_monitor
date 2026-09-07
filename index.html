@@ -1276,14 +1276,14 @@ body.dark-mode [style*="color:#6b7280"] {
                 </select>
             </div>
 
-            <!-- Lignite Extraction Cost Benchmark -->
+            <!-- Lignite Extraction Cost Benchmark (Fixed Audited) -->
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label for="econ_lignite_cost" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
-                    ⛏️ Lignite Fuel Cost
+                <label style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                    ⛏️ Lignite Fuel Benchmark
                 </label>
-                <div style="display: flex; align-items: center; gap: 4px;">
-                    <input type="number" id="econ_lignite_cost" step="0.5" value="18.00" onchange="renderPlantEconomicsTab()" style="width: 75px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 8px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit;">
-                    <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">€/MWh_th</span>
+                <div style="display: flex; align-items: center; gap: 6px; background: var(--input-bg); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 6px; box-sizing: border-box;">
+                    <span style="font-size: 13px; font-weight: 800; color: #8b5cf6;">18.00 €/MWh_th</span>
+                    <span style="font-size: 10px; color: var(--text-muted); font-weight: 600; border-left: 1px solid var(--border-color); padding-left: 6px;" title="RAEWW / PPC Audited Mine Cash Extraction Cost">PPC Audited</span>
                 </div>
             </div>
 
@@ -1401,7 +1401,7 @@ body.dark-mode [style*="color:#6b7280"] {
                     📋 Plant Running Cost Table
                 </h3>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
-                    Ranked by Fuel &amp; Technology 1st, then by Capacity (MW) descending. Exact formulas: Fuel Cost = Fuel Price / η, Carbon Cost = (EUA × Emission Factor) / η.
+                    Ranked by Fuel &amp; Technology 1st, then by Available Capacity (MW) descending. Real-time physical outages from ENTSO-E are cross-referenced directly against active units.
                 </div>
             </div>
             <div>
@@ -1415,8 +1415,10 @@ body.dark-mode [style*="color:#6b7280"] {
                     <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
                         <th style="padding: 10px 12px; font-weight: 700;">#</th>
                         <th style="padding: 10px 12px; font-weight: 700;">Plant Name</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: center;">Physical Status</th>
                         <th style="padding: 10px 12px; font-weight: 700;">Fuel &amp; Technology</th>
-                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Capacity (MW)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Nominal MW</th>
+                        <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Available MW</th>
                         <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Net Efficiency η</th>
                         <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Fuel Cost (€/MWh)</th>
                         <th style="padding: 10px 12px; font-weight: 700; text-align: right;">Carbon Cost (€/MWh)</th>
@@ -2421,6 +2423,88 @@ function closeEconomicsFormulaModal() {
     if (modal) modal.style.display = "none";
 }
 
+// ── Outage Matching Helper ────────────────────────────────────────────────
+function getPlantOutageInfo(plantSpec, country, targetDate) {
+    const outages = window.outagesData || (typeof outagesData !== 'undefined' ? outagesData : []);
+    const nom = plantSpec.nominal_mw || 0;
+
+    if (!outages || outages.length === 0) {
+        return {
+            unavail_mw: 0,
+            avail_mw: nom,
+            status_text: 'Available',
+            status_type: 'available',
+            badge_html: '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🟢 Available</span>'
+        };
+    }
+
+    const dayStart = new Date(targetDate + "T00:00:00Z").getTime();
+    const dayEnd = new Date(targetDate + "T23:59:59Z").getTime();
+    const pid = plantSpec.id;
+
+    // Match Country and plant ID or PSR name
+    const matches = outages.filter(o => {
+        const c = o.Country || '';
+        if (c !== country && c !== country.replace('_LU', '')) return false;
+        const rName = o.production_resource_name || '';
+        const psrName = o.production_resource_psr_name || '';
+        if (rName !== pid && psrName !== pid) return false;
+        const st = typeof o.start === 'number' ? o.start : new Date(o.start).getTime();
+        const en = typeof o.end === 'number' ? o.end : (o.end ? new Date(o.end).getTime() : Infinity);
+        return st <= dayEnd && en >= dayStart;
+    });
+
+    if (matches.length === 0) {
+        return {
+            unavail_mw: 0,
+            avail_mw: nom,
+            status_text: 'Available',
+            status_type: 'available',
+            badge_html: '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🟢 Available</span>'
+        };
+    }
+
+    // Peak unavailable MW during this date
+    let maxUnavail = 0;
+    let bType = 'Planned maintenance';
+    matches.forEach(m => {
+        const u = parseFloat(m.unavailable_mw || 0);
+        if (u > maxUnavail) {
+            maxUnavail = u;
+            bType = m.businesstype || bType;
+        }
+    });
+
+    const avail = Math.max(0, Math.round((nom - maxUnavail) * 10) / 10);
+    const isPlanned = (bType || '').toLowerCase().includes('plan');
+
+    let badgeHtml = '';
+    let statusType = 'available';
+
+    if (avail <= 0.01) {
+        if (isPlanned) {
+            statusType = 'planned';
+            badgeHtml = `<span style="background:rgba(234,179,8,0.18); color:#eab308; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;" title="${bType} (-${maxUnavail.toFixed(0)} MW)">🔧 Planned Outage</span>`;
+        } else {
+            statusType = 'forced';
+            badgeHtml = `<span style="background:rgba(239,68,68,0.18); color:#ef4444; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;" title="${bType} (-${maxUnavail.toFixed(0)} MW)">🔴 Forced Outage</span>`;
+        }
+    } else if (maxUnavail > 0) {
+        statusType = 'partial';
+        badgeHtml = `<span style="background:rgba(249,115,22,0.18); color:#f97316; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;" title="Derated by ${maxUnavail.toFixed(0)} MW (${bType})">🟡 Derated (-${maxUnavail.toFixed(0)} MW)</span>`;
+    } else {
+        badgeHtml = '<span style="background:rgba(16,185,129,0.15); color:#10b981; padding:3px 8px; border-radius:4px; font-weight:700; font-size:11px;">🟢 Available</span>';
+    }
+
+    return {
+        unavail_mw: maxUnavail,
+        avail_mw: avail,
+        status_text: bType,
+        status_type: statusType,
+        badge_html: badgeHtml
+    };
+}
+
 // ── Main Render Function ───────────────────────────────────────────────────
 function renderPlantEconomicsTab() {
     const dateInput = document.getElementById("econ_date");
@@ -2520,7 +2604,7 @@ function renderPlantEconomicsTab() {
         }
     }
 
-    // Calculate Running Cost for each thermal plant
+    // Calculate Running Cost and Outages for each thermal plant
     const plantList = (plantSpecsData.plants && plantSpecsData.plants[country]) || (PLANT_SPECS_FALLBACK.plants[country]) || [];
     const calculatedUnits = [];
 
@@ -2552,13 +2636,21 @@ function renderPlantEconomicsTab() {
         const totalRunningCost = fuelCostEur + carbonCostEur + vom;
         const diffToDam = avgPrice > 0 ? (totalRunningCost - avgPrice) : null;
 
+        // Cross-reference physical outage status for this date
+        const outageInfo = getPlantOutageInfo(spec, country, targetDate);
+
         calculatedUnits.push({
             spec: spec,
             fuel_cost: fuelCostEur,
             carbon_cost: carbonCostEur,
             vom: vom,
             total_running_cost: totalRunningCost,
-            diff_to_dam: diffToDam
+            diff_to_dam: diffToDam,
+            unavail_mw: outageInfo.unavail_mw,
+            avail_mw: outageInfo.avail_mw,
+            status_text: outageInfo.status_text,
+            status_type: outageInfo.status_type,
+            outage_badge: outageInfo.badge_html
         });
     });
 
@@ -2575,7 +2667,7 @@ function renderPlantEconomicsTab() {
     const highestCostEl = document.getElementById("kpi_econ_highest_cost");
     const highestNameEl = document.getElementById("kpi_econ_highest_name");
 
-    // Record Lowest & Highest cost units for KPI overview cards
+    // Lowest & Highest cost units for KPI overview cards
     const sortedByCost = [...calculatedUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
     if (sortedByCost.length > 0) {
         const lowest = sortedByCost[0];
@@ -2586,22 +2678,32 @@ function renderPlantEconomicsTab() {
         if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
     }
 
-    // Compute simple average and capacity-weighted average running cost
-    let sumCost = 0;
-    let sumMw = 0;
-    let sumWeightedCost = 0;
-    calculatedUnits.forEach(u => {
-        sumCost += u.total_running_cost;
-        const mw = u.spec.nominal_mw || 0;
-        sumMw += mw;
-        sumWeightedCost += u.total_running_cost * mw;
-    });
-    const simpleAvg = calculatedUnits.length > 0 ? (sumCost / calculatedUnits.length) : 0;
-    const weightedAvg = sumMw > 0 ? (sumWeightedCost / sumMw) : 0;
+    // Capacity-Weighted Average running cost (Available fleet vs Nominal fleet)
+    let sumNomMw = 0;
+    let sumAvailMw = 0;
+    let sumNomWeightedCost = 0;
+    let sumAvailWeightedCost = 0;
 
-    // Make Capacity-Weighted Average the primary metric
-    if (avgCostEl) avgCostEl.innerText = `${weightedAvg.toFixed(2)} €/MWh`;
-    if (avgSubEl) avgSubEl.innerText = `Simple Avg: ${simpleAvg.toFixed(2)} €/MWh (Fleet: ${Math.round(sumMw).toLocaleString()} MW)`;
+    calculatedUnits.forEach(u => {
+        const nom = u.spec.nominal_mw || 0;
+        const avail = u.avail_mw || 0;
+        sumNomMw += nom;
+        sumAvailMw += avail;
+        sumNomWeightedCost += u.total_running_cost * nom;
+        if (avail > 0) {
+            sumAvailWeightedCost += u.total_running_cost * avail;
+        }
+    });
+
+    const nomWeightedAvg = sumNomMw > 0 ? (sumNomWeightedCost / sumNomMw) : 0;
+    const availWeightedAvg = sumAvailMw > 0 ? (sumAvailWeightedCost / sumAvailMw) : nomWeightedAvg;
+
+    // Available Capacity-Weighted Average is the primary metric
+    if (avgCostEl) avgCostEl.innerText = `${availWeightedAvg.toFixed(2)} €/MWh`;
+    if (avgSubEl) {
+        avgSubEl.innerText = `Avail: ${Math.round(sumAvailMw).toLocaleString()} MW / Fleet: ${Math.round(sumNomMw).toLocaleString()} MW (Nom Avg: ${nomWeightedAvg.toFixed(2)} €/MWh)`;
+        avgSubEl.title = `Weighted by available dispatchable capacity. If nominal fleet was fully available, average would be ${nomWeightedAvg.toFixed(2)} €/MWh.`;
+    }
 
     if (baseEl) baseEl.innerText = avgPrice > 0 ? `${avgPrice.toFixed(2)} €/MWh` : "— (Pending)";
     if (peakEl) peakEl.innerText = peakAvgPrice > 0 ? `Peak (08-20h): ${peakAvgPrice.toFixed(2)} €/MWh` : "Peak: —";
@@ -2609,11 +2711,14 @@ function renderPlantEconomicsTab() {
     if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
     if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
 
-    // Rank 1st by Fuel & Technology, then by Capacity (MW) descending
+    // Rank 1st by Fuel & Technology, then by Available Capacity (MW) descending, then Nominal MW
     const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
     calculatedUnits.sort((a, b) => {
         const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
         if (fuelDiff !== 0) return fuelDiff;
+        // Within same fuel, available capacity first, then nominal
+        const availDiff = (b.avail_mw || 0) - (a.avail_mw || 0);
+        if (availDiff !== 0) return availDiff;
         return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
     });
 
@@ -2634,10 +2739,19 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         return;
     }
 
-    const plantNames = units.map(u => u.spec.name.replace(/\(.*?\)/g, '').trim());
+    const plantNames = units.map(u => {
+        const cleanName = u.spec.name.replace(/\(.*?\)/g, '').trim();
+        return u.avail_mw === 0 ? `⚠️ ${cleanName}` : cleanName;
+    });
     const fuelCosts = units.map(u => u.fuel_cost);
     const carbonCosts = units.map(u => u.carbon_cost);
     const vomCosts = units.map(u => u.vom);
+    const customHover = units.map(u => ({
+        avail: u.avail_mw,
+        nom: u.spec.nominal_mw,
+        status: u.status_text,
+        runningCost: u.total_running_cost
+    }));
 
     const traces = [
         {
@@ -2646,7 +2760,8 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             name: 'Fuel Cost (€/MWh)',
             type: 'bar',
             marker: { color: '#f59e0b' },
-            hovertemplate: '<b>%{x}</b><br>Fuel: <b>%{y:.2f} €/MWh</b><extra></extra>'
+            customdata: customHover,
+            hovertemplate: '<b>%{x}</b><br>Avail: <b>%{customdata.avail:.0f} / %{customdata.nom:.0f} MW</b> (%{customdata.status})<br>Fuel: <b>%{y:.2f} €/MWh</b><extra></extra>'
         },
         {
             x: plantNames,
@@ -2654,6 +2769,7 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             name: 'Carbon Cost (€/MWh)',
             type: 'bar',
             marker: { color: '#10b981' },
+            customdata: customHover,
             hovertemplate: '<b>%{x}</b><br>Carbon: <b>%{y:.2f} €/MWh</b><extra></extra>'
         },
         {
@@ -2662,7 +2778,8 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             name: 'VOM (€/MWh)',
             type: 'bar',
             marker: { color: '#6366f1' },
-            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><extra></extra>'
+            customdata: customHover,
+            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br>Total: <b>%{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
         }
     ];
 
@@ -2716,7 +2833,7 @@ function renderRunningCostTable(units, avgPrice) {
     if (!tbody) return;
 
     if (!units || units.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:30px; color:var(--text-muted);">No thermal generating units found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:30px; color:var(--text-muted);">No thermal generating units found.</td></tr>';
         return;
     }
 
@@ -2739,11 +2856,25 @@ function renderRunningCostTable(units, avgPrice) {
             }
         }
 
+        const isOffline = u.avail_mw <= 0.01;
+        const rowStyle = isOffline 
+            ? "border-bottom: 1px solid var(--border-color); opacity: 0.72; background: rgba(239, 68, 68, 0.02); transition: background 0.15s;" 
+            : "border-bottom: 1px solid var(--border-color); transition: background 0.15s;";
+
+        const availMwHtml = isOffline
+            ? `<span style="color: #ef4444; font-weight: 700;">0.0</span>`
+            : (u.avail_mw < spec.nominal_mw)
+            ? `<span style="color: #f97316; font-weight: 700;">${u.avail_mw.toFixed(1)}</span>`
+            : `<span style="color: #10b981; font-weight: 700;">${u.avail_mw.toFixed(1)}</span>`;
+
         rowsHtml += `
-        <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.15s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+        <tr style="${rowStyle}" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='${isOffline ? 'rgba(239, 68, 68, 0.02)' : 'transparent'}'">
             <td style="padding: 10px 12px; font-weight: 700; color: var(--text-muted);">${idx + 1}</td>
             <td style="padding: 10px 12px; font-weight: 700; color: var(--text-primary);">
                 ${spec.name}
+            </td>
+            <td style="padding: 10px 12px; text-align: center;">
+                ${u.outage_badge}
             </td>
             <td style="padding: 10px 12px;">
                 <div style="display:flex; align-items:center; gap:6px;">
@@ -2751,7 +2882,8 @@ function renderRunningCostTable(units, avgPrice) {
                     <span style="font-size:11px; color:var(--text-secondary);">${spec.tech}</span>
                 </div>
             </td>
-            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-primary);">${spec.nominal_mw.toFixed(1)}</td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${spec.nominal_mw.toFixed(1)}</td>
+            <td style="padding: 10px 12px; text-align: right; font-weight: 700;">${availMwHtml}</td>
             <td style="padding: 10px 12px; text-align: right; font-weight: 600; color: var(--text-secondary);">${(spec.efficiency * 100).toFixed(1)}%</td>
             <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.fuel_cost.toFixed(2)}</td>
             <td style="padding: 10px 12px; text-align: right; color: var(--text-secondary);">${u.carbon_cost.toFixed(2)}</td>
@@ -9718,7 +9850,7 @@ async function initDashboardData() {
                     ]);
 
                     historicalData   = hist;
-                    outagesData      = out;
+                    window.outagesData = outagesData = out;
                     cablesData       = cab;
                     cablesLongData   = cabL;
                     cableOutagesData = cabO;
