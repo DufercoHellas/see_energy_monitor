@@ -2369,6 +2369,7 @@ function initPlantEconomics() {
         })
         .finally(() => {
             initEconDateDefault();
+            renderPlantEconomicsTab();
         });
 }
 
@@ -2561,26 +2562,7 @@ function renderPlantEconomicsTab() {
         });
     });
 
-    // Record Lowest & Highest cost units for KPI overview cards
-    const sortedByCost = [...calculatedUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
-    if (sortedByCost.length > 0) {
-        const lowest = sortedByCost[0];
-        const highest = sortedByCost[sortedByCost.length - 1];
-        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
-        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
-        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
-        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
-    }
-
-    // Rank 1st by Fuel & Technology, then by Capacity (MW) descending
-    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
-    calculatedUnits.sort((a, b) => {
-        const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
-        if (fuelDiff !== 0) return fuelDiff;
-        return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
-    });
-
-    // Update Top Overview Cards
+    // DOM Elements for KPI Overview Cards
     const baseEl = document.getElementById("kpi_econ_power_base");
     const peakEl = document.getElementById("kpi_econ_power_peak");
     const gasEl = document.getElementById("kpi_econ_gas_price");
@@ -2592,6 +2574,17 @@ function renderPlantEconomicsTab() {
     const avgSubEl = document.getElementById("kpi_econ_avg_sub");
     const highestCostEl = document.getElementById("kpi_econ_highest_cost");
     const highestNameEl = document.getElementById("kpi_econ_highest_name");
+
+    // Record Lowest & Highest cost units for KPI overview cards
+    const sortedByCost = [...calculatedUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
+    if (sortedByCost.length > 0) {
+        const lowest = sortedByCost[0];
+        const highest = sortedByCost[sortedByCost.length - 1];
+        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
+        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
+        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
+        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
+    }
 
     // Compute simple average and capacity-weighted average running cost
     let sumCost = 0;
@@ -2615,7 +2608,13 @@ function renderPlantEconomicsTab() {
     if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
     if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
 
-// KPI cards already updated from sortedByCost
+    // Rank 1st by Fuel & Technology, then by Capacity (MW) descending
+    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
+    calculatedUnits.sort((a, b) => {
+        const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
+        if (fuelDiff !== 0) return fuelDiff;
+        return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
+    });
 
     // Render Cost Stack Chart
     renderCostStackChart(calculatedUnits, avgPrice, targetDate);
