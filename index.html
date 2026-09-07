@@ -5275,11 +5275,12 @@ function renderCableOutagesGrid() {
                             const isAllDayReduction = (curtailedEntries.length >= 24) && (minRemaining > 0);
 
                             if (isTotal24h) {
+                                const totalLabel = yearlyCap !== null ? 'Mth/Yr: OUTAGE' : 'Mth: OUTAGE';
                                 html += `
-                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Outage (0 MW all 24 hours)">
-                                        <div style="background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; border-radius: 6px; padding: 7px 4px; font-size: 11px; font-weight: 700; transition: all 0.2s;">
-                                            Mth: OUTAGE
-                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: normal;">${yearlyText}</div>` : ''}
+                                    <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
+                                        <div style="background: #fef2f2; color: #dc2626; border: 1.5px solid #fca5a5; border-radius: 6px; padding: 7px 4px; font-size: 11px; font-weight: 800; transition: all 0.2s;">
+                                            <div>${totalLabel}</div>
+                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fca5a5; padding-top: 2px; font-weight: 600;">(Yr: ${yearlyCap} MW Blocked)</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -5300,10 +5301,10 @@ function renderCableOutagesGrid() {
                                 const subCap = isZeroPartial ? `0/${maxOrig} MW` : `${minRemaining}/${maxOrig} MW`;
                                 html += `
                                     <td style="padding: 6px; border-right: 1px solid #f1f5f9; cursor: pointer;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
-                                        <div style="background: #fffbeb; color: #b45309; border: 1.5px solid #fcd34d; border-radius: 6px; padding: 6px 3px; font-size: 10.5px; font-weight: 700; transition: all 0.2s;">
+                                        <div style="background: #f5f3ff; color: #6d28d9; border: 1.5px solid #c4b5fd; border-radius: 6px; padding: 6px 3px; font-size: 10.5px; font-weight: 700; transition: all 0.2s;">
                                             <div>Mth: ${partialTitle}</div>
-                                            <div style="font-size: 10px; opacity: 0.9; font-weight: 600; margin-top: 1px;">${subCap}</div>
-                                            ${yearlyText ? `<div style="font-size: 10px; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #fcd34d; padding-top: 2px;">${yearlyText}</div>` : ''}
+                                            <div style="font-size: 10px; color: #7c3aed; opacity: 0.95; font-weight: 600; margin-top: 1px;">${subCap}</div>
+                                            ${yearlyText ? `<div style="font-size: 10px; color: #6d28d9; opacity: 0.85; margin-top: 2px; border-top: 1px dashed #c4b5fd; padding-top: 2px;">${yearlyText}</div>` : ''}
                                         </div>
                                     </td>
                                 `;
@@ -5558,6 +5559,38 @@ function showOutageGridDetails(corridor, dateStr) {
     const dayEntries = cableOutagesData.filter(item => item.corridor_code === corridor && item.trade_date === dateStr);
     const curtailed = dayEntries.filter(item => (parseFloat(item.remaining_capacity) || 0) < (parseFloat(item.original_capacity) || 0));
     
+    // Look up Yearly and Monthly capacities for this corridor & date
+    const targetTime = new Date(dateStr).getTime();
+    const yearlyAuctions = cablesLongData.filter(item => 
+        item.corridor_code === corridor && 
+        item.product === 'Yearly' &&
+        new Date(item.start_date.replace(" ", "T")).getTime() <= targetTime &&
+        new Date(item.end_date.replace(" ", "T")).getTime() >= targetTime
+    );
+    const monthlyAuctions = cablesLongData.filter(item => 
+        item.corridor_code === corridor && 
+        item.product === 'Monthly' &&
+        new Date(item.start_date.replace(" ", "T")).getTime() <= targetTime &&
+        new Date(item.end_date.replace(" ", "T")).getTime() >= targetTime
+    );
+
+    let longTermHtml = "";
+    if (yearlyAuctions.length > 0 || monthlyAuctions.length > 0) {
+        const yCap = yearlyAuctions.length > 0 ? `${yearlyAuctions[0].allocated_capacity} MW` : null;
+        const mCap = monthlyAuctions.length > 0 ? `${monthlyAuctions[0].allocated_capacity} MW` : null;
+        longTermHtml = `
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px; flex-shrink: 0;">
+                <div style="font-weight: 700; color: #334155; margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">
+                    <span>⚡</span> <span>Auction Capacities for ${dateStr}</span>
+                </div>
+                <div style="display: flex; gap: 16px; color: #475569; font-size: 12px; flex-wrap: wrap;">
+                    ${yCap ? `<span><strong>Yearly Allocated:</strong> <span style="color:#0369a1; font-weight:700;">${yCap}</span></span>` : ''}
+                    ${mCap ? `<span><strong>Monthly Allocated:</strong> <span style="color:#4338ca; font-weight:700;">${mCap}</span></span>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
     if (overlay) overlay.style.display = "flex";
     panel.style.display = "flex";
     
@@ -5570,6 +5603,7 @@ function showOutageGridDetails(corridor, dateStr) {
                 </div>
                 <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
             </div>
+            ${longTermHtml}
             <div style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:10px; padding:20px; font-size:13.5px; font-weight:600; text-align:center;">
                 ✅ Full 100% capacity available all 24 hours. No curtailments or outages.
             </div>
@@ -5577,25 +5611,57 @@ function showOutageGridDetails(corridor, dateStr) {
         return;
     }
 
-    let listHtml = "";
+    // Smart grouping of contiguous hours with identical capacity and reason
+    let groups = [];
+    let currentGroup = null;
+
     dayEntries.forEach(item => {
         const orig = parseFloat(item.original_capacity) || 0;
         const rem = parseFloat(item.remaining_capacity) || 0;
-        const isCurtailed = rem < orig;
-        const isTotal = rem === 0;
+        const reason = item.reason || 'No description provided';
+        
+        if (currentGroup && 
+            currentGroup.orig === orig && 
+            currentGroup.rem === rem && 
+            currentGroup.reason === reason &&
+            item.position === currentGroup.endHour + 1) {
+            currentGroup.endHour = item.position;
+            currentGroup.count++;
+        } else {
+            if (currentGroup) groups.push(currentGroup);
+            currentGroup = {
+                startHour: item.position,
+                endHour: item.position,
+                count: 1,
+                orig: orig,
+                rem: rem,
+                reason: reason
+            };
+        }
+    });
+    if (currentGroup) groups.push(currentGroup);
+
+    let listHtml = "";
+    groups.forEach(group => {
+        const isCurtailed = group.rem < group.orig;
+        const isTotal = group.rem === 0;
         const severityColor = !isCurtailed ? "#059669" : (isTotal ? "#dc2626" : "#d97706");
-        const badge = !isCurtailed ? `✓ Full ${orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${rem} MW / ${orig} MW`);
+        const badge = !isCurtailed ? `✓ Full ${group.orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${group.rem} MW / ${group.orig} MW`);
         const bg = !isCurtailed ? "#f8fafc" : (isTotal ? "#fef2f2" : "#fffbeb");
         const border = !isCurtailed ? "#f1f5f9" : (isTotal ? "#fee2e2" : "#fef3c7");
         
+        const hourLabel = (group.count === 24) 
+            ? "All 24 Hours (Hours 1–24)" 
+            : (group.startHour === group.endHour ? `Hour ${group.startHour}` : `Hours ${group.startHour}–${group.endHour} (${group.count} hrs)`);
+
         listHtml += `
-            <div style="background: ${bg}; border: 1px solid ${border}; padding: 10px 14px; border-radius: 8px; font-size: 13px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 3px;">
-                    <span style="font-weight: 700; color: #1e293b;">Hour ${item.position}</span>
+            <div style="background: ${bg}; border: 1.5px solid ${border}; padding: 12px 14px; border-radius: 8px; font-size: 13px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+                    <span style="font-weight: 800; color: #1e293b; font-size: 13.5px;">${hourLabel}</span>
                     <span style="color: ${severityColor}; font-weight: 800; font-size: 12.5px;">${badge}</span>
                 </div>
-                <div style="color: #64748b; font-size: 11.5px; font-style: italic; line-height: 1.4;">
-                    Reason: ${item.reason || 'No description provided'}
+                <div style="color: #64748b; font-size: 11.5px; line-height: 1.45; margin-top: 4px;">
+                    <strong style="color: #475569;">Reason:</strong> ${group.reason}
                 </div>
             </div>
         `;
@@ -5609,10 +5675,11 @@ function showOutageGridDetails(corridor, dateStr) {
             </div>
             <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
         </div>
+        ${longTermHtml}
         <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #9a3412; font-weight: 700; display:flex; align-items:center; gap:8px; flex-shrink: 0;">
             <span>⚠️</span> <span>${curtailed.length} of ${dayEntries.length} hours curtailed / reduced</span>
         </div>
-        <div style="overflow-y: auto; max-height: 520px; padding-right: 6px; display: flex; flex-direction: column; gap: 8px;">
+        <div style="overflow-y: auto; max-height: 480px; padding-right: 6px; display: flex; flex-direction: column; gap: 8px;">
             ${listHtml}
         </div>
     `;
