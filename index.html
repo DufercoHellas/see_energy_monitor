@@ -96,29 +96,69 @@ body {
 }
 h2 { color: var(--text-primary); font-size: 22px; margin: 0; font-weight: 800; letter-spacing: -0.4px; }
 
-/* ── THEME TOGGLE BUTTON ── */
-.theme-toggle-btn {
+/* ── THEME TOGGLE SWITCH ── */
+.theme-toggle-switch-wrap {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 6px 12px;
+    padding: 5px 11px;
     font-size: 11px;
     font-weight: 700;
     color: var(--text-secondary);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     transition: all 0.2s ease;
     font-family: 'Inter', sans-serif;
     user-select: none;
     box-shadow: var(--shadow-sm);
 }
-.theme-toggle-btn:hover {
-    background: var(--bg-hover);
-    color: var(--text-primary);
+.theme-toggle-switch-wrap:hover {
     border-color: var(--accent-primary);
-    transform: translateY(-1px);
+    background: var(--bg-hover);
+}
+.theme-switch-track {
+    width: 32px;
+    height: 18px;
+    background-color: #cbd5e1;
+    border-radius: 20px;
+    position: relative;
+    transition: background-color 0.25s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    padding: 2px;
+}
+.theme-switch-track.active {
+    background-color: #4f46e5;
+}
+body.dark-mode .theme-switch-track.active {
+    background-color: #6366f1;
+}
+.theme-switch-thumb {
+    width: 14px;
+    height: 14px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transform: translateX(0);
+}
+.theme-switch-track.active .theme-switch-thumb {
+    transform: translateX(14px);
+}
+.theme-toggle-state-text {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    min-width: 22px;
+}
+.theme-switch-track.active + .theme-toggle-state-text {
+    color: #4f46e5;
+}
+body.dark-mode .theme-switch-track.active + .theme-toggle-state-text {
+    color: #818cf8;
 }
 
 /* ── SUMMARY BOX ── */
@@ -781,11 +821,17 @@ body.dark-mode [style*="color:#6b7280"] {
             </div>
         </div>
 
-        <!-- Dark / Light Theme Toggle -->
-        <button type="button" id="theme_toggle_btn" class="theme-toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark/Light Mode">
-            <span id="theme_toggle_icon">🌙</span>
-            <span id="theme_toggle_text">Dark</span>
-        </button>
+        <!-- Dark Mode Toggle Switch (ON / OFF) -->
+        <div id="theme_toggle_btn" class="theme-toggle-switch-wrap" onclick="toggleDarkMode()" title="Toggle Dark Mode On / Off" role="button" tabindex="0" aria-label="Dark Mode Toggle">
+            <span style="display: flex; align-items: center; gap: 4px; font-weight: 700; color: var(--text-primary);">
+                <span>🌙</span>
+                <span>Dark Mode</span>
+            </span>
+            <div id="theme_switch_track" class="theme-switch-track">
+                <div id="theme_switch_thumb" class="theme-switch-thumb"></div>
+            </div>
+            <span id="theme_toggle_state" class="theme-toggle-state-text">OFF</span>
+        </div>
     </div>
 </div>
 
@@ -1464,8 +1510,21 @@ function isDarkMode() {
 }
 
 function updateThemeUI(isDark) {
+    const track = document.getElementById("theme_switch_track");
+    const state = document.getElementById("theme_toggle_state");
     const icon = document.getElementById("theme_toggle_icon");
     const text = document.getElementById("theme_toggle_text");
+
+    if (track) {
+        if (isDark) {
+            track.classList.add("active");
+        } else {
+            track.classList.remove("active");
+        }
+    }
+    if (state) {
+        state.innerText = isDark ? "ON" : "OFF";
+    }
     if (icon) icon.innerText = isDark ? "☀️" : "🌙";
     if (text) text.innerText = isDark ? "Light" : "Dark";
 }
