@@ -12,6 +12,15 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+@font-face {
+    font-family: "Twemoji Country Flags";
+    font-style: normal;
+    font-weight: 400;
+    src: url('https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.8/dist/TwemojiCountryFlags.woff2') format('woff2');
+    unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E007F;
+    font-display: swap;
+}
+
 /* ── CSS THEME VARIABLES ── */
 :root {
     --bg-body: #f8fafc;
@@ -77,12 +86,16 @@ body.dark-mode {
 
 /* ── LAYOUT ── */
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Twemoji Country Flags", "Segoe UI Emoji", sans-serif;
     margin: 0;
     padding: 16px 24px;
     background-color: var(--bg-body);
     color: var(--text-primary);
     transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+select, option, input, button {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Twemoji Country Flags", "Segoe UI Emoji", sans-serif;
 }
 
 /* ── HEADER ── */
@@ -1771,17 +1784,62 @@ body.dark-mode .flow-dash {
     </div>
 
 
-    <!-- Running Cost Breakdown Chart -->
+    <!-- Running Cost Breakdown Chart & Fleet Toolbar -->
     <div class="chart-wrapper" style="padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: var(--shadow-sm); margin-bottom: 20px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">
-                📊 Plant Running Cost Stack (€/MWh) vs. Day-Ahead Price
-            </h3>
-            <div style="font-size: 11px; color: var(--text-muted);">
-                Bars show Fuel Cost + Carbon Cost + VOM per MWh produced
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <div>
+                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 6px;">
+                    <span id="econ_chart_title_icon">📊</span> <span id="econ_chart_title_text">Plant Running Cost Stack (€/MWh) vs. Day-Ahead Price</span>
+                </h3>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="econ_chart_subtitle">
+                    Bars show Fuel Cost + Carbon Cost + VOM per MWh produced
+                </div>
+            </div>
+
+            <!-- Fleet View & Organization Toolbar -->
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <!-- Chart View Toggle -->
+                <div style="display: flex; align-items: center; background: var(--bg-card-subtle-2); padding: 2px; border-radius: 6px; border: 1px solid var(--border-color);">
+                    <button type="button" id="btn_econ_view_stack" onclick="setEconChartView('stack')" class="inner-tablinks active" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; border: none;">📊 Bars</button>
+                    <button type="button" id="btn_econ_view_curve" onclick="setEconChartView('curve')" class="inner-tablinks" style="padding: 4px 8px; font-size: 11px; font-weight: 700; border-radius: 4px; cursor: pointer; border: none;">📈 Supply Curve</button>
+                </div>
+
+                <!-- Sort Selector -->
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <label for="econ_sort_order" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Sort:</label>
+                    <select id="econ_sort_order" onchange="onEconSortChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">
+                        <option value="alpha" selected>🔤 Alphabetical (A-Z)</option>
+                        <option value="merit_asc">⚡ Merit Order (Cost: Low ➔ High)</option>
+                        <option value="merit_desc">🔺 Highest Cost First</option>
+                        <option value="capacity_desc">🔋 Capacity (Largest MW)</option>
+                    </select>
+                </div>
+
+                <!-- Operator Filter -->
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <label for="econ_operator_filter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Operator:</label>
+                    <select id="econ_operator_filter" onchange="onEconOperatorFilterChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; max-width: 170px;">
+                        <option value="all" selected>All Operators</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <label for="econ_status_filter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Status:</label>
+                    <select id="econ_status_filter" onchange="onEconStatusFilterChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">
+                        <option value="all" selected>All Units</option>
+                        <option value="available">🟢 Available Only</option>
+                        <option value="outage">⚠️ Outages Only</option>
+                    </select>
+                </div>
+
+                <!-- Plant Count Badge -->
+                <span id="econ_fleet_count_badge" style="font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: var(--bg-card-subtle-2); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                    0 units
+                </span>
             </div>
         </div>
-        <div id="plot_econ_cost_stack" style="width: 100%; height: 360px;"></div>
+        <div id="plot_econ_cost_stack" style="width: 100%; height: 420px;"></div>
     </div>
 
     <!-- Plant Running Cost Table -->
@@ -3121,7 +3179,85 @@ function setEconFleetFilter(filter) {
     renderPlantEconomicsTab();
 }
 
+let currentEconSortOrder = 'alpha'; // 'alpha', 'merit_asc', 'merit_desc', 'capacity_desc'
+let currentEconOperatorFilter = 'all';
+let currentEconStatusFilter = 'all';
+let currentEconChartView = 'stack'; // 'stack' or 'curve'
+
+function onEconSortChange() {
+    const sel = document.getElementById("econ_sort_order");
+    if (sel) currentEconSortOrder = sel.value;
+    renderPlantEconomicsTab();
+}
+
+function onEconOperatorFilterChange() {
+    const sel = document.getElementById("econ_operator_filter");
+    if (sel) currentEconOperatorFilter = sel.value;
+    renderPlantEconomicsTab();
+}
+
+function onEconStatusFilterChange() {
+    const sel = document.getElementById("econ_status_filter");
+    if (sel) currentEconStatusFilter = sel.value;
+    renderPlantEconomicsTab();
+}
+
+function setEconChartView(view) {
+    currentEconChartView = view;
+    const btnStack = document.getElementById("btn_econ_view_stack");
+    const btnCurve = document.getElementById("btn_econ_view_curve");
+    if (btnStack) btnStack.classList.toggle("active", view === 'stack');
+    if (btnCurve) btnCurve.classList.toggle("active", view === 'curve');
+
+    const iconEl = document.getElementById("econ_chart_title_icon");
+    const textEl = document.getElementById("econ_chart_title_text");
+    const subEl = document.getElementById("econ_chart_subtitle");
+    if (view === 'curve') {
+        if (iconEl) iconEl.innerText = "📈";
+        if (textEl) textEl.innerText = "Thermal Fleet Merit Order Supply Curve (Cumulative MW)";
+        if (subEl) subEl.innerText = "Marginal running cost vs. Cumulative available generation capacity (MW)";
+    } else {
+        if (iconEl) iconEl.innerText = "📊";
+        if (textEl) textEl.innerText = "Plant Running Cost Stack (€/MWh) vs. Day-Ahead Price";
+        if (subEl) subEl.innerText = "Bars show Fuel Cost + Carbon Cost + VOM per MWh produced";
+    }
+    renderPlantEconomicsTab();
+}
+
+function getPlantOperator(unit) {
+    const raw = unit.spec.name || '';
+    const match = raw.match(/\(([^()]+)\)(?:\s*\(\d+(?:\.\d+)?%\))?$/);
+    if (match && match[1]) {
+        return match[1].trim();
+    }
+    return 'Independent / Other';
+}
+
+function getShortPlantName(unit) {
+    let name = unit.spec.name || '';
+    name = name.replace(/\s*\([^)]*\)/g, '').trim();
+    name = name.replace(/Torrevaldaliga/gi, 'Torrev.')
+               .replace(/Tavazzano Montanaso/gi, 'Tavazzano')
+               .replace(/San Filippo del Mela/gi, 'S. Filippo')
+               .replace(/Porto Tolle/gi, 'P. Tolle')
+               .replace(/Porto Marghera/gi, 'P. Marghera')
+               .replace(/Montalto di Castro/gi, 'Montalto')
+               .replace(/Priolo Gargallo/gi, 'Priolo')
+               .replace(/Simeri Crichi/gi, 'Simeri')
+               .replace(/Cassano d'Adda/gi, 'Cassano')
+               .replace(/Santa Barbara/gi, 'S. Barbara')
+               .replace(/Termini Imerese/gi, 'Termini')
+               .replace(/Rossano Calabro/gi, 'Rossano')
+               .replace(/Ptolemaida/gi, 'Ptolem.')
+               .replace(/Agios Dimitrios/gi, 'Ag. Dimitrios')
+               .replace(/Megalopoli/gi, 'Megal.')
+               .replace(/Agios Nikolaos/gi, 'Ag. Nikolaos')
+               .replace(/Komotini Power/gi, 'Komotini');
+    return name;
+}
+
 function onEconCountryChange() {
+    currentEconOperatorFilter = 'all';
     const country = document.getElementById("econ_country").value;
     const hubSelect = document.getElementById("econ_gas_hub");
     if (hubSelect) {
@@ -3420,16 +3556,54 @@ function renderPlantEconomicsTab() {
     if (gasBasisEl) gasBasisEl.innerText = `TTF: ${ttfPrice.toFixed(2)} | Basis: +${hubBasis.toFixed(2)}`;
     if (euaEl) euaEl.innerText = `${euaPrice.toFixed(2)} €/tCO₂`;
 
-    // Rank 1st by Fuel & Technology, then by Available Capacity (MW) descending, then Nominal MW
-    const unitsToDisplay = [...calculatedUnits];
-    const fuelOrder = { 'gas': 1, 'lignite': 2, 'coal': 3 };
-    unitsToDisplay.sort((a, b) => {
-        const fuelDiff = (fuelOrder[a.spec.fuel] || 9) - (fuelOrder[b.spec.fuel] || 9);
-        if (fuelDiff !== 0) return fuelDiff;
-        const availDiff = (b.avail_mw || 0) - (a.avail_mw || 0);
-        if (availDiff !== 0) return availDiff;
-        return (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0);
+    // Populate Operator dropdown
+    const opCounts = {};
+    calculatedUnits.forEach(u => {
+        const op = getPlantOperator(u);
+        opCounts[op] = (opCounts[op] || 0) + 1;
     });
+    const opSel = document.getElementById("econ_operator_filter");
+    if (opSel) {
+        const currentVal = currentEconOperatorFilter;
+        let opHtml = `<option value="all">🏢 All Operators (${calculatedUnits.length})</option>`;
+        Object.keys(opCounts).sort().forEach(op => {
+            opHtml += `<option value="${op}" ${op === currentVal ? 'selected' : ''}>${op} (${opCounts[op]})</option>`;
+        });
+        opSel.innerHTML = opHtml;
+        if (!opCounts[currentVal] && currentVal !== 'all') {
+            currentEconOperatorFilter = 'all';
+            opSel.value = 'all';
+        }
+    }
+
+    // Filter units by Operator and Status
+    let unitsToDisplay = calculatedUnits.filter(u => {
+        if (currentEconOperatorFilter !== 'all') {
+            if (getPlantOperator(u) !== currentEconOperatorFilter) return false;
+        }
+        if (currentEconStatusFilter === 'available') {
+            if ((u.avail_mw || 0) <= 0) return false;
+        } else if (currentEconStatusFilter === 'outage') {
+            if ((u.avail_mw || 0) > 0) return false;
+        }
+        return true;
+    });
+
+    // Sort units
+    if (currentEconSortOrder === 'alpha') {
+        unitsToDisplay.sort((a, b) => a.spec.name.localeCompare(b.spec.name, undefined, { numeric: true, sensitivity: 'base' }));
+    } else if (currentEconSortOrder === 'merit_asc') {
+        unitsToDisplay.sort((a, b) => a.total_running_cost - b.total_running_cost || (b.avail_mw || 0) - (a.avail_mw || 0));
+    } else if (currentEconSortOrder === 'merit_desc') {
+        unitsToDisplay.sort((a, b) => b.total_running_cost - a.total_running_cost || (b.avail_mw || 0) - (a.avail_mw || 0));
+    } else if (currentEconSortOrder === 'capacity_desc') {
+        unitsToDisplay.sort((a, b) => (b.spec.nominal_mw || 0) - (a.spec.nominal_mw || 0) || a.total_running_cost - b.total_running_cost);
+    }
+
+    const countBadge = document.getElementById("econ_fleet_count_badge");
+    if (countBadge) {
+        countBadge.innerText = `Showing ${unitsToDisplay.length} of ${calculatedUnits.length} units`;
+    }
 
     // Render Cost Stack Chart
     renderCostStackChart(unitsToDisplay, avgPrice, targetDate);
@@ -3438,7 +3612,7 @@ function renderPlantEconomicsTab() {
     renderRunningCostTable(unitsToDisplay, avgPrice);
 }
 
-// ── Chart: Running Cost Stack / Hydro Capacity (MW) ────────────────────────
+// ── Chart: Running Cost Stack / Supply Curve ────────────────────────────────
 function renderCostStackChart(units, avgPrice, targetDate) {
     const container = document.getElementById("plot_econ_cost_stack");
     if (!container || !window.Plotly) return;
@@ -3448,53 +3622,9 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         return;
     }
 
-    // Render Fuel + Carbon + VOM Running Cost Stack for Thermal Fleet
-    const thermalUnits = units;
-    const plantNames = thermalUnits.map(u => {
-        const cleanName = u.spec.name.replace(/\(.*?\)/g, '').trim();
-        return u.avail_mw === 0 ? `⚠️ ${cleanName}` : cleanName;
-    });
-    const fuelCosts = thermalUnits.map(u => u.fuel_cost);
-    const carbonCosts = thermalUnits.map(u => u.carbon_cost);
-    const vomCosts = thermalUnits.map(u => u.vom);
-    const customHover = thermalUnits.map(u => ({
-        avail: u.avail_mw,
-        nom: u.spec.nominal_mw,
-        status: u.status_text,
-        runningCost: u.total_running_cost
-    }));
-
-    const traces = [
-        {
-            x: plantNames,
-            y: fuelCosts,
-            name: 'Fuel Cost (€/MWh)',
-            type: 'bar',
-            marker: { color: '#f59e0b' },
-            customdata: customHover,
-            hovertemplate: '<b>%{x}</b><br>Avail: <b>%{customdata.avail:.0f} / %{customdata.nom:.0f} MW</b> (%{customdata.status})<br>Fuel: <b>%{y:.2f} €/MWh</b><extra></extra>'
-        },
-        {
-            x: plantNames,
-            y: carbonCosts,
-            name: 'CO₂ Cost (€/MWh)',
-            type: 'bar',
-            marker: { color: '#059669' },
-            customdata: customHover,
-            hovertemplate: '<b>%{x}</b><br>CO₂: <b>%{y:.2f} €/MWh</b><extra></extra>'
-        },
-        {
-            x: plantNames,
-            y: vomCosts,
-            name: 'VOM (€/MWh)',
-            type: 'bar',
-            marker: { color: '#6366f1' },
-            customdata: customHover,
-            hovertemplate: '<b>%{x}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br><b>Total: %{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
-        }
-    ];
-
     const shapes = [];
+    const annotations = [];
+
     if (avgPrice > 0) {
         shapes.push({
             type: 'line',
@@ -3505,10 +3635,6 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             y1: avgPrice,
             line: { color: '#2563eb', width: 2, dash: 'dash' }
         });
-    }
-
-    const annotations = [];
-    if (avgPrice > 0) {
         annotations.push({
             xref: 'paper',
             x: 1,
@@ -3517,20 +3643,136 @@ function renderCostStackChart(units, avgPrice, targetDate) {
             showarrow: false,
             xanchor: 'left',
             font: { color: '#2563eb', size: 10, weight: 700 },
-            bgcolor: 'rgba(37, 99, 235, 0.1)',
-            borderpad: 2
+            bgcolor: 'rgba(37, 99, 235, 0.12)',
+            borderpad: 3
         });
     }
+
+    if (currentEconChartView === 'curve') {
+        // Merit Order Supply Curve (Cumulative MW vs Running Cost)
+        const sortedCurveUnits = [...units].sort((a, b) => a.total_running_cost - b.total_running_cost);
+        let cumMw = 0;
+        const curveX = [0];
+        const curveY = [sortedCurveUnits[0]?.total_running_cost || 0];
+        const hoverTexts = ['Start: 0 MW'];
+
+        sortedCurveUnits.forEach(u => {
+            const mw = (u.avail_mw > 0 ? u.avail_mw : u.spec.nominal_mw) || 20;
+            const cost = u.total_running_cost;
+            const op = getPlantOperator(u);
+
+            curveX.push(cumMw);
+            curveY.push(cost);
+            hoverTexts.push(`<b>${u.spec.name}</b><br>Capacity: <b>${mw.toFixed(0)} MW</b> (${op})<br>Running Cost: <b>${cost.toFixed(2)} €/MWh</b>`);
+
+            cumMw += mw;
+            curveX.push(cumMw);
+            curveY.push(cost);
+            hoverTexts.push(`<b>${u.spec.name}</b><br>Cumulative: <b>${cumMw.toFixed(0)} MW</b><br>Running Cost: <b>${cost.toFixed(2)} €/MWh</b>`);
+        });
+
+        const trace = {
+            x: curveX,
+            y: curveY,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Dispatch Supply Curve',
+            line: { color: '#059669', width: 2.5, shape: 'hv' },
+            fill: 'tozeroy',
+            fillcolor: isDarkMode() ? 'rgba(5, 150, 105, 0.15)' : 'rgba(5, 150, 105, 0.1)',
+            hovertext: hoverTexts,
+            hoverinfo: 'text'
+        };
+
+        const layout = getPlotlyThemeLayout({
+            title: {
+                text: `Thermal Fleet Merit-Order Supply Curve (${units.length} units) — ${targetDate}`,
+                font: { size: 14, weight: 700 }
+            },
+            xaxis: {
+                title: 'Cumulative Thermal Capacity (MW)',
+                showgrid: true
+            },
+            yaxis: {
+                title: 'Marginal Running Cost (€/MWh)',
+                showgrid: true
+            },
+            shapes: shapes,
+            annotations: annotations,
+            margin: { l: 55, r: 45, t: 50, b: 60 }
+        });
+
+        Plotly.react(container, [trace], layout, { responsive: true, displayModeBar: false });
+        return;
+    }
+
+    // Default: Bar Chart Cost Stack
+    const thermalUnits = units;
+    const plantNames = thermalUnits.map(u => {
+        const short = getShortPlantName(u);
+        return u.avail_mw === 0 ? `⚠️ ${short}` : short;
+    });
+    const fuelCosts = thermalUnits.map(u => u.fuel_cost);
+    const carbonCosts = thermalUnits.map(u => u.carbon_cost);
+    const vomCosts = thermalUnits.map(u => u.vom);
+    const customHover = thermalUnits.map(u => ({
+        fullName: u.spec.name,
+        operator: getPlantOperator(u),
+        fuel: u.spec.fuel,
+        efficiency: (u.spec.efficiency * 100).toFixed(1),
+        avail: u.avail_mw,
+        nom: u.spec.nominal_mw,
+        status: u.status_text,
+        runningCost: u.total_running_cost,
+        fuelCost: u.fuel_cost,
+        carbonCost: u.carbon_cost,
+        vom: u.vom
+    }));
+
+    const traces = [
+        {
+            x: plantNames,
+            y: fuelCosts,
+            name: 'Fuel Cost (€/MWh)',
+            type: 'bar',
+            marker: { color: '#f59e0b' },
+            customdata: customHover,
+            hovertemplate: '<b>%{customdata.fullName}</b><br>Operator: <b>%{customdata.operator}</b> | Eff: <b>%{customdata.efficiency}%</b><br>Avail: <b>%{customdata.avail:.0f} / %{customdata.nom:.0f} MW</b> (%{customdata.status})<br>Fuel: <b>%{y:.2f} €/MWh</b><extra></extra>'
+        },
+        {
+            x: plantNames,
+            y: carbonCosts,
+            name: 'CO₂ Cost (€/MWh)',
+            type: 'bar',
+            marker: { color: '#059669' },
+            customdata: customHover,
+            hovertemplate: '<b>%{customdata.fullName}</b><br>CO₂: <b>%{y:.2f} €/MWh</b><extra></extra>'
+        },
+        {
+            x: plantNames,
+            y: vomCosts,
+            name: 'VOM (€/MWh)',
+            type: 'bar',
+            marker: { color: '#6366f1' },
+            customdata: customHover,
+            hovertemplate: '<b>%{customdata.fullName}</b><br>VOM: <b>%{y:.2f} €/MWh</b><br><b>Total Cost: %{customdata.runningCost:.2f} €/MWh</b><extra></extra>'
+        }
+    ];
+
+    const showSlider = thermalUnits.length > 20;
 
     const layout = getPlotlyThemeLayout({
         barmode: 'stack',
         title: {
-            text: `Thermal Plants Merit-Order Cost Stack (€/MWh) — ${targetDate}`,
+            text: `Thermal Plants Cost Stack (${thermalUnits.length} units) — ${targetDate}`,
             font: { size: 14, weight: 700 }
         },
         xaxis: {
-            tickangle: -30,
-            tickfont: { size: 10 }
+            tickangle: -45,
+            tickfont: { size: 9 },
+            rangeslider: { visible: showSlider },
+            range: showSlider ? [-0.5, 19.5] : undefined,
+            fixedrange: false
         },
         yaxis: {
             title: 'Marginal Running Cost (€/MWh)',
@@ -3538,12 +3780,12 @@ function renderCostStackChart(units, avgPrice, targetDate) {
         },
         legend: {
             orientation: 'h',
-            y: 1.15,
+            y: 1.14,
             x: 0.0
         },
         shapes: shapes,
         annotations: annotations,
-        margin: { l: 50, r: 40, t: 55, b: 90 }
+        margin: { l: 50, r: 40, t: 55, b: showSlider ? 105 : 75 }
     });
 
     Plotly.react(container, traces, layout, { responsive: true, displayModeBar: false });
