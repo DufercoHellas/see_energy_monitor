@@ -770,6 +770,80 @@ body.dark-mode [style*="color:#6b7280"] {
     transform: translateY(-1px);
 }
 
+/* ── CABLE OUTAGE MODAL THEME STYLES ── */
+.cable-modal-alert-banner {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #9a3412;
+}
+body.dark-mode .cable-modal-alert-banner {
+    background: rgba(234, 88, 12, 0.15);
+    border: 1px solid rgba(249, 115, 22, 0.35);
+    color: #fdba74;
+}
+
+.cable-modal-healthy-card {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+}
+body.dark-mode .cable-modal-healthy-card {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6ee7b7;
+}
+
+/* Hourly Card - Full Capacity */
+.cable-hour-card-full {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+}
+body.dark-mode .cable-hour-card-full {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1.5px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Hourly Card - Partial Curtailment */
+.cable-hour-card-partial {
+    background: #fffbeb;
+    border: 1.5px solid #fef3c7;
+}
+body.dark-mode .cable-hour-card-partial {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1.5px solid rgba(245, 158, 11, 0.28);
+}
+
+/* Hourly Card - Total Outage (0 MW) */
+.cable-hour-card-total {
+    background: #fef2f2;
+    border: 1.5px solid #fee2e2;
+}
+body.dark-mode .cable-hour-card-total {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1.5px solid rgba(239, 68, 68, 0.3);
+}
+
+.cable-hour-label {
+    color: #1e293b;
+}
+body.dark-mode .cable-hour-label {
+    color: #f1f5f9;
+}
+
+.cable-hour-reason {
+    color: #64748b;
+}
+body.dark-mode .cable-hour-reason {
+    color: #94a3b8;
+}
+
+.cable-hour-reason-title {
+    color: #475569;
+}
+body.dark-mode .cable-hour-reason-title {
+    color: #cbd5e1;
+}
+
 
 
         </style>
@@ -7416,13 +7490,13 @@ function showOutageGridDetails(corridor, dateStr) {
             mCapStr = isNaN(mVal) ? '-' : (mVal === 0 ? '0 MW (Scheduled Monthly Maintenance)' : `${mVal} MW`);
         }
         longTermHtml = `
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px; flex-shrink: 0;">
-                <div style="font-weight: 700; color: #334155; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+            <div class="cable-modal-auction-card" style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px; flex-shrink: 0;">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
                     <span>⚡</span> <span>Auction Capacities for ${dateStr}</span>
                 </div>
-                <div style="display: flex; gap: 16px; color: #475569; font-size: 12px; flex-wrap: wrap;">
-                    ${yCapStr ? `<span><strong>Yearly Auction:</strong> <span style="color:${yearlyAuctions[0].allocated_capacity == 0 ? '#dc2626' : '#0369a1'}; font-weight:700;">${yCapStr}</span></span>` : ''}
-                    ${mCapStr ? `<span><strong>Monthly Auction:</strong> <span style="color:${monthlyAuctions[0].allocated_capacity == 0 ? '#dc2626' : '#4338ca'}; font-weight:700;">${mCapStr}</span></span>` : ''}
+                <div style="display: flex; gap: 16px; color: var(--text-secondary); font-size: 12px; flex-wrap: wrap;">
+                    ${yCapStr ? `<span><strong>Yearly Auction:</strong> <span style="color:${yearlyAuctions[0].allocated_capacity == 0 ? '#ef4444' : '#0284c7'}; font-weight:700;">${yCapStr}</span></span>` : ''}
+                    ${mCapStr ? `<span><strong>Monthly Auction:</strong> <span style="color:${monthlyAuctions[0].allocated_capacity == 0 ? '#ef4444' : '#6366f1'}; font-weight:700;">${mCapStr}</span></span>` : ''}
                 </div>
             </div>
         `;
@@ -7471,15 +7545,15 @@ function showOutageGridDetails(corridor, dateStr) {
     
     if (curtailedCount === 0) {
         panel.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
                 <div>
-                    <h3 style="margin:0; font-size:16px; font-weight:800; color:#0f172a; letter-spacing: -0.3px;">${corridor}</h3>
-                    <div style="font-size: 13px; color: #64748b; font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
+                    <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary); letter-spacing: -0.3px;">${corridor}</h3>
+                    <div style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
                 </div>
-                <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
+                <button onclick="closeOutageDetailModal()" style="background:var(--bg-card-subtle-2); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='var(--bg-card-subtle-2)'; this.style.color='var(--text-secondary)'">&times;</button>
             </div>
             ${longTermHtml}
-            <div style="background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0; border-radius:10px; padding:20px; font-size:13.5px; font-weight:600; text-align:center;">
+            <div class="cable-modal-healthy-card" style="border-radius:10px; padding:20px; font-size:13.5px; font-weight:600; text-align:center;">
                 ✅ Full 100% capacity available all 24 hours (${fullNTC} MW). No curtailments or outages.
             </div>
         `;
@@ -7516,38 +7590,37 @@ function showOutageGridDetails(corridor, dateStr) {
     groups.forEach(group => {
         const isCurtailed = group.rem < group.orig;
         const isTotal = group.rem === 0;
-        const severityColor = !isCurtailed ? "#059669" : (isTotal ? "#dc2626" : "#d97706");
+        const severityColor = !isCurtailed ? "#10b981" : (isTotal ? "#ef4444" : "#f59e0b");
         const badge = !isCurtailed ? `✓ Full ${group.orig} MW` : (isTotal ? "TOTAL OUTAGE (0 MW)" : `${group.rem} MW / ${group.orig} MW`);
-        const bg = !isCurtailed ? "#f0fdf4" : (isTotal ? "#fef2f2" : "#fffbeb");
-        const border = !isCurtailed ? "#bbf7d0" : (isTotal ? "#fee2e2" : "#fef3c7");
+        const itemClass = !isCurtailed ? "cable-hour-card-full" : (isTotal ? "cable-hour-card-total" : "cable-hour-card-partial");
         
         const hourLabel = (group.count === 24) 
             ? "All 24 Hours (Hours 1–24)" 
             : (group.startHour === group.endHour ? `Hour ${group.startHour}` : `Hours ${group.startHour}–${group.endHour} (${group.count} hrs)`);
 
         listHtml += `
-            <div style="background: ${bg}; border: 1.5px solid ${border}; padding: 12px 14px; border-radius: 8px; font-size: 13px;">
+            <div class="${itemClass}" style="padding: 12px 14px; border-radius: 8px; font-size: 13px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
-                    <span style="font-weight: 800; color: #1e293b; font-size: 13.5px;">${hourLabel}</span>
+                    <span class="cable-hour-label" style="font-weight: 800; font-size: 13.5px;">${hourLabel}</span>
                     <span style="color: ${severityColor}; font-weight: 800; font-size: 12.5px;">${badge}</span>
                 </div>
-                <div style="color: #64748b; font-size: 11.5px; line-height: 1.45; margin-top: 4px;">
-                    <strong style="color: #475569;">Reason:</strong> ${group.reason}
+                <div class="cable-hour-reason" style="font-size: 11.5px; line-height: 1.45; margin-top: 4px;">
+                    <strong class="cable-hour-reason-title">Reason:</strong> ${group.reason}
                 </div>
             </div>
         `;
     });
 
     panel.innerHTML = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color); flex-shrink: 0;">
             <div>
-                <h3 style="margin:0; font-size:16px; font-weight:800; color:#0f172a; letter-spacing: -0.3px;">${corridor}</h3>
-                <div style="font-size: 13px; color: #64748b; font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
+                <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary); letter-spacing: -0.3px;">${corridor}</h3>
+                <div style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
             </div>
-            <button onclick="closeOutageDetailModal()" style="background:#f1f5f9; border:none; color:#64748b; width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='#e2e8f0'; this.style.color='#0f172a'" onmouseout="this.style.background='#f1f5f9'; this.style.color='#64748b'">&times;</button>
+            <button onclick="closeOutageDetailModal()" style="background:var(--bg-card-subtle-2); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='var(--bg-card-subtle-2)'; this.style.color='var(--text-secondary)'">&times;</button>
         </div>
         ${longTermHtml}
-        <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: #9a3412; font-weight: 700; display:flex; align-items:center; gap:8px; flex-shrink: 0;">
+        <div class="cable-modal-alert-banner" style="border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; font-weight: 700; display:flex; align-items:center; gap:8px; flex-shrink: 0;">
             <span>⚠️</span> <span>${curtailedCount} of 24 hours curtailed / reduced</span>
         </div>
         <div style="overflow-y: auto; max-height: 480px; padding-right: 6px; display: flex; flex-direction: column; gap: 8px;">
