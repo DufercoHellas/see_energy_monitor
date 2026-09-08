@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-08 09:48:14",
+  "timestamp": "2026-09-08 15:12:22",
   "today": "2026-09-08",
   "tomorrow": "2026-09-09",
   "is_after_dam_cutoff": false,
@@ -2331,7 +2331,7 @@
     "status": "healthy",
     "total_records": 33304,
     "unique_mrids": 12908,
-    "active_now": 1017,
+    "active_now": 1041,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2351,23 +2351,23 @@
       },
       "GR": {
         "records": 4932,
-        "active_now": 32,
-        "active_unavailable_mw": 11907.0
+        "active_now": 33,
+        "active_unavailable_mw": 12743.0
       },
       "DE_LU": {
         "records": 9635,
-        "active_now": 180,
-        "active_unavailable_mw": 46481.9
+        "active_now": 191,
+        "active_unavailable_mw": 49294.9
       },
       "FR": {
         "records": 4631,
-        "active_now": 342,
-        "active_unavailable_mw": 106338.5
+        "active_now": 358,
+        "active_unavailable_mw": 108918.0
       },
       "IT": {
         "records": 4455,
-        "active_now": 188,
-        "active_unavailable_mw": 55886.0
+        "active_now": 186,
+        "active_unavailable_mw": 56118.0
       },
       "RS": {
         "records": 194,
@@ -2376,13 +2376,13 @@
       },
       "CZ": {
         "records": 2699,
-        "active_now": 36,
-        "active_unavailable_mw": 6736.5
+        "active_now": 37,
+        "active_unavailable_mw": 6763.8
       },
       "SK": {
         "records": 669,
-        "active_now": 32,
-        "active_unavailable_mw": 4427.2
+        "active_now": 28,
+        "active_unavailable_mw": 3427.2
       },
       "SI": {
         "records": 30,
@@ -2392,12 +2392,12 @@
       "CH": {
         "records": 1096,
         "active_now": 19,
-        "active_unavailable_mw": 4188.0
+        "active_unavailable_mw": 4138.0
       },
       "BE": {
         "records": 1139,
-        "active_now": 25,
-        "active_unavailable_mw": 13257.1
+        "active_now": 26,
+        "active_unavailable_mw": 13415.1
       },
       "AT": {
         "records": 130,
