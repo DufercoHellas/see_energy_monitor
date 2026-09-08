@@ -1756,19 +1756,6 @@ body.dark-mode .flow-dash {
             </div>
         </div>
 
-        <!-- Lowest Cost Plant -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
-                🥇 Lowest Running Cost
-            </div>
-            <div id="kpi_econ_lowest_cost" style="font-size: 20px; font-weight: 800; color: #10b981;">
-                —
-            </div>
-            <div id="kpi_econ_lowest_name" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                —
-            </div>
-        </div>
-
         <!-- Weighted Average Running Cost -->
         <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
             <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
@@ -1779,19 +1766,6 @@ body.dark-mode .flow-dash {
             </div>
             <div id="kpi_econ_avg_sub" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
                 Capacity-Weighted (MW)
-            </div>
-        </div>
-
-        <!-- Highest Cost Plant -->
-        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 14px; box-shadow: var(--shadow-sm);">
-            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
-                🔺 Highest Running Cost
-            </div>
-            <div id="kpi_econ_highest_cost" style="font-size: 20px; font-weight: 800; color: #ef4444;">
-                —
-            </div>
-            <div id="kpi_econ_highest_name" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
-                —
             </div>
         </div>
     </div>
@@ -3411,23 +3385,8 @@ function renderPlantEconomicsTab() {
     const gasEl = document.getElementById("kpi_econ_gas_price");
     const gasBasisEl = document.getElementById("kpi_econ_gas_basis");
     const euaEl = document.getElementById("kpi_econ_eua_price");
-    const lowestCostEl = document.getElementById("kpi_econ_lowest_cost");
-    const lowestNameEl = document.getElementById("kpi_econ_lowest_name");
     const avgCostEl = document.getElementById("kpi_econ_avg_cost");
     const avgSubEl = document.getElementById("kpi_econ_avg_sub");
-    const highestCostEl = document.getElementById("kpi_econ_highest_cost");
-    const highestNameEl = document.getElementById("kpi_econ_highest_name");
-
-    // Lowest & Highest cost units for Thermal fleet
-    const sortedThermal = [...thermalUnits].sort((a, b) => a.total_running_cost - b.total_running_cost);
-    if (sortedThermal.length > 0) {
-        const lowest = sortedThermal[0];
-        const highest = sortedThermal[sortedThermal.length - 1];
-        if (lowestCostEl) lowestCostEl.innerText = `${lowest.total_running_cost.toFixed(2)} €/MWh`;
-        if (lowestNameEl) lowestNameEl.innerText = `${lowest.spec.name} (${(lowest.spec.efficiency*100).toFixed(1)}%)`;
-        if (highestCostEl) highestCostEl.innerText = `${highest.total_running_cost.toFixed(2)} €/MWh`;
-        if (highestNameEl) highestNameEl.innerText = `${highest.spec.name} (${(highest.spec.efficiency*100).toFixed(1)}%)`;
-    }
 
     // Capacity-Weighted Average running cost for Thermal fleet
     let sumNomThermalMw = 0;
