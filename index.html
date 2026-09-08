@@ -2342,13 +2342,311 @@ const PLANT_SPECS_FALLBACK = {
       { "id": "POURNARI II", "name": "Pournari II (PPC / DEI)", "fuel": "hydro", "tech": "Hydro Reservoir (Arachthos)", "nominal_mw": 33.0, "efficiency": 1.0, "emission_factor": 0.0, "vom": 1.50 }
     ],
     "IT": [
-      { "id": "IT_CCGT_CLASS_H", "name": "Porto Marghera / Tavazzano", "fuel": "gas", "tech": "CCGT Class H (Ansaldo GT36)", "nominal_mw": 800.0, "efficiency": 0.630, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
-      { "id": "IT_CCGT_TURBIGO", "name": "Turbigo 4 (Iren / Ansaldo GT36)", "fuel": "gas", "tech": "CCGT (Ansaldo GT36)", "nominal_mw": 850.0, "efficiency": 0.605, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
-      { "id": "IT_CCGT_MODERN_F", "name": "Italian CCGT Fleet Benchmark 58%", "fuel": "gas", "tech": "CCGT Modern Class F", "nominal_mw": 750.0, "efficiency": 0.580, "emission_factor": 0.202, "vom": 2.50, "hub_default": "PSV_IT" },
-      { "id": "IT_CCGT_STANDARD_F", "name": "Italian CCGT Standard 55% (Enel / Eni)", "fuel": "gas", "tech": "CCGT Standard Class F", "nominal_mw": 400.0, "efficiency": 0.550, "emission_factor": 0.202, "vom": 2.75, "hub_default": "PSV_IT" },
-      { "id": "IT_CCGT_OLDER", "name": "Italian CCGT Older / Cogen 50%", "fuel": "gas", "tech": "CCGT Early Generation", "nominal_mw": 350.0, "efficiency": 0.500, "emission_factor": 0.202, "vom": 3.00, "hub_default": "PSV_IT" },
-      { "id": "IT_COAL_USC", "name": "Torrevaldaliga Nord / Brindisi Sud (Enel)", "fuel": "coal", "tech": "Hard Coal Supercritical", "nominal_mw": 660.0, "efficiency": 0.410, "emission_factor": 0.340, "fuel_cost_th": 16.00, "vom": 3.50 }
-    ],
+      {
+            "id": "IM_S18SCMRUP_SMRICRICHI_1",
+            "psr_id": "UP_SMRICRICHI_1",
+            "name": "Simeri Crichi (Edison)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 885.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S06TRVCUP_TORVISCOSA_1",
+            "psr_id": "UP_TORVISCOSA_1",
+            "name": "Torviscosa (Edison)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 867.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S01CHVSUP_CHIVASSO_1",
+            "psr_id": "UP_CHIVASSO_1",
+            "name": "Chivasso Unit 1 (A2A)",
+            "fuel": "gas",
+            "tech": "CCGT Class F Advanced (Ansaldo AE94.3A)",
+            "nominal_mw": 820.0,
+            "efficiency": 0.585,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S05PMARUP_LEVANTE_5",
+            "psr_id": "UP_LEVANTE_5",
+            "name": "Porto Marghera Levante Unit 5 (Edison)",
+            "fuel": "gas",
+            "tech": "CCGT Class H (Ansaldo GT36)",
+            "nominal_mw": 817.0,
+            "efficiency": 0.63,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S16CDMNUP_SRGNPGLCNT_1",
+            "psr_id": "UP_SRGNPGLCNT_1",
+            "name": "Sparanise / Sorgenia (Sorgenia)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 810.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S18EADSUP_ALTOMONTE_1",
+            "psr_id": "UP_ALTOMONTE_1",
+            "name": "Altomonte (Edison)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 808.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S08PLCNUP_PIACENZA_4",
+            "psr_id": "UP_PIACENZA_4",
+            "name": "Piacenza Levante Unit 4 (A2A)",
+            "fuel": "gas",
+            "tech": "CCGT Class H (Ansaldo GT36)",
+            "nominal_mw": 806.0,
+            "efficiency": 0.625,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03TRBGUP_TURBIGO_4",
+            "psr_id": "UP_TURBIGO_4",
+            "name": "Turbigo Unit 4 (Iren)",
+            "fuel": "gas",
+            "tech": "CCGT Class H (Ansaldo GT36 Repowered)",
+            "nominal_mw": 800.0,
+            "efficiency": 0.625,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03CDTLUP_CNTRLDTRNL_1",
+            "psr_id": "UP_CNTRLDTRNL_1",
+            "name": "Terni CCGT (Enel)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 800.0,
+            "efficiency": 0.575,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S05FTSNUP_FUSINAT_7",
+            "psr_id": "UP_FUSINAT_7",
+            "name": "Fusina Unit 7 (Enel)",
+            "fuel": "gas",
+            "tech": "CCGT Class H (Ansaldo GT36)",
+            "nominal_mw": 796.0,
+            "efficiency": 0.625,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03TVZZUP_TAVAZZANO_1",
+            "psr_id": "UP_TAVAZZANO_1",
+            "name": "Tavazzano Montanaso Unit 6/Unit 1 (EP Produzione)",
+            "fuel": "gas",
+            "tech": "CCGT Class H (Ansaldo GT36)",
+            "nominal_mw": 790.0,
+            "efficiency": 0.628,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S12TRRVUP_TRRVLDLIGA_5",
+            "psr_id": "UP_TRRVLDLIGA_5",
+            "name": "Torrevaldaliga Nord CCGT Unit 5 (Enel)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (GE 9FA 2x1)",
+            "nominal_mw": 790.0,
+            "efficiency": 0.575,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S01ECLFUP_NCTLVRNFRR_1",
+            "psr_id": "UP_NCTLVRNFRR_1",
+            "name": "Livorno Ferraris (EP Produzione)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 776.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S14TERMUP_NRGAMOLISE_1",
+            "psr_id": "UP_NRGAMOLISE_1",
+            "name": "Termoli CCGT (Sorgenia)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 769.0,
+            "efficiency": 0.578,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03SRMDUP_SERMIDE_4",
+            "psr_id": "IM_S03SRMDUP_SERMIDE_4",
+            "name": "Sermide Unit 4 (A2A)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Siemens SGT5-4000F 2x1)",
+            "nominal_mw": 766.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S07VTDRUP_VADOTERM_5",
+            "psr_id": "IM_S07VTDRUP_VADOTERM_5",
+            "name": "Vado Ligure Unit 5 (Tirreno Power)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Siemens SGT5-4000F 2x1)",
+            "nominal_mw": 760.0,
+            "efficiency": 0.578,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S19TCRMUP_TERMINI_I_6",
+            "psr_id": "UP_TERMINI_I_6",
+            "name": "Termini Imerese Unit 6 (Enel)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (GE 9FA 2x1)",
+            "nominal_mw": 756.0,
+            "efficiency": 0.57,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_1129698UP_CNTRLFLVCR_7",
+            "psr_id": "UP_CNTRLFLVCR_7",
+            "name": "Cassano d'Adda Unit 7 (A2A)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A)",
+            "nominal_mw": 755.0,
+            "efficiency": 0.575,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03OSTGUP_OSTIGLIA_12",
+            "psr_id": "UP_OSTIGLIA_12",
+            "name": "Ostiglia Unit 12 (EP Produzione)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
+            "nominal_mw": 751.0,
+            "efficiency": 0.58,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03ACMNUP_CASSANO_2",
+            "psr_id": "UP_CASSANO_2",
+            "name": "Cassano d'Adda Unit 2 (A2A)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (Ansaldo AE94.3A)",
+            "nominal_mw": 748.0,
+            "efficiency": 0.57,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S03TVZZUP_TAVAZZANO_5",
+            "psr_id": "UP_TAVAZZANO_5",
+            "name": "Tavazzano Montanaso Unit 5 (EP Produzione)",
+            "fuel": "gas",
+            "tech": "CCGT Class F (GE 9FA)",
+            "nominal_mw": 740.0,
+            "efficiency": 0.565,
+            "emission_factor": 0.202,
+            "vom": 2.5,
+            "hub_default": "PSV_IT"
+      },
+      {
+            "id": "IM_S12TRRLUP_TORREVALN_3",
+            "psr_id": "IM_S12TRRLUP_TORREVALN_3",
+            "name": "Torrevaldaliga Nord Unit 3 (Enel)",
+            "fuel": "coal",
+            "tech": "Hard Coal Supercritical USC",
+            "nominal_mw": 625.0,
+            "efficiency": 0.415,
+            "emission_factor": 0.34,
+            "vom": 3.5,
+            "hub_default": "PSV_IT",
+            "fuel_cost_th": 16.0
+      },
+      {
+            "id": "IM_S12TRRLUP_TORREVALN_2",
+            "psr_id": "IM_S12TRRLUP_TORREVALN_2",
+            "name": "Torrevaldaliga Nord Unit 2 (Enel)",
+            "fuel": "coal",
+            "tech": "Hard Coal Supercritical USC",
+            "nominal_mw": 625.0,
+            "efficiency": 0.415,
+            "emission_factor": 0.34,
+            "vom": 3.5,
+            "hub_default": "PSV_IT",
+            "fuel_cost_th": 16.0
+      },
+      {
+            "id": "IM_S12TRRLUP_TORREVALN_4",
+            "psr_id": "IM_S12TRRLUP_TORREVALN_4",
+            "name": "Torrevaldaliga Nord Unit 4 (Enel)",
+            "fuel": "coal",
+            "tech": "Hard Coal Supercritical USC",
+            "nominal_mw": 615.0,
+            "efficiency": 0.415,
+            "emission_factor": 0.34,
+            "vom": 3.5,
+            "hub_default": "PSV_IT",
+            "fuel_cost_th": 16.0
+      },
+      {
+            "id": "IM_S16BSCRUP_BRNDSSUDCE_4",
+            "psr_id": "IM_S16BSCRUP_BRNDSSUDCE_4",
+            "name": "Brindisi Sud Federico II Unit 4 (Enel)",
+            "fuel": "coal",
+            "tech": "Hard Coal Supercritical",
+            "nominal_mw": 605.0,
+            "efficiency": 0.41,
+            "emission_factor": 0.34,
+            "vom": 3.5,
+            "hub_default": "PSV_IT",
+            "fuel_cost_th": 16.0
+      }
+],
     "BG": [
       { "id": "AES_MI1", "name": "AES Galabovo (Maritsa East 1)", "fuel": "lignite", "tech": "CFB Lignite", "nominal_mw": 686.0, "efficiency": 0.380, "emission_factor": 0.410, "fuel_cost_th": 16.00, "vom": 4.00 },
       { "id": "TPP_MI_2", "name": "Maritsa East 2 (Units 1-8)", "fuel": "lignite", "tech": "Subcritical Lignite", "nominal_mw": 1610.0, "efficiency": 0.340, "emission_factor": 0.430, "fuel_cost_th": 16.00, "vom": 4.50 },
@@ -2472,6 +2770,7 @@ function getPlantOutageInfo(plantSpec, country, targetDate) {
     const dayStart = new Date(targetDate + "T00:00:00Z").getTime();
     const dayEnd = new Date(targetDate + "T23:59:59Z").getTime();
     const pid = plantSpec.id;
+    const psrId = plantSpec.psr_id;
 
     // Match Country and plant ID or PSR name
     const matches = outages.filter(o => {
@@ -2479,7 +2778,7 @@ function getPlantOutageInfo(plantSpec, country, targetDate) {
         if (c !== country && c !== country.replace('_LU', '')) return false;
         const rName = o.production_resource_name || '';
         const psrName = o.production_resource_psr_name || '';
-        if (rName !== pid && psrName !== pid) return false;
+        if (rName !== pid && psrName !== pid && (!psrId || (rName !== psrId && psrName !== psrId))) return false;
         const st = typeof o.start === 'number' ? o.start : new Date(o.start).getTime();
         const en = typeof o.end === 'number' ? o.end : (o.end ? new Date(o.end).getTime() : Infinity);
         return st <= dayEnd && en >= dayStart;
