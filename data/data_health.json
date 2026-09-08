@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-08 09:31:55",
+  "timestamp": "2026-09-08 09:48:14",
   "today": "2026-09-08",
   "tomorrow": "2026-09-09",
   "is_after_dam_cutoff": false,
@@ -221,10 +221,10 @@
           "description": "24 hrs"
         },
         "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-09": {
           "status": "pending",
@@ -389,10 +389,10 @@
           "description": "24 hrs"
         },
         "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-09": {
           "status": "pending",
@@ -936,9 +936,9 @@
       "2026-09-09"
     ],
     "summary": {
-      "complete_days": 124,
+      "complete_days": 126,
       "pending_days": 16,
-      "missing_days": 4,
+      "missing_days": 2,
       "partial_days": 0
     }
   },
@@ -2421,8 +2421,6 @@
     "fetch_time": "2026-09-07 10:28:31"
   },
   "issues_critical": [
-    "CRITICAL: Spot prices for HU TODAY (2026-09-08) are missing!",
-    "CRITICAL: Spot prices for DE_LU TODAY (2026-09-08) are missing!",
     "CRITICAL: Spot prices for SK TODAY (2026-09-08) are missing!",
     "CRITICAL: Spot prices for HR TODAY (2026-09-08) are missing!"
   ],
