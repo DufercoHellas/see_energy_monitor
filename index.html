@@ -12089,6 +12089,26 @@ function renderArbitragePanel() {
                         const start = path[0].to;
                         const end   = path[path.length - 1].to;
 
+                        // 0. Physical Outage Check: If any cable along path has 0 MW remaining capacity on targetDate at this hour, skip!
+                        let cableBlocked = false;
+                        for (let idx = 1; idx < path.length; idx++) {
+                            const cCode = path[idx].cable;
+                            if (!cCode) continue;
+                            const oe = cableOutagesData.find(item =>
+                                item.corridor_code === cCode &&
+                                item.trade_date === targetDate &&
+                                item.position === (h + 1)
+                            );
+                            if (oe) {
+                                const rem = parseFloat(oe.remaining_capacity);
+                                if (!isNaN(rem) && rem <= 0) {
+                                    cableBlocked = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (cableBlocked) return;
+
                         // Dynamically select top valid matches for this path
                         const validMatches = [];
                         for (let i = 0; i < currentTop7.length; i++) {
@@ -12204,31 +12224,60 @@ function renderArbitragePanel() {
                     });
                 }
 
-                // 3. Group by (Start, End) market cluster — deduplicates AL and XK (same ALPEX exchange)
+                // 3. Conflict Resolution & Portfolio Dispatch (Engine Execution)
+                // Simulates true algorithmic execution: greedy allocation by highest margin per hour,
+                // eliminating double-exports, double-imports, and physical cable conflicts.
                 function getMarketCluster(code) {
                     if (code === 'AL' || code === 'XK') return 'AL_XK';
                     return code;
                 }
 
+                const dispatchedPathsByHour = Array.from({length: 24}, () => []);
+                for (let h = 0; h < 24; h++) {
+                    const hourPaths = filteredPathsByHour[h].slice();
+                    // Sort by predicted net margin descending
+                    hourPaths.sort((a, b) => b.netMargin - a.netMargin);
+
+                    const usedBorders = new Set();
+                    const usedCountries = new Set();
+
+                    hourPaths.forEach(res => {
+                        const p = res.path;
+                        const start = res.start;
+                        const end = res.end;
+
+                        // Check border conflicts (bidirectional cable capacity)
+                        let conflict = false;
+                        const legs = [];
+                        for (let idx = 0; idx < p.length - 1; idx++) {
+                            const f = p[idx].to;
+                            const t = p[idx+1].to;
+                            const bPair = `${f < t ? f : t}-${f < t ? t : f}`;
+                            if (usedBorders.has(bPair)) {
+                                conflict = true;
+                                break;
+                            }
+                            legs.push(bPair);
+                        }
+                        if (conflict) return;
+
+                        // Check market endpoint conflicts (no double-export or double-import on same cluster)
+                        const sCluster = getMarketCluster(start);
+                        const eCluster = getMarketCluster(end);
+                        if (usedCountries.has(sCluster) || usedCountries.has(eCluster)) return;
+
+                        // Reserve capacity
+                        legs.forEach(b => usedBorders.add(b));
+                        usedCountries.add(sCluster);
+                        usedCountries.add(eCluster);
+
+                        dispatchedPathsByHour[h].push(res);
+                    });
+                }
+
                 const routeGroups = {};
                 for (let h = 0; h < 24; h++) {
-                    const hourPaths = filteredPathsByHour[h];
-
-                    // Select only the best route per market exchange cluster for this hour
-                    const bestByCluster = {};
-                    hourPaths.forEach(res => {
-                        const clusterKey = `${getMarketCluster(res.start)}_${getMarketCluster(res.end)}`;
-                        if (!bestByCluster[clusterKey] || res.netMargin > bestByCluster[clusterKey].netMargin) {
-                            bestByCluster[clusterKey] = res;
-                        } else if (Math.abs(res.netMargin - bestByCluster[clusterKey].netMargin) < 1e-4) {
-                            // If margins are identical, prefer direct route with fewer hops
-                            if (res.path.length < bestByCluster[clusterKey].path.length) {
-                                bestByCluster[clusterKey] = res;
-                            }
-                        }
-                    });
-
-                    Object.values(bestByCluster).forEach(res => {
+                    dispatchedPathsByHour[h].forEach(res => {
                         const pairKey = `${res.start}_${res.end}`;
                         if (!routeGroups[pairKey]) {
                             routeGroups[pairKey] = {
@@ -12250,7 +12299,7 @@ function renderArbitragePanel() {
                         routeGroups[pairKey].corridors[rKey].hours.push({
                             hour: h,
                             pStart: res.pStart,
-                            pEnd: res.pEnd,
+                            pEnd:   res.pEnd,
                             grossSpread: res.grossSpread,
                             transitCost: res.transitCost,
                             netMargin: res.netMargin
@@ -12854,15 +12903,18 @@ function renderArbitragePanel() {
                         // Check if target date has actual price data for realised margins
                         const hasRealisedData = historicalData['GR']?.[targetDate]?.prices?.length > 0;
                         let avgRealised = null;
+                        let sumRealised = 0;
+                        let countRealised = 0;
+                        let winsRealised = 0;
                         if (hasRealisedData) {
-                            let sumRealised = 0;
-                            let countRealised = 0;
                             allRouteMg.forEach(m => {
-                                const actualSrc = historicalData[m.src]?.[targetDate]?.prices?.[m.hour];
-                                const actualDst = historicalData[m.dst]?.[targetDate]?.prices?.[m.hour];
+                                const actualSrc = getRealizedPriceWithFallback(m.src, m.hour, targetDate);
+                                const actualDst = getRealizedPriceWithFallback(m.dst, m.hour, targetDate);
                                 if (actualSrc != null && actualDst != null && actualSrc > 0 && actualDst > 0) {
-                                    sumRealised += (actualDst - actualSrc) - (m.transitCost || 0);
+                                    const netR = (actualDst - actualSrc) - (m.transitCost || 0);
+                                    sumRealised += netR;
                                     countRealised++;
+                                    if (netR > 0) winsRealised++;
                                 }
                             });
                             if (countRealised > 0) avgRealised = sumRealised / countRealised;
@@ -12890,18 +12942,26 @@ function renderArbitragePanel() {
                             <div style="background:${greenBoxBg};border:1px solid ${greenBoxBorder};border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
                                 <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Predicted Avg Net Margin</div>
                                 <div style="font-size:22px;font-weight:800;color:${dark ? '#34d399' : '#059669'};">${avgPredicted.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
-                                <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${allRouteMg.length} profitable hours</div>
+                                <div style="font-size:10px;color:#94a3b8;margin-top:2px;">${allRouteMg.length} dispatched hours</div>
                             </div>`;
 
                         if (avgRealised != null) {
                             const diff = avgRealised - avgPredicted;
                             const diffColor = diff >= 0 ? (dark ? '#34d399' : '#059669') : '#ef4444';
                             const diffArrow = diff >= 0 ? '▲' : '▼';
+                            const mwPerFlow = allRouteMg.length > 0 ? (100.0 / allRouteMg.length) : 0;
+                            const totalPnL = sumRealised * mwPerFlow;
+                            const winRate = countRealised > 0 ? ((winsRealised / countRealised) * 100).toFixed(1) : 0;
                             mHtml += `
                                 <div style="background:${greenBoxBg};border:1px solid ${greenBoxBorder};border-radius:8px;padding:10px 14px;flex:1;min-width:160px;">
                                     <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Realised Avg Net Margin</div>
                                     <div style="font-size:22px;font-weight:800;color:${dark ? '#34d399' : '#059669'};">${avgRealised.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
                                     <div style="font-size:11px;color:${diffColor};font-weight:600;margin-top:2px;">${diffArrow} ${diff >= 0 ? '+' : ''}${diff.toFixed(2)} vs predicted</div>
+                                </div>
+                                <div style="background:${totalPnL >= 0 ? greenBoxBg : (dark ? 'rgba(239, 68, 68, 0.18)' : '#fef2f2')};border:1px solid ${totalPnL >= 0 ? greenBoxBorder : (dark ? 'rgba(239, 68, 68, 0.35)' : '#fecaca')};border-radius:8px;padding:10px 14px;flex:1;min-width:170px;">
+                                    <div style="font-size:9px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:700;text-transform:uppercase;letter-spacing:0.05em;">Portfolio Realized PnL (100 MW)</div>
+                                    <div style="font-size:22px;font-weight:800;color:${totalPnL >= 0 ? (dark ? '#34d399' : '#059669') : '#ef4444'};">${totalPnL >= 0 ? '+' : ''}€${Math.round(totalPnL).toLocaleString()}</div>
+                                    <div style="font-size:11px;color:${dark ? '#94a3b8' : '#64748b'};font-weight:600;margin-top:2px;">Win Rate: ${winRate}% (${winsRealised}/${countRealised}) • ${mwPerFlow.toFixed(1)} MW/flow</div>
                                 </div>`;
                         } else {
                             mHtml += `
