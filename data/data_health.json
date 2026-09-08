@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-08 05:30:51",
+  "timestamp": "2026-09-08 06:30:51",
   "today": "2026-09-08",
   "tomorrow": "2026-09-09",
   "is_after_dam_cutoff": false,
@@ -2357,7 +2357,7 @@
       "DE_LU": {
         "records": 9635,
         "active_now": 181,
-        "active_unavailable_mw": 47699.3
+        "active_unavailable_mw": 47679.3
       },
       "FR": {
         "records": 4631,
