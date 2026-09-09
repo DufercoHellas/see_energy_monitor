@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-09 09:05:43",
+  "timestamp": "2026-09-09 09:26:01",
   "today": "2026-09-09",
   "tomorrow": "2026-09-10",
   "is_after_dam_cutoff": false,
@@ -53,10 +53,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -109,10 +109,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -165,10 +165,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -277,10 +277,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -333,10 +333,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -445,10 +445,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -501,10 +501,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -551,10 +551,10 @@
           "description": "24 hrs"
         },
         "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-09": {
           "status": "missing",
@@ -613,10 +613,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -663,10 +663,10 @@
           "description": "24 hrs"
         },
         "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-09": {
           "status": "missing",
@@ -725,10 +725,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -781,10 +781,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -837,10 +837,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -893,10 +893,10 @@
           "description": "24 hrs"
         },
         "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-10": {
           "status": "pending",
@@ -936,9 +936,9 @@
       "2026-09-10"
     ],
     "summary": {
-      "complete_days": 110,
+      "complete_days": 124,
       "pending_days": 16,
-      "missing_days": 18,
+      "missing_days": 4,
       "partial_days": 0
     }
   },
@@ -2421,26 +2421,11 @@
     "fetch_time": "2026-09-08 15:48:22"
   },
   "issues_critical": [
-    "CRITICAL: Spot prices for GR TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for BG TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for RO TODAY (2026-09-09) are missing!",
     "CRITICAL: Spot prices for HU TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for RS TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for IT TODAY (2026-09-09) are missing!",
     "CRITICAL: Spot prices for DE_LU TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for CZ TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for AT TODAY (2026-09-09) are missing!",
     "CRITICAL: Spot prices for SK TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for SI TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for HR TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for AL TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for MK TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for ME TODAY (2026-09-09) are missing!",
-    "CRITICAL: Spot prices for XK TODAY (2026-09-09) are missing!"
+    "CRITICAL: Spot prices for HR TODAY (2026-09-09) are missing!"
   ],
-  "issues_warning": [
-    "Historical spot prices for SK on 2026-09-08 missing.",
-    "Historical spot prices for HR on 2026-09-08 missing."
-  ],
+  "issues_warning": [],
   "issues_info": []
 }
