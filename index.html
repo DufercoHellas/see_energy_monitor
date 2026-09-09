@@ -2184,14 +2184,13 @@ body.dark-mode .flow-dash {
                         Strategy Mode:
                     </label>
                     <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 8px 18px; border: 1.5px solid var(--input-border); border-radius: 10px; font-size: 15px; font-weight: 800; color: var(--text-primary); background: var(--input-bg); cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
-                        <option value="elite" selected style="font-weight: 800;">🐺⚡ Apex Predator</option>
-                        <option value="7" style="font-weight: 800;">🎯 Sniper (Strict 100%)</option>
-                        <option value="5" style="font-weight: 800;">⚖️ Balanced</option>
+                        <option value="elite" selected style="font-weight: 800;">👑 Sovereign</option>
+                        <option value="5" style="font-weight: 800;">🎯 Sniper</option>
                         <option value="3" style="font-weight: 800;">🚀 High Volume</option>
                     </select>
                 </div>
                 <div id="strategy_mode_description" style="font-size: 11px; color: var(--text-muted); max-width: 420px; text-align: right; line-height: 1.4; padding-right: 4px;">
-                    <span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, high-conviction trades.
+                    <span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> High-conviction institutional authority. Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, authoritative trades.
                 </div>
             </div>
         </div>
@@ -12153,10 +12152,9 @@ function renderArbitragePanel() {
                 const descEl = document.getElementById("strategy_mode_description");
                 if (descEl) {
                     const descriptions = {
-                        "elite": `<span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, high-conviction trades.`,
-                        "7": `<span style="color: #6366f1; font-weight: 700;">Top 7 Strict Unanimous (100%):</span> All 7 analogues must agree on positive margin (&ge;5 €/MWh). Conservative risk-averse execution.`,
-                        "5": `<span style="color: #6366f1; font-weight: 700;">Top 5 Analogues:</span> Inverse-distance weighted consensus across top 5 historical days. Balances flow frequency with directional safety.`,
-                        "3": `<span style="color: #6366f1; font-weight: 700;">Top 3 Analogues:</span> Rapid opportunistic execution across top 3 closest weather/demand analogues to capture maximum price swings.`
+                        "elite": `<span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> High-conviction institutional authority. Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, authoritative trades.`,
+                        "5": `<span style="color: #6366f1; font-weight: 700;">Top 5 Balanced Consensus (&ge;60%):</span> Inverse-distance weighted consensus across top 5 historical days with conflict resolution.`,
+                        "3": `<span style="color: #6366f1; font-weight: 700;">Top 3 Analogues:</span> Rapid opportunistic execution across top 3 closest analogues. Purges cards with &lt;3h after conflict resolution.`
                     };
                     descEl.innerHTML = descriptions[stratMode] || descriptions["elite"];
                 }
@@ -12436,9 +12434,9 @@ function renderArbitragePanel() {
                     });
                 }
 
-                // 4. Strict Minimum 3 Hours Filter for Apex Predator
+                // 4. Strict Minimum 3 Hours Filter (all strategies)
                 // If after cutting a flow/card has only 1 or 2 hours left in the entire day, purge it completely!
-                if (isElite) {
+                {
                     const validPairKeys = new Set();
                     Object.keys(routeGroups).forEach(pairKey => {
                         const group = routeGroups[pairKey];
@@ -13000,12 +12998,12 @@ function renderArbitragePanel() {
 
                 if (cardsHtml === '') {
                     const topNVal = (document.getElementById("arbitrage_top_n") && document.getElementById("arbitrage_top_n").value) || "elite";
-                    const stratName = topNVal === "elite" ? "🐺⚡ Apex Predator" : (topNVal === "7" ? "🎯 Sniper (Strict 100%)" : (topNVal === "5" ? "⚖️ Balanced" : "🚀 High Volume"));
+                    const stratName = topNVal === "elite" ? "👑 Sovereign" : (topNVal === "5" ? "🎯 Sniper" : "🚀 High Volume");
 
                     const dark = typeof isDarkMode === 'function' && isDarkMode();
                     const emptyStateHtml = `
                     <div style="background: var(--bg-card); border: 1.5px dashed var(--border-color); border-radius: 12px; padding: 22px 20px; text-align: center; margin: 8px 0; box-shadow: var(--shadow-sm);">
-                        <div style="font-size: 22px; margin-bottom: 6px;">${topNVal === 'elite' ? '🐺' : '🎯'}</div>
+                        <div style="font-size: 22px; margin-bottom: 6px;">${topNVal === 'elite' ? '👑' : (topNVal === '5' ? '🎯' : '🚀')}</div>
                         <div style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
                             No cross-border flows qualify under <span style="color: #6366f1;">${stratName}</span> for this date
                         </div>
@@ -13013,9 +13011,8 @@ function renderArbitragePanel() {
                             High-conviction threshold requiring net margin &ge; ${threshold.toFixed(0)} €/MWh across candidate days. Explore wider market opportunities by switching strategy:
                         </p>
                         <div style="display: inline-flex; align-items: center; gap: 10px; background: var(--bg-card-subtle); padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border-color); flex-wrap: wrap; justify-content: center;">
-                            ${topNVal !== 'elite' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='elite'; renderArbitragePanel();" style="background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(99,102,241,0.25)); border: 1.5px solid #6366f1; color: var(--text-primary); padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🐺⚡ Switch to Apex Predator</button>` : ''}
-                            ${topNVal !== '7' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='7'; renderArbitragePanel();" style="background: var(--bg-card); border: 1.5px solid var(--border-color); color: var(--text-primary); padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🎯 Switch to Sniper (Strict 100%)</button>` : ''}
-                            ${topNVal !== '5' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='5'; renderArbitragePanel();" style="background: ${dark ? 'rgba(5, 150, 105, 0.2)' : '#f0fdf4'}; border: 1.5px solid ${dark ? '#059669' : '#86efac'}; color: ${dark ? '#6ee7b7' : '#166534'}; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">⚖️ Switch to Balanced (Top 5)</button>` : ''}
+                            ${topNVal !== 'elite' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='elite'; renderArbitragePanel();" style="background: linear-gradient(135deg, rgba(79,70,229,0.15), rgba(99,102,241,0.25)); border: 1.5px solid #6366f1; color: var(--text-primary); padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">👑 Switch to Sovereign</button>` : ''}
+                            ${topNVal !== '5' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='5'; renderArbitragePanel();" style="background: ${dark ? 'rgba(5, 150, 105, 0.2)' : '#f0fdf4'}; border: 1.5px solid ${dark ? '#059669' : '#86efac'}; color: ${dark ? '#6ee7b7' : '#166534'}; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🎯 Switch to Sniper</button>` : ''}
                             ${topNVal !== '3' ? `<button type="button" onclick="document.getElementById('arbitrage_top_n').value='3'; renderArbitragePanel();" style="background: ${dark ? 'rgba(37, 99, 235, 0.2)' : '#eff6ff'}; border: 1.5px solid ${dark ? '#2563eb' : '#93c5fd'}; color: ${dark ? '#93c5fd' : '#1d4ed8'}; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 800; cursor: pointer; box-shadow: var(--shadow-sm); transition: all 0.15s ease;">🚀 Switch to High Volume (Top 3)</button>` : ''}
                         </div>
                     </div>`;
