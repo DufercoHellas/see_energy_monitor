@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-09 12:30:52",
+  "timestamp": "2026-09-09 13:30:52",
   "today": "2026-09-09",
   "tomorrow": "2026-09-10",
   "is_after_dam_cutoff": false,
@@ -59,10 +59,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "BG": {
@@ -115,10 +115,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "RO": {
@@ -171,10 +171,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "HU": {
@@ -227,10 +227,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "RS": {
@@ -283,10 +283,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "IT": {
@@ -339,10 +339,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "DE_LU": {
@@ -395,10 +395,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "CZ": {
@@ -507,10 +507,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "SK": {
@@ -563,10 +563,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "SI": {
@@ -619,10 +619,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "HR": {
@@ -731,10 +731,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "MK": {
@@ -787,10 +787,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "ME": {
@@ -843,10 +843,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "XK": {
@@ -899,10 +899,10 @@
           "description": "24 hrs"
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       }
     },
@@ -936,8 +936,8 @@
       "2026-09-10"
     ],
     "summary": {
-      "complete_days": 127,
-      "pending_days": 16,
+      "complete_days": 141,
+      "pending_days": 2,
       "missing_days": 1,
       "partial_days": 0
     }
@@ -994,10 +994,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "AL-ME": {
@@ -1050,10 +1050,122 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "BA-HR": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
           "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "BA-ME": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "BG-MK": {
@@ -1106,10 +1218,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "BG-RS": {
@@ -1162,10 +1274,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "CH-IT": {
@@ -1274,10 +1386,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "GR-MK": {
@@ -1330,10 +1442,122 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "GR-TR": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
           "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "HR-BA": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "HU-RS": {
@@ -1386,10 +1610,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "IT-CH": {
@@ -1498,10 +1722,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "ME-AL": {
@@ -1554,10 +1778,66 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "ME-BA": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
           "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "ME-IT": {
@@ -1610,10 +1890,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "ME-RS": {
@@ -1666,10 +1946,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "ME-XK": {
@@ -1722,10 +2002,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "MK-BG": {
@@ -1778,10 +2058,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "MK-GR": {
@@ -1834,10 +2114,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "MK-RS": {
@@ -1890,10 +2170,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "MK-XK": {
@@ -1946,10 +2226,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "RS-BG": {
@@ -2002,10 +2282,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "RS-HU": {
@@ -2058,10 +2338,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "RS-ME": {
@@ -2114,10 +2394,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "RS-MK": {
@@ -2170,10 +2450,66 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        }
+      },
+      "TR-GR": {
+        "2026-09-02": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
           "positions": 0
+        },
+        "2026-09-03": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-04": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-05": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-06": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-07": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-08": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing",
+          "positions": 0
+        },
+        "2026-09-09": {
+          "status": "missing",
+          "badge": "🔴",
+          "description": "Missing Today",
+          "positions": 0
+        },
+        "2026-09-10": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "XK-ME": {
@@ -2226,10 +2562,10 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       },
       "XK-MK": {
@@ -2282,25 +2618,30 @@
           "positions": 24
         },
         "2026-09-10": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
         }
       }
     },
     "corridors": [
       "AL-GR",
       "AL-ME",
+      "BA-HR",
+      "BA-ME",
       "BG-MK",
       "BG-RS",
       "CH-IT",
       "GR-AL",
       "GR-MK",
+      "GR-TR",
+      "HR-BA",
       "HU-RS",
       "IT-CH",
       "IT-ME",
       "ME-AL",
+      "ME-BA",
       "ME-IT",
       "ME-RS",
       "ME-XK",
@@ -2312,6 +2653,7 @@
       "RS-HU",
       "RS-ME",
       "RS-MK",
+      "TR-GR",
       "XK-ME",
       "XK-MK"
     ],
@@ -2331,7 +2673,7 @@
     "status": "healthy",
     "total_records": 33814,
     "unique_mrids": 13057,
-    "active_now": 1063,
+    "active_now": 1071,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2356,8 +2698,8 @@
       },
       "DE_LU": {
         "records": 9810,
-        "active_now": 182,
-        "active_unavailable_mw": 43778.9
+        "active_now": 189,
+        "active_unavailable_mw": 45535.3
       },
       "FR": {
         "records": 4690,
@@ -2367,7 +2709,7 @@
       "IT": {
         "records": 4505,
         "active_now": 187,
-        "active_unavailable_mw": 57135.0
+        "active_unavailable_mw": 57201.0
       },
       "RS": {
         "records": 197,
@@ -2376,8 +2718,8 @@
       },
       "CZ": {
         "records": 2714,
-        "active_now": 39,
-        "active_unavailable_mw": 7095.6
+        "active_now": 40,
+        "active_unavailable_mw": 7132.3
       },
       "SK": {
         "records": 683,
@@ -2392,7 +2734,7 @@
       "CH": {
         "records": 1148,
         "active_now": 20,
-        "active_unavailable_mw": 4300.0
+        "active_unavailable_mw": 4250.0
       },
       "BE": {
         "records": 1142,
@@ -2423,6 +2765,13 @@
   "issues_critical": [
     "CRITICAL: Spot prices for HR TODAY (2026-09-09) are missing!"
   ],
-  "issues_warning": [],
+  "issues_warning": [
+    "Cable auction for BA-HR TODAY (2026-09-09) is missing.",
+    "Cable auction for BA-ME TODAY (2026-09-09) is missing.",
+    "Cable auction for GR-TR TODAY (2026-09-09) is missing.",
+    "Cable auction for HR-BA TODAY (2026-09-09) is missing.",
+    "Cable auction for ME-BA TODAY (2026-09-09) is missing.",
+    "Cable auction for TR-GR TODAY (2026-09-09) is missing."
+  ],
   "issues_info": []
 }
