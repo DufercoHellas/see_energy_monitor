@@ -12192,7 +12192,7 @@ function renderArbitragePanel() {
                     simpleSolar = solarState.startsWith("HighSolar") ? "HighSolar" : (solarState.startsWith("MedSolar") ? "MedSolar" : "LowSolar");
                 }
 
-                // 2. Pre-index Cable Prices
+                // 2. Pre-index Cable Prices & Outages (O(1) lookups)
                 const cablesMap = {};
                 cablesData.forEach(item => {
                     const key = `${item.trade_date}_${item.corridor_code}_${item.position}`;
@@ -12202,6 +12202,58 @@ function renderArbitragePanel() {
                 function getCablePrice(cable, h, date) {
                     if (!cable) return 0.0;
                     return cablesMap[`${date}_${cable}_${h+1}`] || 0.0;
+                }
+
+                // Pre-index Cable Outages for targetDate (O(1) blocked lookup)
+                const blockedCablesSet = new Set();
+                if (Array.isArray(cableOutagesData)) {
+                    for (let i = 0; i < cableOutagesData.length; i++) {
+                        const item = cableOutagesData[i];
+                        if (item.trade_date === targetDate) {
+                            const rem = parseFloat(item.remaining_capacity);
+                            if (!isNaN(rem) && rem <= 0) {
+                                blockedCablesSet.add(`${item.corridor_code}_${item.position}`);
+                            }
+                        }
+                    }
+                }
+
+                // Memoize valid matches and weights by start_end pair across 24h
+                const pairMatchesCache = {};
+                function getPairMatches(start, end) {
+                    const key = `${start}_${end}`;
+                    if (key in pairMatchesCache) return pairMatchesCache[key];
+
+                    const validMatches = [];
+                    for (let i = 0; i < currentTop7.length; i++) {
+                        const m = currentTop7[i];
+                        const avgStart = getDayAveragePriceWithFallback(start, m.date);
+                        const avgEnd = getDayAveragePriceWithFallback(end, m.date);
+                        if (avgStart <= 0.01 || avgEnd <= 0.01) continue;
+                        validMatches.push(m);
+                        if (validMatches.length === count) break;
+                    }
+
+                    if (validMatches.length < count) {
+                        pairMatchesCache[key] = null;
+                        return null;
+                    }
+
+                    let matchWeightsLocal = [];
+                    if (isElite) {
+                        const eliteWeights = [100, 90, 80, 70, 60, 50, 40].slice(0, validMatches.length);
+                        const sumW = eliteWeights.reduce((a, b) => a + b, 0);
+                        matchWeightsLocal = eliteWeights.map(w => sumW > 0 ? w / sumW : 1 / validMatches.length);
+                    } else {
+                        const rawSimsLocal = validMatches.map(m => Math.max(100.0 - m.combined, 1e-4));
+                        const invSimsLocal = rawSimsLocal.map(s => 1.0 / s);
+                        const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
+                        matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
+                    }
+
+                    const res = { validMatches, matchWeightsLocal };
+                    pairMatchesCache[key] = res;
+                    return res;
                 }
 
                 let profitableHoursCount = 0;
@@ -12216,57 +12268,22 @@ function renderArbitragePanel() {
                         const start = path[0].to;
                         const end   = path[path.length - 1].to;
 
-                        // 0. Physical Outage Check: If any cable along path has 0 MW remaining capacity on targetDate at this hour, skip!
+                        // 0. Physical Outage Check (O(1) Set lookup instead of linear scan)
                         let cableBlocked = false;
                         for (let idx = 1; idx < path.length; idx++) {
                             const cCode = path[idx].cable;
-                            if (!cCode) continue;
-                            const oe = cableOutagesData.find(item =>
-                                item.corridor_code === cCode &&
-                                item.trade_date === targetDate &&
-                                item.position === (h + 1)
-                            );
-                            if (oe) {
-                                const rem = parseFloat(oe.remaining_capacity);
-                                if (!isNaN(rem) && rem <= 0) {
-                                    cableBlocked = true;
-                                    break;
-                                }
+                            if (cCode && blockedCablesSet.has(`${cCode}_${h + 1}`)) {
+                                cableBlocked = true;
+                                break;
                             }
                         }
                         if (cableBlocked) return;
 
-                        // Dynamically select top valid matches for this path
-                        const validMatches = [];
-                        for (let i = 0; i < currentTop7.length; i++) {
-                            const m = currentTop7[i];
-                            const avgStart = getDayAveragePriceWithFallback(start, m.date);
-                            const avgEnd = getDayAveragePriceWithFallback(end, m.date);
-                            if (avgStart <= 0.01 || avgEnd <= 0.01) {
-                                continue;
-                            }
-                            validMatches.push(m);
-                            if (validMatches.length === count) {
-                                break;
-                            }
-                        }
-
-                        if (validMatches.length < count) {
-                            return; // skip this path/hour because we don't have enough valid matches
-                        }
-
-                        // Re-calculate weights dynamically for these valid matches
-                        let matchWeightsLocal = [];
-                        if (isElite) {
-                            const eliteWeights = [100, 90, 80, 70, 60, 50, 40].slice(0, validMatches.length);
-                            const sumW = eliteWeights.reduce((a, b) => a + b, 0);
-                            matchWeightsLocal = eliteWeights.map(w => sumW > 0 ? w / sumW : 1 / validMatches.length);
-                        } else {
-                            const rawSimsLocal = validMatches.map(m => Math.max(100.0 - m.combined, 1e-4));
-                            const invSimsLocal = rawSimsLocal.map(s => 1.0 / s);
-                            const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
-                            matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
-                        }
+                        // Dynamically select top valid matches for this pair (memoized)
+                        const pm = getPairMatches(start, end);
+                        if (!pm) return;
+                        const validMatches = pm.validMatches;
+                        const matchWeightsLocal = pm.matchWeightsLocal;
 
                         let allPositive = true;
                         let positiveWeightPct = 0.0;
@@ -12305,7 +12322,7 @@ function renderArbitragePanel() {
 
                         let passGate = false;
                         if (isElite) {
-                            // Sniper Elite Gate: Weighted consensus >= 70% AND weighted net margin >= threshold
+                            // Sovereign Gate: Weighted consensus >= 70% AND weighted net margin >= threshold
                             const weightedNet = weightedGross - weightedCable;
                             passGate = (positiveWeightPct >= 0.70) && (weightedNet >= threshold);
                         } else {
@@ -12330,15 +12347,13 @@ function renderArbitragePanel() {
                     });
                 }
 
-                // 2. Filter paths to require at least 3 consecutive hours for the same route
+                // 2. Filter paths to require at least 3 consecutive hours for the same route (O(1) Set lookups)
+                const profitableKeysByHour = Array.from({length: 24}, (_, hr) => new Set(pathByHour[hr].map(p => p.routeKey)));
                 const filteredPathsByHour = Array.from({length: 24}, () => []);
                 for (let h = 0; h < 24; h++) {
                     pathByHour[h].forEach(item => {
                         const rKey = item.routeKey;
-                        const isProfitableAt = (hourIdx) => {
-                            if (hourIdx < 0 || hourIdx >= 24) return false;
-                            return pathByHour[hourIdx].some(p => p.routeKey === rKey);
-                        };
+                        const isProfitableAt = (hourIdx) => (hourIdx >= 0 && hourIdx < 24 && profitableKeysByHour[hourIdx].has(rKey));
 
                         const has3HourRun = 
                             (isProfitableAt(h - 2) && isProfitableAt(h - 1)) ||
