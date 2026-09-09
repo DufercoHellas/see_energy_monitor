@@ -2137,6 +2137,34 @@ body.dark-mode .flow-dash {
                 🔍 Find Matches
             </button>
         </div>
+
+        <!-- ── Target Reference Values (DE prior, GR prior, BG prior, EUA, TTF) ── -->
+        <div id="target_prior_ref_strip" style="display: inline-flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 8px 14px; box-shadow: var(--shadow-sm); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: var(--text-muted); padding-right: 10px; border-right: 1.5px solid var(--border-color);">
+                <span style="font-size: 13px;">📌</span>
+                <span id="ref_prior_date_label" title="Prior day-type baseline date used for price shape and commodity matching">Ref: —</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Germany Prior Day Average Spot Price">DE Prior:</span>
+                <strong id="ref_de_prior_val" style="color: #3b82f6; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Greece Prior Day Average Spot Price">GR Prior:</span>
+                <strong id="ref_gr_prior_val" style="color: #6366f1; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Bulgaria Prior Day Average Spot Price">BG Prior:</span>
+                <strong id="ref_bg_prior_val" style="color: #06b6d4; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Carbon Allowance Price (EUA)">EUA:</span>
+                <strong id="ref_eua_val" style="color: #10b981; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Dutch TTF Natural Gas Price">TTF:</span>
+                <strong id="ref_ttf_val" style="color: #f59e0b; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+        </div>
     </div>
 
     <!-- ── 1. Interconnector Arbitrage & Spreads (TOP POSITION) ── -->
@@ -8734,17 +8762,26 @@ document.addEventListener('keydown', function(e) {
 
 // Apply the pre-computed optimal weights for the target date's solar/day-type
 function applyOptimizedWeights(force = false) {
-                if (isManualWeights && !force) return;
+                if (isManualWeights && !force) {
+                    updateTargetReferenceStrip();
+                    return;
+                }
                 
                 const targetDateStr = document.getElementById("analogue_date").value;
-                if (!targetDateStr) return;
+                if (!targetDateStr) {
+                    updateTargetReferenceStrip();
+                    return;
+                }
                 
                 const targetDate = parseLocalDate(targetDateStr);
                 const country = (document.getElementById("analogue_country") && ((document.getElementById("analogue_country") && document.getElementById("analogue_country").value) || "GR")) || "GR";
                 const isHoliday = (historicalData[country] && historicalData[country][targetDateStr]) ? historicalData[country][targetDateStr].is_holiday : false;
                 
                 const targetData = historicalData[country]?.[targetDateStr];
-                if (!targetData) return;
+                if (!targetData) {
+                    updateTargetReferenceStrip();
+                    return;
+                }
                 
                 const dayType = get3DayType(targetDate, isHoliday);
                 var opt = PRODUCTION_WEIGHTS;
@@ -8765,6 +8802,82 @@ function applyOptimizedWeights(force = false) {
                         label.style.color = "#10b981";
                     }
                 }
+                updateTargetReferenceStrip();
+            }
+
+// Update the target date reference values strip (DE Prior, GR Prior, BG Prior, EUA, TTF)
+function updateTargetReferenceStrip() {
+                const dateInput = document.getElementById("analogue_date");
+                if (!dateInput) return;
+                const targetDateStr = dateInput.value;
+                if (!targetDateStr) return;
+
+                const country = (document.getElementById("analogue_country") && document.getElementById("analogue_country").value) || "GR";
+                if (typeof historicalData === 'undefined' || !historicalData) return;
+
+                // Find prior same day-type reference date
+                const refPriorDate = (typeof getPriorSameDayTypeDate === 'function')
+                    ? getPriorSameDayTypeDate(targetDateStr, country)
+                    : null;
+
+                const targetData = historicalData[country] ? historicalData[country][targetDateStr] : null;
+                const refData = (refPriorDate && historicalData[country]) ? historicalData[country][refPriorDate] : null;
+                const deRefData = (refPriorDate) ? (historicalData['DE_LU']?.[refPriorDate] || historicalData['DE']?.[refPriorDate]) : null;
+                const bgRefData = (refPriorDate) ? historicalData['BG']?.[refPriorDate] : null;
+
+                function getAvgPrice(dataObj) {
+                    if (!dataObj || !dataObj.prices || !Array.isArray(dataObj.prices)) return null;
+                    const valid = dataObj.prices.filter(p => p !== null && p !== undefined);
+                    if (valid.length === 0) return null;
+                    const sum = valid.reduce((a, b) => a + b, 0);
+                    return sum / valid.length;
+                }
+
+                let euaVal = null;
+                if (refData && refData.eua_price != null && refData.eua_price > 0) {
+                    euaVal = refData.eua_price;
+                } else if (targetData && targetData.eua_price != null && targetData.eua_price > 0) {
+                    euaVal = targetData.eua_price;
+                }
+
+                let ttfVal = null;
+                if (refData && refData.ttf_price != null && refData.ttf_price > 0) {
+                    ttfVal = refData.ttf_price;
+                } else if (targetData && targetData.ttf_price != null && targetData.ttf_price > 0) {
+                    ttfVal = targetData.ttf_price;
+                }
+
+                const deAvg = getAvgPrice(deRefData);
+                const grAvg = getAvgPrice(refData);
+                const bgAvg = getAvgPrice(bgRefData);
+
+                const refDateEl = document.getElementById("ref_prior_date_label");
+                if (refDateEl) {
+                    if (refPriorDate) {
+                        const parts = refPriorDate.split('-');
+                        const shortDate = (parts.length === 3) ? `${parts[2]}/${parts[1]}` : refPriorDate;
+                        refDateEl.innerText = `Ref: ${shortDate}`;
+                        refDateEl.title = `Reference Prior Date (same day-type): ${refPriorDate}`;
+                    } else {
+                        refDateEl.innerText = `Ref: —`;
+                        refDateEl.title = "No prior same day-type date found";
+                    }
+                }
+
+                const deEl = document.getElementById("ref_de_prior_val");
+                if (deEl) deEl.innerText = deAvg !== null ? `${deAvg.toFixed(1)} €` : "—";
+
+                const grEl = document.getElementById("ref_gr_prior_val");
+                if (grEl) grEl.innerText = grAvg !== null ? `${grAvg.toFixed(1)} €` : "—";
+
+                const bgEl = document.getElementById("ref_bg_prior_val");
+                if (bgEl) bgEl.innerText = bgAvg !== null ? `${bgAvg.toFixed(1)} €` : "—";
+
+                const euaEl = document.getElementById("ref_eua_val");
+                if (euaEl) euaEl.innerText = euaVal !== null ? `${euaVal.toFixed(1)} €/t` : "—";
+
+                const ttfEl = document.getElementById("ref_ttf_val");
+                if (ttfEl) ttfEl.innerText = ttfVal !== null ? `${ttfVal.toFixed(1)} €` : "—";
             }
             
 // Re-distribute weights proportionally when the user manually changes one slider
@@ -11352,6 +11465,7 @@ function findAnalogues() {
                 
                 currentTargetDate = targetDate;
                 currentTargetData = historicalData[country][targetDate];
+                updateTargetReferenceStrip();
                 
                 const targetDateObj = parseLocalDate(targetDate);
                 const t_is_holiday = currentTargetData.is_holiday || false;
