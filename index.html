@@ -2086,7 +2086,7 @@ body.dark-mode .flow-dash {
             <div style="display: inline-flex; gap: 6px; background: var(--bg-card); padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); align-items: center; box-sizing: border-box; flex-wrap: wrap;">
                 <div style="display: flex; align-items: center; gap: 2px;">
                     <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Greece Residuals (GR R)">GR R:</span>
-                    <input type="number" id="w_res" min="0" max="100" value="20" onchange="updateWeights('w_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <input type="number" id="w_res" min="0" max="100" value="25" onchange="updateWeights('w_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
                     <span style="font-size: 10px; color: var(--text-muted);">%</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 2px;">
@@ -2116,7 +2116,7 @@ body.dark-mode .flow-dash {
                 </div>
                 <div style="display: flex; align-items: center; gap: 2px;">
                     <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Bulgarian Prior Day Price (BG P)">BG P:</span>
-                    <input type="number" id="w_bg_prior" min="0" max="100" value="13" onchange="updateWeights('w_bg_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <input type="number" id="w_bg_prior" min="0" max="100" value="8" onchange="updateWeights('w_bg_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
                     <span style="font-size: 10px; color: var(--text-muted);">%</span>
                 </div>
                 <div style="display: flex; align-items: center; gap: 2px;">
@@ -2608,12 +2608,12 @@ function selectCorridorTab(cid, selectedIdx, count) {
 // All data references (historicalData, cablesData, historicalStats)
 // are closure-global from the concatenated script.
 
-// ── Production Weights (backtest winner: 71.8% win rate) ──────────────
+// ── Production Weights (backtest winner: 70.2% real win rate, 20.65 EUR/MWh) ──
 // 9 dimensions: res, eua, de_res, bg_res, ttf, gr_prior, de_prior, bg_prior, it_res
 // No solar-state filter, no month window, no lookback limit.
 // Stored in backtest/models/expanded.json
 
-var PRODUCTION_WEIGHTS = { res: 20, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 13, it_res: 8 };
+var PRODUCTION_WEIGHTS = { res: 25, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 8, it_res: 8 };
 
 // ── Original per-category weights (used by Standard model) ──────────────
 var OPTIMIZED_WEIGHTS = {
