@@ -2150,7 +2150,7 @@ body.dark-mode .flow-dash {
                     Calculates and routes optimal cross-border power flows using an inverse-distance weighted average of the top N analogues. Filters out Non-EU ➔ EU imports (CBAM compliance).
                 </p>
             </div>
-            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
                 <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-card-subtle); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 8px 18px; box-shadow: var(--shadow-sm);">
                     <label for="arbitrage_top_n" style="font-size: 15px; font-weight: 800; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px;">
                         Strategy Mode:
@@ -2161,6 +2161,9 @@ body.dark-mode .flow-dash {
                         <option value="5" style="font-weight: 800;">⚖️ Balanced</option>
                         <option value="3" style="font-weight: 800;">🚀 High Volume</option>
                     </select>
+                </div>
+                <div id="strategy_mode_description" style="font-size: 11px; color: var(--text-muted); max-width: 420px; text-align: right; line-height: 1.4; padding-right: 4px;">
+                    <span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, high-conviction trades.
                 </div>
             </div>
         </div>
@@ -12049,6 +12052,19 @@ function renderArbitragePanel() {
                 // 1. Compute Weights for top N matches (rank-decay for elite, inverse-distance for others)
                 const stratMode = (document.getElementById("arbitrage_top_n") && document.getElementById("arbitrage_top_n").value) || "elite";
                 const isElite = (stratMode === "elite");
+
+                // Update small descriptive text below strategy dropdown
+                const descEl = document.getElementById("strategy_mode_description");
+                if (descEl) {
+                    const descriptions = {
+                        "elite": `<span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, high-conviction trades.`,
+                        "7": `<span style="color: #6366f1; font-weight: 700;">Top 7 Strict Unanimous (100%):</span> All 7 analogues must agree on positive margin (&ge;5 €/MWh). Conservative risk-averse execution.`,
+                        "5": `<span style="color: #6366f1; font-weight: 700;">Top 5 Analogues:</span> Inverse-distance weighted consensus across top 5 historical days. Balances flow frequency with directional safety.`,
+                        "3": `<span style="color: #6366f1; font-weight: 700;">Top 3 Analogues:</span> Rapid opportunistic execution across top 3 closest weather/demand analogues to capture maximum price swings.`
+                    };
+                    descEl.innerHTML = descriptions[stratMode] || descriptions["elite"];
+                }
+
                 const topNSel = isElite ? 7 : parseInt(stratMode, 10);
                 const count = Math.min(topNSel, currentTop7.length);
                 const matchDates = [];
