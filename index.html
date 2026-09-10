@@ -14912,13 +14912,14 @@ function renderEUMapCountryDetail(dataKey, date) {
 // === tab_cable_calculator.js ===
 // ── tab_cable_calculator.js ──────────────────────────────────────────────────
 // Daily Cable Calculator & Auction Clearing Engine
-// Features JAO-style OUT AREA / SWAP / IN AREA selector, empirical clearing percentiles (P50, P75, P90, Max),
+// Features JAO-style OUT AREA / SWAP / IN AREA selector, All-Day (24h uniform bid) and
+// hourly (Hour 1 to 24) empirical clearing percentiles (P50, P75, P90, Max),
 // and historical win-rate probability simulation for explicit cross-border cables.
 
 (function() {
     let calcInitialized = false;
-    let currentCorridorStats = [];
-    let selectedActiveHour = 20; // 1-indexed (1 to 24), default to evening peak H20
+    let currentCorridorStats = { hourly: [], allDay: null };
+    let selectedActiveHour = 'ALL'; // Default to 'ALL' (All Day), or 1..24 for specific hours
 
     // Country Flag and Name Metadata
     const countryLabels = {
@@ -15109,15 +15110,22 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         if (!outSelect || !hourSelect || !targetDateInput) return;
 
-        // Populate Delivery Hours (1 to 24)
+        // Populate Delivery Hours: All Day (pre-selected default) + Hour 1 to Hour 24
         if (hourSelect.options.length === 0) {
             hourSelect.innerHTML = '';
+            
+            // All Day (Default Pre-selected)
+            const allOpt = document.createElement("option");
+            allOpt.value = 'ALL';
+            allOpt.textContent = 'All Day';
+            if (selectedActiveHour === 'ALL') allOpt.selected = true;
+            hourSelect.appendChild(allOpt);
+
             for (let h = 1; h <= 24; h++) {
                 const opt = document.createElement("option");
-                opt.value = h;
-                const hh = String(h).padStart(2, '0');
-                opt.textContent = `Hour ${hh}:00 (Delivery ${h})`;
-                if (h === selectedActiveHour) opt.selected = true;
+                opt.value = h.toString();
+                opt.textContent = `Hour ${h}`;
+                if (String(selectedActiveHour) === String(h)) opt.selected = true;
                 hourSelect.appendChild(opt);
             }
         }
@@ -15167,7 +15175,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             }
         }
 
-        const result = [];
+        const hourlyResult = [];
         for (let h = 1; h <= 24; h++) {
             const rawPrices = hourlyBuckets[h];
             const sortedPrices = rawPrices.slice().sort((a, b) => a - b);
@@ -15187,7 +15195,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                 zeroCount = sortedPrices.filter(p => p <= 0.001).length;
             }
 
-            result.push({
+            hourlyResult.push({
                 hour: h,
                 count: count,
                 min: min,
@@ -15203,7 +15211,44 @@ function renderEUMapCountryDetail(dataKey, date) {
                 prices: sortedPrices
             });
         }
-        return result;
+
+        // Aggregate All-Day (All 24 hours combined)
+        const allPrices = [].concat(...Object.values(hourlyBuckets)).sort((a, b) => a - b);
+        const allCount = allPrices.length;
+        let allMin = 0.0, allP25 = 0.0, allP50 = 0.0, allP75 = 0.0, allP90 = 0.0, allP95 = 0.0, allMax = 0.0, allAvg = 0.0, allZeroCount = 0;
+
+        if (allCount > 0) {
+            allMin = allPrices[0];
+            allP25 = getPercentile(allPrices, 25);
+            allP50 = getPercentile(allPrices, 50);
+            allP75 = getPercentile(allPrices, 75);
+            allP90 = getPercentile(allPrices, 90);
+            allP95 = getPercentile(allPrices, 95);
+            allMax = allPrices[allCount - 1];
+            allAvg = allPrices.reduce((sum, val) => sum + val, 0) / allCount;
+            allZeroCount = allPrices.filter(p => p <= 0.001).length;
+        }
+
+        const allDayResult = {
+            hour: 'ALL',
+            count: allCount,
+            min: allMin,
+            p25: allP25,
+            p50: allP50,
+            p75: allP75,
+            p90: allP90,
+            p95: allP95,
+            max: allMax,
+            avg: allAvg,
+            zeroCount: allZeroCount,
+            zeroPct: allCount > 0 ? (allZeroCount / allCount) * 100 : 0,
+            prices: allPrices
+        };
+
+        return {
+            hourly: hourlyResult,
+            allDay: allDayResult
+        };
     }
 
     // ── Check Outages & Curtailments ─────────────────────────────────────────
@@ -15211,6 +15256,16 @@ function renderEUMapCountryDetail(dataKey, date) {
         const outData = window.cableOutagesData || (typeof cableOutagesData !== 'undefined' ? cableOutagesData : []);
         if (!Array.isArray(outData)) return [];
         return outData.filter(item => item.corridor_code === corridor && item.trade_date === targetDateStr);
+    }
+
+    // ── Helper to Get Active Stat ────────────────────────────────────────────
+    function getActiveStat() {
+        if (!currentCorridorStats || !currentCorridorStats.allDay) return null;
+        if (selectedActiveHour === 'ALL') {
+            return currentCorridorStats.allDay;
+        }
+        const hIdx = parseInt(selectedActiveHour) - 1;
+        return currentCorridorStats.hourly[hIdx] || null;
     }
 
     // ── Recalculate & Refresh Entire Cable Calculator ────────────────────────
@@ -15227,24 +15282,29 @@ function renderEUMapCountryDetail(dataKey, date) {
         const corridor = `${outSelect.value}-${inSelect.value}`;
         const targetDate = targetDateInput.value;
         const lookbackDays = parseInt(lookbackSelect ? lookbackSelect.value : "60") || 60;
-        selectedActiveHour = parseInt(hourSelect ? hourSelect.value : "20") || 20;
+        
+        selectedActiveHour = hourSelect ? hourSelect.value : 'ALL';
 
         if (!outSelect.value || !inSelect.value || !targetDate) return;
 
         syncCorridorAndBadge();
 
-        // Compute 24-hour Statistics
+        // Compute 24-hour and All-Day Statistics
         currentCorridorStats = computeCorridorStats(corridor, targetDate, lookbackDays);
+
+        const activeStat = getActiveStat();
 
         // Update Active Hour Tag
         const activeTag = document.getElementById("calc_active_hour_tag");
         if (activeTag) {
-            const hh = String(selectedActiveHour).padStart(2, '0');
-            activeTag.textContent = `Hour ${hh}:00 (Delivery ${selectedActiveHour})`;
+            if (selectedActiveHour === 'ALL') {
+                activeTag.textContent = `🗓️ All Day (24h Flat Bid)`;
+            } else {
+                activeTag.textContent = `Hour ${selectedActiveHour}`;
+            }
         }
 
         // Set default proposed bid to P75 if empty
-        const activeStat = currentCorridorStats[selectedActiveHour - 1];
         if (activeStat && (!proposedBidInput.value || parseFloat(proposedBidInput.value) === 0)) {
             proposedBidInput.value = (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50).toFixed(2);
         }
@@ -15279,7 +15339,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         slider.max = maxScale.toFixed(2);
 
         if (p75Label) p75Label.textContent = `P75: ${activeStat.p75.toFixed(2)} €`;
-        if (maxLabel) maxLabel.textContent = `60d Max: ${activeStat.max.toFixed(2)} €`;
+        if (maxLabel) maxLabel.textContent = `Max: ${activeStat.max.toFixed(2)} €`;
 
         const currentBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
         slider.value = currentBid;
@@ -15322,7 +15382,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // ── Update Simulator KPIs, Win Rate ──────────────────────────────────────
     function updateSimulatorKPIs() {
-        const activeStat = currentCorridorStats[selectedActiveHour - 1];
+        const activeStat = getActiveStat();
         if (!activeStat) return;
 
         const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
@@ -15332,7 +15392,11 @@ function renderEUMapCountryDetail(dataKey, date) {
         const kpiBidSub = document.getElementById("kpi_proposed_bid_sub");
         if (kpiBid) kpiBid.textContent = `${proposedBid.toFixed(2)} €`;
         if (kpiBidSub) {
-            kpiBidSub.textContent = `Bidding price for Hour ${selectedActiveHour}:00`;
+            if (selectedActiveHour === 'ALL') {
+                kpiBidSub.textContent = `Uniform 1 bid across all 24 hours`;
+            } else {
+                kpiBidSub.textContent = `Target bid for Hour ${selectedActiveHour}`;
+            }
         }
 
         // KPI 2: Win Rate Calculation
@@ -15354,7 +15418,12 @@ function renderEUMapCountryDetail(dataKey, date) {
             kpiWinBar.style.background = winRate >= 85 ? '#10b981' : (winRate >= 65 ? '#059669' : (winRate >= 45 ? '#f59e0b' : '#ef4444'));
         }
         if (kpiWinSub) {
-            kpiWinSub.textContent = `Won ${winCount} of ${activeStat.count} historical auctions (Clearing &le; ${proposedBid.toFixed(2)} €)`;
+            if (selectedActiveHour === 'ALL') {
+                const avgHoursWon = (winRate * 24 / 100).toFixed(1);
+                kpiWinSub.textContent = `Won ${winCount} of ${activeStat.count} auctions (~${avgHoursWon}/24 hours won per day)`;
+            } else {
+                kpiWinSub.textContent = `Won ${winCount} of ${activeStat.count} historical auctions (Clearing &le; ${proposedBid.toFixed(2)} €)`;
+            }
         }
 
         // KPI 3: Percentiles
@@ -15368,14 +15437,21 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (statP75) statP75.textContent = `${activeStat.p75.toFixed(2)} €`;
         if (statP90) statP90.textContent = `${activeStat.p90.toFixed(2)} €`;
         if (statMax) statMax.textContent = `${activeStat.max.toFixed(2)} €`;
-        if (statAvg) statAvg.textContent = `60-Day Average: ${activeStat.avg.toFixed(2)} €/MWh`;
+        if (statAvg) {
+            const scopeLabel = selectedActiveHour === 'ALL' ? 'All-Day Average' : `Hour ${selectedActiveHour} Average`;
+            statAvg.textContent = `${scopeLabel}: ${activeStat.avg.toFixed(2)} €/MWh`;
+        }
 
         // KPI 4: Congestion & Zero Price
         const kpiZero = document.getElementById("kpi_zero_pct");
         const statZero = document.getElementById("kpi_stat_zero_sub");
         if (kpiZero) kpiZero.textContent = `${activeStat.zeroPct.toFixed(0)}% Free`;
         if (statZero) {
-            statZero.textContent = `Cleared at 0.00 € on ${activeStat.zeroCount} of ${activeStat.count} days (${activeStat.count - activeStat.zeroCount} congested)`;
+            if (selectedActiveHour === 'ALL') {
+                statZero.textContent = `Cleared at 0.00 € in ${activeStat.zeroCount} of ${activeStat.count} total hours`;
+            } else {
+                statZero.textContent = `Cleared at 0.00 € on ${activeStat.zeroCount} of ${activeStat.count} days`;
+            }
         }
 
         // Update Risk/Win Badge
@@ -15388,17 +15464,19 @@ function renderEUMapCountryDetail(dataKey, date) {
         const sub = document.getElementById("calc_bid_vs_cap_sub");
         if (!badge) return;
 
+        const isAll = selectedActiveHour === 'ALL';
+
         if (stat.count > 0 && bid >= stat.max) {
             badge.className = "calc-risk-badge badge-aggressive";
-            badge.textContent = "🏆 100% Historical Win";
+            badge.textContent = isAll ? "🏆 100% 24h Win Rate" : "🏆 100% Historical Win";
             if (sub) sub.textContent = `Covers 60d peak clearing price (${stat.max.toFixed(2)} €)`;
         } else if (bid >= stat.p90) {
             badge.className = "calc-risk-badge badge-aggressive";
-            badge.textContent = "⚡ Aggressive Win Rate";
-            if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions (secures high congestion)`;
+            badge.textContent = isAll ? "⚡ Aggressive 24h Bid" : "⚡ Aggressive Win Rate";
+            if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions across all hours`;
         } else if (bid >= stat.p75) {
             badge.className = "calc-risk-badge badge-recommended";
-            badge.textContent = "🟢 Value Optimal ⭐";
+            badge.textContent = isAll ? "🟢 Value 24h Bid ⭐" : "🟢 Value Optimal ⭐";
             if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions at sensible clearing cost`;
         } else if (bid >= stat.p50) {
             badge.className = "calc-risk-badge badge-conservative";
@@ -15411,13 +15489,13 @@ function renderEUMapCountryDetail(dataKey, date) {
         } else {
             badge.className = "calc-risk-badge badge-conservative";
             badge.textContent = "⚪ Zero Price (0.00 €)";
-            if (sub) sub.textContent = `Wins on non-congested days (${winRate.toFixed(0)}% frequency)`;
+            if (sub) sub.textContent = `Wins on non-congested hours (${winRate.toFixed(0)}% frequency)`;
         }
     }
 
     // ── Strategy Presets ─────────────────────────────────────────────────────
     window.setBidPreset = function(preset) {
-        const activeStat = currentCorridorStats[selectedActiveHour - 1];
+        const activeStat = getActiveStat();
         if (!activeStat) return;
 
         const bidInput = document.getElementById("calc_proposed_bid_input");
@@ -15446,7 +15524,9 @@ function renderEUMapCountryDetail(dataKey, date) {
         }
 
         updateSimulatorKPIs();
+        render24HourHorizonChart();
         renderDistributionChart();
+        render24HourMatrixTable();
     };
 
     // ── Input Event Handlers ─────────────────────────────────────────────────
@@ -15456,7 +15536,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     window.onCableCalculatorHourChange = function() {
         const hourSelect = document.getElementById("calc_hour_select");
-        if (hourSelect) selectedActiveHour = parseInt(hourSelect.value) || 1;
+        if (hourSelect) selectedActiveHour = hourSelect.value;
         refreshCableCalculator();
     };
 
@@ -15467,7 +15547,9 @@ function renderEUMapCountryDetail(dataKey, date) {
             const val = parseFloat(bidInput.value) || 0;
             slider.value = val;
             updateSimulatorKPIs();
+            render24HourHorizonChart();
             renderDistributionChart();
+            render24HourMatrixTable();
         }
     };
 
@@ -15478,23 +15560,28 @@ function renderEUMapCountryDetail(dataKey, date) {
             const val = parseFloat(slider.value) || 0;
             bidInput.value = val.toFixed(2);
             updateSimulatorKPIs();
+            render24HourHorizonChart();
             renderDistributionChart();
+            render24HourMatrixTable();
         }
     };
 
     window.resetCalculatorDefaults = function() {
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (bidInput) bidInput.value = '';
+        selectedActiveHour = 'ALL';
+        const hourSelect = document.getElementById("calc_hour_select");
+        if (hourSelect) hourSelect.value = 'ALL';
         refreshCableCalculator();
     };
 
     // ── Select Specific Hour from Matrix Table ───────────────────────────────
     window.selectCalculatorHour = function(h) {
-        selectedActiveHour = h;
+        selectedActiveHour = h.toString();
         const hourSelect = document.getElementById("calc_hour_select");
-        if (hourSelect) hourSelect.value = h;
+        if (hourSelect) hourSelect.value = h.toString();
 
-        const activeStat = currentCorridorStats[h - 1];
+        const activeStat = getActiveStat();
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (activeStat && bidInput) {
             bidInput.value = (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50).toFixed(2);
@@ -15510,7 +15597,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     // ── Plotly Chart 1: 24-Hour Horizon ──────────────────────────────────────
     function render24HourHorizonChart() {
         const chartEl = document.getElementById("calc_chart_24h");
-        if (!chartEl || typeof Plotly === 'undefined') return;
+        if (!chartEl || typeof Plotly === 'undefined' || !currentCorridorStats.hourly.length) return;
 
         const hours = [];
         const p50s = [];
@@ -15520,8 +15607,8 @@ function renderEUMapCountryDetail(dataKey, date) {
         const avgs = [];
 
         for (let h = 1; h <= 24; h++) {
-            hours.push(`H${String(h).padStart(2, '0')}`);
-            const st = currentCorridorStats[h - 1];
+            hours.push(`Hour ${h}`);
+            const st = currentCorridorStats.hourly[h - 1];
             p50s.push(st ? st.p50 : 0);
             p75s.push(st ? st.p75 : 0);
             p90s.push(st ? st.p90 : 0);
@@ -15530,12 +15617,13 @@ function renderEUMapCountryDetail(dataKey, date) {
         }
 
         const isDark = typeof isDarkMode === 'function' && isDarkMode();
+        const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
 
         const traces = [
             {
                 x: hours,
                 y: maxs,
-                name: '60d Historical Max',
+                name: '60d Max',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#ef4444', width: 1.8 },
@@ -15544,7 +15632,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p90s,
-                name: 'P90 (90% Win Chance)',
+                name: 'P90 (90% Win)',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#f59e0b', width: 2 },
@@ -15553,7 +15641,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p75s,
-                name: 'P75 (75% Win Chance) ⭐',
+                name: 'P75 (75% Win) ⭐',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#10b981', width: 2.5 },
@@ -15562,7 +15650,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p50s,
-                name: 'P50 (Median Baseline)',
+                name: 'P50 (Median)',
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#64748b', width: 1.5, dash: 'dash' }
@@ -15576,6 +15664,22 @@ function renderEUMapCountryDetail(dataKey, date) {
                 line: { color: '#8b5cf6', width: 1.5, dash: 'dot' }
             }
         ];
+
+        // Add Proposed Bid Line
+        if (proposedBid > 0) {
+            const bidLabel = selectedActiveHour === 'ALL'
+                ? `All-Day Proposed Bid (${proposedBid.toFixed(2)} €)`
+                : `Hour ${selectedActiveHour} Bid (${proposedBid.toFixed(2)} €)`;
+
+            traces.push({
+                x: hours,
+                y: new Array(24).fill(proposedBid),
+                name: bidLabel,
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: '#6366f1', width: 3, dash: 'dash' }
+            });
+        }
 
         const layout = {
             margin: { t: 20, r: 20, l: 45, b: 35 },
@@ -15606,29 +15710,32 @@ function renderEUMapCountryDetail(dataKey, date) {
         Plotly.react(chartEl, traces, layout, { responsive: true, displayModeBar: false });
     }
 
-    // ── Plotly Chart 2: Distribution for Selected Hour ───────────────────────
+    // ── Plotly Chart 2: Distribution for Selected Hour or All-Day ────────────
     function renderDistributionChart() {
         const chartEl = document.getElementById("calc_chart_distribution");
         const subTitle = document.getElementById("calc_dist_subtitle");
         if (!chartEl || typeof Plotly === 'undefined') return;
 
-        const activeStat = currentCorridorStats[selectedActiveHour - 1];
+        const activeStat = getActiveStat();
         if (!activeStat || activeStat.count === 0) {
             chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px;">No clearing price data found for selected lookback period.</div>';
             return;
         }
 
-        const hh = String(selectedActiveHour).padStart(2, '0');
         const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
         const prices = activeStat.prices;
 
         if (subTitle) {
-            subTitle.textContent = `Historical clearing price frequencies for Hour ${hh}:00 (Delivery ${selectedActiveHour}). Tested bid: ${proposedBid.toFixed(2)} €/MWh.`;
+            if (selectedActiveHour === 'ALL') {
+                subTitle.textContent = `All-Day clearing price distribution across all 24 hours (${activeStat.count} auctions sampled). Tested flat bid: ${proposedBid.toFixed(2)} €/MWh.`;
+            } else {
+                subTitle.textContent = `Historical clearing price frequencies for Hour ${selectedActiveHour}. Tested bid: ${proposedBid.toFixed(2)} €/MWh.`;
+            }
         }
 
         // Construct Frequency Bins
         const maxVal = Math.max(activeStat.max, proposedBid, 10);
-        const binStep = Math.max(1, Math.round(maxVal / 18));
+        const binStep = Math.max(0.5, Math.round(maxVal / 18));
         const bins = [];
         const winCounts = [];
         const loseCounts = [];
@@ -15640,7 +15747,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             const winInBin = inBin.filter(p => p <= proposedBid).length;
             const loseInBin = inBin.length - winInBin;
 
-            bins.push(`${bMin}-${bMax} €`);
+            bins.push(`${bMin.toFixed(1)}-${bMax.toFixed(1)} €`);
             winCounts.push(winInBin);
             loseCounts.push(loseInBin);
         }
@@ -15675,7 +15782,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                 showgrid: false
             },
             yaxis: {
-                title: 'Number of Days',
+                title: 'Number of Auctions',
                 showgrid: true,
                 gridcolor: isDark ? '#1e293b' : '#f1f5f9'
             },
@@ -15693,7 +15800,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     // ── Render 24-Hour Bidding Matrix Table ───────────────────────────────────
     function render24HourMatrixTable() {
         const tbody = document.getElementById("calc_matrix_tbody");
-        if (!tbody) return;
+        if (!tbody || !currentCorridorStats.hourly.length) return;
 
         const outSelect = document.getElementById("calc_out_area_select");
         const inSelect = document.getElementById("calc_in_area_select");
@@ -15705,9 +15812,11 @@ function renderEUMapCountryDetail(dataKey, date) {
         const outageMap = {};
         outages.forEach(o => { outageMap[o.position] = o; });
 
+        const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
+
         let html = '';
         for (let h = 1; h <= 24; h++) {
-            const st = currentCorridorStats[h - 1] || { min: 0, p50: 0, p75: 0, p90: 0, max: 0, avg: 0, zeroPct: 0, count: 0 };
+            const st = currentCorridorStats.hourly[h - 1] || { min: 0, p50: 0, p75: 0, p90: 0, max: 0, avg: 0, zeroPct: 0, count: 0, prices: [] };
 
             // Outage indicator
             const oe = outageMap[h];
@@ -15723,13 +15832,22 @@ function renderEUMapCountryDetail(dataKey, date) {
                 }
             }
 
-            const isActive = h === selectedActiveHour;
-            const hh = String(h).padStart(2, '0');
+            // Calculate Win Rate for this hour at current Proposed Bid
+            let hourWinRate = 0;
+            if (st.count > 0 && proposedBid >= 0) {
+                const won = st.prices.filter(p => p <= proposedBid + 0.0001).length;
+                hourWinRate = (won / st.count) * 100;
+            }
+            let winChipColor = '#dc2626', winChipBg = 'rgba(239, 68, 68, 0.1)';
+            if (hourWinRate >= 80) { winChipColor = '#059669'; winChipBg = 'rgba(16, 185, 129, 0.12)'; }
+            else if (hourWinRate >= 50) { winChipColor = '#d97706'; winChipBg = 'rgba(245, 158, 11, 0.12)'; }
+
+            const isActive = String(selectedActiveHour) === String(h);
 
             html += `
                 <tr class="calc-matrix-row ${isActive ? 'calc-row-active' : ''}" onclick="selectCalculatorHour(${h})">
                     <td style="text-align:left; font-weight:700; color: var(--text-primary);">
-                        ${hh}:00 ${isActive ? '<span class="calc-active-badge">Active</span>' : ''}
+                        Hour ${h} ${isActive ? '<span class="calc-active-badge">Active</span>' : ''}
                     </td>
                     <td style="text-align:right; color: var(--text-muted);">${st.min.toFixed(2)} €</td>
                     <td style="text-align:right; font-weight:600; color: #64748b;">${st.p50.toFixed(2)} €</td>
@@ -15742,11 +15860,15 @@ function renderEUMapCountryDetail(dataKey, date) {
                     <td style="text-align:right; color: #dc2626; font-weight:700;">${st.max.toFixed(2)} €</td>
                     <td style="text-align:right; color: #8b5cf6; font-weight:600;">${st.avg.toFixed(2)} €</td>
                     <td style="text-align:right; color: var(--text-muted);">${st.zeroPct.toFixed(0)}%</td>
-                    <td style="text-align:right; color: var(--text-secondary); font-weight:600;">${st.count} days</td>
+                    <td style="text-align:right;">
+                        <span style="font-size:11px; font-weight:700; color:${winChipColor}; background:${winChipBg}; padding:2px 7px; border-radius:4px;">
+                            ${hourWinRate.toFixed(0)}% Win
+                        </span>
+                    </td>
                     <td style="text-align:center;">${statusHtml}</td>
                     <td style="text-align:center;">
                         <button type="button" class="btn-matrix-simulate" onclick="event.stopPropagation(); selectCalculatorHour(${h})">
-                            🎯 Test Bid
+                            Hour ${h}
                         </button>
                     </td>
                 </tr>
@@ -15780,11 +15902,16 @@ function renderEUMapCountryDetail(dataKey, date) {
         const targetDateInput = document.getElementById("calc_target_date");
         const hourSelect = document.getElementById("calc_hour_select");
 
-        const targetHour1Indexed = (hour0Indexed + 1);
-
         if (targetDate && targetDateInput) targetDateInput.value = targetDate;
-        if (hourSelect) hourSelect.value = targetHour1Indexed;
-        selectedActiveHour = targetHour1Indexed;
+        
+        // If hour is provided, select that hour; otherwise keep All Day
+        if (typeof hour0Indexed === 'number' && hour0Indexed >= 0 && hour0Indexed < 24) {
+            selectedActiveHour = (hour0Indexed + 1).toString();
+            if (hourSelect) hourSelect.value = selectedActiveHour;
+        } else {
+            selectedActiveHour = 'ALL';
+            if (hourSelect) hourSelect.value = 'ALL';
+        }
 
         // 4. Recalculate
         refreshCableCalculator();
