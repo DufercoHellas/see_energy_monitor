@@ -2294,8 +2294,8 @@ body.dark-mode .btn-wiggle-quick:hover {
     <button class="tablinks" onclick="openTab(event, 'Economics')">🏭 Plant Costs</button>
     <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cable Outages</button>
     <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
-    <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
     <button class="tablinks" onclick="openTab(event, 'CableCalculator')">🧮 Cable Calculator</button>
+    <button class="tablinks" onclick="openTab(event, 'Analogues')">🔍 Historical Analogues</button>
 </div>
 
 
@@ -3013,204 +3013,6 @@ body.dark-mode .btn-wiggle-quick:hover {
 </div>
 
 
-        <!-- ── TAB: Historical Analogues ── -->
-        <!-- ── TAB: Historical Analogues ── -->
-<div id="Analogues" class="tabcontent" style="display:none;">
-    <h2>Historical Analogues</h2>
-    <p style="color:var(--text-muted);margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
-    <!-- ── Search Controls ── -->
-    <div style="background: var(--bg-card-subtle); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 18px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
-        <div>
-            <label for="analogue_date" style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 6px;">Target Date</label>
-            <input type="date" id="analogue_date" onchange="applyOptimizedWeights();" style="padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--input-border); font-size: 13px; font-weight: 600; color: var(--text-primary); background: var(--input-bg); cursor: pointer;">
-        </div>
-        
-        <div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Feature Weights</label>
-                <div id="weights_auto_label" style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-left: 10px;"></div>
-            </div>
-            <div style="display: inline-flex; gap: 6px; background: var(--bg-card); padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); align-items: center; box-sizing: border-box; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Greece Residuals (GR R)">GR R:</span>
-                    <input type="number" id="w_res" min="0" max="100" value="25" onchange="updateWeights('w_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Germany Residuals (DE R)">DE R:</span>
-                    <input type="number" id="w_de_res" min="0" max="100" value="9" onchange="updateWeights('w_de_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Bulgarian Residuals (BG R)">BG R:</span>
-                    <input type="number" id="w_bg_res" min="0" max="100" value="9" onchange="updateWeights('w_bg_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Italian Residuals (IT R)">IT R:</span>
-                    <input type="number" id="w_it_res" min="0" max="100" value="8" onchange="updateWeights('w_it_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Greece Prior Day Price (GR P)">GR P:</span>
-                    <input type="number" id="w_gr_prior" min="0" max="100" value="7" onchange="updateWeights('w_gr_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Germany Prior Day Price (DE P)">DE P:</span>
-                    <input type="number" id="w_de_prior" min="0" max="100" value="9" onchange="updateWeights('w_de_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Bulgarian Prior Day Price (BG P)">BG P:</span>
-                    <input type="number" id="w_bg_prior" min="0" max="100" value="8" onchange="updateWeights('w_bg_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Carbon Price">EUA:</span>
-                    <input type="number" id="w_eua" min="0" max="100" value="21" onchange="updateWeights('w_eua')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-                <div style="display: flex; align-items: center; gap: 2px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Gas Price">TTF:</span>
-                    <input type="number" id="w_ttf" min="0" max="100" value="4" onchange="updateWeights('w_ttf')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
-                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
-                </div>
-            </div>
-        </div>
-        
-        <div>
-            <button onclick="findAnalogues()" style="background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white; padding: 10px 22px; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3); transition: all 0.15s ease;" onmouseover="this.style.boxShadow='0 5px 14px rgba(79, 70, 229, 0.45)'" onmouseout="this.style.boxShadow='0 3px 8px rgba(79, 70, 229, 0.3)'">
-                🔍 Find Matches
-            </button>
-        </div>
-
-        <!-- ── Target Reference Values (DE prior, GR prior, BG prior, EUA, TTF) ── -->
-        <div id="target_prior_ref_strip" style="display: inline-flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 8px 14px; box-shadow: var(--shadow-sm); flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: var(--text-muted); padding-right: 10px; border-right: 1.5px solid var(--border-color);">
-                <span style="font-size: 13px;">📌</span>
-                <span id="ref_prior_date_label" title="Prior day-type baseline date used for price shape and commodity matching">Ref: —</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                <span style="font-weight: 700; color: var(--text-secondary);" title="Germany Prior Day Average Spot Price">DE Prior:</span>
-                <strong id="ref_de_prior_val" style="color: #3b82f6; font-weight: 800; font-size: 12px;">—</strong>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                <span style="font-weight: 700; color: var(--text-secondary);" title="Greece Prior Day Average Spot Price">GR Prior:</span>
-                <strong id="ref_gr_prior_val" style="color: #6366f1; font-weight: 800; font-size: 12px;">—</strong>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                <span style="font-weight: 700; color: var(--text-secondary);" title="Bulgaria Prior Day Average Spot Price">BG Prior:</span>
-                <strong id="ref_bg_prior_val" style="color: #06b6d4; font-weight: 800; font-size: 12px;">—</strong>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                <span style="font-weight: 700; color: var(--text-secondary);" title="Carbon Allowance Price (EUA)">EUA:</span>
-                <strong id="ref_eua_val" style="color: #10b981; font-weight: 800; font-size: 12px;">—</strong>
-            </div>
-            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
-                <span style="font-weight: 700; color: var(--text-secondary);" title="Dutch TTF Natural Gas Price">TTF:</span>
-                <strong id="ref_ttf_val" style="color: #f59e0b; font-weight: 800; font-size: 12px;">—</strong>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── 1. Interconnector Arbitrage & Spreads (TOP POSITION) ── -->
-    <div id="arbitrage_opportunities_panel" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: var(--shadow-sm);">
-        <div style="border-bottom: 2px solid var(--border-color-subtle); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <div>
-                <h3 style="margin: 0; color: var(--text-primary); font-size: 18px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 20px;">⚡</span> Interconnector Arbitrage & Spreads Prediction (Day-Ahead)
-                </h3>
-                <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                    Calculates and routes optimal cross-border power flows using an inverse-distance weighted average of the top N analogues. Filters out Non-EU ➔ EU imports (CBAM compliance).
-                </p>
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
-                <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-card-subtle); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 8px 18px; box-shadow: var(--shadow-sm);">
-                    <label for="arbitrage_top_n" style="font-size: 15px; font-weight: 800; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px;">
-                        Strategy Mode:
-                    </label>
-                    <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 8px 18px; border: 1.5px solid var(--input-border); border-radius: 10px; font-size: 15px; font-weight: 800; color: var(--text-primary); background: var(--input-bg); cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
-                        <option value="elite" selected style="font-weight: 800;">👑 Sovereign</option>
-                        <option value="5" style="font-weight: 800;">🎯 Sniper</option>
-                        <option value="3" style="font-weight: 800;">🚀 High Volume</option>
-                    </select>
-                </div>
-                <div id="strategy_mode_description" style="font-size: 11px; color: var(--text-muted); max-width: 420px; text-align: right; line-height: 1.4; padding-right: 4px;">
-                    <span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> High-conviction institutional authority. Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, authoritative trades.
-                </div>
-            </div>
-        </div>
-
-        <!-- ── Route Cards ── -->
-        <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
-            <div style="padding: 32px; text-align: center; color: var(--text-muted); font-size: 14px;">No data available. Run match search first.</div>
-        </div>
-    </div>
-    
-    <!-- ── 2. Matches Table & Zoom Comparison (BELOW ARBITRAGE) ── -->
-    <div id="analogues_results_container" style="display:none; margin-top: 20px;">
-        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; width: 100%; box-sizing: border-box;">
-            <!-- ── Matches Table Card ── -->
-            <div style="flex: 1 1 440px; min-width: 0; max-width: 48%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-sm); box-sizing: border-box; align-self: flex-start;">
-                <div style="border-bottom: 1px solid var(--border-color-subtle); padding-bottom: 8px; margin-bottom: 10px;">
-                    <h3 style="margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
-                        <span>📋</span> Top 7 Closest Matches
-                    </h3>
-                    <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0;">Click any match row below to inspect profiles and price curves.</p>
-                </div>
-                <div class="table-container" style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
-                    <table id="analogues_table" style="width: 100%; border-collapse: collapse; table-layout: auto;">
-                        <thead>
-                            <tr style="background: var(--table-header-bg); font-size: 10px; text-transform: uppercase; color: var(--table-header-color); letter-spacing: 0.3px;">
-                                <th style="padding: 6px 4px; text-align: left;">Date</th>
-                                <th style="padding: 6px 4px; text-align: center;">Combined</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Greece Residuals">GR R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Germany Residuals">DE R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Italy Residuals">IT R</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Carbon Price">EUA</th>
-                                <th style="padding: 6px 2px; text-align: center;" title="Gas Price">TTF</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- ── Comparison Detail Panel ── -->
-            <div style="flex: 1.2 1 520px; min-width: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-sm); box-sizing: border-box; overflow: hidden;">
-                <div style="border-bottom: 1px solid var(--border-color-subtle); padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                    <h3 id="comparison_header" style="margin: 0; color: var(--text-primary); font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                        Zoom Comparison
-                    </h3>
-                </div>
-                
-                <!-- ── Comparison Charts ── -->
-                <div id="comp_charts_tab" style="width: 100%; min-width: 0; box-sizing: border-box;">
-                    <!-- ── Prices Comparison ── -->
-                    <div id="plot_comp_prices" style="width: 100%; height: 240px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; margin-bottom: 10px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
-                    <!-- ── Residuals Grid (2x2) ── -->
-                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; width: 100%; min-width: 0; box-sizing: border-box;">
-                        <div id="plot_comp_de_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
-                        <div id="plot_comp_it_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
-                        <div id="plot_comp_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
-                        <div id="plot_comp_bg_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ── 3. MK PV Export Opportunities (BELOW TOP 7 MATCHES) ── -->
-    <div id="mk_pv_opportunities_container"></div>
-</div>
-
-
         <!-- ── TAB: Daily Cable Calculator ── -->
         <!-- ── TAB: Daily Cable Calculator & Auction Bidding Strategist ── -->
 <div id="CableCalculator" class="tabcontent" style="display:none; padding: 24px;">
@@ -3522,6 +3324,204 @@ body.dark-mode .btn-wiggle-quick:hover {
             </table>
         </div>
     </div>
+</div>
+
+
+        <!-- ── TAB: Historical Analogues ── -->
+        <!-- ── TAB: Historical Analogues ── -->
+<div id="Analogues" class="tabcontent" style="display:none;">
+    <h2>Historical Analogues</h2>
+    <p style="color:var(--text-muted);margin-top:8px;margin-bottom:24px;font-size:14px;">Find past days with a similar residual profile and demand profile. Similarity scores are relative — 100% = closest possible match in the selected lookback window.</p>
+    <!-- ── Search Controls ── -->
+    <div style="background: var(--bg-card-subtle); padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 18px; display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap;">
+        <div>
+            <label for="analogue_date" style="font-size: 13px; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 6px;">Target Date</label>
+            <input type="date" id="analogue_date" onchange="applyOptimizedWeights();" style="padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--input-border); font-size: 13px; font-weight: 600; color: var(--text-primary); background: var(--input-bg); cursor: pointer;">
+        </div>
+        
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <label style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Feature Weights</label>
+                <div id="weights_auto_label" style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-left: 10px;"></div>
+            </div>
+            <div style="display: inline-flex; gap: 6px; background: var(--bg-card); padding: 6px 10px; border-radius: 8px; border: 1.5px solid var(--border-color); align-items: center; box-sizing: border-box; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Greece Residuals (GR R)">GR R:</span>
+                    <input type="number" id="w_res" min="0" max="100" value="25" onchange="updateWeights('w_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Germany Residuals (DE R)">DE R:</span>
+                    <input type="number" id="w_de_res" min="0" max="100" value="9" onchange="updateWeights('w_de_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Bulgarian Residuals (BG R)">BG R:</span>
+                    <input type="number" id="w_bg_res" min="0" max="100" value="9" onchange="updateWeights('w_bg_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Italian Residuals (IT R)">IT R:</span>
+                    <input type="number" id="w_it_res" min="0" max="100" value="8" onchange="updateWeights('w_it_res')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Greece Prior Day Price (GR P)">GR P:</span>
+                    <input type="number" id="w_gr_prior" min="0" max="100" value="7" onchange="updateWeights('w_gr_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Germany Prior Day Price (DE P)">DE P:</span>
+                    <input type="number" id="w_de_prior" min="0" max="100" value="9" onchange="updateWeights('w_de_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Bulgarian Prior Day Price (BG P)">BG P:</span>
+                    <input type="number" id="w_bg_prior" min="0" max="100" value="8" onchange="updateWeights('w_bg_prior')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Carbon Price">EUA:</span>
+                    <input type="number" id="w_eua" min="0" max="100" value="21" onchange="updateWeights('w_eua')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
+                    <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);" title="Gas Price">TTF:</span>
+                    <input type="number" id="w_ttf" min="0" max="100" value="4" onchange="updateWeights('w_ttf')" style="width: 32px; border: 1px solid var(--input-border); background: var(--input-bg); border-radius: 4px; padding: 2px 3px; font-size: 11px; text-align: center; font-weight: 700; color: var(--text-primary);">
+                    <span style="font-size: 10px; color: var(--text-muted);">%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div>
+            <button onclick="findAnalogues()" style="background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white; padding: 10px 22px; border: none; border-radius: 8px; font-size: 14px; font-weight: 800; cursor: pointer; box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3); transition: all 0.15s ease;" onmouseover="this.style.boxShadow='0 5px 14px rgba(79, 70, 229, 0.45)'" onmouseout="this.style.boxShadow='0 3px 8px rgba(79, 70, 229, 0.3)'">
+                🔍 Find Matches
+            </button>
+        </div>
+
+        <!-- ── Target Reference Values (DE prior, GR prior, BG prior, EUA, TTF) ── -->
+        <div id="target_prior_ref_strip" style="display: inline-flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: 8px; padding: 8px 14px; box-shadow: var(--shadow-sm); flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 800; color: var(--text-muted); padding-right: 10px; border-right: 1.5px solid var(--border-color);">
+                <span style="font-size: 13px;">📌</span>
+                <span id="ref_prior_date_label" title="Prior day-type baseline date used for price shape and commodity matching">Ref: —</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Germany Prior Day Average Spot Price">DE Prior:</span>
+                <strong id="ref_de_prior_val" style="color: #3b82f6; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Greece Prior Day Average Spot Price">GR Prior:</span>
+                <strong id="ref_gr_prior_val" style="color: #6366f1; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Bulgaria Prior Day Average Spot Price">BG Prior:</span>
+                <strong id="ref_bg_prior_val" style="color: #06b6d4; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Carbon Allowance Price (EUA)">EUA:</span>
+                <strong id="ref_eua_val" style="color: #10b981; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px;">
+                <span style="font-weight: 700; color: var(--text-secondary);" title="Dutch TTF Natural Gas Price">TTF:</span>
+                <strong id="ref_ttf_val" style="color: #f59e0b; font-weight: 800; font-size: 12px;">—</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 1. Interconnector Arbitrage & Spreads (TOP POSITION) ── -->
+    <div id="arbitrage_opportunities_panel" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: var(--shadow-sm);">
+        <div style="border-bottom: 2px solid var(--border-color-subtle); padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div>
+                <h3 style="margin: 0; color: var(--text-primary); font-size: 18px; display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">⚡</span> Interconnector Arbitrage & Spreads Prediction (Day-Ahead)
+                </h3>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: var(--text-muted);">
+                    Calculates and routes optimal cross-border power flows using an inverse-distance weighted average of the top N analogues. Filters out Non-EU ➔ EU imports (CBAM compliance).
+                </p>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;">
+                <div style="display: flex; align-items: center; gap: 12px; background: var(--bg-card-subtle); border: 1.5px solid var(--border-color); border-radius: 12px; padding: 8px 18px; box-shadow: var(--shadow-sm);">
+                    <label for="arbitrage_top_n" style="font-size: 15px; font-weight: 800; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; letter-spacing: -0.2px;">
+                        Strategy Mode:
+                    </label>
+                    <select id="arbitrage_top_n" onchange="renderArbitragePanel()" style="padding: 8px 18px; border: 1.5px solid var(--input-border); border-radius: 10px; font-size: 15px; font-weight: 800; color: var(--text-primary); background: var(--input-bg); cursor: pointer; outline: none; box-shadow: var(--shadow-sm); transition: all 0.2s ease;">
+                        <option value="elite" selected style="font-weight: 800;">👑 Sovereign</option>
+                        <option value="5" style="font-weight: 800;">🎯 Sniper</option>
+                        <option value="3" style="font-weight: 800;">🚀 High Volume</option>
+                    </select>
+                </div>
+                <div id="strategy_mode_description" style="font-size: 11px; color: var(--text-muted); max-width: 420px; text-align: right; line-height: 1.4; padding-right: 4px;">
+                    <span style="color: #6366f1; font-weight: 700;">Top 7 Rank-Weighted Consensus (&ge;70%):</span> High-conviction institutional authority. Conflict cutting with strict <strong style="color: var(--text-primary);">&ge;3h continuous blocks</strong>. Purges isolated 1–2h cuts for clean, authoritative trades.
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Route Cards ── -->
+        <div id="arbitrage_cards_container" style="display: flex; flex-direction: column; gap: 12px;">
+            <div style="padding: 32px; text-align: center; color: var(--text-muted); font-size: 14px;">No data available. Run match search first.</div>
+        </div>
+    </div>
+    
+    <!-- ── 2. Matches Table & Zoom Comparison (BELOW ARBITRAGE) ── -->
+    <div id="analogues_results_container" style="display:none; margin-top: 20px;">
+        <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; width: 100%; box-sizing: border-box;">
+            <!-- ── Matches Table Card ── -->
+            <div style="flex: 1 1 440px; min-width: 0; max-width: 48%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-sm); box-sizing: border-box; align-self: flex-start;">
+                <div style="border-bottom: 1px solid var(--border-color-subtle); padding-bottom: 8px; margin-bottom: 10px;">
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                        <span>📋</span> Top 7 Closest Matches
+                    </h3>
+                    <p style="font-size: 11px; color: var(--text-muted); margin: 3px 0 0 0;">Click any match row below to inspect profiles and price curves.</p>
+                </div>
+                <div class="table-container" style="overflow-x: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+                    <table id="analogues_table" style="width: 100%; border-collapse: collapse; table-layout: auto;">
+                        <thead>
+                            <tr style="background: var(--table-header-bg); font-size: 10px; text-transform: uppercase; color: var(--table-header-color); letter-spacing: 0.3px;">
+                                <th style="padding: 6px 4px; text-align: left;">Date</th>
+                                <th style="padding: 6px 4px; text-align: center;">Combined</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Greece Residuals">GR R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Germany Residuals">DE R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Residuals">BG R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Italy Residuals">IT R</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Greece Prior Day Price">GR P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Germany Prior Day Price">DE P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Bulgaria Prior Day Price">BG P</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Carbon Price">EUA</th>
+                                <th style="padding: 6px 2px; text-align: center;" title="Gas Price">TTF</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- ── Comparison Detail Panel ── -->
+            <div style="flex: 1.2 1 520px; min-width: 0; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; box-shadow: var(--shadow-sm); box-sizing: border-box; overflow: hidden;">
+                <div style="border-bottom: 1px solid var(--border-color-subtle); padding-bottom: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 id="comparison_header" style="margin: 0; color: var(--text-primary); font-size: 13.5px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        Zoom Comparison
+                    </h3>
+                </div>
+                
+                <!-- ── Comparison Charts ── -->
+                <div id="comp_charts_tab" style="width: 100%; min-width: 0; box-sizing: border-box;">
+                    <!-- ── Prices Comparison ── -->
+                    <div id="plot_comp_prices" style="width: 100%; height: 240px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; margin-bottom: 10px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                    <!-- ── Residuals Grid (2x2) ── -->
+                    <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; width: 100%; min-width: 0; box-sizing: border-box;">
+                        <div id="plot_comp_de_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_it_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                        <div id="plot_comp_bg_residuals" style="height: 150px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); padding: 2px; box-sizing: border-box; min-width: 0; overflow: hidden;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ── 3. MK PV Export Opportunities (BELOW TOP 7 MATCHES) ── -->
+    <div id="mk_pv_opportunities_container"></div>
 </div>
 
 
