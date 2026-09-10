@@ -2700,14 +2700,14 @@ body.dark-mode .btn-cable-calc-link:hover {
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
                 <span style="font-size: 26px;">🧮</span>
                 <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.5px;">
-                    Daily Cable Calculator &amp; Auction Bidding Strategist
+                    Daily Cable Calculator &amp; Auction Clearing Engine
                 </h2>
                 <span style="background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                    60-Day Empirical Engine
+                    60-Day Clearing Distributions
                 </span>
             </div>
             <p style="color: var(--text-muted); margin: 0; font-size: 13.5px; line-height: 1.4; max-width: 900px;">
-                Empirical 60-day clearing price percentiles (P50, P75, P90, Max), win probability simulation, and risk-adjusted margin optimization. Avoid overpaying break-even spreads and secure winning bids at optimal clearing prices.
+                Empirical historical clearing price percentiles (P50, P75, P90, Max) and auction win-rate probability simulation. Select a corridor and test your proposed bid to see your exact statistical chance of winning capacity.
             </p>
         </div>
         <div style="display: flex; align-items: center; gap: 8px;">
@@ -2721,7 +2721,7 @@ body.dark-mode .btn-cable-calc-link:hover {
     </div>
 
     <!-- ── Scenario & Filter Bar ── -->
-    <div class="calc-control-panel">
+    <div class="calc-control-panel" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
         <div class="calc-control-group">
             <label class="calc-control-label">Interconnector Corridor</label>
             <select id="calc_corridor_select" class="calc-select" onchange="onCableCalculatorCorridorChange()">
@@ -2737,8 +2737,8 @@ body.dark-mode .btn-cable-calc-link:hover {
         <div class="calc-control-group">
             <label class="calc-control-label">Lookback Sample</label>
             <select id="calc_lookback_days" class="calc-select" onchange="onCableCalculatorParamChange()">
-                <option value="14">Last 14 Days (Immediate Trend)</option>
-                <option value="30">Last 30 Days (Monthly Regime)</option>
+                <option value="14">Last 14 Days (Recent Dynamics)</option>
+                <option value="30">Last 30 Days (Monthly Sample)</option>
                 <option value="60" selected>Last 60 Days (Standard 2-Month)</option>
                 <option value="90">Last 90 Days (Quarterly Sample)</option>
             </select>
@@ -2749,14 +2749,6 @@ body.dark-mode .btn-cable-calc-link:hover {
             <select id="calc_hour_select" class="calc-select" onchange="onCableCalculatorHourChange()">
                 <!-- Populated 1 to 24 -->
             </select>
-        </div>
-
-        <div class="calc-control-group">
-            <label class="calc-control-label">Predicted Gross Spread (€/MWh)</label>
-            <div style="position: relative;">
-                <input type="number" id="calc_gross_spread_input" class="calc-input" step="0.1" oninput="onGrossSpreadInputChange()" placeholder="0.00" style="padding-right: 30px;">
-                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-muted); font-weight: 600;">€</span>
-            </div>
         </div>
     </div>
 
@@ -2772,26 +2764,26 @@ body.dark-mode .btn-cable-calc-link:hover {
             </div>
             <!-- Preset Buttons -->
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Strategy Presets:</span>
-                <button type="button" class="btn-preset" onclick="setBidPreset('p50')" title="Conservative / Baseline Median clearing price">
+                <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Quick Bid Presets:</span>
+                <button type="button" class="btn-preset" onclick="setBidPreset('free')" title="0.00 €: Check zero-price clearing frequency">
+                    0.00 € (Free)
+                </button>
+                <button type="button" class="btn-preset" onclick="setBidPreset('p50')" title="Conservative / Baseline Median clearing price (wins ~50%)">
                     P50 (Median)
                 </button>
-                <button type="button" class="btn-preset active" onclick="setBidPreset('p75')" title="Optimal Value: High win probability with strong margin">
+                <button type="button" class="btn-preset active" onclick="setBidPreset('p75')" title="Optimal Value: High win probability (~75%)">
                     P75 (Value) ⭐
                 </button>
-                <button type="button" class="btn-preset" onclick="setBidPreset('p90')" title="Aggressive: Secures allocation in ~90% of past auctions">
+                <button type="button" class="btn-preset" onclick="setBidPreset('p90')" title="Aggressive: High-clearing auctions (wins ~90%)">
                     P90 (Aggressive)
                 </button>
-                <button type="button" class="btn-preset" onclick="setBidPreset('max')" title="Historical Maximum: Wins almost all auctions">
+                <button type="button" class="btn-preset" onclick="setBidPreset('max')" title="Historical Maximum: Wins 100% of historical sample">
                     60d Max
-                </button>
-                <button type="button" class="btn-preset danger" onclick="setBidPreset('spread')" title="Break-Even Ceiling: Net margin is exactly 0.00 €">
-                    Break-Even Cap
                 </button>
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 240px 1fr 180px; gap: 16px; align-items: center;" class="calc-simulator-grid">
+        <div style="display: grid; grid-template-columns: 240px 1fr 220px; gap: 16px; align-items: center;" class="calc-simulator-grid">
             <!-- Proposed Bid Input -->
             <div>
                 <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px;">
@@ -2799,7 +2791,7 @@ body.dark-mode .btn-cable-calc-link:hover {
                 </label>
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <div style="position: relative; flex: 1;">
-                        <input type="number" id="calc_proposed_bid_input" class="calc-input" step="0.1" oninput="onProposedBidInputChange()" style="font-size: 16px; font-weight: 800; color: #4f46e5; padding-right: 30px;">
+                        <input type="number" id="calc_proposed_bid_input" class="calc-input" step="0.1" min="0" oninput="onProposedBidInputChange()" style="font-size: 16px; font-weight: 800; color: #4f46e5; padding-right: 30px;">
                         <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); font-weight: 700;">€</span>
                     </div>
                 </div>
@@ -2810,9 +2802,9 @@ body.dark-mode .btn-cable-calc-link:hover {
                 <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 600;">
                     <span>0.00 € (Free)</span>
                     <span id="calc_slider_p75_label">P75 Value</span>
-                    <span id="calc_slider_cap_label">Break-Even Cap</span>
+                    <span id="calc_slider_max_label">60d Max</span>
                 </div>
-                <input type="range" id="calc_bid_slider" min="0" max="100" step="0.25" oninput="onBidSliderChange()" class="calc-slider" style="width: 100%;">
+                <input type="range" id="calc_bid_slider" min="0" max="100" step="0.1" oninput="onBidSliderChange()" class="calc-slider" style="width: 100%;">
             </div>
 
             <!-- Quick Action / Status -->
@@ -2821,70 +2813,60 @@ body.dark-mode .btn-cable-calc-link:hover {
                     🟢 Value Optimal
                 </div>
                 <div id="calc_bid_vs_cap_sub" style="font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500;">
-                    Takes 21% of Spread
+                    Wins 75% of auctions
                 </div>
             </div>
         </div>
     </div>
 
     <!-- ── KPI Cards: Active Hour Performance ── -->
-    <div class="calc-kpi-grid">
-        <!-- KPI 1: Predicted Gross Spread (Cap) -->
-        <div class="calc-kpi-card">
-            <div class="calc-kpi-header">
-                <span class="calc-kpi-title">Break-Even Cap (Spread)</span>
-                <span class="calc-kpi-icon">📐</span>
-            </div>
-            <div class="calc-kpi-val" id="kpi_gross_spread">0.00 €</div>
-            <div class="calc-kpi-sub" id="kpi_gross_spread_sub">Maximum bid before trade loses money</div>
-        </div>
-
-        <!-- KPI 2: Proposed Cable Bid -->
+    <div class="calc-kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+        <!-- KPI 1: Proposed Cable Bid -->
         <div class="calc-kpi-card" style="border-top: 3px solid #6366f1;">
             <div class="calc-kpi-header">
                 <span class="calc-kpi-title">Proposed Cable Bid</span>
                 <span class="calc-kpi-icon">🎫</span>
             </div>
             <div class="calc-kpi-val" id="kpi_proposed_bid" style="color: #6366f1;">0.00 €</div>
-            <div class="calc-kpi-sub" id="kpi_proposed_bid_sub">Auction clearing threshold</div>
+            <div class="calc-kpi-sub" id="kpi_proposed_bid_sub">Auction clearing threshold to test</div>
         </div>
 
-        <!-- KPI 3: Estimated Win Probability -->
+        <!-- KPI 2: Estimated Win Probability -->
         <div class="calc-kpi-card" style="border-top: 3px solid #10b981;">
             <div class="calc-kpi-header">
-                <span class="calc-kpi-title">Historical Win Rate</span>
+                <span class="calc-kpi-title">Historical Win Probability</span>
                 <span class="calc-kpi-icon">🏆</span>
             </div>
             <div class="calc-kpi-val" id="kpi_win_probability" style="color: #10b981;">0%</div>
             <div class="calc-win-bar-wrap">
                 <div id="kpi_win_bar_fill" class="calc-win-bar-fill" style="width: 0%;"></div>
             </div>
-            <div class="calc-kpi-sub" id="kpi_win_probability_sub">Past 60-day clearing &le; Bid</div>
+            <div class="calc-kpi-sub" id="kpi_win_probability_sub">Past clearing prices &le; Bid</div>
         </div>
 
-        <!-- KPI 4: Expected Net Margin -->
-        <div class="calc-kpi-card" style="border-top: 3px solid #059669;">
+        <!-- KPI 3: 60-Day Lookback Percentiles -->
+        <div class="calc-kpi-card" style="border-top: 3px solid #3b82f6;">
             <div class="calc-kpi-header">
-                <span class="calc-kpi-title">Expected Net Margin</span>
-                <span class="calc-kpi-icon">💰</span>
-            </div>
-            <div class="calc-kpi-val" id="kpi_net_margin" style="color: #059669;">0.00 €</div>
-            <div class="calc-kpi-sub" id="kpi_net_margin_sub">Remaining margin after cable cost</div>
-        </div>
-
-        <!-- KPI 5: 60-Day Lookback Summary -->
-        <div class="calc-kpi-card">
-            <div class="calc-kpi-header">
-                <span class="calc-kpi-title">60-Day Percentiles</span>
+                <span class="calc-kpi-title">Clearing Percentiles</span>
                 <span class="calc-kpi-icon">📊</span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; margin-top: 2px;">
-                <div><span style="color: var(--text-muted);">P50:</span> <strong id="kpi_stat_p50">0.00 €</strong></div>
-                <div><span style="color: var(--text-muted);">P75:</span> <strong id="kpi_stat_p75">0.00 €</strong></div>
-                <div><span style="color: var(--text-muted);">P90:</span> <strong id="kpi_stat_p90">0.00 €</strong></div>
-                <div><span style="color: var(--text-muted);">Max:</span> <strong id="kpi_stat_max">0.00 €</strong></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11.5px; margin-top: 2px;">
+                <div><span style="color: var(--text-muted);">P50 (Median):</span> <strong id="kpi_stat_p50">0.00 €</strong></div>
+                <div><span style="color: var(--text-muted);">P75 (Value):</span> <strong id="kpi_stat_p75" style="color: #059669;">0.00 €</strong></div>
+                <div><span style="color: var(--text-muted);">P90 (Aggr.):</span> <strong id="kpi_stat_p90" style="color: #d97706;">0.00 €</strong></div>
+                <div><span style="color: var(--text-muted);">60d Max:</span> <strong id="kpi_stat_max" style="color: #dc2626;">0.00 €</strong></div>
             </div>
-            <div class="calc-kpi-sub" id="kpi_stat_zero_sub" style="margin-top: 6px;">Zero price: 0% of days</div>
+            <div class="calc-kpi-sub" id="kpi_stat_avg_sub" style="margin-top: 6px;">60-Day Average: 0.00 €</div>
+        </div>
+
+        <!-- KPI 4: Clearing Dynamics & Congestion -->
+        <div class="calc-kpi-card" style="border-top: 3px solid #8b5cf6;">
+            <div class="calc-kpi-header">
+                <span class="calc-kpi-title">Auction Congestion</span>
+                <span class="calc-kpi-icon">⚡</span>
+            </div>
+            <div class="calc-kpi-val" id="kpi_zero_pct" style="color: #8b5cf6;">0% Free</div>
+            <div class="calc-kpi-sub" id="kpi_stat_zero_sub">Cleared at 0.00 € on 0 of 0 sample days</div>
         </div>
     </div>
 
@@ -2898,17 +2880,17 @@ body.dark-mode .btn-cable-calc-link:hover {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                 <div>
                     <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-                        📈 24-Hour Bidding Horizon &amp; Spread Capture
+                        📈 24-Hour Cable Clearing Price Horizon
                     </h3>
                     <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);">
-                        Predicted Gross Spread vs 60-day clearing percentiles across all 24 delivery hours.
+                        Historical clearing price distribution percentiles (P50, P75, P90, Max) across all 24 delivery hours.
                     </p>
                 </div>
                 <div style="display: flex; gap: 6px;">
-                    <span class="calc-legend-badge" style="background: rgba(79, 70, 229, 0.15); color: #4f46e5; border: 1px solid rgba(79, 70, 229, 0.3);">Gross Spread</span>
-                    <span class="calc-legend-badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">P75 Value</span>
-                    <span class="calc-legend-badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">P90 Aggressive</span>
+                    <span class="calc-legend-badge" style="background: rgba(16, 185, 129, 0.15); color: #059669; border: 1px solid rgba(16, 185, 129, 0.3);">P75 (Value)</span>
+                    <span class="calc-legend-badge" style="background: rgba(245, 158, 11, 0.15); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.3);">P90 (Aggr.)</span>
                     <span class="calc-legend-badge" style="background: rgba(239, 68, 68, 0.15); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.3);">60d Max</span>
+                    <span class="calc-legend-badge" style="background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3);">P50 (Median)</span>
                 </div>
             </div>
             <div id="calc_chart_24h" style="width: 100%; height: 350px;"></div>
@@ -2919,10 +2901,10 @@ body.dark-mode .btn-cable-calc-link:hover {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                 <div>
                     <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-                        📊 60-Day Auction Clearing Distribution
+                        📊 Auction Clearing Distribution &amp; Bid Position
                     </h3>
                     <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);" id="calc_dist_subtitle">
-                        Historical clearing price frequencies for Hour 20:00 with your proposed bid marker.
+                        Historical clearing price frequencies with your proposed bid marker.
                     </p>
                 </div>
             </div>
@@ -2935,16 +2917,20 @@ body.dark-mode .btn-cable-calc-link:hover {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
             <div>
                 <h3 style="margin: 0; font-size: 16px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-                    📋 Full 24-Hour Bidding Strategy Matrix
+                    📋 24-Hour Cable Clearing Matrix
                 </h3>
                 <p style="margin: 2px 0 0 0; font-size: 12.5px; color: var(--text-muted);">
-                    Click any hour row to instantly inspect its clearing distribution and simulate bids in the interactive panel above.
+                    Click any hour row to inspect its clearing distribution and simulate bids in the interactive panel above.
                 </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; font-size: 11px; color: var(--text-secondary);">
-                <span><strong style="color: #059669;">Safe Bid:</strong> min(P75, 75% Spread)</span>
+                <span><strong style="color: #64748b;">P50:</strong> 50% Win Rate</span>
                 <span>&bull;</span>
-                <span><strong style="color: #d97706;">Aggressive Bid:</strong> min(P90, 90% Spread)</span>
+                <span><strong style="color: #059669;">P75:</strong> 75% Win Rate</span>
+                <span>&bull;</span>
+                <span><strong style="color: #d97706;">P90:</strong> 90% Win Rate</span>
+                <span>&bull;</span>
+                <span><strong style="color: #dc2626;">Max:</strong> 100% Win Rate</span>
             </div>
         </div>
 
@@ -2952,18 +2938,17 @@ body.dark-mode .btn-cable-calc-link:hover {
             <table class="calc-matrix-table" id="calc_matrix_table">
                 <thead>
                     <tr>
-                        <th style="width: 60px; text-align: left;">Hour</th>
-                        <th style="text-align: right;">Gross Spread</th>
-                        <th style="text-align: right;" title="60-day minimum clearing price">Min</th>
-                        <th style="text-align: right;" title="60-day median clearing price">P50 (Median)</th>
-                        <th style="text-align: right; background: rgba(16, 185, 129, 0.08); color: #059669;" title="75th percentile: captures ~75% of auctions">P75 (Value)</th>
-                        <th style="text-align: right; background: rgba(245, 158, 11, 0.08); color: #d97706;" title="90th percentile: aggressive clearing ceiling">P90 (Aggr.)</th>
-                        <th style="text-align: right;" title="Highest clearing price in the past 60 days">60d Max</th>
-                        <th style="text-align: right;" title="Percentage of lookback days where cable cleared at 0.00 €">Zero %</th>
-                        <th style="text-align: right; font-weight: 800; color: #4f46e5;">Recommended Bid</th>
-                        <th style="text-align: right; font-weight: 800;">Exp. Net Margin</th>
+                        <th style="width: 70px; text-align: left;">Hour</th>
+                        <th style="text-align: right;" title="Lowest clearing price in sample">Min</th>
+                        <th style="text-align: right;" title="50th percentile: median clearing price">P50 (Median)</th>
+                        <th style="text-align: right; background: rgba(16, 185, 129, 0.08); color: #059669;" title="75th percentile: captures ~75% of auctions">P75 (Value) ⭐</th>
+                        <th style="text-align: right; background: rgba(245, 158, 11, 0.08); color: #d97706;" title="90th percentile: aggressive clearing price">P90 (Aggr.)</th>
+                        <th style="text-align: right; color: #dc2626;" title="Highest clearing price in sample">60d Max</th>
+                        <th style="text-align: right;" title="Arithmetic mean clearing price">Average</th>
+                        <th style="text-align: right;" title="Percentage of days clearing at 0.00 €">Zero %</th>
+                        <th style="text-align: right;" title="Number of historical auction days sampled">Sample Days</th>
                         <th style="text-align: center;">Cable Status</th>
-                        <th style="width: 90px; text-align: center;">Action</th>
+                        <th style="width: 100px; text-align: center;">Simulate Bid</th>
                     </tr>
                 </thead>
                 <tbody id="calc_matrix_tbody">
@@ -13608,9 +13593,8 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-gross" style="padding:7px 12px;text-align:right;">${res.grossSpread.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:7px 12px;text-align:right;">${res.transitCost.toFixed(2)} €</td>
                                 <td class="flow-cell-max-bid" style="padding:6px 10px;text-align:right;">
-                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryCable}', '${targetDate}', ${res.hour}, ${res.grossSpread})" title="Launch 60-day Cable Calculator for ${primaryCable || 'corridor'} Hour ${res.hour+1} (Break-Even Cap: ${res.grossSpread.toFixed(2)} €)">
-                                        <span>${res.grossSpread.toFixed(2)} €</span>
-                                        <span style="font-size:10px;opacity:0.85;">🧮 Calc</span>
+                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryCable}', '${targetDate}', ${res.hour})" title="Open 60-Day Cable Calculator for ${primaryCable || 'corridor'} Hour ${res.hour+1}">
+                                        <span style="font-size:11.5px;">🧮 Bid Calc</span>
                                     </button>
                                 </td>
                                 <td style="padding:7px 12px;font-weight:800;color:${mCol};text-align:right;">${res.netMargin.toFixed(2)} €</td>
@@ -13640,7 +13624,7 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
-                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Maximum break-even cable bid based on predicted price spread. Click any row button to launch 60-Day Cable Calculator.">Cable Bidding Max 🧮</th>
+                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Open 60-Day Cable Auction Calculator to evaluate clearing prices and win probabilities">Cable Bid Calc 🧮</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                         <th style="padding:6px 12px;">Outages</th>
@@ -13853,9 +13837,8 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-gross" style="padding:6px 12px;text-align:right;">${hd.gross.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:6px 12px;text-align:right;">${hd.cable.toFixed(2)} €</td>
                                 <td class="flow-cell-max-bid" style="padding:6px 10px;text-align:right;">
-                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryMkCable}', '${targetDate}', ${hd.hour}, ${hd.gross})" title="Launch 60-day Cable Calculator for ${primaryMkCable || 'corridor'} Hour ${hd.hour+1} (Break-Even Cap: ${hd.gross.toFixed(2)} €)">
-                                        <span>${hd.gross.toFixed(2)} €</span>
-                                        <span style="font-size:10px;opacity:0.85;">🧮 Calc</span>
+                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryMkCable}', '${targetDate}', ${hd.hour})" title="Open 60-Day Cable Calculator for ${primaryMkCable || 'corridor'} Hour ${hd.hour+1}">
+                                        <span style="font-size:11.5px;">🧮 Bid Calc</span>
                                     </button>
                                 </td>
                                 <td style="padding:6px 12px;font-weight:800;color:${mCol};text-align:right;">${hd.net.toFixed(2)} €</td>
@@ -13877,7 +13860,7 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell (${trade.end})</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
-                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Maximum break-even cable bid based on predicted price spread. Click any row button to launch 60-Day Cable Calculator.">Cable Bidding Max 🧮</th>
+                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Open 60-Day Cable Auction Calculator to evaluate clearing prices and win probabilities">Cable Bid Calc 🧮</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                     </tr>
@@ -14834,14 +14817,13 @@ function renderEUMapCountryDetail(dataKey, date) {
 
 // === tab_cable_calculator.js ===
 // ── tab_cable_calculator.js ──────────────────────────────────────────────────
-// Daily Cable Calculator & Auction Bidding Strategist
-// Computes 60-day historical clearing price distributions, percentiles (P50, P75, P90, Max),
-// win-rate probabilities, and margin-optimised bidding recommendations for explicit cross-border cables.
+// Daily Cable Calculator & Auction Clearing Engine
+// Computes empirical clearing price distributions (P50, P75, P90, Max),
+// historical win-rate probabilities, and auction bidding dynamics for explicit cross-border cables.
 
 (function() {
     let calcInitialized = false;
     let currentCorridorStats = [];
-    let currentHourlyGrossSpreads = new Array(24).fill(0);
     let selectedActiveHour = 20; // 1-indexed (1 to 24), default to evening peak H20
 
     // ── Percentile Calculation Helper ────────────────────────────────────────
@@ -14973,6 +14955,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                 p95: p95,
                 max: max,
                 avg: avg,
+                zeroCount: zeroCount,
                 zeroPct: count > 0 ? (zeroCount / count) * 100 : 0,
                 prices: sortedPrices
             });
@@ -14987,39 +14970,12 @@ function renderEUMapCountryDetail(dataKey, date) {
         return outData.filter(item => item.corridor_code === corridor && item.trade_date === targetDateStr);
     }
 
-    // ── Auto-Detect 24h Gross Spreads from Historical / Analogue Forecasts ───
-    function autoDetect24hGrossSpreads(corridor, targetDateStr) {
-        const parts = corridor.split('-');
-        if (parts.length !== 2) return;
-
-        let src = parts[0];
-        let dst = parts[1];
-        if (src === 'DE') src = 'DE_LU';
-        if (dst === 'DE') dst = 'DE_LU';
-
-        const hData = window.historicalData || (typeof historicalData !== 'undefined' ? historicalData : {});
-
-        // Check if day-ahead spot prices exist
-        if (hData[src]?.[targetDateStr]?.prices && hData[dst]?.[targetDateStr]?.prices) {
-            const pSrc = hData[src][targetDateStr].prices;
-            const pDst = hData[dst][targetDateStr].prices;
-            for (let h = 0; h < 24; h++) {
-                const sVal = parseFloat(pSrc[h]) || 0;
-                const dVal = parseFloat(pDst[h]) || 0;
-                if (sVal > 0.01 && dVal > 0.01) {
-                    currentHourlyGrossSpreads[h] = Math.max(0, dVal - sVal);
-                }
-            }
-        }
-    }
-
     // ── Recalculate & Refresh Entire Cable Calculator ────────────────────────
     window.refreshCableCalculator = function() {
         const corridorSelect = document.getElementById("calc_corridor_select");
         const targetDateInput = document.getElementById("calc_target_date");
         const lookbackSelect = document.getElementById("calc_lookback_days");
         const hourSelect = document.getElementById("calc_hour_select");
-        const grossSpreadInput = document.getElementById("calc_gross_spread_input");
         const proposedBidInput = document.getElementById("calc_proposed_bid_input");
 
         if (!corridorSelect || !targetDateInput) return;
@@ -15030,18 +14986,6 @@ function renderEUMapCountryDetail(dataKey, date) {
         selectedActiveHour = parseInt(hourSelect ? hourSelect.value : "20") || 20;
 
         if (!corridor || !targetDate) return;
-
-        // Auto-detect spreads if currentHourlyGrossSpreads is completely 0
-        if (currentHourlyGrossSpreads.every(v => v === 0)) {
-            autoDetect24hGrossSpreads(corridor, targetDate);
-        }
-
-        // If active hour has a spread recorded, sync with input box
-        if (currentHourlyGrossSpreads[selectedActiveHour - 1] > 0 && (!grossSpreadInput.value || parseFloat(grossSpreadInput.value) === 0)) {
-            grossSpreadInput.value = currentHourlyGrossSpreads[selectedActiveHour - 1].toFixed(2);
-        } else if (grossSpreadInput && grossSpreadInput.value) {
-            currentHourlyGrossSpreads[selectedActiveHour - 1] = parseFloat(grossSpreadInput.value) || 0;
-        }
 
         // Compute 24-hour Statistics
         currentCorridorStats = computeCorridorStats(corridor, targetDate, lookbackDays);
@@ -15056,12 +15000,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         // Set default proposed bid to P75 if empty
         const activeStat = currentCorridorStats[selectedActiveHour - 1];
         if (activeStat && (!proposedBidInput.value || parseFloat(proposedBidInput.value) === 0)) {
-            const grossSpread = currentHourlyGrossSpreads[selectedActiveHour - 1] || 0;
-            let defaultBid = activeStat.p75;
-            if (grossSpread > 0 && defaultBid > grossSpread) {
-                defaultBid = grossSpread * 0.75;
-            }
-            proposedBidInput.value = (defaultBid > 0 ? defaultBid : activeStat.p50).toFixed(2);
+            proposedBidInput.value = (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50).toFixed(2);
         }
 
         // Check Outages
@@ -15085,17 +15024,16 @@ function renderEUMapCountryDetail(dataKey, date) {
     function updateSliderBounds(activeStat) {
         const slider = document.getElementById("calc_bid_slider");
         const p75Label = document.getElementById("calc_slider_p75_label");
-        const capLabel = document.getElementById("calc_slider_cap_label");
-        const grossSpread = currentHourlyGrossSpreads[selectedActiveHour - 1] || 0;
+        const maxLabel = document.getElementById("calc_slider_max_label");
 
         if (!slider || !activeStat) return;
 
-        const maxScale = Math.max(activeStat.max * 1.1, grossSpread * 1.1, 50);
+        const maxScale = Math.max(activeStat.max * 1.05, 30);
         slider.min = "0";
         slider.max = maxScale.toFixed(2);
 
         if (p75Label) p75Label.textContent = `P75: ${activeStat.p75.toFixed(2)} €`;
-        if (capLabel) capLabel.textContent = grossSpread > 0 ? `Cap: ${grossSpread.toFixed(2)} €` : `60d Max: ${activeStat.max.toFixed(2)} €`;
+        if (maxLabel) maxLabel.textContent = `60d Max: ${activeStat.max.toFixed(2)} €`;
 
         const currentBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
         slider.value = currentBid;
@@ -15125,7 +15063,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                     <div>
                         <strong style="color: #dc2626; font-size: 13.5px;">Transmission Curtailment Detected on ${corridor} (${targetDate})</strong>
                         <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
-                            ${outHours.length} hours curtailed (H${outHours.join(', H')}). Remaining capacity: <strong>${minRem} MW</strong> (from original ${origCap} MW). Cable bids may see severe price spikes due to reduced NTC!
+                            ${outHours.length} hours curtailed (H${outHours.join(', H')}). Remaining capacity: <strong>${minRem} MW</strong> (from original ${origCap} MW). Reduced NTC may cause high clearing prices!
                         </div>
                     </div>
                 </div>
@@ -15136,38 +15074,22 @@ function renderEUMapCountryDetail(dataKey, date) {
         `;
     }
 
-    // ── Update Simulator KPIs, Win Rate & Net Margin ─────────────────────────
+    // ── Update Simulator KPIs, Win Rate ──────────────────────────────────────
     function updateSimulatorKPIs() {
         const activeStat = currentCorridorStats[selectedActiveHour - 1];
         if (!activeStat) return;
 
-        const grossSpread = currentHourlyGrossSpreads[selectedActiveHour - 1] || parseFloat(document.getElementById("calc_gross_spread_input").value) || 0;
         const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
 
-        // KPI 1: Gross Spread
-        const kpiSpread = document.getElementById("kpi_gross_spread");
-        const kpiSpreadSub = document.getElementById("kpi_gross_spread_sub");
-        if (kpiSpread) kpiSpread.textContent = `${grossSpread.toFixed(2)} €`;
-        if (kpiSpreadSub) {
-            kpiSpreadSub.textContent = grossSpread > 0
-                ? `Max break-even bid for Hour ${selectedActiveHour}`
-                : `Enter predicted spread to evaluate margin`;
-        }
-
-        // KPI 2: Proposed Bid
+        // KPI 1: Proposed Bid
         const kpiBid = document.getElementById("kpi_proposed_bid");
         const kpiBidSub = document.getElementById("kpi_proposed_bid_sub");
         if (kpiBid) kpiBid.textContent = `${proposedBid.toFixed(2)} €`;
         if (kpiBidSub) {
-            if (grossSpread > 0) {
-                const pctOfSpread = ((proposedBid / grossSpread) * 100).toFixed(0);
-                kpiBidSub.textContent = `${pctOfSpread}% of gross spread utilized`;
-            } else {
-                kpiBidSub.textContent = `Simulation bid`;
-            }
+            kpiBidSub.textContent = `Bidding price for Hour ${selectedActiveHour}:00`;
         }
 
-        // KPI 3: Win Rate Calculation
+        // KPI 2: Win Rate Calculation
         let winCount = 0;
         if (activeStat.count > 0) {
             winCount = activeStat.prices.filter(p => p <= proposedBid + 0.0001).length;
@@ -15179,77 +15101,71 @@ function renderEUMapCountryDetail(dataKey, date) {
         const kpiWinSub = document.getElementById("kpi_win_probability_sub");
         if (kpiWin) {
             kpiWin.textContent = `${winRate.toFixed(1)}%`;
-            kpiWin.style.color = winRate >= 80 ? '#10b981' : (winRate >= 50 ? '#f59e0b' : '#ef4444');
+            kpiWin.style.color = winRate >= 85 ? '#10b981' : (winRate >= 65 ? '#059669' : (winRate >= 45 ? '#f59e0b' : '#ef4444'));
         }
         if (kpiWinBar) {
             kpiWinBar.style.width = `${Math.min(100, Math.max(0, winRate))}%`;
-            kpiWinBar.style.background = winRate >= 80 ? '#10b981' : (winRate >= 50 ? '#f59e0b' : '#ef4444');
+            kpiWinBar.style.background = winRate >= 85 ? '#10b981' : (winRate >= 65 ? '#059669' : (winRate >= 45 ? '#f59e0b' : '#ef4444'));
         }
         if (kpiWinSub) {
-            kpiWinSub.textContent = `Won ${winCount} of ${activeStat.count} historical auctions`;
+            kpiWinSub.textContent = `Won ${winCount} of ${activeStat.count} historical auctions (Clearing &le; ${proposedBid.toFixed(2)} €)`;
         }
 
-        // KPI 4: Expected Net Margin
-        const netMargin = grossSpread - proposedBid;
-        const kpiNet = document.getElementById("kpi_net_margin");
-        const kpiNetSub = document.getElementById("kpi_net_margin_sub");
-        if (kpiNet) {
-            kpiNet.textContent = `${netMargin >= 0 ? '+' : ''}${netMargin.toFixed(2)} €`;
-            kpiNet.style.color = netMargin > 10 ? '#059669' : (netMargin >= 0 ? '#10b981' : '#dc2626');
-        }
-        if (kpiNetSub) {
-            kpiNetSub.textContent = netMargin < 0
-                ? `⚠️ NEGATIVE MARGIN: Overpaying by ${Math.abs(netMargin).toFixed(2)} €/MWh!`
-                : `Net profit retained per MWh traded`;
-        }
-
-        // KPI 5: 60-Day Percentiles
+        // KPI 3: Percentiles
         const statP50 = document.getElementById("kpi_stat_p50");
         const statP75 = document.getElementById("kpi_stat_p75");
         const statP90 = document.getElementById("kpi_stat_p90");
         const statMax = document.getElementById("kpi_stat_max");
-        const statZero = document.getElementById("kpi_stat_zero_sub");
+        const statAvg = document.getElementById("kpi_stat_avg_sub");
 
         if (statP50) statP50.textContent = `${activeStat.p50.toFixed(2)} €`;
         if (statP75) statP75.textContent = `${activeStat.p75.toFixed(2)} €`;
         if (statP90) statP90.textContent = `${activeStat.p90.toFixed(2)} €`;
         if (statMax) statMax.textContent = `${activeStat.max.toFixed(2)} €`;
-        if (statZero) statZero.textContent = `Cleared at 0.00 € on ${activeStat.zeroPct.toFixed(0)}% of days (${activeStat.count} sample days)`;
+        if (statAvg) statAvg.textContent = `60-Day Average: ${activeStat.avg.toFixed(2)} €/MWh`;
 
-        // Update Risk Badge
-        updateRiskBadge(proposedBid, grossSpread, activeStat, winRate, netMargin);
+        // KPI 4: Congestion & Zero Price
+        const kpiZero = document.getElementById("kpi_zero_pct");
+        const statZero = document.getElementById("kpi_stat_zero_sub");
+        if (kpiZero) kpiZero.textContent = `${activeStat.zeroPct.toFixed(0)}% Free`;
+        if (statZero) {
+            statZero.textContent = `Cleared at 0.00 € on ${activeStat.zeroCount} of ${activeStat.count} days (${activeStat.count - activeStat.zeroCount} congested)`;
+        }
+
+        // Update Risk/Win Badge
+        updateRiskBadge(proposedBid, activeStat, winRate);
     }
 
-    // ── Update Risk Assessment Badge ─────────────────────────────────────────
-    function updateRiskBadge(bid, spread, stat, winRate, netMargin) {
+    // ── Update Risk/Win Assessment Badge ─────────────────────────────────────
+    function updateRiskBadge(bid, stat, winRate) {
         const badge = document.getElementById("calc_bid_risk_badge");
         const sub = document.getElementById("calc_bid_vs_cap_sub");
         if (!badge) return;
 
-        if (spread > 0 && bid > spread) {
-            badge.className = "calc-risk-badge badge-danger";
-            badge.textContent = "🔴 Guaranteed Loss (Bid > Spread)";
-            if (sub) sub.textContent = `Overpaying spread by ${(bid - spread).toFixed(2)} €/MWh`;
-        } else if (spread > 0 && bid >= spread * 0.95) {
-            badge.className = "calc-risk-badge badge-warning";
-            badge.textContent = "🟠 Near Break-Even Cap";
-            if (sub) sub.textContent = `Retains only ${netMargin.toFixed(2)} €/MWh (${winRate.toFixed(0)}% win rate)`;
+        if (stat.count > 0 && bid >= stat.max) {
+            badge.className = "calc-risk-badge badge-aggressive";
+            badge.textContent = "🏆 100% Historical Win";
+            if (sub) sub.textContent = `Covers 60d peak clearing price (${stat.max.toFixed(2)} €)`;
         } else if (bid >= stat.p90) {
             badge.className = "calc-risk-badge badge-aggressive";
-            badge.textContent = "⚡ Aggressive Clearing";
-            if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions, retains +${netMargin.toFixed(2)} € net`;
+            badge.textContent = "⚡ Aggressive Win Rate";
+            if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions (secures high congestion)`;
         } else if (bid >= stat.p75) {
             badge.className = "calc-risk-badge badge-recommended";
             badge.textContent = "🟢 Value Optimal ⭐";
-            if (sub) sub.textContent = `Strong win probability (${winRate.toFixed(0)}%), leaves +${netMargin.toFixed(2)} € net`;
+            if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions at sensible clearing cost`;
         } else if (bid >= stat.p50) {
             badge.className = "calc-risk-badge badge-conservative";
             badge.textContent = "🔵 Median Baseline";
-            if (sub) sub.textContent = `Wins ~50% of auctions, leaves high margin (+${netMargin.toFixed(2)} €)`;
-        } else {
+            if (sub) sub.textContent = `Wins ~50% of auctions (${winRate.toFixed(0)}% actual)`;
+        } else if (bid > 0) {
             badge.className = "calc-risk-badge badge-lowball";
-            badge.textContent = "🟣 Low-Ball / Non-Congested";
-            if (sub) sub.textContent = `Wins uncongested hours (${winRate.toFixed(0)}% win rate)`;
+            badge.textContent = "🟣 Low-Ball / Opportunistic";
+            if (sub) sub.textContent = `Wins uncongested hours only (${winRate.toFixed(0)}% win rate)`;
+        } else {
+            badge.className = "calc-risk-badge badge-conservative";
+            badge.textContent = "⚪ Zero Price (0.00 €)";
+            if (sub) sub.textContent = `Wins on non-congested days (${winRate.toFixed(0)}% frequency)`;
         }
     }
 
@@ -15258,23 +15174,20 @@ function renderEUMapCountryDetail(dataKey, date) {
         const activeStat = currentCorridorStats[selectedActiveHour - 1];
         if (!activeStat) return;
 
-        const grossSpread = currentHourlyGrossSpreads[selectedActiveHour - 1] || parseFloat(document.getElementById("calc_gross_spread_input").value) || 0;
         const bidInput = document.getElementById("calc_proposed_bid_input");
         const slider = document.getElementById("calc_bid_slider");
 
         let targetBid = 0.0;
-        if (preset === 'p50') {
+        if (preset === 'free') {
+            targetBid = 0.0;
+        } else if (preset === 'p50') {
             targetBid = activeStat.p50;
         } else if (preset === 'p75') {
             targetBid = activeStat.p75;
-            if (grossSpread > 0 && targetBid > grossSpread) targetBid = grossSpread * 0.75;
         } else if (preset === 'p90') {
             targetBid = activeStat.p90;
-            if (grossSpread > 0 && targetBid > grossSpread) targetBid = grossSpread * 0.90;
         } else if (preset === 'max') {
             targetBid = activeStat.max;
-        } else if (preset === 'spread') {
-            targetBid = Math.max(0, grossSpread);
         }
 
         if (bidInput) bidInput.value = targetBid.toFixed(2);
@@ -15292,7 +15205,6 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // ── Input Event Handlers ─────────────────────────────────────────────────
     window.onCableCalculatorCorridorChange = function() {
-        currentHourlyGrossSpreads = new Array(24).fill(0);
         refreshCableCalculator();
     };
 
@@ -15304,17 +15216,6 @@ function renderEUMapCountryDetail(dataKey, date) {
         const hourSelect = document.getElementById("calc_hour_select");
         if (hourSelect) selectedActiveHour = parseInt(hourSelect.value) || 1;
         refreshCableCalculator();
-    };
-
-    window.onGrossSpreadInputChange = function() {
-        const grossSpreadInput = document.getElementById("calc_gross_spread_input");
-        if (grossSpreadInput) {
-            const val = parseFloat(grossSpreadInput.value) || 0;
-            currentHourlyGrossSpreads[selectedActiveHour - 1] = val;
-            updateSimulatorKPIs();
-            render24HourHorizonChart();
-            render24HourMatrixTable();
-        }
     };
 
     window.onProposedBidInputChange = function() {
@@ -15340,11 +15241,8 @@ function renderEUMapCountryDetail(dataKey, date) {
     };
 
     window.resetCalculatorDefaults = function() {
-        currentHourlyGrossSpreads = new Array(24).fill(0);
         const bidInput = document.getElementById("calc_proposed_bid_input");
-        const spreadInput = document.getElementById("calc_gross_spread_input");
         if (bidInput) bidInput.value = '';
-        if (spreadInput) spreadInput.value = '';
         refreshCableCalculator();
     };
 
@@ -15354,18 +15252,10 @@ function renderEUMapCountryDetail(dataKey, date) {
         const hourSelect = document.getElementById("calc_hour_select");
         if (hourSelect) hourSelect.value = h;
 
-        const spreadInput = document.getElementById("calc_gross_spread_input");
-        if (spreadInput && currentHourlyGrossSpreads[h - 1] > 0) {
-            spreadInput.value = currentHourlyGrossSpreads[h - 1].toFixed(2);
-        }
-
         const activeStat = currentCorridorStats[h - 1];
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (activeStat && bidInput) {
-            const spread = currentHourlyGrossSpreads[h - 1] || 0;
-            let rec = activeStat.p75;
-            if (spread > 0 && rec > spread) rec = spread * 0.75;
-            bidInput.value = rec.toFixed(2);
+            bidInput.value = (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50).toFixed(2);
         }
 
         refreshCableCalculator();
@@ -15381,20 +15271,20 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (!chartEl || typeof Plotly === 'undefined') return;
 
         const hours = [];
-        const spreads = [];
         const p50s = [];
         const p75s = [];
         const p90s = [];
         const maxs = [];
+        const avgs = [];
 
         for (let h = 1; h <= 24; h++) {
             hours.push(`H${String(h).padStart(2, '0')}`);
-            spreads.push(currentHourlyGrossSpreads[h - 1] || 0);
             const st = currentCorridorStats[h - 1];
             p50s.push(st ? st.p50 : 0);
             p75s.push(st ? st.p75 : 0);
             p90s.push(st ? st.p90 : 0);
             maxs.push(st ? st.max : 0);
+            avgs.push(st ? st.avg : 0);
         }
 
         const isDark = typeof isDarkMode === 'function' && isDarkMode();
@@ -15402,27 +15292,17 @@ function renderEUMapCountryDetail(dataKey, date) {
         const traces = [
             {
                 x: hours,
-                y: spreads,
-                name: 'Predicted Spread (Cap)',
-                type: 'scatter',
-                mode: 'lines+markers',
-                line: { color: '#4f46e5', width: 3 },
-                marker: { size: 6, color: '#4f46e5' },
-                fill: 'tozeroy',
-                fillcolor: isDark ? 'rgba(79, 70, 229, 0.12)' : 'rgba(79, 70, 229, 0.08)'
-            },
-            {
-                x: hours,
                 y: maxs,
                 name: '60d Historical Max',
                 type: 'scatter',
-                mode: 'lines',
-                line: { color: '#ef4444', width: 1.5, dash: 'dot' }
+                mode: 'lines+markers',
+                line: { color: '#ef4444', width: 1.8 },
+                marker: { size: 4, color: '#ef4444' }
             },
             {
                 x: hours,
                 y: p90s,
-                name: '60d P90 (Aggressive)',
+                name: 'P90 (90% Win Chance)',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#f59e0b', width: 2 },
@@ -15431,7 +15311,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p75s,
-                name: '60d P75 (Value Optimal)',
+                name: 'P75 (75% Win Chance) ⭐',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#10b981', width: 2.5 },
@@ -15440,10 +15320,18 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p50s,
-                name: '60d P50 (Median)',
+                name: 'P50 (Median Baseline)',
                 type: 'scatter',
                 mode: 'lines',
                 line: { color: '#64748b', width: 1.5, dash: 'dash' }
+            },
+            {
+                x: hours,
+                y: avgs,
+                name: '60d Average',
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: '#8b5cf6', width: 1.5, dash: 'dot' }
             }
         ];
 
@@ -15458,7 +15346,7 @@ function renderEUMapCountryDetail(dataKey, date) {
                 zeroline: false
             },
             yaxis: {
-                title: '€/MWh',
+                title: 'Clearing Price (€/MWh)',
                 showgrid: true,
                 gridcolor: isDark ? '#1e293b' : '#f1f5f9',
                 zeroline: true,
@@ -15466,7 +15354,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             },
             legend: {
                 orientation: 'h',
-                y: 1.12,
+                y: 1.14,
                 x: 0,
                 font: { size: 10 }
             },
@@ -15489,16 +15377,16 @@ function renderEUMapCountryDetail(dataKey, date) {
         }
 
         const hh = String(selectedActiveHour).padStart(2, '0');
-        if (subTitle) {
-            subTitle.textContent = `Historical clearing price frequencies for Hour ${hh}:00 (Delivery ${selectedActiveHour}) with your proposed bid marker.`;
-        }
-
         const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
         const prices = activeStat.prices;
 
+        if (subTitle) {
+            subTitle.textContent = `Historical clearing price frequencies for Hour ${hh}:00 (Delivery ${selectedActiveHour}). Tested bid: ${proposedBid.toFixed(2)} €/MWh.`;
+        }
+
         // Construct Frequency Bins
         const maxVal = Math.max(activeStat.max, proposedBid, 10);
-        const binStep = Math.max(1, Math.round(maxVal / 20));
+        const binStep = Math.max(1, Math.round(maxVal / 18));
         const bins = [];
         const winCounts = [];
         const loseCounts = [];
@@ -15521,14 +15409,14 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: bins,
                 y: winCounts,
-                name: 'Won Auctions (&le; Proposed Bid)',
+                name: 'Won Auctions (Clearing &le; Your Bid)',
                 type: 'bar',
                 marker: { color: '#10b981' }
             },
             {
                 x: bins,
                 y: loseCounts,
-                name: 'Lost Auctions (> Proposed Bid)',
+                name: 'Lost Auctions (Clearing > Your Bid)',
                 type: 'bar',
                 marker: { color: isDark ? '#475569' : '#cbd5e1' }
             }
@@ -15545,13 +15433,13 @@ function renderEUMapCountryDetail(dataKey, date) {
                 showgrid: false
             },
             yaxis: {
-                title: 'Frequency (Days)',
+                title: 'Number of Days',
                 showgrid: true,
                 gridcolor: isDark ? '#1e293b' : '#f1f5f9'
             },
             legend: {
                 orientation: 'h',
-                y: 1.12,
+                y: 1.14,
                 x: 0,
                 font: { size: 10 }
             }
@@ -15576,18 +15464,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         let html = '';
         for (let h = 1; h <= 24; h++) {
-            const st = currentCorridorStats[h - 1] || { min: 0, p50: 0, p75: 0, p90: 0, max: 0, zeroPct: 0 };
-            const grossSpread = currentHourlyGrossSpreads[h - 1] || 0;
-
-            // Safe Bid = min(P75, 75% of Gross Spread)
-            let safeBid = st.p75;
-            if (grossSpread > 0 && safeBid > grossSpread * 0.75) {
-                safeBid = grossSpread * 0.75;
-            }
-            if (safeBid <= 0 && st.p50 > 0) safeBid = st.p50;
-
-            const netMargin = grossSpread > 0 ? (grossSpread - safeBid) : 0;
-            const netCol = netMargin > 10 ? '#059669' : (netMargin >= 0 ? '#10b981' : '#dc2626');
+            const st = currentCorridorStats[h - 1] || { min: 0, p50: 0, p75: 0, p90: 0, max: 0, avg: 0, zeroPct: 0, count: 0 };
 
             // Outage indicator
             const oe = outageMap[h];
@@ -15611,25 +15488,18 @@ function renderEUMapCountryDetail(dataKey, date) {
                     <td style="text-align:left; font-weight:700; color: var(--text-primary);">
                         ${hh}:00 ${isActive ? '<span class="calc-active-badge">Active</span>' : ''}
                     </td>
-                    <td style="text-align:right; font-weight:700; color: ${grossSpread > 0 ? '#4f46e5' : 'var(--text-muted)'};">
-                        ${grossSpread > 0 ? grossSpread.toFixed(2) + ' €' : '—'}
-                    </td>
                     <td style="text-align:right; color: var(--text-muted);">${st.min.toFixed(2)} €</td>
-                    <td style="text-align:right; font-weight:600;">${st.p50.toFixed(2)} €</td>
-                    <td style="text-align:right; font-weight:700; color: #059669; background: rgba(16, 185, 129, 0.05);">
+                    <td style="text-align:right; font-weight:600; color: #64748b;">${st.p50.toFixed(2)} €</td>
+                    <td style="text-align:right; font-weight:800; color: #059669; background: rgba(16, 185, 129, 0.07);">
                         ${st.p75.toFixed(2)} €
                     </td>
-                    <td style="text-align:right; font-weight:700; color: #d97706; background: rgba(245, 158, 11, 0.05);">
+                    <td style="text-align:right; font-weight:800; color: #d97706; background: rgba(245, 158, 11, 0.07);">
                         ${st.p90.toFixed(2)} €
                     </td>
-                    <td style="text-align:right; color: #dc2626; font-weight:600;">${st.max.toFixed(2)} €</td>
+                    <td style="text-align:right; color: #dc2626; font-weight:700;">${st.max.toFixed(2)} €</td>
+                    <td style="text-align:right; color: #8b5cf6; font-weight:600;">${st.avg.toFixed(2)} €</td>
                     <td style="text-align:right; color: var(--text-muted);">${st.zeroPct.toFixed(0)}%</td>
-                    <td style="text-align:right; font-weight:800; color: #4f46e5;">
-                        ${safeBid.toFixed(2)} €
-                    </td>
-                    <td style="text-align:right; font-weight:800; color: ${netCol};">
-                        ${grossSpread > 0 ? (netMargin >= 0 ? '+' : '') + netMargin.toFixed(2) + ' €' : '—'}
-                    </td>
+                    <td style="text-align:right; color: var(--text-secondary); font-weight:600;">${st.count} days</td>
                     <td style="text-align:center;">${statusHtml}</td>
                     <td style="text-align:center;">
                         <button type="button" class="btn-matrix-simulate" onclick="event.stopPropagation(); selectCalculatorHour(${h})">
@@ -15643,7 +15513,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     }
 
     // ── Public Deep Link Function from Flow Cards in tab_analogues ───────────
-    window.openCableCalculatorForFlow = function(corridor, targetDate, hour0Indexed, grossSpread) {
+    window.openCableCalculatorForFlow = function(corridor, targetDate, hour0Indexed) {
         // 1. Switch to CableCalculator Tab
         if (typeof openTab === 'function') {
             openTab(null, 'CableCalculator');
@@ -15656,8 +15526,6 @@ function renderEUMapCountryDetail(dataKey, date) {
         const corridorSelect = document.getElementById("calc_corridor_select");
         const targetDateInput = document.getElementById("calc_target_date");
         const hourSelect = document.getElementById("calc_hour_select");
-        const spreadInput = document.getElementById("calc_gross_spread_input");
-        const bidInput = document.getElementById("calc_proposed_bid_input");
 
         const targetHour1Indexed = (hour0Indexed + 1);
 
@@ -15682,10 +15550,6 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (targetDate && targetDateInput) targetDateInput.value = targetDate;
         if (hourSelect) hourSelect.value = targetHour1Indexed;
         selectedActiveHour = targetHour1Indexed;
-
-        const gSpreadVal = parseFloat(grossSpread) || 0;
-        currentHourlyGrossSpreads[selectedActiveHour - 1] = gSpreadVal;
-        if (spreadInput) spreadInput.value = gSpreadVal > 0 ? gSpreadVal.toFixed(2) : '';
 
         // 4. Recalculate
         refreshCableCalculator();
