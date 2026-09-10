@@ -1229,8 +1229,9 @@ body.dark-mode .flow-dash {
 
 /* ── Daily Cable Calculator Styles ── */
 .calc-control-panel {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
     gap: 16px;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
@@ -1238,6 +1239,82 @@ body.dark-mode .flow-dash {
     padding: 16px 20px;
     margin-bottom: 18px;
     box-shadow: var(--shadow-sm);
+}
+
+/* JAO Area Pair Selector */
+.calc-jao-group {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    background: var(--bg-card-subtle-2);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 8px 12px;
+}
+
+.calc-jao-select {
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 125px;
+}
+
+.btn-jao-swap {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #4f46e5;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    margin-bottom: 1px;
+}
+
+.btn-jao-swap:hover {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4f46e5;
+    transform: rotate(180deg) scale(1.08);
+    box-shadow: 0 3px 10px rgba(79, 70, 229, 0.4);
+}
+
+body.dark-mode .btn-jao-swap {
+    background: #1e293b;
+    border-color: #334155;
+    color: #818cf8;
+}
+
+body.dark-mode .btn-jao-swap:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
+.calc-active-route-pill {
+    background: rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(79, 70, 229, 0.25);
+    color: #4f46e5;
+    font-size: 12.5px;
+    font-weight: 800;
+    padding: 8px 14px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    margin-bottom: 1px;
+}
+
+body.dark-mode .calc-active-route-pill {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.35);
+    color: #a5b4fc;
 }
 
 .calc-control-group {
@@ -2721,20 +2798,39 @@ body.dark-mode .btn-cable-calc-link:hover {
     </div>
 
     <!-- ── Scenario & Filter Bar ── -->
-    <div class="calc-control-panel" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
-        <div class="calc-control-group">
-            <label class="calc-control-label">Interconnector Corridor</label>
-            <select id="calc_corridor_select" class="calc-select" onchange="onCableCalculatorCorridorChange()">
-                <option value="">Loading corridors...</option>
-            </select>
+    <!-- ── JAO-Style Corridor & Scenario Bar ── -->
+    <div class="calc-control-panel calc-jao-bar">
+        <!-- JAO OUT / SWAP / IN Selector -->
+        <div class="calc-jao-group">
+            <div class="calc-control-group" style="min-width: 140px;">
+                <label class="calc-control-label">OUT AREA</label>
+                <select id="calc_out_area_select" class="calc-select calc-jao-select" onchange="onOutAreaChange()">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <!-- JAO Circular Swap Button -->
+            <button type="button" class="btn-jao-swap" onclick="swapCorridorAreas()" title="Swap OUT and IN areas (reverse flow direction)" aria-label="Swap corridor direction">
+                <span style="font-size: 16px; font-weight: 800; line-height: 1;">⇄</span>
+            </button>
+
+            <div class="calc-control-group" style="min-width: 140px;">
+                <label class="calc-control-label">IN AREA</label>
+                <select id="calc_in_area_select" class="calc-select calc-jao-select" onchange="onInAreaChange()">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Hidden input maintaining active corridor code -->
+            <input type="hidden" id="calc_corridor_select" value="RS-HU">
         </div>
 
-        <div class="calc-control-group">
+        <div class="calc-control-group" style="min-width: 160px;">
             <label class="calc-control-label">Auction Target Date</label>
             <input type="date" id="calc_target_date" class="calc-input" onchange="onCableCalculatorParamChange()">
         </div>
 
-        <div class="calc-control-group">
+        <div class="calc-control-group" style="min-width: 190px;">
             <label class="calc-control-label">Lookback Sample</label>
             <select id="calc_lookback_days" class="calc-select" onchange="onCableCalculatorParamChange()">
                 <option value="14">Last 14 Days (Recent Dynamics)</option>
@@ -2744,11 +2840,15 @@ body.dark-mode .btn-cable-calc-link:hover {
             </select>
         </div>
 
-        <div class="calc-control-group">
+        <div class="calc-control-group" style="min-width: 180px;">
             <label class="calc-control-label">Target Delivery Hour</label>
             <select id="calc_hour_select" class="calc-select" onchange="onCableCalculatorHourChange()">
                 <!-- Populated 1 to 24 -->
             </select>
+        </div>
+
+        <div id="calc_corridor_active_badge" class="calc-active-route-pill">
+            <!-- Rendered by JS e.g. 🇲🇪 ME ➔ 🇮🇹 IT -->
         </div>
     </div>
 
@@ -14812,13 +14912,175 @@ function renderEUMapCountryDetail(dataKey, date) {
 // === tab_cable_calculator.js ===
 // ── tab_cable_calculator.js ──────────────────────────────────────────────────
 // Daily Cable Calculator & Auction Clearing Engine
-// Computes empirical clearing price distributions (P50, P75, P90, Max),
-// historical win-rate probabilities, and auction bidding dynamics for explicit cross-border cables.
+// Features JAO-style OUT AREA / SWAP / IN AREA selector, empirical clearing percentiles (P50, P75, P90, Max),
+// and historical win-rate probability simulation for explicit cross-border cables.
 
 (function() {
     let calcInitialized = false;
     let currentCorridorStats = [];
     let selectedActiveHour = 20; // 1-indexed (1 to 24), default to evening peak H20
+
+    // Country Flag and Name Metadata
+    const countryLabels = {
+        'AL': { code: 'AL', name: 'Albania', flag: '🇦🇱' },
+        'BA': { code: 'BA', name: 'Bosnia & Herzegovina', flag: '🇧🇦' },
+        'BG': { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+        'GR': { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+        'HR': { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+        'HU': { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
+        'IT': { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+        'ME': { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
+        'MK': { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
+        'RS': { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
+        'XK': { code: 'XK', name: 'Kosovo', flag: '🇽🇰' }
+    };
+
+    let corridorAdj = {}; // OUT -> array of valid IN destinations
+    let corridorMap = {}; // 'OUT-IN' -> true
+
+    // ── Build Corridor Graph from cablesData ─────────────────────────────────
+    function buildCorridorAdjacency() {
+        corridorAdj = {};
+        corridorMap = {};
+        const cData = window.cablesData || (typeof cablesData !== 'undefined' ? cablesData : []);
+        const corridors = [...new Set(cData.map(d => d.corridor_code))].filter(Boolean);
+
+        corridors.forEach(c => {
+            corridorMap[c] = true;
+            const parts = c.split('-');
+            if (parts.length === 2) {
+                const outArea = parts[0];
+                const inArea = parts[1];
+                if (!corridorAdj[outArea]) corridorAdj[outArea] = [];
+                if (!corridorAdj[outArea].includes(inArea)) corridorAdj[outArea].push(inArea);
+            }
+        });
+
+        // Alphabetize destinations
+        Object.keys(corridorAdj).forEach(k => corridorAdj[k].sort());
+    }
+
+    // ── Initialize JAO OUT / IN Area Selectors ───────────────────────────────
+    function initJaoAreaSelectors(preselectedCorridor) {
+        buildCorridorAdjacency();
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
+        if (!outSelect || !inSelect) return;
+
+        const outAreas = Object.keys(corridorAdj).sort();
+        if (outAreas.length === 0) return;
+
+        let initOut = 'ME';
+        let initIn = 'IT';
+
+        if (preselectedCorridor && preselectedCorridor.includes('-')) {
+            const parts = preselectedCorridor.split('-');
+            if (corridorAdj[parts[0]]) {
+                initOut = parts[0];
+                initIn = corridorAdj[parts[0]].includes(parts[1]) ? parts[1] : (corridorAdj[parts[0]][0] || '');
+            }
+        } else if (!corridorAdj[initOut]) {
+            initOut = outAreas[0];
+            initIn = corridorAdj[initOut][0] || '';
+        }
+
+        // Populate OUT AREA
+        outSelect.innerHTML = '';
+        outAreas.forEach(area => {
+            const opt = document.createElement("option");
+            opt.value = area;
+            const meta = countryLabels[area] || { flag: '', name: area };
+            opt.textContent = `${meta.flag} ${area}`;
+            if (area === initOut) opt.selected = true;
+            outSelect.appendChild(opt);
+        });
+
+        updateInAreaOptions(initOut, initIn);
+    }
+
+    function updateInAreaOptions(outArea, targetInArea) {
+        const inSelect = document.getElementById("calc_in_area_select");
+        if (!inSelect) return;
+
+        const destinations = corridorAdj[outArea] || [];
+        inSelect.innerHTML = '';
+        destinations.forEach(dest => {
+            const opt = document.createElement("option");
+            opt.value = dest;
+            const meta = countryLabels[dest] || { flag: '', name: dest };
+            opt.textContent = `${meta.flag} ${dest}`;
+            if (dest === targetInArea) opt.selected = true;
+            inSelect.appendChild(opt);
+        });
+
+        if (!inSelect.value && destinations.length > 0) {
+            inSelect.value = destinations[0];
+        }
+
+        syncCorridorAndBadge();
+    }
+
+    function syncCorridorAndBadge() {
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
+        const hiddenCorridor = document.getElementById("calc_corridor_select");
+        const badge = document.getElementById("calc_corridor_active_badge");
+        if (!outSelect || !inSelect) return;
+
+        const outVal = outSelect.value;
+        const inVal = inSelect.value;
+        const code = `${outVal}-${inVal}`;
+
+        if (hiddenCorridor) hiddenCorridor.value = code;
+
+        const metaOut = countryLabels[outVal] || { flag: '', name: outVal };
+        const metaIn = countryLabels[inVal] || { flag: '', name: inVal };
+
+        if (badge) {
+            badge.innerHTML = `
+                <span>${metaOut.flag} <strong>${outVal}</strong></span>
+                <span style="font-size: 15px; opacity: 0.65;">➔</span>
+                <span>${metaIn.flag} <strong>${inVal}</strong></span>
+                <span style="font-size: 11px; opacity: 0.75; font-weight: 600; margin-left: 4px;">(${code})</span>
+            `;
+        }
+    }
+
+    // ── JAO Area Event Handlers ──────────────────────────────────────────────
+    window.onOutAreaChange = function() {
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
+        if (!outSelect || !inSelect) return;
+        const outArea = outSelect.value;
+        const currentIn = inSelect.value;
+        updateInAreaOptions(outArea, currentIn);
+        refreshCableCalculator();
+    };
+
+    window.onInAreaChange = function() {
+        syncCorridorAndBadge();
+        refreshCableCalculator();
+    };
+
+    window.swapCorridorAreas = function() {
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
+        if (!outSelect || !inSelect) return;
+
+        const currentOut = outSelect.value;
+        const currentIn = inSelect.value;
+
+        // Check if reverse corridor exists (e.g. currentIn -> currentOut)
+        if (corridorAdj[currentIn] && corridorAdj[currentIn].includes(currentOut)) {
+            outSelect.value = currentIn;
+            updateInAreaOptions(currentIn, currentOut);
+            refreshCableCalculator();
+        } else if (corridorAdj[currentIn] && corridorAdj[currentIn].length > 0) {
+            outSelect.value = currentIn;
+            updateInAreaOptions(currentIn, null);
+            refreshCableCalculator();
+        }
+    };
 
     // ── Percentile Calculation Helper ────────────────────────────────────────
     function getPercentile(sortedArr, p) {
@@ -14841,11 +15103,11 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // ── Main Initialization ──────────────────────────────────────────────────
     window.initCableCalculator = function() {
-        const corridorSelect = document.getElementById("calc_corridor_select");
+        const outSelect = document.getElementById("calc_out_area_select");
         const hourSelect = document.getElementById("calc_hour_select");
         const targetDateInput = document.getElementById("calc_target_date");
 
-        if (!corridorSelect || !hourSelect || !targetDateInput) return;
+        if (!outSelect || !hourSelect || !targetDateInput) return;
 
         // Populate Delivery Hours (1 to 24)
         if (hourSelect.options.length === 0) {
@@ -14872,24 +15134,11 @@ function renderEUMapCountryDetail(dataKey, date) {
             }
         }
 
-        // Populate Corridors from cablesData
-        const cData = window.cablesData || (typeof cablesData !== 'undefined' ? cablesData : []);
-        if (Array.isArray(cData) && cData.length > 0) {
-            const corridors = [...new Set(cData.map(d => d.corridor_code))].filter(Boolean).sort();
-            const currentVal = corridorSelect.value;
-            corridorSelect.innerHTML = '';
-            corridors.forEach(c => {
-                const opt = document.createElement("option");
-                opt.value = c;
-                opt.textContent = c;
-                if (c === currentVal || (!currentVal && (c === 'RS-HU' || c === 'HU-RS'))) {
-                    opt.selected = true;
-                }
-                corridorSelect.appendChild(opt);
-            });
-            if (!corridorSelect.value && corridors.length > 0) {
-                corridorSelect.value = corridors[0];
-            }
+        // Populate JAO Area Selectors if empty
+        if (outSelect.options.length === 0) {
+            const hiddenCorridor = document.getElementById("calc_corridor_select");
+            const curVal = hiddenCorridor ? hiddenCorridor.value : 'RS-HU';
+            initJaoAreaSelectors(curVal);
         }
 
         calcInitialized = true;
@@ -14966,20 +15215,23 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // ── Recalculate & Refresh Entire Cable Calculator ────────────────────────
     window.refreshCableCalculator = function() {
-        const corridorSelect = document.getElementById("calc_corridor_select");
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
         const targetDateInput = document.getElementById("calc_target_date");
         const lookbackSelect = document.getElementById("calc_lookback_days");
         const hourSelect = document.getElementById("calc_hour_select");
         const proposedBidInput = document.getElementById("calc_proposed_bid_input");
 
-        if (!corridorSelect || !targetDateInput) return;
+        if (!outSelect || !inSelect || !targetDateInput) return;
 
-        const corridor = corridorSelect.value;
+        const corridor = `${outSelect.value}-${inSelect.value}`;
         const targetDate = targetDateInput.value;
         const lookbackDays = parseInt(lookbackSelect ? lookbackSelect.value : "60") || 60;
         selectedActiveHour = parseInt(hourSelect ? hourSelect.value : "20") || 20;
 
-        if (!corridor || !targetDate) return;
+        if (!outSelect.value || !inSelect.value || !targetDate) return;
+
+        syncCorridorAndBadge();
 
         // Compute 24-hour Statistics
         currentCorridorStats = computeCorridorStats(corridor, targetDate, lookbackDays);
@@ -15198,10 +15450,6 @@ function renderEUMapCountryDetail(dataKey, date) {
     };
 
     // ── Input Event Handlers ─────────────────────────────────────────────────
-    window.onCableCalculatorCorridorChange = function() {
-        refreshCableCalculator();
-    };
-
     window.onCableCalculatorParamChange = function() {
         refreshCableCalculator();
     };
@@ -15447,9 +15695,10 @@ function renderEUMapCountryDetail(dataKey, date) {
         const tbody = document.getElementById("calc_matrix_tbody");
         if (!tbody) return;
 
-        const corridorSelect = document.getElementById("calc_corridor_select");
+        const outSelect = document.getElementById("calc_out_area_select");
+        const inSelect = document.getElementById("calc_in_area_select");
         const targetDateInput = document.getElementById("calc_target_date");
-        const corridor = corridorSelect ? corridorSelect.value : '';
+        const corridor = (outSelect && inSelect) ? `${outSelect.value}-${inSelect.value}` : '';
         const targetDate = targetDateInput ? targetDateInput.value : '';
 
         const outages = checkCorridorOutages(corridor, targetDate);
@@ -15516,30 +15765,22 @@ function renderEUMapCountryDetail(dataKey, date) {
         // 2. Initialize if not ready
         initCableCalculator();
 
-        // 3. Set Inputs
-        const corridorSelect = document.getElementById("calc_corridor_select");
+        // 3. Set JAO Area Selectors
+        if (corridor && corridor.includes('-')) {
+            const parts = corridor.split('-');
+            const outArea = parts[0];
+            const inArea = parts[1];
+            const outSelect = document.getElementById("calc_out_area_select");
+            if (outSelect && corridorAdj[outArea]) {
+                outSelect.value = outArea;
+                updateInAreaOptions(outArea, inArea);
+            }
+        }
+
         const targetDateInput = document.getElementById("calc_target_date");
         const hourSelect = document.getElementById("calc_hour_select");
 
         const targetHour1Indexed = (hour0Indexed + 1);
-
-        if (corridor && corridorSelect) {
-            // Check if option exists, or add it
-            let hasOpt = false;
-            for (let i = 0; i < corridorSelect.options.length; i++) {
-                if (corridorSelect.options[i].value === corridor) {
-                    hasOpt = true;
-                    break;
-                }
-            }
-            if (!hasOpt) {
-                const opt = document.createElement("option");
-                opt.value = corridor;
-                opt.textContent = corridor;
-                corridorSelect.appendChild(opt);
-            }
-            corridorSelect.value = corridor;
-        }
 
         if (targetDate && targetDateInput) targetDateInput.value = targetDate;
         if (hourSelect) hourSelect.value = targetHour1Indexed;
