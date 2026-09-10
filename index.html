@@ -3281,8 +3281,11 @@ body.dark-mode .btn-calc-pill:hover {
             <input type="hidden" id="calc_hour_select" value="ALL">
         </div>
 
-        <div id="calc_corridor_active_badge" class="calc-active-route-pill">
-            <!-- Rendered by JS e.g. 🇲🇪 ME ➔ 🇮🇹 IT -->
+        <!-- Copy Bids for Excel (placed right next to Target Delivery Hours) -->
+        <div class="calc-control-group" style="align-self: flex-end;">
+            <button type="button" class="btn-copy-bids" id="btn_copy_bids" onclick="copyBidsToClipboard()" title="Generate 24-hour bid schedule (active hours = bid, others = 0) and copy to clipboard for Excel" style="padding: 7.5px 16px; font-size: 13px; margin-bottom: 1px;">
+                📋 <span id="btn_copy_bids_text">Copy Bids</span>
+            </button>
         </div>
     </div>
 
@@ -3296,7 +3299,7 @@ body.dark-mode .btn-calc-pill:hover {
                     All Day (24h Flat Bid)
                 </span>
             </div>
-            <!-- Preset Buttons & Prominent Copy Bids -->
+            <!-- Preset Buttons -->
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Presets:</span>
                 <button type="button" class="btn-preset" onclick="setBidPreset('free')" title="0.00 €: Check zero-price clearing frequency">
@@ -3313,9 +3316,6 @@ body.dark-mode .btn-calc-pill:hover {
                 </button>
                 <button type="button" class="btn-preset" onclick="setBidPreset('max')" title="Historical Maximum: Wins 100% of historical sample">
                     60d Max
-                </button>
-                <button type="button" class="btn-copy-bids" id="btn_copy_bids" onclick="copyBidsToClipboard()" title="Generate 24-hour bid schedule (active hours = bid, others = 0) and copy to clipboard for Excel">
-                    📋 <span id="btn_copy_bids_text">Copy Bids</span>
                 </button>
             </div>
         </div>
