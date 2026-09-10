@@ -895,6 +895,11 @@ body.dark-mode .cable-hour-reason-title {
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 6px 14px;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
 }
 body.dark-mode .flow-stat-pill {
     background: #0f172a !important;
@@ -907,6 +912,7 @@ body.dark-mode .flow-stat-pill {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-bottom: 2px;
 }
 body.dark-mode .flow-stat-pill-label {
     color: #94a3b8 !important;
@@ -916,6 +922,7 @@ body.dark-mode .flow-stat-pill-label {
     font-size: 18px;
     font-weight: 800;
     color: #334155;
+    line-height: 1.15;
 }
 body.dark-mode .flow-stat-pill-val {
     color: #f1f5f9 !important;
@@ -933,6 +940,11 @@ body.dark-mode .flow-stat-pill-corridors {
 .flow-stat-pill-outages {
     background: #fef2f2;
     border: 1px solid #fecaca;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
 }
 body.dark-mode .flow-stat-pill-outages {
     background: rgba(239, 68, 68, 0.12) !important;
@@ -942,6 +954,11 @@ body.dark-mode .flow-stat-pill-outages {
 .flow-stat-pill-holidays {
     background: #fffbeb;
     border: 1px solid #fde68a;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-sizing: border-box;
 }
 body.dark-mode .flow-stat-pill-holidays {
     background: rgba(245, 158, 11, 0.12) !important;
@@ -2053,11 +2070,12 @@ body.dark-mode .btn-cable-calc-link:hover {
 
 /* Stat Pill Cable Calculator Buttons (Placed next to Outages) */
 .btn-calc-pill {
-    background: #ffffff;
-    border: 1.5px solid #c7d2fe;
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    border: 1.5px solid #4338ca;
     border-radius: 8px;
-    padding: 4px 14px;
-    color: #4338ca;
+    padding: 6px 16px;
+    min-height: 48px;
+    color: #ffffff;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
     display: inline-flex;
@@ -2065,48 +2083,86 @@ body.dark-mode .btn-cable-calc-link:hover {
     align-items: center;
     justify-content: center;
     text-align: center;
-    line-height: 1.2;
-    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    line-height: 1.25;
+    transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.35);
     white-space: nowrap;
     text-transform: none;
+    box-sizing: border-box;
 }
 
 .btn-calc-pill .btn-calc-pill-corridor {
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 800;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.4px;
     text-align: center;
     display: block;
+    line-height: 1.2;
+    color: #ffffff;
 }
 
 .btn-calc-pill .btn-calc-pill-label {
-    font-size: 10px;
-    font-weight: 600;
-    opacity: 0.85;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #c7d2fe;
     text-align: center;
     display: block;
-    margin-top: 1px;
+    margin-top: 2px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.95;
+    transition: color 0.15s ease;
 }
 
 .btn-calc-pill:hover {
-    background: #4f46e5;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-color: #312e81;
     color: #ffffff;
-    border-color: #4f46e5;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
-    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-calc-pill:hover .btn-calc-pill-label {
+    color: #ffffff;
+    opacity: 1;
+}
+
+.btn-calc-pill:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(79, 70, 229, 0.35);
 }
 
 body.dark-mode .btn-calc-pill {
-    background: #0f172a;
-    border-color: rgba(99, 102, 241, 0.45);
-    color: #a5b4fc;
+    background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+    border: 1.5px solid #6366f1;
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+body.dark-mode .btn-calc-pill .btn-calc-pill-corridor {
+    color: #ffffff;
+}
+
+body.dark-mode .btn-calc-pill .btn-calc-pill-label {
+    color: #c7d2fe;
 }
 
 body.dark-mode .btn-calc-pill:hover {
-    background: #4f46e5;
-    border-color: #4f46e5;
+    background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+    border-color: #818cf8;
     color: #ffffff;
+    box-shadow: 0 4px 16px rgba(99, 102, 241, 0.6);
+    transform: translateY(-2px);
+}
+
+body.dark-mode .btn-calc-pill:hover .btn-calc-pill-label {
+    color: #ffffff;
+}
+
+body.dark-mode .btn-calc-pill:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.35);
 }
 
 /* Quick Wiggle Room Button (+5 €) & Badge */
@@ -14159,11 +14215,11 @@ function renderArbitragePanel() {
                         const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
                         return `<button type="button" class="btn-calc-pill" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${activeFlowHours1Indexed.join(',')}])" title="Open Cable Calculator for ${formattedCable} with the ${activeFlowHours1Indexed.length} flow hours">
                             <span class="btn-calc-pill-corridor">${formattedCable}</span>
-                            <span class="btn-calc-pill-label">Calculator</span>
+                            <span class="btn-calc-pill-label">Calculator ➔</span>
                         </button>`;
                     }).join('');
 
-                    const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+                    const pillsHtml = `<div class="flow-stat-pill-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;align-items:stretch;">
                         <div class="flow-stat-pill">
                             <div class="flow-stat-pill-label">Avg Margin</div>
                             <div class="flow-stat-pill-val" style="color:${accentCol};">${avgMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
@@ -14178,7 +14234,7 @@ function renderArbitragePanel() {
                         </div>` : ''}
                         ${outageCardHtml}
                         ${holidayCardHtml}
-                        ${cableButtonsHtml ? `<div style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;">${cableButtonsHtml}</div>` : ''}
+                        ${cableButtonsHtml}
                     </div>`;
 
                     let allDetailTablesHtml = '';
@@ -14247,21 +14303,10 @@ function renderArbitragePanel() {
 
                         allDetailTablesHtml += `
                         <div id="${cid}_corridor_${ci}" style="display:${ci===0?'block':'none'};">
-                            <div class="flow-route-info-bar" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:8px 0 6px 0;">
-                                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                                    <span class="flow-route-label">Route:</span>
-                                    ${fullPathBadges}
-                                    <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
-                                </div>
-                                <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                                    ${routeCables.map(cable => {
-                                        const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
-                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${cor.hours.map(h => h.hour + 1).sort((a,b)=>a-b).join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${cor.hours.length} active hours">
-                                            <span style="font-weight:800;font-size:11.5px;line-height:1.2;display:block;text-align:center;">${formattedCable}</span>
-                                            <span style="font-size:9.5px;font-weight:600;opacity:0.85;line-height:1.2;display:block;text-align:center;">Calculator</span>
-                                        </button>`;
-                                    }).join(' ')}
-                                </div>
+                            <div class="flow-route-info-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 0 6px 0;">
+                                <span class="flow-route-label">Route:</span>
+                                ${fullPathBadges}
+                                <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
@@ -14489,21 +14534,9 @@ function renderArbitragePanel() {
 
                         const detailTableHtml = `
                         <div id="mk_card_${ti}_details" style="display:none;margin-top:12px;padding-top:10px;" class="flow-route-info-bar">
-                            <div style="font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap;">
-                                <div style="display:flex;align-items:center;gap:4px;">
-                                    <span class="flow-route-label">Corridor:</span>
-                                    <span class="flow-route-title">${trade.routeName}</span>
-                                </div>
-                                <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
-                                    ${mkCables.map(cable => {
-                                        const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
-                                        const pvHours1Indexed = trade.hourlyDetails.filter(hd => hd.hour >= 8 && hd.hour <= 16).map(hd => hd.hour + 1).sort((a,b)=>a-b);
-                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${pvHours1Indexed.join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${pvHours1Indexed.length} PV peak hours">
-                                            <span style="font-weight:800;font-size:11.5px;line-height:1.2;display:block;text-align:center;">${formattedCable}</span>
-                                            <span style="font-size:9.5px;font-weight:600;opacity:0.85;line-height:1.2;display:block;text-align:center;">Calculator</span>
-                                        </button>`;
-                                    }).join(' ')}
-                                </div>
+                            <div style="font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+                                <span class="flow-route-label">Corridor:</span>
+                                <span class="flow-route-title">${trade.routeName}</span>
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
