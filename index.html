@@ -1918,9 +1918,7 @@ body.dark-mode .calc-active-route-pill {
 
 /* Charts Grid */
 .calc-charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
-    gap: 20px;
+    display: block;
     margin-bottom: 22px;
 }
 
@@ -3174,15 +3172,6 @@ body.dark-mode .btn-calc-pill:hover {
             <p style="color: var(--text-muted); margin: 0; font-size: 13.5px; line-height: 1.4; max-width: 900px;">
                 Empirical historical clearing price percentiles (P50, P75, P90, Max) and auction win-rate probability simulation. Select a corridor and test your proposed bid to see your exact statistical chance of winning capacity.
             </p>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <button type="button" class="btn-calc-action" onclick="refreshCableCalculator()" title="Recalculate with current inputs">
-                🔄 Recalculate
-            </button>
-            <button type="button" class="btn-calc-action secondary" onclick="resetCalculatorDefaults()" title="Reset to defaults">
-                ↺ Reset
-            </button>
-        </div>
     </div>
 
     <!-- ── Scenario & Filter Bar ── -->
@@ -3431,21 +3420,6 @@ body.dark-mode .btn-calc-pill:hover {
                 </div>
             </div>
             <div id="calc_chart_24h" style="width: 100%; height: 350px;"></div>
-        </div>
-
-        <!-- Chart 2: Clearing Price Distribution (Selected Hour) -->
-        <div class="calc-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-                <div>
-                    <h3 style="margin: 0; font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
-                        📊 Auction Clearing Distribution &amp; Bid Position
-                    </h3>
-                    <p style="margin: 2px 0 0 0; font-size: 12px; color: var(--text-muted);" id="calc_dist_subtitle">
-                        Historical clearing price frequencies with your proposed bid marker.
-                    </p>
-                </div>
-            </div>
-            <div id="calc_chart_distribution" style="width: 100%; height: 350px;"></div>
         </div>
     </div>
 
@@ -15966,9 +15940,8 @@ function renderEUMapCountryDetail(dataKey, date) {
         // Update KPI Cards & Badges
         updateSimulatorKPIs();
 
-        // Render Charts
+        // Render Chart
         render24HourHorizonChart();
-        renderDistributionChart();
 
         // Render Table Matrix
         render24HourMatrixTable();
@@ -16174,7 +16147,6 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         updateSimulatorKPIs();
         render24HourHorizonChart();
-        renderDistributionChart();
         render24HourMatrixTable();
     };
 
@@ -16278,7 +16250,6 @@ function renderEUMapCountryDetail(dataKey, date) {
             slider.value = val;
             updateSimulatorKPIs();
             render24HourHorizonChart();
-            renderDistributionChart();
             render24HourMatrixTable();
         }
     };
@@ -16291,7 +16262,6 @@ function renderEUMapCountryDetail(dataKey, date) {
             bidInput.value = val.toFixed(2);
             updateSimulatorKPIs();
             render24HourHorizonChart();
-            renderDistributionChart();
             render24HourMatrixTable();
         }
     };
@@ -16450,95 +16420,8 @@ function renderEUMapCountryDetail(dataKey, date) {
         Plotly.react(chartEl, traces, layout, { responsive: true, displayModeBar: false });
     }
 
-    // ── Plotly Chart 2: Distribution for Selected Hours ───────────────────────
-    function renderDistributionChart() {
-        const chartEl = document.getElementById("calc_chart_distribution");
-        const subTitle = document.getElementById("calc_dist_subtitle");
-        if (!chartEl || typeof Plotly === 'undefined') return;
-
-        const activeStat = getActiveStat();
-        if (!activeStat || activeStat.count === 0) {
-            chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);font-size:13px;">No clearing price data found for selected hours in lookback window.</div>';
-            return;
-        }
-
-        const proposedBid = parseFloat(document.getElementById("calc_proposed_bid_input").value) || 0;
-        const prices = activeStat.prices;
-        const count = selectedHoursSet.size;
-
-        if (subTitle) {
-            if (count === 24) {
-                subTitle.textContent = `All-Day clearing price distribution across all 24 hours (${activeStat.count} auctions sampled). Flat bid: ${proposedBid.toFixed(2)} €/MWh.`;
-            } else if (count === 1) {
-                subTitle.textContent = `Clearing price distribution for Hour ${[...selectedHoursSet][0]} (${activeStat.count} auctions). Tested bid: ${proposedBid.toFixed(2)} €/MWh.`;
-            } else {
-                subTitle.textContent = `Clearing price distribution across ${count} selected delivery hours (${activeStat.count} auctions). Tested bid: ${proposedBid.toFixed(2)} €/MWh.`;
-            }
-        }
-
-        // Construct Frequency Bins
-        const maxVal = Math.max(activeStat.max, proposedBid, 10);
-        const binStep = Math.max(0.5, Math.round(maxVal / 18));
-        const bins = [];
-        const winCounts = [];
-        const loseCounts = [];
-
-        for (let b = 0; b <= maxVal + binStep; b += binStep) {
-            const bMin = b;
-            const bMax = b + binStep;
-            const inBin = prices.filter(p => p >= bMin && (bMax >= maxVal ? p <= bMax : p < bMax));
-            const winInBin = inBin.filter(p => p <= proposedBid).length;
-            const loseInBin = inBin.length - winInBin;
-
-            bins.push(`${bMin.toFixed(1)}-${bMax.toFixed(1)} €`);
-            winCounts.push(winInBin);
-            loseCounts.push(loseInBin);
-        }
-
-        const isDark = typeof isDarkMode === 'function' && isDarkMode();
-
-        const traces = [
-            {
-                x: bins,
-                y: winCounts,
-                name: 'Won Auctions (Clearing &le; Your Bid)',
-                type: 'bar',
-                marker: { color: '#10b981' }
-            },
-            {
-                x: bins,
-                y: loseCounts,
-                name: 'Lost Auctions (Clearing > Your Bid)',
-                type: 'bar',
-                marker: { color: isDark ? '#475569' : '#cbd5e1' }
-            }
-        ];
-
-        const layout = {
-            barmode: 'stack',
-            margin: { t: 20, r: 20, l: 40, b: 50 },
-            paper_bgcolor: 'transparent',
-            plot_bgcolor: 'transparent',
-            font: { family: 'Inter, sans-serif', size: 11, color: isDark ? '#94a3b8' : '#475569' },
-            xaxis: {
-                tickangle: -45,
-                showgrid: false
-            },
-            yaxis: {
-                title: 'Number of Auctions',
-                showgrid: true,
-                gridcolor: isDark ? '#1e293b' : '#f1f5f9'
-            },
-            legend: {
-                orientation: 'h',
-                y: 1.14,
-                x: 0,
-                font: { size: 10 }
-            }
-        };
-
-        Plotly.react(chartEl, traces, layout, { responsive: true, displayModeBar: false });
-    }
+    // ── Plotly Chart 2 (Removed) ──────────────────────────────────────────────
+    function renderDistributionChart() {}
 
     // ── Render 24-Hour Bidding Matrix Table ───────────────────────────────────
     function render24HourMatrixTable() {
