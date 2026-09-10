@@ -3253,10 +3253,10 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
             <!-- Preset Buttons -->
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Presets:</span>
-                <button type="button" class="btn-preset active" onclick="setBidPreset('p75')" title="Optimal Value: High win probability (~75%)">
-                    P75 (Value) ⭐
+                <button type="button" class="btn-preset" onclick="setBidPreset('p75')" title="Optimal Value: High win probability (~75%)">
+                    P75 (Value)
                 </button>
-                <button type="button" class="btn-preset" onclick="setBidPreset('p90')" title="Aggressive: High-clearing auctions (wins ~90%)">
+                <button type="button" class="btn-preset active" onclick="setBidPreset('p90')" title="Aggressive: High-clearing auctions (wins ~90%)">
                     P90 (Aggressive)
                 </button>
                 <button type="button" class="btn-preset" onclick="setBidPreset('max')" title="Historical Maximum: Wins 100% of historical sample">
@@ -3419,7 +3419,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                         <th style="width: 70px; text-align: left;">Hour</th>
                         <th style="text-align: right;" title="Lowest clearing price in sample">Min</th>
                         <th style="text-align: right;" title="50th percentile: median clearing price">P50 (Median)</th>
-                        <th style="text-align: right; background: rgba(16, 185, 129, 0.08); color: #059669;" title="75th percentile: captures ~75% of auctions">P75 (Value) ⭐</th>
+                        <th style="text-align: right; background: rgba(16, 185, 129, 0.08); color: #059669;" title="75th percentile: captures ~75% of auctions">P75 (Value)</th>
                         <th style="text-align: right; background: rgba(245, 158, 11, 0.08); color: #d97706;" title="90th percentile: aggressive clearing price">P90 (Aggr.)</th>
                         <th style="text-align: right; color: #dc2626;" title="Highest clearing price in sample">60d Max</th>
                         <th style="text-align: right;" title="Arithmetic mean clearing price">Average</th>
@@ -15705,6 +15705,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         renderJaoDropdowns();
         refreshCableCalculator();
+        setBidPreset('p90');
         updateWiggleUI();
     };
 
@@ -15726,6 +15727,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         renderJaoDropdowns();
         refreshCableCalculator();
+        setBidPreset('p90');
         updateWiggleUI();
     };
 
@@ -15908,6 +15910,7 @@ function renderEUMapCountryDetail(dataKey, date) {
 
         calcInitialized = true;
         refreshCableCalculator();
+        setBidPreset('p90');
     };
 
     // ── Compute Corridor Statistics over Lookback Window ─────────────────────
@@ -16105,9 +16108,9 @@ function renderEUMapCountryDetail(dataKey, date) {
             }
         }
 
-        // Set default proposed bid to P75 + current wiggle room (starts at 0)
+        // Set default proposed bid to P90 + current wiggle room (starts at 0)
         if (activeStat && (!proposedBidInput.value || parseFloat(proposedBidInput.value) === 0)) {
-            const baseBid = activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50;
+            const baseBid = activeStat.p90 > 0 ? activeStat.p90 : (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50);
             proposedBidInput.value = (baseBid + currentWiggleRoom).toFixed(2);
         }
 
@@ -16278,7 +16281,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions across target hours`;
         } else if (bid >= stat.p75) {
             badge.className = "calc-risk-badge badge-recommended";
-            badge.textContent = isAll ? "🟢 Value 24h Bid ⭐" : "🟢 Value Optimal ⭐";
+            badge.textContent = isAll ? "🟢 Value 24h Bid" : "🟢 Value Optimal";
             if (sub) sub.textContent = `Wins ${winRate.toFixed(0)}% of auctions at sensible clearing cost`;
         } else if (bid >= stat.p50) {
             badge.className = "calc-risk-badge badge-conservative";
@@ -16320,11 +16323,15 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (bidInput) bidInput.value = targetBid.toFixed(2);
         if (slider) slider.value = targetBid;
 
-        // Update preset button active states
-        document.querySelectorAll(".btn-preset").forEach(btn => btn.classList.remove("active"));
-        if (window.event && window.event.currentTarget) {
-            window.event.currentTarget.classList.add("active");
-        }
+        // Update preset button active states (works for both clicks & programmatic calls)
+        document.querySelectorAll(".btn-preset").forEach(btn => {
+            const oc = btn.getAttribute("onclick") || "";
+            if (oc.includes(`'${preset}'`)) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
 
         updateSimulatorKPIs();
         render24HourHorizonChart();
@@ -16486,6 +16493,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         selectedHoursSet = new Set(Array.from({length: 24}, (_, i) => i + 1));
         renderHourPicker();
         refreshCableCalculator();
+        setBidPreset('p90');
         updateWiggleUI();
     };
 
@@ -16497,11 +16505,12 @@ function renderEUMapCountryDetail(dataKey, date) {
         const activeStat = getActiveStat();
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (activeStat && bidInput) {
-            const baseBid = activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50;
+            const baseBid = activeStat.p90 > 0 ? activeStat.p90 : (activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50);
             bidInput.value = (baseBid + currentWiggleRoom).toFixed(2);
         }
 
         refreshCableCalculator();
+        setBidPreset('p90');
 
         // Scroll to simulator panel smoothly
         const simPanel = document.querySelector(".calc-simulator-panel");
@@ -16566,7 +16575,7 @@ function renderEUMapCountryDetail(dataKey, date) {
             {
                 x: hours,
                 y: p75s,
-                name: 'P75 (75% Win) ⭐',
+                name: 'P75 (75% Win)',
                 type: 'scatter',
                 mode: 'lines+markers',
                 line: { color: '#10b981', width: 2.5 },
@@ -16770,7 +16779,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         renderJaoDropdowns();
         renderHourPicker();
         refreshCableCalculator();
-        setBidPreset('p75');
+        setBidPreset('p90');
         updateWiggleUI();
 
         const tabEl = document.getElementById("CableCalculator");
