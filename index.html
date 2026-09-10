@@ -15819,31 +15819,22 @@ function renderEUMapCountryDetail(dataKey, date) {
         // Aggregate All-Day (All 24 hours combined)
         const allPrices = [].concat(...Object.values(hourlyBuckets)).sort((a, b) => a - b);
         const allCount = allPrices.length;
-        let allMin = 0.0, allP25 = 0.0, allP50 = 0.0, allP75 = 0.0, allP90 = 0.0, allP95 = 0.0, allMax = 0.0, allAvg = 0.0, allZeroCount = 0;
-
+        let allZeroCount = 0;
         if (allCount > 0) {
-            allMin = allPrices[0];
-            allP25 = getPercentile(allPrices, 25);
-            allP50 = getPercentile(allPrices, 50);
-            allP75 = getPercentile(allPrices, 75);
-            allP90 = getPercentile(allPrices, 90);
-            allP95 = getPercentile(allPrices, 95);
-            allMax = allPrices[allCount - 1];
-            allAvg = allPrices.reduce((sum, val) => sum + val, 0) / allCount;
             allZeroCount = allPrices.filter(p => p <= 0.001).length;
         }
 
         const allDayResult = {
             hour: 'ALL',
             count: allCount,
-            min: allMin,
-            p25: allP25,
-            p50: allP50,
-            p75: allP75,
-            p90: allP90,
-            p95: allP95,
-            max: allMax,
-            avg: allAvg,
+            min: Math.min(...hourlyResult.map(h => h.min)),
+            p25: Math.max(...hourlyResult.map(h => h.p25)),
+            p50: Math.max(...hourlyResult.map(h => h.p50)),
+            p75: Math.max(...hourlyResult.map(h => h.p75)),
+            p90: Math.max(...hourlyResult.map(h => h.p90)),
+            p95: Math.max(...hourlyResult.map(h => h.p95)),
+            max: Math.max(...hourlyResult.map(h => h.max)),
+            avg: hourlyResult.reduce((sum, h) => sum + h.avg, 0) / 24,
             zeroCount: allZeroCount,
             zeroPct: allCount > 0 ? (allZeroCount / allCount) * 100 : 0,
             prices: allPrices
@@ -15864,18 +15855,9 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // ── Helper to Get Active Stat across Selected Hours ──────────────────────
     function getActiveStat() {
-        if (!currentCorridorStats || !currentCorridorStats.allDay) return null;
+        if (!currentCorridorStats || !currentCorridorStats.hourly || !currentCorridorStats.hourly.length) return null;
 
         const count = selectedHoursSet.size;
-
-        if (count === 24) {
-            return currentCorridorStats.allDay;
-        }
-
-        if (count === 1) {
-            const h = [...selectedHoursSet][0];
-            return currentCorridorStats.hourly[h - 1] || null;
-        }
 
         if (count === 0) {
             return {
@@ -15886,41 +15868,51 @@ function renderEUMapCountryDetail(dataKey, date) {
             };
         }
 
-        // Multiple hours selected: compute aggregated sample distribution
+        if (count === 1) {
+            const h = [...selectedHoursSet][0];
+            return currentCorridorStats.hourly[h - 1] || null;
+        }
+
+        // Multiple hours selected (including 24-hour All Day)
+        const selectedHourly = [...selectedHoursSet]
+            .map(h => currentCorridorStats.hourly[h - 1])
+            .filter(Boolean);
+
+        if (selectedHourly.length === 0) return null;
+
+        // Peak / envelope percentiles across the selected delivery hours
+        // This ensures the proposed bid covers the peak clearing price of the selected window
+        // and matches the visual curves on the 24-Hour Clearing Horizon chart!
+        const maxP90 = Math.max(...selectedHourly.map(s => s.p90));
+        const maxP75 = Math.max(...selectedHourly.map(s => s.p75));
+        const maxP50 = Math.max(...selectedHourly.map(s => s.p50));
+        const maxP25 = Math.max(...selectedHourly.map(s => s.p25));
+        const maxMax = Math.max(...selectedHourly.map(s => s.max));
+        const minMin = Math.min(...selectedHourly.map(s => s.min));
+
         const multiPrices = [];
-        selectedHoursSet.forEach(h => {
-            const st = currentCorridorStats.hourly[h - 1];
-            if (st && st.prices) multiPrices.push(...st.prices);
+        selectedHourly.forEach(st => {
+            if (st.prices) multiPrices.push(...st.prices);
         });
         multiPrices.sort((a, b) => a - b);
         const totalSampleCount = multiPrices.length;
 
-        let min = 0, p25 = 0, p50 = 0, p75 = 0, p90 = 0, p95 = 0, max = 0, avg = 0, zeroCount = 0;
-        if (totalSampleCount > 0) {
-            min = multiPrices[0];
-            p25 = getPercentile(multiPrices, 25);
-            p50 = getPercentile(multiPrices, 50);
-            p75 = getPercentile(multiPrices, 75);
-            p90 = getPercentile(multiPrices, 90);
-            p95 = getPercentile(multiPrices, 95);
-            max = multiPrices[totalSampleCount - 1];
-            avg = multiPrices.reduce((s, v) => s + v, 0) / totalSampleCount;
-            zeroCount = multiPrices.filter(p => p <= 0.001).length;
-        }
+        const totalZero = selectedHourly.reduce((s, st) => s + st.zeroCount, 0);
+        const avgPrice = selectedHourly.reduce((s, st) => s + st.avg, 0) / selectedHourly.length;
 
         return {
-            hour: 'MULTI',
+            hour: count === 24 ? 'ALL' : 'MULTI',
             count: totalSampleCount,
-            min: min,
-            p25: p25,
-            p50: p50,
-            p75: p75,
-            p90: p90,
-            p95: p95,
-            max: max,
-            avg: avg,
-            zeroCount: zeroCount,
-            zeroPct: totalSampleCount > 0 ? (zeroCount / totalSampleCount) * 100 : 0,
+            min: minMin,
+            p25: maxP25,
+            p50: maxP50,
+            p75: maxP75,
+            p90: maxP90,
+            p95: Math.max(...selectedHourly.map(s => s.p95 || s.p90)),
+            max: maxMax,
+            avg: avgPrice,
+            zeroCount: totalZero,
+            zeroPct: totalSampleCount > 0 ? (totalZero / totalSampleCount) * 100 : 0,
             prices: multiPrices
         };
     }
