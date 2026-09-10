@@ -1297,9 +1297,10 @@ body.dark-mode .flow-dash {
 }
 
 .jao-trigger-flag {
-    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
-    display: inline-block;
 }
 
 .jao-trigger-code {
@@ -1374,7 +1375,9 @@ body.dark-mode .jao-menu-item:hover {
 }
 
 .jao-item-flag {
-    font-size: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
 }
 
@@ -3165,26 +3168,24 @@ body.dark-mode .btn-calc-pill:hover {
                 <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0; letter-spacing: -0.5px;">
                     Daily Cable Calculator &amp; Auction Clearing Engine
                 </h2>
-                <span style="background: linear-gradient(135deg, #4f46e5, #3b82f6); color: white; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
-                    60-Day Clearing Distributions
-                </span>
             </div>
-            <p style="color: var(--text-muted); margin: 0; font-size: 13.5px; line-height: 1.4; max-width: 900px;">
-                Empirical historical clearing price percentiles (P50, P75, P90, Max) and auction win-rate probability simulation. Select a corridor and test your proposed bid to see your exact statistical chance of winning capacity.
+            <p style="color: var(--text-muted); margin: 0; font-size: 13px; line-height: 1.4;">
+                Simulate auction win rates and benchmark cross-border capacity bids against historical clearing price percentiles.
             </p>
+        </div>
     </div>
 
     <!-- ── Scenario & Filter Bar ── -->
     <!-- ── JAO-Style Corridor & Scenario Bar ── -->
     <div class="calc-control-panel calc-jao-bar">
-        <!-- JAO OUT / SWAP / IN Selector with Real Emoji Flags -->
+        <!-- JAO OUT / SWAP / IN Selector with Real Country Flags -->
         <div class="calc-jao-group">
             <div class="calc-control-group" style="min-width: 140px;">
                 <label class="calc-control-label">OUT AREA</label>
                 <div class="jao-dropdown-container" id="jao_out_container">
                     <button type="button" class="jao-dropdown-trigger" id="jao_out_trigger" onclick="toggleJaoMenu('out', event)">
                         <div class="jao-trigger-content">
-                            <span class="jao-trigger-flag" id="jao_out_flag">🇲🇪</span>
+                            <span class="jao-trigger-flag" id="jao_out_flag"><img src="https://flagcdn.com/24x18/me.png" width="22" height="16" alt="ME" style="border-radius: 2px; vertical-align: -2px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.18);"></span>
                             <span class="jao-trigger-code" id="jao_out_code">ME</span>
                         </div>
                         <span class="jao-trigger-arrow">▾</span>
@@ -3206,7 +3207,7 @@ body.dark-mode .btn-calc-pill:hover {
                 <div class="jao-dropdown-container" id="jao_in_container">
                     <button type="button" class="jao-dropdown-trigger" id="jao_in_trigger" onclick="toggleJaoMenu('in', event)">
                         <div class="jao-trigger-content">
-                            <span class="jao-trigger-flag" id="jao_in_flag">🇮🇹</span>
+                            <span class="jao-trigger-flag" id="jao_in_flag"><img src="https://flagcdn.com/24x18/it.png" width="22" height="16" alt="IT" style="border-radius: 2px; vertical-align: -2px; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.18);"></span>
                             <span class="jao-trigger-code" id="jao_in_code">IT</span>
                         </div>
                         <span class="jao-trigger-arrow">▾</span>
@@ -3291,12 +3292,6 @@ body.dark-mode .btn-calc-pill:hover {
             <!-- Preset Buttons -->
             <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
                 <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Presets:</span>
-                <button type="button" class="btn-preset" onclick="setBidPreset('free')" title="0.00 €: Check zero-price clearing frequency">
-                    0.00 € (Free)
-                </button>
-                <button type="button" class="btn-preset" onclick="setBidPreset('p50')" title="Conservative / Baseline Median clearing price (wins ~50%)">
-                    P50 (Median)
-                </button>
                 <button type="button" class="btn-preset active" onclick="setBidPreset('p75')" title="Optimal Value: High win probability (~75%)">
                     P75 (Value) ⭐
                 </button>
@@ -15367,17 +15362,25 @@ function renderEUMapCountryDetail(dataKey, date) {
 
     // Country Flag and Name Metadata
     const countryLabels = {
-        'AL': { code: 'AL', name: 'Albania', flag: '🇦🇱' },
-        'BA': { code: 'BA', name: 'Bosnia & Herzegovina', flag: '🇧🇦' },
-        'BG': { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
-        'GR': { code: 'GR', name: 'Greece', flag: '🇬🇷' },
-        'HR': { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
-        'HU': { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
-        'IT': { code: 'IT', name: 'Italy', flag: '🇮🇹' },
-        'ME': { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
-        'MK': { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
-        'RS': { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
-        'XK': { code: 'XK', name: 'Kosovo', flag: '🇽🇰' }
+        'AL': { code: 'AL', name: 'Albania' },
+        'AT': { code: 'AT', name: 'Austria' },
+        'BA': { code: 'BA', name: 'Bosnia & Herzegovina' },
+        'BG': { code: 'BG', name: 'Bulgaria' },
+        'CZ': { code: 'CZ', name: 'Czech Republic' },
+        'DE': { code: 'DE', name: 'Germany' },
+        'DE_LU': { code: 'DE_LU', name: 'Germany' },
+        'GR': { code: 'GR', name: 'Greece' },
+        'HR': { code: 'HR', name: 'Croatia' },
+        'HU': { code: 'HU', name: 'Hungary' },
+        'IT': { code: 'IT', name: 'Italy' },
+        'ME': { code: 'ME', name: 'Montenegro' },
+        'MK': { code: 'MK', name: 'North Macedonia' },
+        'PL': { code: 'PL', name: 'Poland' },
+        'RO': { code: 'RO', name: 'Romania' },
+        'RS': { code: 'RS', name: 'Serbia' },
+        'SI': { code: 'SI', name: 'Slovenia' },
+        'SK': { code: 'SK', name: 'Slovakia' },
+        'XK': { code: 'XK', name: 'Kosovo' }
     };
 
     let corridorAdj = {}; // OUT -> array of valid IN destinations
@@ -15425,7 +15428,15 @@ function renderEUMapCountryDetail(dataKey, date) {
         renderJaoDropdowns();
     }
 
-    // ── Render Custom JAO Dropdowns with Full Flag Emojis ─────────────────────
+    // ── Helper: Render Country Flag using FlagCDN ────────────────────────────
+    function getCountryFlagHtml(code, w = 22, h = 16) {
+        if (!code) return '';
+        const c = String(code).trim().toUpperCase();
+        const flagCode = (c === 'DE_LU' || c === 'DE') ? 'de' : c.toLowerCase();
+        return `<img src="https://flagcdn.com/24x18/${flagCode}.png" width="${w}" height="${h}" alt="${c}" style="border-radius: 2px; vertical-align: middle; display: inline-block; box-shadow: 0 1px 2px rgba(0,0,0,0.18); object-fit: cover;">`;
+    }
+
+    // ── Render Custom JAO Dropdowns with Real Country Flags ───────────────────
     function renderJaoDropdowns() {
         const outFlagEl = document.getElementById("jao_out_flag");
         const outCodeEl = document.getElementById("jao_out_code");
@@ -15440,13 +15451,10 @@ function renderEUMapCountryDetail(dataKey, date) {
         const hiddenCorridor = document.getElementById("calc_corridor_select");
         const badge = document.getElementById("calc_corridor_active_badge");
 
-        const metaOut = countryLabels[currentOutArea] || { flag: '🌐', name: currentOutArea };
-        const metaIn = countryLabels[currentInArea] || { flag: '🌐', name: currentInArea };
-
         // Update Triggers
-        if (outFlagEl) outFlagEl.textContent = metaOut.flag;
+        if (outFlagEl) outFlagEl.innerHTML = getCountryFlagHtml(currentOutArea, 22, 16);
         if (outCodeEl) outCodeEl.textContent = currentOutArea;
-        if (inFlagEl) inFlagEl.textContent = metaIn.flag;
+        if (inFlagEl) inFlagEl.innerHTML = getCountryFlagHtml(currentInArea, 22, 16);
         if (inCodeEl) inCodeEl.textContent = currentInArea;
 
         // Update Hidden Inputs
@@ -15459,11 +15467,11 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (outMenu) {
             const outAreas = Object.keys(corridorAdj).sort();
             outMenu.innerHTML = outAreas.map(area => {
-                const m = countryLabels[area] || { flag: '🌐', name: area };
+                const m = countryLabels[area] || { name: area };
                 const isActive = area === currentOutArea ? 'active' : '';
                 return `
                     <div class="jao-menu-item ${isActive}" onclick="selectJaoArea('out', '${area}')">
-                        <span class="jao-item-flag">${m.flag}</span>
+                        <span class="jao-item-flag">${getCountryFlagHtml(area, 22, 16)}</span>
                         <span class="jao-item-code">${area}</span>
                         <span class="jao-item-name">${m.name}</span>
                     </div>
@@ -15475,11 +15483,11 @@ function renderEUMapCountryDetail(dataKey, date) {
         if (inMenu) {
             const destinations = corridorAdj[currentOutArea] || [];
             inMenu.innerHTML = destinations.map(dest => {
-                const m = countryLabels[dest] || { flag: '🌐', name: dest };
+                const m = countryLabels[dest] || { name: dest };
                 const isActive = dest === currentInArea ? 'active' : '';
                 return `
                     <div class="jao-menu-item ${isActive}" onclick="selectJaoArea('in', '${dest}')">
-                        <span class="jao-item-flag">${m.flag}</span>
+                        <span class="jao-item-flag">${getCountryFlagHtml(dest, 22, 16)}</span>
                         <span class="jao-item-code">${dest}</span>
                         <span class="jao-item-name">${m.name}</span>
                     </div>
@@ -15490,9 +15498,9 @@ function renderEUMapCountryDetail(dataKey, date) {
         // Update Header Route Badge
         if (badge) {
             badge.innerHTML = `
-                <span>${metaOut.flag} <strong>${currentOutArea}</strong></span>
+                <span style="display:inline-flex;align-items:center;gap:5px;">${getCountryFlagHtml(currentOutArea, 18, 13)} <strong>${currentOutArea}</strong></span>
                 <span style="font-size: 15px; opacity: 0.65;">➔</span>
-                <span>${metaIn.flag} <strong>${currentInArea}</strong></span>
+                <span style="display:inline-flex;align-items:center;gap:5px;">${getCountryFlagHtml(currentInArea, 18, 13)} <strong>${currentInArea}</strong></span>
                 <span style="font-size: 11px; opacity: 0.75; font-weight: 600; margin-left: 4px;">(${corridorCode})</span>
             `;
         }
