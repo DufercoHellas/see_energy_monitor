@@ -1087,6 +1087,34 @@ body.dark-mode .flow-th-cap {
     color: #c084fc !important;
 }
 
+.flow-th-max-bid {
+    color: #0284c7 !important;
+    font-weight: 800 !important;
+    font-size: 11px !important;
+    letter-spacing: 0.03em;
+    background: rgba(14, 165, 233, 0.08);
+    border-radius: 4px;
+}
+body.dark-mode .flow-th-max-bid {
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.14) !important;
+}
+
+.flow-cell-max-bid {
+    font-weight: 800 !important;
+    font-size: 13px !important;
+    color: #0369a1 !important;
+    background: rgba(14, 165, 233, 0.08) !important;
+    border-left: 1px dashed rgba(14, 165, 233, 0.25);
+    border-right: 1px dashed rgba(14, 165, 233, 0.25);
+}
+body.dark-mode .flow-cell-max-bid {
+    color: #38bdf8 !important;
+    background: rgba(14, 165, 233, 0.16) !important;
+    border-left: 1px dashed rgba(56, 189, 248, 0.35);
+    border-right: 1px dashed rgba(56, 189, 248, 0.35);
+}
+
 .flow-th-margin {
     color: #10b981 !important;
 }
@@ -12878,6 +12906,7 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-price" style="padding:7px 12px;text-align:right;">${res.pEnd.toFixed(2)} €</td>
                                 <td class="flow-cell-gross" style="padding:7px 12px;text-align:right;">${res.grossSpread.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:7px 12px;text-align:right;">${res.transitCost.toFixed(2)} €</td>
+                                <td class="flow-cell-max-bid" style="padding:7px 12px;text-align:right;" title="Maximum break-even cable bid (Gross Spread = ${res.grossSpread.toFixed(2)} €/MWh)">${res.grossSpread.toFixed(2)} €</td>
                                 <td style="padding:7px 12px;font-weight:800;color:${mCol};text-align:right;">${res.netMargin.toFixed(2)} €</td>
                                 <td style="padding:7px 12px;text-align:right;">${realizedCell}</td>
                                 <td style="padding:7px 12px;">${outagePart}</td>
@@ -12905,6 +12934,7 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
+                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Maximum break-even cable bid based on predicted price spread">Cable Bidding Max</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                         <th style="padding:6px 12px;">Outages</th>
@@ -13110,6 +13140,7 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-price" style="padding:6px 12px;text-align:right;">${hd.pEnd.toFixed(2)} €</td>
                                 <td class="flow-cell-gross" style="padding:6px 12px;text-align:right;">${hd.gross.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:6px 12px;text-align:right;">${hd.cable.toFixed(2)} €</td>
+                                <td class="flow-cell-max-bid" style="padding:6px 12px;text-align:right;" title="Maximum break-even cable bid (Gross Spread = ${hd.gross.toFixed(2)} €/MWh)">${hd.gross.toFixed(2)} €</td>
                                 <td style="padding:6px 12px;font-weight:800;color:${mCol};text-align:right;">${hd.net.toFixed(2)} €</td>
                                 <td style="padding:6px 12px;text-align:right;">${realizedCell}</td>
                             </tr>`;
@@ -13129,6 +13160,7 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell (${trade.end})</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
+                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Maximum break-even cable bid based on predicted price spread">Cable Bidding Max</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                     </tr>
