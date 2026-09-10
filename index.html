@@ -2047,6 +2047,47 @@ body.dark-mode .btn-cable-calc-link:hover {
     border-color: #4f46e5;
 }
 
+/* Stat Pill Cable Calculator Buttons (Placed next to Outages) */
+.btn-calc-pill {
+    background: #ffffff;
+    border: 1.5px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 7px 13px;
+    color: #4338ca;
+    font-size: 12px;
+    font-weight: 800;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    white-space: nowrap;
+    text-transform: none;
+    letter-spacing: 0.2px;
+}
+
+.btn-calc-pill:hover {
+    background: #4f46e5;
+    color: #ffffff;
+    border-color: #4f46e5;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+    transform: translateY(-1px);
+}
+
+body.dark-mode .btn-calc-pill {
+    background: #0f172a;
+    border-color: rgba(99, 102, 241, 0.45);
+    color: #a5b4fc;
+}
+
+body.dark-mode .btn-calc-pill:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    color: #ffffff;
+}
+
 
 
 
@@ -14019,7 +14060,24 @@ function renderArbitragePanel() {
                         + `</div>`
                         : '';
 
-                    const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:stretch;">
+                    // Extract all unique cross-border cables used in this route
+                    const cardRouteCables = [];
+                    effectiveCorridorList.forEach(cor => {
+                        for (let idx = 1; idx < cor.path.length; idx++) {
+                            const c = cor.path[idx].cable;
+                            if (c && !cardRouteCables.includes(c)) {
+                                cardRouteCables.push(c);
+                            }
+                        }
+                    });
+
+                    const activeFlowHours1Indexed = allHours.map(h => h.hour + 1).sort((a,b) => a - b);
+                    const cableButtonsHtml = cardRouteCables.map(cable => {
+                        const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
+                        return `<button type="button" class="btn-calc-pill" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${activeFlowHours1Indexed.join(',')}])" title="Open Cable Calculator for ${formattedCable} with the ${activeFlowHours1Indexed.length} flow hours">🧮 ${formattedCable} Calculator</button>`;
+                    }).join('');
+
+                    const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
                         <div class="flow-stat-pill">
                             <div class="flow-stat-pill-label">Avg Margin</div>
                             <div class="flow-stat-pill-val" style="color:${accentCol};">${avgMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;">€/MWh</span></div>
@@ -14034,6 +14092,7 @@ function renderArbitragePanel() {
                         </div>` : ''}
                         ${outageCardHtml}
                         ${holidayCardHtml}
+                        ${cableButtonsHtml ? `<div style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;">${cableButtonsHtml}</div>` : ''}
                     </div>`;
 
                     let allDetailTablesHtml = '';
@@ -14107,8 +14166,12 @@ function renderArbitragePanel() {
                                     <span class="flow-route-label">Route:</span>
                                     ${fullPathBadges}
                                     <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
+                                <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                                    ${routeCables.map(cable => {
+                                        const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
+                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${cor.hours.map(h => h.hour + 1).sort((a,b)=>a-b).join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${cor.hours.length} active hours">🧮 ${formattedCable} Calculator</button>`;
+                                    }).join(' ')}
                                 </div>
-                                ${primaryCable ? `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryCable}', '${targetDate}', ${cor.hours[0]?.hour ?? 19})" title="Open 60-day Cable Calculator for ${primaryCable}">🧮 ${primaryCable} Cable Calculator</button>` : ''}
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
@@ -14340,8 +14403,13 @@ function renderArbitragePanel() {
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <span class="flow-route-label">Corridor:</span>
                                     <span class="flow-route-title">${trade.routeName}</span>
+                                <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
+                                    ${mkCables.map(cable => {
+                                        const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
+                                        const pvHours1Indexed = trade.hourlyDetails.filter(hd => hd.hour >= 8 && hd.hour <= 16).map(hd => hd.hour + 1).sort((a,b)=>a-b);
+                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${pvHours1Indexed.join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${pvHours1Indexed.length} PV peak hours">🧮 ${formattedCable} Calculator</button>`;
+                                    }).join(' ')}
                                 </div>
-                                ${primaryMkCable ? `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryMkCable}', '${targetDate}', ${trade.hourlyDetails[0]?.hour ?? 11})" title="Open 60-day Cable Calculator for ${primaryMkCable}">🧮 ${primaryMkCable} Cable Calculator</button>` : ''}
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
@@ -16560,24 +16628,45 @@ function renderEUMapCountryDetail(dataKey, date) {
     }
 
     // ── Public Deep Link Function from Flow Cards in tab_analogues ───────────
-    window.openCableCalculatorForFlow = function(corridor, targetDate, hour0Indexed) {
+    // ── Public Deep Link Function from Flow Cards in tab_analogues ───────────
+    window.openCableCalculatorForFlow = function(corridor, targetDate, hoursArg) {
         if (typeof openTab === 'function') {
             openTab(null, 'CableCalculator');
         }
 
         buildCorridorAdjacency();
 
-        if (corridor && corridor.includes('-')) {
-            const parts = corridor.split('-');
-            currentOutArea = parts[0];
-            currentInArea = parts[1];
+        if (corridor) {
+            // Strip any spaces e.g. "MK - GR" -> "MK-GR"
+            const cleanCorridor = corridor.replace(/\s+/g, '');
+            if (cleanCorridor.includes('-')) {
+                const parts = cleanCorridor.split('-');
+                currentOutArea = parts[0];
+                currentInArea = parts[1];
+
+                // Ensure corridor graph registers this pair
+                if (!corridorAdj[currentOutArea]) corridorAdj[currentOutArea] = [];
+                if (!corridorAdj[currentOutArea].includes(currentInArea)) {
+                    corridorAdj[currentOutArea].push(currentInArea);
+                }
+            }
         }
 
         const targetDateInput = document.getElementById("calc_target_date");
         if (targetDate && targetDateInput) targetDateInput.value = targetDate;
 
-        if (typeof hour0Indexed === 'number' && hour0Indexed >= 0 && hour0Indexed < 24) {
-            selectedHoursSet = new Set([hour0Indexed + 1]);
+        // Parse hours: can be an array of hours (1-indexed or 0-indexed), a single hour, or undefined
+        if (Array.isArray(hoursArg) && hoursArg.length > 0) {
+            const parsed = hoursArg.map(h => parseInt(h)).filter(h => h >= 1 && h <= 24);
+            selectedHoursSet = parsed.length > 0 ? new Set(parsed) : new Set(Array.from({length: 24}, (_, i) => i + 1));
+        } else if (typeof hoursArg === 'number') {
+            if (hoursArg >= 0 && hoursArg < 24) {
+                selectedHoursSet = new Set([hoursArg + 1]);
+            } else if (hoursArg >= 1 && hoursArg <= 24) {
+                selectedHoursSet = new Set([hoursArg]);
+            } else {
+                selectedHoursSet = new Set(Array.from({length: 24}, (_, i) => i + 1));
+            }
         } else {
             selectedHoursSet = new Set(Array.from({length: 24}, (_, i) => i + 1));
         }
