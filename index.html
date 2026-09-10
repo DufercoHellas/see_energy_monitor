@@ -13592,11 +13592,6 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-price" style="padding:7px 12px;text-align:right;">${res.pEnd.toFixed(2)} €</td>
                                 <td class="flow-cell-gross" style="padding:7px 12px;text-align:right;">${res.grossSpread.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:7px 12px;text-align:right;">${res.transitCost.toFixed(2)} €</td>
-                                <td class="flow-cell-max-bid" style="padding:6px 10px;text-align:right;">
-                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryCable}', '${targetDate}', ${res.hour})" title="Open 60-Day Cable Calculator for ${primaryCable || 'corridor'} Hour ${res.hour+1}">
-                                        <span style="font-size:11.5px;">🧮 Bid Calc</span>
-                                    </button>
-                                </td>
                                 <td style="padding:7px 12px;font-weight:800;color:${mCol};text-align:right;">${res.netMargin.toFixed(2)} €</td>
                                 <td style="padding:7px 12px;text-align:right;">${realizedCell}</td>
                                 <td style="padding:7px 12px;">${outagePart}</td>
@@ -13611,10 +13606,13 @@ function renderArbitragePanel() {
 
                         allDetailTablesHtml += `
                         <div id="${cid}_corridor_${ci}" style="display:${ci===0?'block':'none'};">
-                            <div class="flow-route-info-bar" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 0 6px 0;">
-                                <span class="flow-route-label">Route:</span>
-                                ${fullPathBadges}
-                                <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
+                            <div class="flow-route-info-bar" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:8px 0 6px 0;">
+                                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                    <span class="flow-route-label">Route:</span>
+                                    ${fullPathBadges}
+                                    <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
+                                </div>
+                                ${primaryCable ? `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryCable}', '${targetDate}', ${cor.hours[0]?.hour ?? 19})" title="Open 60-day Cable Calculator for ${primaryCable}">🧮 ${primaryCable} Cable Calculator</button>` : ''}
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
@@ -13624,7 +13622,6 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
-                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Open 60-Day Cable Auction Calculator to evaluate clearing prices and win probabilities">Cable Bid Calc 🧮</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                         <th style="padding:6px 12px;">Outages</th>
@@ -13836,11 +13833,6 @@ function renderArbitragePanel() {
                                 <td class="flow-cell-price" style="padding:6px 12px;text-align:right;">${hd.pEnd.toFixed(2)} €</td>
                                 <td class="flow-cell-gross" style="padding:6px 12px;text-align:right;">${hd.gross.toFixed(2)} €</td>
                                 <td class="flow-cell-cap" style="padding:6px 12px;text-align:right;">${hd.cable.toFixed(2)} €</td>
-                                <td class="flow-cell-max-bid" style="padding:6px 10px;text-align:right;">
-                                    <button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryMkCable}', '${targetDate}', ${hd.hour})" title="Open 60-Day Cable Calculator for ${primaryMkCable || 'corridor'} Hour ${hd.hour+1}">
-                                        <span style="font-size:11.5px;">🧮 Bid Calc</span>
-                                    </button>
-                                </td>
                                 <td style="padding:6px 12px;font-weight:800;color:${mCol};text-align:right;">${hd.net.toFixed(2)} €</td>
                                 <td style="padding:6px 12px;text-align:right;">${realizedCell}</td>
                             </tr>`;
@@ -13848,9 +13840,12 @@ function renderArbitragePanel() {
 
                         const detailTableHtml = `
                         <div id="mk_card_${ti}_details" style="display:none;margin-top:12px;padding-top:10px;" class="flow-route-info-bar">
-                            <div style="font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:4px;">
-                                <span class="flow-route-label">Corridor:</span>
-                                <span class="flow-route-title">${trade.routeName}</span>
+                            <div style="font-size:11px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:4px;flex-wrap:wrap;">
+                                <div style="display:flex;align-items:center;gap:4px;">
+                                    <span class="flow-route-label">Corridor:</span>
+                                    <span class="flow-route-title">${trade.routeName}</span>
+                                </div>
+                                ${primaryMkCable ? `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${primaryMkCable}', '${targetDate}', ${trade.hourlyDetails[0]?.hour ?? 11})" title="Open 60-day Cable Calculator for ${primaryMkCable}">🧮 ${primaryMkCable} Cable Calculator</button>` : ''}
                             </div>
                             <table class="flow-detail-table">
                                 <thead>
@@ -13860,7 +13855,6 @@ function renderArbitragePanel() {
                                         <th style="padding:6px 12px;text-align:right;">Sell (${trade.end})</th>
                                         <th style="padding:6px 12px;text-align:right;">Gross</th>
                                         <th class="flow-th-cap" style="padding:6px 12px;text-align:right;">Cap. Cost</th>
-                                        <th class="flow-th-max-bid" style="padding:6px 12px;text-align:right;" title="Open 60-Day Cable Auction Calculator to evaluate clearing prices and win probabilities">Cable Bid Calc 🧮</th>
                                         <th class="flow-th-margin" style="padding:6px 12px;text-align:right;">Net Margin</th>
                                         <th class="flow-th-realized" style="padding:6px 12px;text-align:right;">Realized</th>
                                     </tr>
