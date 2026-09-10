@@ -2019,11 +2019,14 @@ body.dark-mode .calc-active-route-pill {
     font-weight: 800;
     font-size: 12px;
     font-family: 'Inter', sans-serif;
-    padding: 3px 8px;
+    padding: 3px 10px;
     cursor: pointer;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
     transition: all 0.15s ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
@@ -2053,20 +2056,37 @@ body.dark-mode .btn-cable-calc-link:hover {
     background: #ffffff;
     border: 1.5px solid #c7d2fe;
     border-radius: 8px;
-    padding: 7px 13px;
+    padding: 4px 14px;
     color: #4338ca;
-    font-size: 12px;
-    font-weight: 800;
     font-family: 'Inter', sans-serif;
     cursor: pointer;
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
     transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
     white-space: nowrap;
     text-transform: none;
-    letter-spacing: 0.2px;
+}
+
+.btn-calc-pill .btn-calc-pill-corridor {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-align: center;
+    display: block;
+}
+
+.btn-calc-pill .btn-calc-pill-label {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.85;
+    text-align: center;
+    display: block;
+    margin-top: 1px;
 }
 
 .btn-calc-pill:hover {
@@ -14043,7 +14063,10 @@ function renderArbitragePanel() {
                     const activeFlowHours1Indexed = allHours.map(h => h.hour + 1).sort((a,b) => a - b);
                     const cableButtonsHtml = cardRouteCables.map(cable => {
                         const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
-                        return `<button type="button" class="btn-calc-pill" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${activeFlowHours1Indexed.join(',')}])" title="Open Cable Calculator for ${formattedCable} with the ${activeFlowHours1Indexed.length} flow hours">🧮 ${formattedCable} Calculator</button>`;
+                        return `<button type="button" class="btn-calc-pill" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${activeFlowHours1Indexed.join(',')}])" title="Open Cable Calculator for ${formattedCable} with the ${activeFlowHours1Indexed.length} flow hours">
+                            <span class="btn-calc-pill-corridor">${formattedCable}</span>
+                            <span class="btn-calc-pill-label">Calculator</span>
+                        </button>`;
                     }).join('');
 
                     const pillsHtml = `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
@@ -14135,10 +14158,14 @@ function renderArbitragePanel() {
                                     <span class="flow-route-label">Route:</span>
                                     ${fullPathBadges}
                                     <span class="flow-route-subtext">(${cor.hours.length} active hours)</span>
+                                </div>
                                 <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
                                     ${routeCables.map(cable => {
                                         const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
-                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${cor.hours.map(h => h.hour + 1).sort((a,b)=>a-b).join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${cor.hours.length} active hours">🧮 ${formattedCable} Calculator</button>`;
+                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${cor.hours.map(h => h.hour + 1).sort((a,b)=>a-b).join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${cor.hours.length} active hours">
+                                            <span style="font-weight:800;font-size:11.5px;line-height:1.2;display:block;text-align:center;">${formattedCable}</span>
+                                            <span style="font-size:9.5px;font-weight:600;opacity:0.85;line-height:1.2;display:block;text-align:center;">Calculator</span>
+                                        </button>`;
                                     }).join(' ')}
                                 </div>
                             </div>
@@ -14166,7 +14193,7 @@ function renderArbitragePanel() {
                     const cardAccent = startIsEU ? '#3b82f6' : '#ef4444';
 
                     cardsHtml += `
-                    <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
+                    <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid ${cardAccent};">
                         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
                             <div style="display:flex;align-items:center;gap:6px;">${headerBadges}</div>
                             <span style="font-size:10px;font-weight:600;color:#94a3b8;letter-spacing:0.05em;text-transform:uppercase;">Optimal Flow Route</span>
@@ -14372,11 +14399,15 @@ function renderArbitragePanel() {
                                 <div style="display:flex;align-items:center;gap:4px;">
                                     <span class="flow-route-label">Corridor:</span>
                                     <span class="flow-route-title">${trade.routeName}</span>
+                                </div>
                                 <div style="display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;">
                                     ${mkCables.map(cable => {
                                         const formattedCable = cable.includes('-') ? cable.replace('-', ' - ') : cable;
                                         const pvHours1Indexed = trade.hourlyDetails.filter(hd => hd.hour >= 8 && hd.hour <= 16).map(hd => hd.hour + 1).sort((a,b)=>a-b);
-                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${pvHours1Indexed.join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${pvHours1Indexed.length} PV peak hours">🧮 ${formattedCable} Calculator</button>`;
+                                        return `<button type="button" class="btn-cable-calc-link" onclick="openCableCalculatorForFlow('${cable}', '${targetDate}', [${pvHours1Indexed.join(',')}])" title="Open 60-day Cable Calculator for ${formattedCable} with ${pvHours1Indexed.length} PV peak hours">
+                                            <span style="font-weight:800;font-size:11.5px;line-height:1.2;display:block;text-align:center;">${formattedCable}</span>
+                                            <span style="font-size:9.5px;font-weight:600;opacity:0.85;line-height:1.2;display:block;text-align:center;">Calculator</span>
+                                        </button>`;
                                     }).join(' ')}
                                 </div>
                             </div>
@@ -14399,7 +14430,7 @@ function renderArbitragePanel() {
                         const toggleBtnHtml = `<button onclick="toggleDetail('mk_card_${ti}_details');const t=this;setTimeout(()=>{t.textContent=document.getElementById('mk_card_${ti}_details').style.display==='none'?'📊 Show hour details':'📊 Hide details';},50);" style="width:100%;margin-top:12px;padding:10px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:10px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,0.3);transition:box-shadow 0.15s,transform 0.1s;" onmouseover="this.style.boxShadow='0 4px 14px rgba(99,102,241,0.45)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(99,102,241,0.3)'" onmousedown="this.style.transform='scale(0.98)'" onmouseup="this.style.transform='scale(1)'">📊 Show hour details</button>`;
 
                         mkHtml += `
-                        <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid #f59e0b;">
+                        <div style="background:${isDarkMode() ? '#1e293b' : '#fff'};border:1px solid ${isDarkMode() ? '#334155' : '#e2e8f0'};border-radius:12px;padding:16px 20px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,0.05);border-left:5px solid #f59e0b;">
                             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-wrap:wrap;gap:8px;">
                                 <div style="display:flex;align-items:center;gap:6px;">${routeBadges} ${cbamBadge}</div>
                                 <div style="font-size:16px;font-weight:800;color:${avgColor};">${avgPvMargin.toFixed(2)} <span style="font-size:11px;font-weight:600;color:${isDarkMode() ? '#94a3b8' : '#64748b'};">€ avg PV</span></div>
