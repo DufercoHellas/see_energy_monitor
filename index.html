@@ -2109,7 +2109,31 @@ body.dark-mode .btn-calc-pill:hover {
     color: #ffffff;
 }
 
-/* Quick Wiggle Room Button (+5 €) */
+/* Quick Wiggle Room Button (+5 €) & Badge */
+.calc-wiggle-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: var(--bg-card-subtle);
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1.2;
+    transition: all 0.15s ease;
+}
+
+.calc-wiggle-badge.active {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #059669;
+}
+
+body.dark-mode .calc-wiggle-badge.active {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.45);
+    color: #34d399;
+}
+
 .btn-wiggle-quick {
     background: rgba(79, 70, 229, 0.08);
     border: 1px solid rgba(79, 70, 229, 0.3);
@@ -2132,6 +2156,19 @@ body.dark-mode .btn-calc-pill:hover {
     transform: translateY(-1px);
 }
 
+.btn-wiggle-quick.secondary {
+    background: var(--bg-card-subtle);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+}
+
+.btn-wiggle-quick.secondary:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
 body.dark-mode .btn-wiggle-quick {
     background: rgba(99, 102, 241, 0.15);
     border-color: rgba(99, 102, 241, 0.4);
@@ -2140,6 +2177,18 @@ body.dark-mode .btn-wiggle-quick {
 
 body.dark-mode .btn-wiggle-quick:hover {
     background: #6366f1;
+    color: #ffffff;
+}
+
+body.dark-mode .btn-wiggle-quick.secondary {
+    background: #1e293b;
+    border-color: #334155;
+    color: #94a3b8;
+}
+
+body.dark-mode .btn-wiggle-quick.secondary:hover {
+    background: #ef4444;
+    border-color: #ef4444;
     color: #ffffff;
 }
 
@@ -3167,9 +3216,15 @@ body.dark-mode .btn-wiggle-quick:hover {
                     <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin: 0;">
                         Proposed Cable Bid (€/MWh)
                     </label>
-                    <button type="button" class="btn-wiggle-quick" onclick="addWiggleRoom(5)" title="Add +5.00 € safety margin to proposed bid">
-                        +5 € Wiggle
-                    </button>
+                    <div style="display: inline-flex; align-items: center; gap: 4px;">
+                        <span id="calc_wiggle_badge" class="calc-wiggle-badge" title="Active wiggle room buffer added to proposed bid">Wiggle: 0 €</span>
+                        <button type="button" class="btn-wiggle-quick" onclick="pumpWiggleRoom(5)" title="Pump proposed bid by +5.00 €">
+                            +5 € Pump
+                        </button>
+                        <button type="button" class="btn-wiggle-quick secondary" onclick="pumpWiggleRoom(-5)" title="Reduce proposed bid by 5.00 €">
+                            -5 €
+                        </button>
+                    </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 6px;">
                     <div style="position: relative; flex: 1;">
@@ -15429,6 +15484,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     
     let currentOutArea = 'ME';
     let currentInArea = 'IT';
+    let currentWiggleRoom = 0.0;
 
     // Country Flag and Name Metadata
     const countryLabels = {
@@ -15609,8 +15665,14 @@ function renderEUMapCountryDetail(dataKey, date) {
             if (inCont) inCont.classList.remove("open");
         }
 
+        // Reset wiggle room to 0 on corridor switch
+        currentWiggleRoom = 0.0;
+        const bidInput = document.getElementById("calc_proposed_bid_input");
+        if (bidInput) bidInput.value = '';
+
         renderJaoDropdowns();
         refreshCableCalculator();
+        updateWiggleUI();
     };
 
     window.swapCorridorAreas = function() {
@@ -15624,8 +15686,14 @@ function renderEUMapCountryDetail(dataKey, date) {
             currentInArea = corridorAdj[currentInArea][0];
         }
 
+        // Reset wiggle room to 0 on corridor swap
+        currentWiggleRoom = 0.0;
+        const bidInput = document.getElementById("calc_proposed_bid_input");
+        if (bidInput) bidInput.value = '';
+
         renderJaoDropdowns();
         refreshCableCalculator();
+        updateWiggleUI();
     };
 
     // ── Multi-Hour Delivery Picker Handlers ──────────────────────────────────
@@ -16004,10 +16072,10 @@ function renderEUMapCountryDetail(dataKey, date) {
             }
         }
 
-        // Set default proposed bid to P75 + 5.00 € wiggle room if empty or 0
+        // Set default proposed bid to P75 + current wiggle room (starts at 0)
         if (activeStat && (!proposedBidInput.value || parseFloat(proposedBidInput.value) === 0)) {
             const baseBid = activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50;
-            proposedBidInput.value = (baseBid + 5.0).toFixed(2);
+            proposedBidInput.value = (baseBid + currentWiggleRoom).toFixed(2);
         }
 
         // Check Outages
@@ -16202,19 +16270,20 @@ function renderEUMapCountryDetail(dataKey, date) {
         const bidInput = document.getElementById("calc_proposed_bid_input");
         const slider = document.getElementById("calc_bid_slider");
 
-        let targetBid = 0.0;
+        let baseBid = 0.0;
         if (preset === 'free') {
-            targetBid = 0.0;
+            baseBid = 0.0;
         } else if (preset === 'p50') {
-            targetBid = activeStat.p50 + 5.0;
+            baseBid = activeStat.p50;
         } else if (preset === 'p75') {
-            targetBid = activeStat.p75 + 5.0;
+            baseBid = activeStat.p75;
         } else if (preset === 'p90') {
-            targetBid = activeStat.p90 + 5.0;
+            baseBid = activeStat.p90;
         } else if (preset === 'max') {
-            targetBid = activeStat.max + 5.0;
+            baseBid = activeStat.max;
         }
 
+        const targetBid = Math.max(0, baseBid + currentWiggleRoom);
         if (bidInput) bidInput.value = targetBid.toFixed(2);
         if (slider) slider.value = targetBid;
 
@@ -16227,13 +16296,15 @@ function renderEUMapCountryDetail(dataKey, date) {
         updateSimulatorKPIs();
         render24HourHorizonChart();
         render24HourMatrixTable();
+        updateWiggleUI();
     };
 
-    // ── Add / Adjust Wiggle Room (e.g. +5.00 € buffer) ────────────────────────
-    window.addWiggleRoom = function(delta = 5.0) {
+    // ── Pump / Adjust Wiggle Room (e.g. +5.00 € buffer) ───────────────────────
+    window.pumpWiggleRoom = function(delta = 5.0) {
         const bidInput = document.getElementById("calc_proposed_bid_input");
         const slider = document.getElementById("calc_bid_slider");
         if (bidInput) {
+            currentWiggleRoom = Math.max(0, currentWiggleRoom + delta);
             const current = parseFloat(bidInput.value) || 0;
             const next = Math.max(0, current + delta);
             bidInput.value = next.toFixed(2);
@@ -16241,8 +16312,23 @@ function renderEUMapCountryDetail(dataKey, date) {
             updateSimulatorKPIs();
             render24HourHorizonChart();
             render24HourMatrixTable();
+            updateWiggleUI();
         }
     };
+    window.addWiggleRoom = window.pumpWiggleRoom;
+
+    function updateWiggleUI() {
+        const badge = document.getElementById("calc_wiggle_badge");
+        if (badge) {
+            if (currentWiggleRoom > 0) {
+                badge.textContent = `Wiggle: +${currentWiggleRoom.toFixed(0)} €`;
+                badge.className = "calc-wiggle-badge active";
+            } else {
+                badge.textContent = `Wiggle: 0 €`;
+                badge.className = "calc-wiggle-badge";
+            }
+        }
+    }
 
     // ── "📋 Copy Bids" for Excel Vertical Column ─────────────────────────────
     window.copyBidsToClipboard = function() {
@@ -16361,11 +16447,13 @@ function renderEUMapCountryDetail(dataKey, date) {
     };
 
     window.resetCalculatorDefaults = function() {
+        currentWiggleRoom = 0.0;
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (bidInput) bidInput.value = '';
         selectedHoursSet = new Set(Array.from({length: 24}, (_, i) => i + 1));
         renderHourPicker();
         refreshCableCalculator();
+        updateWiggleUI();
     };
 
     // ── Select Specific Hour from Matrix Table ───────────────────────────────
@@ -16377,7 +16465,7 @@ function renderEUMapCountryDetail(dataKey, date) {
         const bidInput = document.getElementById("calc_proposed_bid_input");
         if (activeStat && bidInput) {
             const baseBid = activeStat.p75 > 0 ? activeStat.p75 : activeStat.p50;
-            bidInput.value = (baseBid + 5.0).toFixed(2);
+            bidInput.value = (baseBid + currentWiggleRoom).toFixed(2);
         }
 
         refreshCableCalculator();
@@ -16641,10 +16729,16 @@ function renderEUMapCountryDetail(dataKey, date) {
             selectedHoursSet = new Set(Array.from({length: 24}, (_, i) => i + 1));
         }
 
+        // Reset wiggle room to 0 on corridor open from flow
+        currentWiggleRoom = 0.0;
+        const bidInput = document.getElementById("calc_proposed_bid_input");
+        if (bidInput) bidInput.value = '';
+
         renderJaoDropdowns();
         renderHourPicker();
         refreshCableCalculator();
         setBidPreset('p75');
+        updateWiggleUI();
 
         const tabEl = document.getElementById("CableCalculator");
         if (tabEl) {
