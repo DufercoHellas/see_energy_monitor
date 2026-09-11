@@ -15245,44 +15245,39 @@ function drawPlotlyEUMap(selectedDate) {
                         data: { type: 'FeatureCollection', features: features }
                     });
                 }
-                if (!mbMap.getLayer('cable-hit-layer')) {
+                if (!mbMap.getLayer('cable-outline')) {
                     mbMap.addLayer({
-                        id: 'cable-hit-layer',
+                        id: 'cable-outline',
                         type: 'line',
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': '#00e5ff',
-                            'line-width': 20,
-                            'line-opacity': 0
+                            'line-color': '#ffffff',
+                            'line-width': 14,
+                            'line-opacity': dark ? 0.7 : 0.85
                         }
                     });
                 }
-                if (!mbMap.getLayer('cable-glow-layer')) {
+                if (!mbMap.getLayer('cable-core')) {
                     mbMap.addLayer({
-                        id: 'cable-glow-layer',
+                        id: 'cable-core',
                         type: 'line',
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': '#00bcd4',
-                            'line-width': 10,
-                            'line-opacity': 0.35
+                            'line-color': '#00c8ff',
+                            'line-width': 6,
+                            'line-opacity': 1
                         }
                     });
                 }
-                if (!mbMap.getLayer('cable-core-layer')) {
+                if (!mbMap.getLayer('cable-hit')) {
                     mbMap.addLayer({
-                        id: 'cable-core-layer',
+                        id: 'cable-hit',
                         type: 'line',
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: {
-                            'line-color': '#00e5ff',
-                            'line-width': 4,
-                            'line-opacity': 0.95,
-                            'line-dasharray': [8, 8]
-                        }
+                        paint: { 'line-width': 28, 'line-opacity': 0 }
                     });
                 }
                 function handleCableClick(e) {
@@ -15293,27 +15288,13 @@ function drawPlotlyEUMap(selectedDate) {
                         renderEUMapCableDetail(feature.properties.corridor_code);
                     }
                 }
-                mbMap.on('click', 'cable-hit-layer', handleCableClick);
-                mbMap.on('click', 'cable-core-layer', handleCableClick);
-                mbMap.on('mouseenter', 'cable-hit-layer', function() {
+                mbMap.on('click', 'cable-hit', handleCableClick);
+                mbMap.on('mouseenter', 'cable-hit', function() {
                     mbMap.getCanvas().style.cursor = 'pointer';
                 });
-                mbMap.on('mouseleave', 'cable-hit-layer', function() {
+                mbMap.on('mouseleave', 'cable-hit', function() {
                     mbMap.getCanvas().style.cursor = '';
                 });
-                if (!window._cableAnimId) {
-                    let dashOff = 0;
-                    window._cableAnimId = setInterval(function() {
-                        dashOff = (dashOff + 1) % 16;
-                        if (mbMap.getLayer('cable-core-layer')) {
-                            mbMap.setPaintProperty('cable-core-layer', 'line-dasharray', [8, 8, dashOff]);
-                        }
-                        if (mbMap.getLayer('cable-glow-layer')) {
-                            var pulse = 0.25 + 0.15 * Math.sin(Date.now() / 600);
-                            mbMap.setPaintProperty('cable-glow-layer', 'line-opacity', pulse);
-                        }
-                    }, 50);
-                }
             }
 
             if (mbMap.isStyleLoaded()) {
@@ -15573,183 +15554,119 @@ function renderEUMapCableDetail(corridorCode, date) {
 
     const route = EU_MAP_CABLE_ROUTES[corridorCode];
     const cableName = route ? route.name : corridorCode;
+    const parts = corridorCode.split('-');
+    const dark = isDarkMode();
 
     const cData = window.cablesData || (typeof cablesData !== 'undefined' ? cablesData : []);
-    const dayCable = cData.filter(d => d.trade_date === date && d.corridor_code === corridorCode);
-
     const oData = window.cableOutagesData || (typeof cableOutagesData !== 'undefined' ? cableOutagesData : []);
-    const dayOutages = oData.filter(d => d.trade_date === date && d.corridor_code === corridorCode);
 
-    const [yr, mo, dy] = date.split('-');
+    const [yr, mo] = date.split('-');
+    const yearPrefix = yr;
+    const monthPrefix = yr + '-' + mo;
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const dateStr = `${dy} ${months[parseInt(mo)-1]} ${yr}`;
-    const dark = isDarkMode();
+    const monthName = months[parseInt(mo) - 1];
+
+    const corridorData = cData.filter(d => d.corridor_code === corridorCode);
+    const monthData = corridorData.filter(d => d.trade_date && d.trade_date.startsWith(monthPrefix));
+    const yearData = corridorData.filter(d => d.trade_date && d.trade_date.startsWith(yearPrefix));
+
+    function avgPrice(records) {
+        let sum = 0, count = 0;
+        records.forEach(d => { const p = parseFloat(d.price); if (!isNaN(p) && p > 0) { sum += p; count++; } });
+        return count > 0 ? sum / count : null;
+    }
+
+    const monthAvg = avgPrice(monthData);
+    const yearAvg = avgPrice(yearData);
+
+    const corridorOutages = oData.filter(d => d.corridor_code === corridorCode);
+    const recentOutages = corridorOutages.slice().sort((a, b) => b.trade_date.localeCompare(a.trade_date)).slice(0, 10);
 
     const placeholder = document.getElementById('eumap_detail_placeholder');
     const content = document.getElementById('eumap_detail_content');
     placeholder.style.display = 'none';
     content.style.display = 'block';
+    document.getElementById('eumap_hourly_chart').innerHTML = '';
 
-    let avgPrice = 0, totalOffered = 0, totalAllocated = 0, priceCount = 0;
-    dayCable.forEach(d => {
-        const p = parseFloat(d.price);
-        if (!isNaN(p) && p > 0) { avgPrice += p; priceCount++; }
-        totalOffered += parseFloat(d.offered_capacity) || 0;
-        totalAllocated += parseFloat(d.allocated_capacity) || 0;
-    });
-    if (priceCount > 0) avgPrice /= priceCount;
-    const curtailed = Math.max(0, totalOffered - totalAllocated);
-    const utilPct = totalOffered > 0 ? (totalAllocated / totalOffered * 100) : 0;
-
-    const parts = corridorCode.split('-');
-    const fromFlag = parts[0], toFlag = parts[1];
-
-    const cableBg = dark ? '#172554' : '#eff6ff';
-    const cableBorder = dark ? '#1e40af' : '#bfdbfe';
-    const cableColor = dark ? '#60a5fa' : '#1d4ed8';
-
-    const utilBg = dark ? '#052e16' : '#f0fdf4';
-    const utilBorder = dark ? '#14532d' : '#bbf7d0';
-    const utilColor = dark ? '#4ade80' : '#15803d';
-
-    const curtBg = dark ? '#451a03' : '#fff7ed';
-    const curtBorder = dark ? '#7c2d12' : '#fed7aa';
-    const curtColor = dark ? '#fb923c' : '#c2410c';
-
-    let headerHtml = `
+    document.getElementById('eumap_detail_header').innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
             <div>
                 <div style="display:flex;align-items:center;gap:8px;">
                     <span style="font-size:18px;font-weight:800;color:var(--text-primary);">${cableName}</span>
                     <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${corridorCode}</span>
                 </div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${fromFlag} → ${toFlag} &bull; ${dateStr}</div>
-            </div>
-            <div style="background:linear-gradient(135deg,#00bcd4,#00e5ff);color:white;border-radius:10px;padding:8px 14px;text-align:center;box-shadow:0 2px 8px rgba(0,188,212,0.3);">
-                <div style="font-size:10px;font-weight:600;opacity:0.85;letter-spacing:0.5px;">AVG PRICE</div>
-                <div style="font-size:18px;font-weight:800;">${avgPrice.toFixed(1)} <span style="font-size:11px;">&euro;/MWh</span></div>
+                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${parts[0]} \u2192 ${parts[1]} Interconnector</div>
             </div>
         </div>`;
 
-    document.getElementById('eumap_detail_header').innerHTML = headerHtml;
+    const mBg = dark ? '#172554' : '#eff6ff';
+    const mBorder = dark ? '#1e40af' : '#bfdbfe';
+    const mColor = dark ? '#60a5fa' : '#1d4ed8';
 
-    let statsHtml = '';
+    const yBg = dark ? '#052e16' : '#f0fdf4';
+    const yBorder = dark ? '#14532d' : '#bbf7d0';
+    const yColor = dark ? '#4ade80' : '#15803d';
 
-    if (dayCable.length === 0 && dayOutages.length === 0) {
-        statsHtml = `
-            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;color:var(--text-muted);text-align:center;">
-                <span style="font-size:48px;">🔌</span>
-                <div>
-                    <div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:4px;">No data for ${corridorCode}</div>
-                    <div style="font-size:12px;">Auction data for this interconnector is not yet available.<br>Check back after the pipeline fetches the latest records.</div>
-                </div>
+    const oBg = dark ? '#451a03' : '#fff7ed';
+    const oBorder = dark ? '#7c2d12' : '#fed7aa';
+    const oColor = dark ? '#fb923c' : '#c2410c';
+
+    let statsHtml = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div style="background:${mBg};border:1px solid ${mBorder};border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;font-weight:700;color:${mColor};letter-spacing:0.5px;margin-bottom:4px;">MONTHLY AVG</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">${monthName} ${yr}</div>
+                <div style="font-size:22px;font-weight:800;color:${mColor};">${monthAvg !== null ? monthAvg.toFixed(2) : '\u2014'}</div>
+                <div style="font-size:10px;color:var(--text-muted);">\u20ac/MWh</div>
+            </div>
+            <div style="background:${yBg};border:1px solid ${yBorder};border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;font-weight:700;color:${yColor};letter-spacing:0.5px;margin-bottom:4px;">YEARLY AVG</div>
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">${yr}</div>
+                <div style="font-size:22px;font-weight:800;color:${yColor};">${yearAvg !== null ? yearAvg.toFixed(2) : '\u2014'}</div>
+                <div style="font-size:10px;color:var(--text-muted);">\u20ac/MWh</div>
+            </div>
+        </div>`;
+
+    statsHtml += `
+        <div style="background:${oBg};border:1px solid ${oBorder};border-radius:10px;padding:14px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <div style="font-size:12px;font-weight:800;color:${oColor};letter-spacing:0.3px;">\u26A0\uFE0F OUTAGES</div>
+                <div style="font-size:11px;font-weight:700;color:${oColor};background:${dark ? 'rgba(251,146,60,0.15)' : 'rgba(194,65,18,0.1)'};border-radius:12px;padding:2px 8px;">${recentOutages.length} record${recentOutages.length !== 1 ? 's' : ''}</div>
             </div>`;
-        document.getElementById('eumap_hourly_stats').innerHTML = statsHtml;
-        document.getElementById('eumap_hourly_chart').innerHTML = '';
-        return;
-    }
 
-    statsHtml = `
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-            <div style="background:${cableBg};border:1px solid ${cableBorder};border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:${dark ? '#93c5fd' : '#2563eb'};letter-spacing:0.4px;">OFFERED</div>
-                <div style="font-size:15px;font-weight:800;color:${cableColor};">${totalOffered.toFixed(0)}</div>
-                <div style="font-size:10px;color:var(--text-muted);">MW</div>
-            </div>
-            <div style="background:${utilBg};border:1px solid ${utilBorder};border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:${dark ? '#86efac' : '#16a34a'};letter-spacing:0.4px;">ALLOCATED</div>
-                <div style="font-size:15px;font-weight:800;color:${utilColor};">${totalAllocated.toFixed(0)}</div>
-                <div style="font-size:10px;color:var(--text-muted);">${utilPct.toFixed(0)}% util</div>
-            </div>
-            <div style="background:${curtBg};border:1px solid ${curtBorder};border-radius:8px;padding:8px;text-align:center;">
-                <div style="font-size:10px;font-weight:600;color:${dark ? '#fdba74' : '#c2410c'};letter-spacing:0.4px;">CURTAILED</div>
-                <div style="font-size:15px;font-weight:800;color:${curtColor};">${curtailed.toFixed(0)}</div>
-                <div style="font-size:10px;color:var(--text-muted);">MW</div>
-            </div>
-        </div>`;
-
-    if (dayOutages.length > 0) {
-        const outageBg = dark ? '#451a03' : '#fff7ed';
-        const outageBorder = dark ? '#7c2d12' : '#fed7aa';
-        const reasons = [...new Set(dayOutages.map(o => o.reason).filter(Boolean))];
-        const totalOrig = dayOutages.reduce((s, o) => s + (parseFloat(o.original_capacity) || 0), 0);
-        const totalRemain = dayOutages.reduce((s, o) => s + (parseFloat(o.remaining_capacity) || 0), 0);
-        const lostCap = totalOrig - totalRemain;
-        const affectedHours = dayOutages.length;
-
+    if (recentOutages.length === 0) {
         statsHtml += `
-            <div style="background:${outageBg};border:1px solid ${outageBorder};border-radius:8px;padding:10px;margin-bottom:12px;">
-                <div style="font-size:11px;font-weight:700;color:${dark ? '#fb923c' : '#c2410c'};margin-bottom:6px;">
-                    ⚠️ Outage${dayOutages.length > 1 ? 's' : ''} &mdash; ${affectedHours}h affected
-                </div>
-                <div style="font-size:12px;color:var(--text-secondary);">
-                    Capacity lost: <b>${lostCap.toFixed(0)} MW</b>
-                    ${reasons.length > 0 ? `<br>Reason: ${reasons.join(', ')}` : ''}
-                </div>
+            <div style="text-align:center;padding:16px 0;color:var(--text-muted);font-size:12px;font-weight:600;">
+                No outages recorded for this corridor
             </div>`;
-    }
-
-    document.getElementById('eumap_hourly_stats').innerHTML = statsHtml;
-
-    if (dayCable.length > 0) {
-        const hours = dayCable.map(d => parseInt(d.position));
-        const prices = dayCable.map(d => parseFloat(d.price) || 0);
-        const offered = dayCable.map(d => parseFloat(d.offered_capacity) || 0);
-        const allocated = dayCable.map(d => parseFloat(d.allocated_capacity) || 0);
-        const hourLabels = hours.map(h => `${String(h).padStart(2,'0')}:00`);
-
-        const chartLayout = getPlotlyThemeLayout({
-            margin: { t: 10, b: 60, l: 50, r: 50 },
-            showlegend: true,
-            legend: { x: 0, y: 1.12, orientation: 'h', font: { size: 10 } },
-            xaxis: { tickfont: { size: 9 }, tickangle: -45 },
-            yaxis: {
-                title: { text: '\u20ac/MWh', font: { size: 10 } },
-                tickfont: { size: 10 },
-                zeroline: false
-            },
-            yaxis2: {
-                title: { text: 'MW', font: { size: 10 } },
-                tickfont: { size: 10 },
-                overlaying: 'y',
-                side: 'right',
-                zeroline: false
-            }
-        });
-
-        Plotly.newPlot('eumap_hourly_chart', [{
-            type: 'bar',
-            x: hourLabels,
-            y: offered,
-            name: 'Offered',
-            marker: { color: dark ? 'rgba(96,165,250,0.3)' : 'rgba(59,130,246,0.2)', line: { color: dark ? '#60a5fa' : '#3b82f6', width: 0.5 } },
-            hovertemplate: '<b>%{x}</b><br>Offered: %{y} MW<extra></extra>',
-            yaxis: 'y2'
-        }, {
-            type: 'bar',
-            x: hourLabels,
-            y: allocated,
-            name: 'Allocated',
-            marker: { color: dark ? 'rgba(74,222,128,0.4)' : 'rgba(34,197,94,0.3)', line: { color: dark ? '#4ade80' : '#22c55e', width: 0.5 } },
-            hovertemplate: '<b>%{x}</b><br>Allocated: %{y} MW<extra></extra>',
-            yaxis: 'y2'
-        }, {
-            type: 'scatter',
-            mode: 'lines+markers',
-            x: hourLabels,
-            y: prices,
-            name: 'Price',
-            line: { color: '#00e5ff', width: 2.5 },
-            marker: { size: 5, color: '#00e5ff' },
-            hovertemplate: '<b>%{x}</b><br>Price: %{y:.2f} \u20ac/MWh<extra></extra>'
-        }], chartLayout, { displayModeBar: false, responsive: true });
     } else {
-        document.getElementById('eumap_hourly_chart').innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;height:200px;flex-direction:column;gap:8px;color:var(--text-muted);">
-                <span style="font-size:32px;">🔌</span>
-                <span style="font-size:13px;font-weight:600;">No auction data for this date</span>
-            </div>`;
+        statsHtml += '<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">';
+        recentOutages.forEach(function(o) {
+            const oDate = o.trade_date || '';
+            const oPos = o.position ? 'Hr ' + String(parseInt(o.position)).padStart(2, '0') : '';
+            const origCap = parseFloat(o.original_capacity) || 0;
+            const remCap = parseFloat(o.remaining_capacity) || 0;
+            const lost = origCap - remCap;
+            const reason = o.reason || 'Unknown';
+            const dateParts = oDate.split('-');
+            const dateLabel = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}` : oDate;
+
+            statsHtml += `
+                <div style="background:${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'};border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:11px;font-weight:700;color:var(--text-secondary);">${dateLabel} ${oPos}</div>
+                        <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${reason}</div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                        <div style="font-size:12px;font-weight:800;color:${oColor};">-${lost.toFixed(0)} MW</div>
+                    </div>
+                </div>`;
+        });
+        statsHtml += '</div>';
     }
+
+    statsHtml += '</div>';
+    document.getElementById('eumap_hourly_stats').innerHTML = statsHtml;
 }
 
 // ── Initialisation ─────────────────────────────────────────────────────────
