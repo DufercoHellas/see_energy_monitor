@@ -15245,16 +15245,16 @@ function drawPlotlyEUMap(selectedDate) {
                         data: { type: 'FeatureCollection', features: features }
                     });
                 }
-                if (!mbMap.getLayer('cable-outline')) {
+                if (!mbMap.getLayer('cable-shadow')) {
                     mbMap.addLayer({
-                        id: 'cable-outline',
+                        id: 'cable-shadow',
                         type: 'line',
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': '#ffffff',
-                            'line-width': 14,
-                            'line-opacity': dark ? 0.7 : 0.85
+                            'line-color': dark ? '#1e1b4b' : '#312e81',
+                            'line-width': 10,
+                            'line-opacity': dark ? 0.6 : 0.18
                         }
                     });
                 }
@@ -15265,9 +15265,9 @@ function drawPlotlyEUMap(selectedDate) {
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': '#00c8ff',
-                            'line-width': 6,
-                            'line-opacity': 1
+                            'line-color': dark ? '#a78bfa' : '#7c3aed',
+                            'line-width': 3.5,
+                            'line-opacity': 0.9
                         }
                     });
                 }
@@ -15277,7 +15277,7 @@ function drawPlotlyEUMap(selectedDate) {
                         type: 'line',
                         source: 'cable-routes-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-width': 28, 'line-opacity': 0 }
+                        paint: { 'line-width': 24, 'line-opacity': 0 }
                     });
                 }
                 function handleCableClick(e) {
@@ -15566,8 +15566,11 @@ function renderEUMapCableDetail(corridorCode, date) {
     const latestYearly = latestPrice(yearlyRecords);
     const latestMonthly = latestPrice(monthlyRecords);
 
-    const corridorOutages = oData.filter(d => d.corridor_code === corridorCode);
-    const recentOutages = corridorOutages.slice().sort((a, b) => b.trade_date.localeCompare(a.trade_date)).slice(0, 10);
+    const dateInput = document.getElementById('eumap_date');
+    const selectedDate = dateInput ? dateInput.value : null;
+
+    const corridorOutages = oData.filter(d => d.corridor_code === corridorCode && (!selectedDate || d.trade_date >= selectedDate));
+    const recentOutages = corridorOutages.slice().sort((a, b) => a.trade_date.localeCompare(b.trade_date)).slice(0, 10);
 
     const placeholder = document.getElementById('eumap_detail_placeholder');
     const content = document.getElementById('eumap_detail_content');
@@ -15586,9 +15589,9 @@ function renderEUMapCableDetail(corridorCode, date) {
             </div>
         </div>`;
 
-    const mBg = dark ? '#172554' : '#eff6ff';
-    const mBorder = dark ? '#1e40af' : '#bfdbfe';
-    const mColor = dark ? '#60a5fa' : '#1d4ed8';
+    const mBg = dark ? '#1e1b4b' : '#ede9fe';
+    const mBorder = dark ? '#3730a3' : '#c4b5fd';
+    const mColor = dark ? '#a78bfa' : '#6d28d9';
 
     const yBg = dark ? '#052e16' : '#f0fdf4';
     const yBorder = dark ? '#14532d' : '#bbf7d0';
