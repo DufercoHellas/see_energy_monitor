@@ -15245,6 +15245,19 @@ function drawPlotlyEUMap(selectedDate) {
                         data: { type: 'FeatureCollection', features: features }
                     });
                 }
+                if (!mbMap.getLayer('cable-hit-layer')) {
+                    mbMap.addLayer({
+                        id: 'cable-hit-layer',
+                        type: 'line',
+                        source: 'cable-routes-src',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: {
+                            'line-color': '#00e5ff',
+                            'line-width': 20,
+                            'line-opacity': 0
+                        }
+                    });
+                }
                 if (!mbMap.getLayer('cable-glow-layer')) {
                     mbMap.addLayer({
                         id: 'cable-glow-layer',
@@ -15253,8 +15266,8 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
                             'line-color': '#00bcd4',
-                            'line-width': 7,
-                            'line-opacity': 0.3
+                            'line-width': 10,
+                            'line-opacity': 0.35
                         }
                     });
                 }
@@ -15266,35 +15279,37 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
                             'line-color': '#00e5ff',
-                            'line-width': 2.8,
+                            'line-width': 4,
                             'line-opacity': 0.95,
-                            'line-dasharray': [6, 6]
+                            'line-dasharray': [8, 8]
                         }
                     });
                 }
-                mbMap.on('click', 'cable-core-layer', function(e) {
+                function handleCableClick(e) {
                     const feature = e.features[0];
                     if (feature && feature.properties.corridor_code) {
                         window._suppressCountryClick = true;
                         setTimeout(function() { window._suppressCountryClick = false; }, 300);
                         renderEUMapCableDetail(feature.properties.corridor_code);
                     }
-                });
-                mbMap.on('mouseenter', 'cable-core-layer', function() {
+                }
+                mbMap.on('click', 'cable-hit-layer', handleCableClick);
+                mbMap.on('click', 'cable-core-layer', handleCableClick);
+                mbMap.on('mouseenter', 'cable-hit-layer', function() {
                     mbMap.getCanvas().style.cursor = 'pointer';
                 });
-                mbMap.on('mouseleave', 'cable-core-layer', function() {
+                mbMap.on('mouseleave', 'cable-hit-layer', function() {
                     mbMap.getCanvas().style.cursor = '';
                 });
                 if (!window._cableAnimId) {
                     let dashOff = 0;
                     window._cableAnimId = setInterval(function() {
-                        dashOff = (dashOff + 1) % 12;
+                        dashOff = (dashOff + 1) % 16;
                         if (mbMap.getLayer('cable-core-layer')) {
-                            mbMap.setPaintProperty('cable-core-layer', 'line-dasharray', [6, 6, dashOff]);
+                            mbMap.setPaintProperty('cable-core-layer', 'line-dasharray', [8, 8, dashOff]);
                         }
                         if (mbMap.getLayer('cable-glow-layer')) {
-                            var pulse = 0.2 + 0.15 * Math.sin(Date.now() / 600);
+                            var pulse = 0.25 + 0.15 * Math.sin(Date.now() / 600);
                             mbMap.setPaintProperty('cable-glow-layer', 'line-opacity', pulse);
                         }
                     }, 50);
@@ -15618,7 +15633,23 @@ function renderEUMapCableDetail(corridorCode, date) {
 
     document.getElementById('eumap_detail_header').innerHTML = headerHtml;
 
-    let statsHtml = `
+    let statsHtml = '';
+
+    if (dayCable.length === 0 && dayOutages.length === 0) {
+        statsHtml = `
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;color:var(--text-muted);text-align:center;">
+                <span style="font-size:48px;">🔌</span>
+                <div>
+                    <div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:4px;">No data for ${corridorCode}</div>
+                    <div style="font-size:12px;">Auction data for this interconnector is not yet available.<br>Check back after the pipeline fetches the latest records.</div>
+                </div>
+            </div>`;
+        document.getElementById('eumap_hourly_stats').innerHTML = statsHtml;
+        document.getElementById('eumap_hourly_chart').innerHTML = '';
+        return;
+    }
+
+    statsHtml = `
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
             <div style="background:${cableBg};border:1px solid ${cableBorder};border-radius:8px;padding:8px;text-align:center;">
                 <div style="font-size:10px;font-weight:600;color:${dark ? '#93c5fd' : '#2563eb'};letter-spacing:0.4px;">OFFERED</div>
