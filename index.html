@@ -15004,19 +15004,19 @@ function renderEUMap() {
 const EU_MAP_CABLE_ROUTES = {
     'FR-IT': {
         name: 'SACOI',
-        coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [8.0, 41.9], [9.0, 42.5], [9.5, 43.5], [10.0, 44.3]]
+        coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [8.0, 41.9], [9.0, 42.5], [9.5, 43.5], [10.2, 44.8], [10.8, 45.6]]
     },
     'AT-IT': {
         name: 'San Pietro',
-        coords: [[11.4, 47.3], [11.8, 46.9], [12.1, 46.7], [12.4, 46.3], [12.5, 45.8]]
+        coords: [[11.4, 47.3], [11.8, 46.9], [12.1, 46.7], [12.4, 46.3], [12.5, 45.8], [12.5, 45.3]]
     },
     'SI-IT': {
         name: 'Vodice',
-        coords: [[14.5, 45.5], [14.1, 45.7], [13.6, 45.7], [13.1, 45.8], [12.6, 45.9]]
+        coords: [[14.5, 45.5], [14.1, 45.7], [13.6, 45.7], [13.1, 45.8], [12.8, 45.5], [12.3, 45.1]]
     },
     'GR-IT': {
         name: 'Poseidon',
-        coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.0, 40.4], [16.0, 40.5], [15.0, 40.3], [14.5, 40.5]]
+        coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.0, 40.4], [16.0, 40.5], [15.5, 40.2], [15.0, 39.8]]
     },
     'ME-IT': {
         name: 'Monita'
@@ -15237,42 +15237,86 @@ function drawPlotlyEUMap(selectedDate) {
             }
 
             function initCableLayers() {
-                if (!mbMap.getSource('cable-routes-src')) {
-                    const features = Object.entries(EU_MAP_CABLE_ROUTES)
-                        .filter(([code, route]) => route.coords && route.coords.length >= 2)
-                        .map(([code, route]) => ({
-                            type: 'Feature',
-                            properties: { corridor_code: code, name: route.name },
-                            geometry: { type: 'LineString', coordinates: route.coords }
-                        }));
-                    mbMap.addSource('cable-routes-src', {
+                var lineFeatures = [];
+                var arrowFeatures = [];
+                Object.entries(EU_MAP_CABLE_ROUTES).forEach(function(entry) {
+                    var code = entry[0], route = entry[1];
+                    if (!route.coords || route.coords.length < 2) return;
+                    lineFeatures.push({
+                        type: 'Feature',
+                        properties: { corridor_code: code, name: route.name },
+                        geometry: { type: 'LineString', coordinates: route.coords }
+                    });
+                    var c = route.coords, n = c.length;
+                    var dx = c[n-1][0] - c[n-2][0];
+                    var dy = c[n-1][1] - c[n-2][1];
+                    var bearing = Math.atan2(dx, dy) * (180 / Math.PI);
+                    arrowFeatures.push({
+                        type: 'Feature',
+                        properties: { corridor_code: code, bearing: bearing },
+                        geometry: { type: 'Point', coordinates: c[n-1] }
+                    });
+                });
+
+                if (!mbMap.getSource('cable-src')) {
+                    mbMap.addSource('cable-src', {
                         type: 'geojson',
-                        data: { type: 'FeatureCollection', features: features }
+                        data: { type: 'FeatureCollection', features: lineFeatures }
                     });
                 }
-                if (!mbMap.getLayer('cable-shadow')) {
+                if (!mbMap.getSource('cable-arrows-src')) {
+                    mbMap.addSource('cable-arrows-src', {
+                        type: 'geojson',
+                        data: { type: 'FeatureCollection', features: arrowFeatures }
+                    });
+                }
+
+                if (!mbMap.hasImage('cable-arrow-icon')) {
+                    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">'
+                        + '<path d="M8 20 L0 5 L8 9 L16 5 Z" fill="' + (dark ? '#60a5fa' : '#2563eb') + '" stroke="white" stroke-width="1.2"/>'
+                        + '</svg>';
+                    var img = new Image(16, 20);
+                    img.onload = function() {
+                        if (!mbMap.hasImage('cable-arrow-icon')) mbMap.addImage('cable-arrow-icon', img);
+                    };
+                    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+                }
+
+                if (!mbMap.getLayer('cable-outline')) {
                     mbMap.addLayer({
-                        id: 'cable-shadow',
+                        id: 'cable-outline',
                         type: 'line',
-                        source: 'cable-routes-src',
+                        source: 'cable-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': dark ? '#1e1b4b' : '#312e81',
-                            'line-width': 10,
-                            'line-opacity': dark ? 0.6 : 0.18
+                            'line-color': dark ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)',
+                            'line-width': 7
                         }
                     });
                 }
-                if (!mbMap.getLayer('cable-core')) {
+                if (!mbMap.getLayer('cable-line')) {
                     mbMap.addLayer({
-                        id: 'cable-core',
+                        id: 'cable-line',
                         type: 'line',
-                        source: 'cable-routes-src',
+                        source: 'cable-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
-                            'line-color': dark ? '#a78bfa' : '#7c3aed',
-                            'line-width': 3.5,
-                            'line-opacity': 0.9
+                            'line-color': dark ? '#60a5fa' : '#2563eb',
+                            'line-width': 3
+                        }
+                    });
+                }
+                if (!mbMap.getLayer('cable-arrow-layer')) {
+                    mbMap.addLayer({
+                        id: 'cable-arrow-layer',
+                        type: 'symbol',
+                        source: 'cable-arrows-src',
+                        layout: {
+                            'icon-image': 'cable-arrow-icon',
+                            'icon-rotate': ['get', 'bearing'],
+                            'icon-size': 0.9,
+                            'icon-allow-overlap': true,
+                            'icon-ignore-placement': true
                         }
                     });
                 }
@@ -15280,26 +15324,24 @@ function drawPlotlyEUMap(selectedDate) {
                     mbMap.addLayer({
                         id: 'cable-hit',
                         type: 'line',
-                        source: 'cable-routes-src',
+                        source: 'cable-src',
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-width': 24, 'line-opacity': 0 }
+                        paint: { 'line-width': 22, 'line-opacity': 0 }
                     });
                 }
+
                 function handleCableClick(e) {
-                    const feature = e.features[0];
-                    if (feature && feature.properties.corridor_code) {
+                    var feature = e.features[0];
+                    if (feature && feature.properties && feature.properties.corridor_code) {
                         window._suppressCountryClick = true;
                         setTimeout(function() { window._suppressCountryClick = false; }, 300);
                         renderEUMapCableDetail(feature.properties.corridor_code);
                     }
                 }
                 mbMap.on('click', 'cable-hit', handleCableClick);
-                mbMap.on('mouseenter', 'cable-hit', function() {
-                    mbMap.getCanvas().style.cursor = 'pointer';
-                });
-                mbMap.on('mouseleave', 'cable-hit', function() {
-                    mbMap.getCanvas().style.cursor = '';
-                });
+                mbMap.on('click', 'cable-line', handleCableClick);
+                mbMap.on('mouseenter', 'cable-hit', function() { mbMap.getCanvas().style.cursor = 'pointer'; });
+                mbMap.on('mouseleave', 'cable-hit', function() { mbMap.getCanvas().style.cursor = ''; });
             }
 
             if (mbMap.isStyleLoaded()) {
@@ -15590,9 +15632,9 @@ function renderEUMapCableDetail(corridorCode, date) {
             <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${corridorCode}</span>
         </div>`;
 
-    const mBg = dark ? '#1e1b4b' : '#ede9fe';
-    const mBorder = dark ? '#3730a3' : '#c4b5fd';
-    const mColor = dark ? '#a78bfa' : '#6d28d9';
+    const mBg = dark ? '#172554' : '#eff6ff';
+    const mBorder = dark ? '#1e40af' : '#bfdbfe';
+    const mColor = dark ? '#60a5fa' : '#2563eb';
 
     const yBg = dark ? '#052e16' : '#f0fdf4';
     const yBorder = dark ? '#14532d' : '#bbf7d0';
