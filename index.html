@@ -15003,20 +15003,20 @@ function renderEUMap() {
 // ── Cable Route Coordinates (multi-point LineStrings) ──────────────────
 const EU_MAP_CABLE_ROUTES = {
     'FR-IT': {
-        name: 'SACOI',
-        coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [7.5, 43.0], [8.0, 43.8], [8.5, 44.5], [9.0, 45.0], [9.5, 45.2]]
+        name: 'Savoie\u2013Piemonte',
+        coords: [[6.4, 45.5], [6.8, 45.3], [7.0, 45.1], [7.3, 44.95]]
     },
     'AT-IT': {
-        name: 'San Pietro',
-        coords: [[11.4, 47.3], [11.6, 47.0], [11.3, 46.6], [11.0, 46.2], [11.2, 45.8], [11.5, 45.5]]
+        name: 'Passo Resia',
+        coords: [[10.5, 46.9], [10.55, 46.8], [10.6, 46.7]]
     },
     'SI-IT': {
-        name: 'Vodice',
-        coords: [[14.5, 45.5], [14.1, 45.7], [13.6, 45.7], [13.2, 45.6], [13.5, 45.4], [13.8, 45.1]]
+        name: 'Redipuglia\u2013Vrtojba',
+        coords: [[13.6, 45.83], [13.55, 45.81], [13.5, 45.79]]
     },
     'GR-IT': {
-        name: 'Poseidon',
-        coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.5, 40.0], [16.8, 39.5], [16.5, 39.0], [16.3, 38.5]]
+        name: 'HVDC Italy\u2013Greece',
+        coords: [[20.8, 39.2], [20.0, 39.5], [19.2, 39.8], [18.5, 40.1], [18.2, 40.2]]
     },
     'ME-IT': {
         name: 'Monita'
@@ -15273,7 +15273,7 @@ function drawPlotlyEUMap(selectedDate) {
 
                 if (!mbMap.hasImage('cable-arrow-icon')) {
                     var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">'
-                        + '<path d="M8 0 L0 15 L8 11 L16 15 Z" fill="' + (dark ? '#60a5fa' : '#2563eb') + '" stroke="white" stroke-width="1.2"/>'
+                        + '<path d="M8 0 L0 15 L8 11 L16 15 Z" fill="' + (dark ? '#60a5fa' : '#2563eb') + '"/>'
                         + '</svg>';
                     var img = new Image(16, 20);
                     img.onload = function() {
