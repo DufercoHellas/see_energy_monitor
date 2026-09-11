@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-11 05:30:52",
+  "timestamp": "2026-09-11 06:30:51",
   "today": "2026-09-11",
   "tomorrow": "2026-09-12",
   "is_after_dam_cutoff": false,
@@ -2443,20 +2443,20 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 34365,
-    "unique_mrids": 13186,
-    "active_now": 1003,
+    "total_records": 34679,
+    "unique_mrids": 13265,
+    "active_now": 1051,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
-        "records": 153,
-        "active_now": 40,
-        "active_unavailable_mw": 6872.0
+        "records": 154,
+        "active_now": 41,
+        "active_unavailable_mw": 7066.0
       },
       "HU": {
-        "records": 3469,
-        "active_now": 65,
-        "active_unavailable_mw": 10924.3
+        "records": 3493,
+        "active_now": 80,
+        "active_unavailable_mw": 11253.9
       },
       "BG": {
         "records": 120,
@@ -2464,39 +2464,39 @@
         "active_unavailable_mw": 3426.0
       },
       "GR": {
-        "records": 5255,
-        "active_now": 41,
-        "active_unavailable_mw": 14855.0
+        "records": 5262,
+        "active_now": 43,
+        "active_unavailable_mw": 15298.0
       },
       "DE_LU": {
-        "records": 9925,
-        "active_now": 174,
-        "active_unavailable_mw": 44796.4
+        "records": 9985,
+        "active_now": 181,
+        "active_unavailable_mw": 46032.9
       },
       "FR": {
-        "records": 4732,
-        "active_now": 320,
-        "active_unavailable_mw": 107394.1
+        "records": 4785,
+        "active_now": 331,
+        "active_unavailable_mw": 115666.1
       },
       "IT": {
-        "records": 4551,
-        "active_now": 192,
-        "active_unavailable_mw": 56106.0
+        "records": 4576,
+        "active_now": 198,
+        "active_unavailable_mw": 57159.0
       },
       "RS": {
-        "records": 198,
+        "records": 202,
         "active_now": 22,
         "active_unavailable_mw": 3624.0
       },
       "CZ": {
-        "records": 2748,
-        "active_now": 30,
-        "active_unavailable_mw": 5387.0
+        "records": 2773,
+        "active_now": 34,
+        "active_unavailable_mw": 5997.0
       },
       "SK": {
-        "records": 699,
-        "active_now": 32,
-        "active_unavailable_mw": 3916.8
+        "records": 718,
+        "active_now": 33,
+        "active_unavailable_mw": 4039.2
       },
       "SI": {
         "records": 31,
@@ -2504,12 +2504,12 @@
         "active_unavailable_mw": 3234.0
       },
       "CH": {
-        "records": 1199,
-        "active_now": 21,
-        "active_unavailable_mw": 4405.0
+        "records": 1259,
+        "active_now": 22,
+        "active_unavailable_mw": 4715.0
       },
       "BE": {
-        "records": 1143,
+        "records": 1179,
         "active_now": 25,
         "active_unavailable_mw": 13257.1
       },
