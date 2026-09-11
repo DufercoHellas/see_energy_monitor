@@ -15003,20 +15003,23 @@ function renderEUMap() {
 // ── Cable Route Coordinates (multi-point LineStrings) ──────────────────
 const EU_MAP_CABLE_ROUTES = {
     'FR-IT': {
-        name: 'France \u2013 Italy',
+        name: 'SACOI',
         coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [8.0, 41.9], [9.0, 42.5], [9.5, 43.5], [10.0, 44.3]]
     },
     'AT-IT': {
-        name: 'Austria \u2013 Italy',
+        name: 'San Pietro',
         coords: [[11.4, 47.3], [11.8, 46.9], [12.1, 46.7], [12.4, 46.3], [12.5, 45.8]]
     },
     'SI-IT': {
-        name: 'Slovenia \u2013 Italy',
+        name: 'Vodice',
         coords: [[14.5, 45.5], [14.1, 45.7], [13.6, 45.7], [13.1, 45.8], [12.6, 45.9]]
     },
     'GR-IT': {
-        name: 'Greece \u2013 Italy',
+        name: 'Poseidon',
         coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.0, 40.4], [16.0, 40.5], [15.0, 40.3], [14.5, 40.5]]
+    },
+    'ME-IT': {
+        name: 'Monita'
     }
 };
 
@@ -15410,6 +15413,7 @@ function renderEUMapCountryDetail(dataKey, date) {
     const content     = document.getElementById('eumap_detail_content');
     placeholder.style.display = 'none';
     content.style.display = 'block';
+    document.getElementById('eumap_hourly_chart').style.display = 'block';
 
     const [yr, mo, dy] = date.split('-');
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -15576,17 +15580,12 @@ function renderEUMapCableDetail(corridorCode, date) {
     const content = document.getElementById('eumap_detail_content');
     placeholder.style.display = 'none';
     content.style.display = 'block';
-    document.getElementById('eumap_hourly_chart').innerHTML = '';
+    document.getElementById('eumap_hourly_chart').style.display = 'none';
 
     document.getElementById('eumap_detail_header').innerHTML = `
-        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-            <div>
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span style="font-size:18px;font-weight:800;color:var(--text-primary);">${cableName}</span>
-                    <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${corridorCode}</span>
-                </div>
-                <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${parts[0]} \u2192 ${parts[1]} Interconnector</div>
-            </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:18px;font-weight:800;color:var(--text-primary);">${cableName}</span>
+            <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${corridorCode}</span>
         </div>`;
 
     const mBg = dark ? '#1e1b4b' : '#ede9fe';
