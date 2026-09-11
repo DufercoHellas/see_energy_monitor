@@ -15238,11 +15238,13 @@ function drawPlotlyEUMap(selectedDate) {
 
             function initCableLayers() {
                 if (!mbMap.getSource('cable-routes-src')) {
-                    const features = Object.entries(EU_MAP_CABLE_ROUTES).map(([code, route]) => ({
-                        type: 'Feature',
-                        properties: { corridor_code: code, name: route.name },
-                        geometry: { type: 'LineString', coordinates: route.coords }
-                    }));
+                    const features = Object.entries(EU_MAP_CABLE_ROUTES)
+                        .filter(([code, route]) => route.coords && route.coords.length >= 2)
+                        .map(([code, route]) => ({
+                            type: 'Feature',
+                            properties: { corridor_code: code, name: route.name },
+                            geometry: { type: 'LineString', coordinates: route.coords }
+                        }));
                     mbMap.addSource('cable-routes-src', {
                         type: 'geojson',
                         data: { type: 'FeatureCollection', features: features }
