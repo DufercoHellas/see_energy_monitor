@@ -15290,7 +15290,7 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
                             'line-color': dark ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)',
-                            'line-width': 7
+                            'line-width': 21
                         }
                     });
                 }
@@ -15302,7 +15302,7 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: { 'line-join': 'round', 'line-cap': 'round' },
                         paint: {
                             'line-color': dark ? '#60a5fa' : '#2563eb',
-                            'line-width': 3
+                            'line-width': 9
                         }
                     });
                 }
@@ -15314,7 +15314,7 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: {
                             'icon-image': 'cable-arrow-icon',
                             'icon-rotate': ['get', 'bearing'],
-                            'icon-size': 0.9,
+                            'icon-size': 1.5,
                             'icon-allow-overlap': true,
                             'icon-ignore-placement': true
                         }
