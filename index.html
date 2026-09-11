@@ -15546,38 +15546,25 @@ function renderEUMapCountryDetail(dataKey, date) {
 // ── Cable Detail Panel ────────────────────────────────────────────────────
 
 function renderEUMapCableDetail(corridorCode, date) {
-    if (!date) {
-        const dateInput = document.getElementById('eumap_date');
-        date = dateInput ? dateInput.value : null;
-    }
-    if (!date) return;
-
     const route = EU_MAP_CABLE_ROUTES[corridorCode];
     const cableName = route ? route.name : corridorCode;
     const parts = corridorCode.split('-');
     const dark = isDarkMode();
 
-    const cData = window.cablesData || (typeof cablesData !== 'undefined' ? cablesData : []);
+    const longData = window.cablesLongData || (typeof cablesLongData !== 'undefined' ? cablesLongData : []);
     const oData = window.cableOutagesData || (typeof cableOutagesData !== 'undefined' ? cableOutagesData : []);
 
-    const [yr, mo] = date.split('-');
-    const yearPrefix = yr;
-    const monthPrefix = yr + '-' + mo;
-    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const monthName = months[parseInt(mo) - 1];
+    const corridorLong = longData.filter(d => d.corridor_code === corridorCode);
+    const yearlyRecords = corridorLong.filter(d => d.product === 'Yearly');
+    const monthlyRecords = corridorLong.filter(d => d.product === 'Monthly');
 
-    const corridorData = cData.filter(d => d.corridor_code === corridorCode);
-    const monthData = corridorData.filter(d => d.trade_date && d.trade_date.startsWith(monthPrefix));
-    const yearData = corridorData.filter(d => d.trade_date && d.trade_date.startsWith(yearPrefix));
-
-    function avgPrice(records) {
-        let sum = 0, count = 0;
-        records.forEach(d => { const p = parseFloat(d.price); if (!isNaN(p) && p > 0) { sum += p; count++; } });
-        return count > 0 ? sum / count : null;
+    function latestPrice(records) {
+        const withPrice = records.filter(d => parseFloat(d.price) > 0).sort((a, b) => (b.start_date || '').localeCompare(a.start_date || ''));
+        return withPrice.length > 0 ? withPrice[0] : null;
     }
 
-    const monthAvg = avgPrice(monthData);
-    const yearAvg = avgPrice(yearData);
+    const latestYearly = latestPrice(yearlyRecords);
+    const latestMonthly = latestPrice(monthlyRecords);
 
     const corridorOutages = oData.filter(d => d.corridor_code === corridorCode);
     const recentOutages = corridorOutages.slice().sort((a, b) => b.trade_date.localeCompare(a.trade_date)).slice(0, 10);
@@ -15611,20 +15598,31 @@ function renderEUMapCableDetail(corridorCode, date) {
     const oBorder = dark ? '#7c2d12' : '#fed7aa';
     const oColor = dark ? '#fb923c' : '#c2410c';
 
+    function fmtDate(d) {
+        if (!d) return '';
+        const p = d.split(' ')[0].split('-');
+        return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0].slice(2) : d;
+    }
+
+    function productCard(label, rec, bg, border, color) {
+        const price = rec ? parseFloat(rec.price) : null;
+        const offered = rec ? parseFloat(rec.offered_capacity) || 0 : 0;
+        const allocated = rec ? parseFloat(rec.allocated_capacity) || 0 : 0;
+        const period = rec ? fmtDate(rec.start_date) + ' \u2013 ' + fmtDate(rec.end_date) : '';
+        return `
+            <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:14px;text-align:center;">
+                <div style="font-size:10px;font-weight:700;color:${color};letter-spacing:0.5px;margin-bottom:6px;">${label}</div>
+                <div style="font-size:26px;font-weight:800;color:${color};">${price && price > 0 ? price.toFixed(2) : '\u2014'}</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">\u20ac/MWh</div>
+                ${rec ? `<div style="font-size:10px;color:var(--text-muted);">${offered.toFixed(0)} MW offered &bull; ${allocated.toFixed(0)} MW allocated</div>` : ''}
+                ${period ? `<div style="font-size:9px;color:var(--text-muted);margin-top:3px;opacity:0.7;">${period}</div>` : ''}
+            </div>`;
+    }
+
     let statsHtml = `
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-            <div style="background:${mBg};border:1px solid ${mBorder};border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:10px;font-weight:700;color:${mColor};letter-spacing:0.5px;margin-bottom:4px;">MONTHLY AVG</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">${monthName} ${yr}</div>
-                <div style="font-size:22px;font-weight:800;color:${mColor};">${monthAvg !== null ? monthAvg.toFixed(2) : '\u2014'}</div>
-                <div style="font-size:10px;color:var(--text-muted);">\u20ac/MWh</div>
-            </div>
-            <div style="background:${yBg};border:1px solid ${yBorder};border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:10px;font-weight:700;color:${yColor};letter-spacing:0.5px;margin-bottom:4px;">YEARLY AVG</div>
-                <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">${yr}</div>
-                <div style="font-size:22px;font-weight:800;color:${yColor};">${yearAvg !== null ? yearAvg.toFixed(2) : '\u2014'}</div>
-                <div style="font-size:10px;color:var(--text-muted);">\u20ac/MWh</div>
-            </div>
+            ${productCard('MONTHLY', latestMonthly, mBg, mBorder, mColor)}
+            ${productCard('YEARLY', latestYearly, yBg, yBorder, yColor)}
         </div>`;
 
     statsHtml += `
