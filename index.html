@@ -15282,18 +15282,6 @@ function drawPlotlyEUMap(selectedDate) {
                     img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
                 }
 
-                if (!mbMap.getLayer('cable-outline')) {
-                    mbMap.addLayer({
-                        id: 'cable-outline',
-                        type: 'line',
-                        source: 'cable-src',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: {
-                            'line-color': dark ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)',
-                            'line-width': 21
-                        }
-                    });
-                }
                 if (!mbMap.getLayer('cable-line')) {
                     mbMap.addLayer({
                         id: 'cable-line',
