@@ -1,11 +1,11 @@
 {
-  "timestamp": "2026-09-11 06:30:51",
+  "timestamp": "2026-09-11 12:30:52",
   "today": "2026-09-11",
   "tomorrow": "2026-09-12",
   "is_after_dam_cutoff": false,
   "dam_cutoff_hour": 18,
-  "overall_status": "CRITICAL",
-  "overall_badge": "🔴",
+  "overall_status": "HEALTHY",
+  "overall_badge": "🟢",
   "summary": [],
   "spot_prices": {
     "matrix": {
@@ -781,10 +781,10 @@
           "description": "24 hrs"
         },
         "2026-09-11": {
-          "status": "missing",
-          "badge": "🔴",
-          "hours": 0,
-          "description": "Missing Today"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         },
         "2026-09-12": {
           "status": "pending",
@@ -936,9 +936,9 @@
       "2026-09-12"
     ],
     "summary": {
-      "complete_days": 127,
+      "complete_days": 128,
       "pending_days": 16,
-      "missing_days": 1,
+      "missing_days": 0,
       "partial_days": 0
     }
   },
@@ -2445,7 +2445,7 @@
     "status": "healthy",
     "total_records": 34679,
     "unique_mrids": 13265,
-    "active_now": 1051,
+    "active_now": 1061,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2465,23 +2465,23 @@
       },
       "GR": {
         "records": 5262,
-        "active_now": 43,
-        "active_unavailable_mw": 15298.0
+        "active_now": 44,
+        "active_unavailable_mw": 16156.0
       },
       "DE_LU": {
         "records": 9985,
-        "active_now": 181,
-        "active_unavailable_mw": 46032.9
+        "active_now": 179,
+        "active_unavailable_mw": 47339.4
       },
       "FR": {
         "records": 4785,
-        "active_now": 331,
-        "active_unavailable_mw": 115666.1
+        "active_now": 341,
+        "active_unavailable_mw": 117344.3
       },
       "IT": {
         "records": 4576,
-        "active_now": 198,
-        "active_unavailable_mw": 57159.0
+        "active_now": 199,
+        "active_unavailable_mw": 57131.0
       },
       "RS": {
         "records": 202,
@@ -2534,9 +2534,7 @@
     "days_lag": -1,
     "fetch_time": "2026-09-10 11:46:06"
   },
-  "issues_critical": [
-    "CRITICAL: Spot prices for MK TODAY (2026-09-11) are missing!"
-  ],
+  "issues_critical": [],
   "issues_warning": [],
   "issues_info": []
 }
