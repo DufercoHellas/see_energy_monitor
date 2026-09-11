@@ -3106,7 +3106,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
         <div id="eumap_detail_panel" style="flex: 1.2; min-width: 320px; background: white; border: 1px solid #e5e7eb; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
             <div id="eumap_detail_placeholder" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:400px; gap:12px; color:#94a3b8;">
                 <span style="font-size:48px;">&#128506;&#65039;</span>
-                <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country or cable on the map<br>to see its details</p>
+                <p style="font-size:14px; font-weight:600; text-align:center; margin:0; line-height:1.6;">Click a country on the map<br>to see its 24h price profile</p>
             </div>
             <div id="eumap_detail_content" style="display:none;">
                 <div id="eumap_detail_header" style="margin-bottom:14px;"></div>
@@ -15000,29 +15000,6 @@ function renderEUMap() {
     drawPlotlyEUMap(selectedDate);
 }
 
-// ── Cable Route Coordinates (multi-point LineStrings) ──────────────────
-const EU_MAP_CABLE_ROUTES = {
-    'FR-IT': {
-        name: 'Savoie\u2013Piemonte',
-        coords: [[4.83, 45.76], [5.5, 45.5], [6.5, 45.3], [7.5, 45.1], [8.5, 45.0], [9.5, 44.9], [10.33, 44.80]]
-    },
-    'AT-IT': {
-        name: 'Passo Resia',
-        coords: [[11.4, 47.27], [11.3, 46.8], [11.2, 46.3], [11.25, 45.8], [11.3, 45.3], [11.34, 44.49]]
-    },
-    'SI-IT': {
-        name: 'Redipuglia\u2013Vrtojba',
-        coords: [[14.5, 46.05], [14.0, 46.0], [13.5, 45.9], [13.0, 45.5], [12.8, 45.0], [12.6, 44.5], [12.5, 44.0], [12.39, 43.11]]
-    },
-    'GR-IT': {
-        name: 'HVDC Italy\u2013Greece',
-        coords: [[20.8, 39.2], [20.0, 39.5], [19.2, 39.8], [18.5, 40.1], [18.2, 40.2]]
-    },
-    'ME-IT': {
-        name: 'Monita'
-    }
-};
-
 // ── Choropleth Rendering ───────────────────────────────────────────────────
 
 // Build and render the Plotly choropleth map for a given date
@@ -15082,7 +15059,6 @@ function drawPlotlyEUMap(selectedDate) {
 
     // Exclude Nordic/Baltic zones from colour-scale anchoring to avoid dragging other prices into red
     const SCALE_EXCLUDE = new Set(['NO1','NO2','NO3','NO4','NO5','SE1','SE2','SE3','SE4','LT','LV','EE','FI','DK1','DK2']);
-
     const scalePrices = [];
     for (let i = 0; i < z.length; i++) {
         if (z[i] > 0 && !SCALE_EXCLUDE.has(customdata[i])) scalePrices.push(z[i]);
@@ -15236,110 +15212,10 @@ function drawPlotlyEUMap(selectedDate) {
                 }
             }
 
-            function initCableLayers() {
-                var lineFeatures = [];
-                var arrowFeatures = [];
-                Object.entries(EU_MAP_CABLE_ROUTES).forEach(function(entry) {
-                    var code = entry[0], route = entry[1];
-                    if (!route.coords || route.coords.length < 2) return;
-                    lineFeatures.push({
-                        type: 'Feature',
-                        properties: { corridor_code: code, name: route.name },
-                        geometry: { type: 'LineString', coordinates: route.coords }
-                    });
-                    var c = route.coords, n = c.length;
-                    var dx = c[n-1][0] - c[n-2][0];
-                    var dy = c[n-1][1] - c[n-2][1];
-                    var bearing = Math.atan2(dx, dy) * (180 / Math.PI);
-                    arrowFeatures.push({
-                        type: 'Feature',
-                        properties: { corridor_code: code, bearing: bearing },
-                        geometry: { type: 'Point', coordinates: c[n-1] }
-                    });
-                });
-
-                if (!mbMap.getSource('cable-src')) {
-                    mbMap.addSource('cable-src', {
-                        type: 'geojson',
-                        data: { type: 'FeatureCollection', features: lineFeatures }
-                    });
-                }
-                if (!mbMap.getSource('cable-arrows-src')) {
-                    mbMap.addSource('cable-arrows-src', {
-                        type: 'geojson',
-                        data: { type: 'FeatureCollection', features: arrowFeatures }
-                    });
-                }
-
-                if (!mbMap.hasImage('cable-arrow-icon')) {
-                    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" viewBox="0 0 16 20">'
-                        + '<path d="M8 0 L0 15 L8 11 L16 15 Z" fill="' + (dark ? '#60a5fa' : '#2563eb') + '"/>'
-                        + '</svg>';
-                    var img = new Image(16, 20);
-                    img.onload = function() {
-                        if (!mbMap.hasImage('cable-arrow-icon')) mbMap.addImage('cable-arrow-icon', img);
-                    };
-                    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
-                }
-
-                if (!mbMap.getLayer('cable-line')) {
-                    mbMap.addLayer({
-                        id: 'cable-line',
-                        type: 'line',
-                        source: 'cable-src',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: {
-                            'line-color': dark ? '#60a5fa' : '#2563eb',
-                            'line-width': 9
-                        }
-                    });
-                }
-                if (!mbMap.getLayer('cable-arrow-layer')) {
-                    mbMap.addLayer({
-                        id: 'cable-arrow-layer',
-                        type: 'symbol',
-                        source: 'cable-arrows-src',
-                        layout: {
-                            'icon-image': 'cable-arrow-icon',
-                            'icon-rotate': ['get', 'bearing'],
-                            'icon-size': 1.1,
-                            'icon-allow-overlap': true,
-                            'icon-ignore-placement': true
-                        }
-                    });
-                }
-                if (!mbMap.getLayer('cable-hit')) {
-                    mbMap.addLayer({
-                        id: 'cable-hit',
-                        type: 'line',
-                        source: 'cable-src',
-                        layout: { 'line-join': 'round', 'line-cap': 'round' },
-                        paint: { 'line-width': 22, 'line-opacity': 0 }
-                    });
-                }
-
-                function handleCableClick(e) {
-                    var feature = e.features[0];
-                    if (feature && feature.properties && feature.properties.corridor_code) {
-                        window._suppressCountryClick = true;
-                        setTimeout(function() { window._suppressCountryClick = false; }, 300);
-                        renderEUMapCableDetail(feature.properties.corridor_code);
-                    }
-                }
-                mbMap.on('click', 'cable-hit', handleCableClick);
-                mbMap.on('click', 'cable-line', handleCableClick);
-                mbMap.on('mouseenter', 'cable-hit', function() { mbMap.getCanvas().style.cursor = 'pointer'; });
-                mbMap.on('mouseleave', 'cable-hit', function() { mbMap.getCanvas().style.cursor = ''; });
-            }
-
             if (mbMap.isStyleLoaded()) {
                 initBorderHighlight();
-                initCableLayers();
             } else {
-                mbMap.once('styledata', function() {
-                    initBorderHighlight();
-                    initCableLayers();
-                });
+                mbMap.once('styledata', initBorderHighlight);
             }
         }
 
@@ -15392,7 +15268,6 @@ function drawPlotlyEUMap(selectedDate) {
         positionBadges();
 
         gd.on('plotly_click', function(data) {
-            if (window._suppressCountryClick) return;
             if (!data || !data.points || !data.points.length) return;
             const pt = data.points[0];
             const raw = pt.customdata || pt.location;
@@ -15445,7 +15320,6 @@ function renderEUMapCountryDetail(dataKey, date) {
     const content     = document.getElementById('eumap_detail_content');
     placeholder.style.display = 'none';
     content.style.display = 'block';
-    document.getElementById('eumap_hourly_chart').style.display = 'block';
 
     const [yr, mo, dy] = date.split('-');
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -15577,128 +15451,6 @@ function renderEUMapCountryDetail(dataKey, date) {
                 <div style="font-size:10px;color:var(--text-muted);">Hr ${String(peakHr).padStart(2,'0')}</div>
             </div>
         </div>`;
-}
-
-// ── Cable Detail Panel ────────────────────────────────────────────────────
-
-function renderEUMapCableDetail(corridorCode, date) {
-    const route = EU_MAP_CABLE_ROUTES[corridorCode];
-    const cableName = route ? route.name : corridorCode;
-    const parts = corridorCode.split('-');
-    const dark = isDarkMode();
-
-    const longData = window.cablesLongData || (typeof cablesLongData !== 'undefined' ? cablesLongData : []);
-    const oData = window.cableOutagesData || (typeof cableOutagesData !== 'undefined' ? cableOutagesData : []);
-
-    const corridorLong = longData.filter(d => d.corridor_code === corridorCode);
-    const yearlyRecords = corridorLong.filter(d => d.product === 'Yearly');
-    const monthlyRecords = corridorLong.filter(d => d.product === 'Monthly');
-
-    function latestPrice(records) {
-        const withPrice = records.filter(d => parseFloat(d.price) > 0).sort((a, b) => (b.start_date || '').localeCompare(a.start_date || ''));
-        return withPrice.length > 0 ? withPrice[0] : null;
-    }
-
-    const latestYearly = latestPrice(yearlyRecords);
-    const latestMonthly = latestPrice(monthlyRecords);
-
-    const dateInput = document.getElementById('eumap_date');
-    const selectedDate = dateInput ? dateInput.value : null;
-
-    const corridorOutages = oData.filter(d => d.corridor_code === corridorCode && (!selectedDate || d.trade_date >= selectedDate));
-    const recentOutages = corridorOutages.slice().sort((a, b) => a.trade_date.localeCompare(b.trade_date)).slice(0, 10);
-
-    const placeholder = document.getElementById('eumap_detail_placeholder');
-    const content = document.getElementById('eumap_detail_content');
-    placeholder.style.display = 'none';
-    content.style.display = 'block';
-    document.getElementById('eumap_hourly_chart').style.display = 'none';
-
-    document.getElementById('eumap_detail_header').innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:18px;font-weight:800;color:var(--text-primary);">${cableName}</span>
-            <span style="background:${dark ? '#312e81' : '#ede9fe'};color:${dark ? '#c7d2fe' : '#6d28d9'};border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;">${corridorCode}</span>
-        </div>`;
-
-    const mBg = dark ? '#172554' : '#eff6ff';
-    const mBorder = dark ? '#1e40af' : '#bfdbfe';
-    const mColor = dark ? '#60a5fa' : '#2563eb';
-
-    const yBg = dark ? '#052e16' : '#f0fdf4';
-    const yBorder = dark ? '#14532d' : '#bbf7d0';
-    const yColor = dark ? '#4ade80' : '#15803d';
-
-    const oBg = dark ? '#451a03' : '#fff7ed';
-    const oBorder = dark ? '#7c2d12' : '#fed7aa';
-    const oColor = dark ? '#fb923c' : '#c2410c';
-
-    function fmtDate(d) {
-        if (!d) return '';
-        const p = d.split(' ')[0].split('-');
-        return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0].slice(2) : d;
-    }
-
-    function productCard(label, rec, bg, border, color) {
-        const price = rec ? parseFloat(rec.price) : null;
-        const offered = rec ? parseFloat(rec.offered_capacity) || 0 : 0;
-        const allocated = rec ? parseFloat(rec.allocated_capacity) || 0 : 0;
-        const period = rec ? fmtDate(rec.start_date) + ' \u2013 ' + fmtDate(rec.end_date) : '';
-        return `
-            <div style="background:${bg};border:1px solid ${border};border-radius:10px;padding:14px;text-align:center;">
-                <div style="font-size:10px;font-weight:700;color:${color};letter-spacing:0.5px;margin-bottom:6px;">${label}</div>
-                <div style="font-size:26px;font-weight:800;color:${color};">${price && price > 0 ? price.toFixed(2) : '\u2014'}</div>
-                <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;">\u20ac/MWh</div>
-                ${rec ? `<div style="font-size:10px;color:var(--text-muted);">${offered.toFixed(0)} MW offered &bull; ${allocated.toFixed(0)} MW allocated</div>` : ''}
-                ${period ? `<div style="font-size:9px;color:var(--text-muted);margin-top:3px;opacity:0.7;">${period}</div>` : ''}
-            </div>`;
-    }
-
-    let statsHtml = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-            ${productCard('MONTHLY', latestMonthly, mBg, mBorder, mColor)}
-            ${productCard('YEARLY', latestYearly, yBg, yBorder, yColor)}
-        </div>`;
-
-    statsHtml += `
-        <div style="background:${oBg};border:1px solid ${oBorder};border-radius:10px;padding:14px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-                <div style="font-size:12px;font-weight:800;color:${oColor};letter-spacing:0.3px;">\u26A0\uFE0F OUTAGES</div>
-                <div style="font-size:11px;font-weight:700;color:${oColor};background:${dark ? 'rgba(251,146,60,0.15)' : 'rgba(194,65,18,0.1)'};border-radius:12px;padding:2px 8px;">${recentOutages.length} record${recentOutages.length !== 1 ? 's' : ''}</div>
-            </div>`;
-
-    if (recentOutages.length === 0) {
-        statsHtml += `
-            <div style="text-align:center;padding:16px 0;color:var(--text-muted);font-size:12px;font-weight:600;">
-                No outages recorded for this corridor
-            </div>`;
-    } else {
-        statsHtml += '<div style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;">';
-        recentOutages.forEach(function(o) {
-            const oDate = o.trade_date || '';
-            const oPos = o.position ? 'Hr ' + String(parseInt(o.position)).padStart(2, '0') : '';
-            const origCap = parseFloat(o.original_capacity) || 0;
-            const remCap = parseFloat(o.remaining_capacity) || 0;
-            const lost = origCap - remCap;
-            const reason = o.reason || 'Unknown';
-            const dateParts = oDate.split('-');
-            const dateLabel = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}` : oDate;
-
-            statsHtml += `
-                <div style="background:${dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)'};border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:11px;font-weight:700;color:var(--text-secondary);">${dateLabel} ${oPos}</div>
-                        <div style="font-size:10px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${reason}</div>
-                    </div>
-                    <div style="text-align:right;flex-shrink:0;">
-                        <div style="font-size:12px;font-weight:800;color:${oColor};">-${lost.toFixed(0)} MW</div>
-                    </div>
-                </div>`;
-        });
-        statsHtml += '</div>';
-    }
-
-    statsHtml += '</div>';
-    document.getElementById('eumap_hourly_stats').innerHTML = statsHtml;
 }
 
 // ── Initialisation ─────────────────────────────────────────────────────────
