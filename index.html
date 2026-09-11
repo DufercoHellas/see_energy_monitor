@@ -15004,11 +15004,11 @@ function renderEUMap() {
 const EU_MAP_CABLE_ROUTES = {
     'FR-IT': {
         name: 'SACOI',
-        coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [8.0, 41.9], [9.0, 42.5], [9.5, 43.5], [10.2, 44.8], [10.8, 45.6]]
+        coords: [[4.3, 43.1], [5.5, 42.7], [6.8, 42.1], [7.5, 43.0], [8.0, 43.8], [8.5, 44.5], [9.0, 45.0], [9.5, 45.2]]
     },
     'AT-IT': {
         name: 'San Pietro',
-        coords: [[11.4, 47.3], [11.6, 47.0], [11.3, 46.6], [10.8, 46.1], [10.2, 45.7], [9.8, 45.4]]
+        coords: [[11.4, 47.3], [11.6, 47.0], [11.3, 46.6], [11.0, 46.2], [11.2, 45.8], [11.5, 45.5]]
     },
     'SI-IT': {
         name: 'Vodice',
@@ -15016,7 +15016,7 @@ const EU_MAP_CABLE_ROUTES = {
     },
     'GR-IT': {
         name: 'Poseidon',
-        coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.0, 40.4], [16.0, 40.5], [15.5, 40.2], [15.0, 39.8]]
+        coords: [[20.5, 39.5], [19.3, 39.8], [18.2, 40.2], [17.5, 40.0], [16.8, 39.5], [16.5, 39.0], [16.3, 38.5]]
     },
     'ME-IT': {
         name: 'Monita'
@@ -15314,7 +15314,7 @@ function drawPlotlyEUMap(selectedDate) {
                         layout: {
                             'icon-image': 'cable-arrow-icon',
                             'icon-rotate': ['get', 'bearing'],
-                            'icon-size': 1.5,
+                            'icon-size': 1.1,
                             'icon-allow-overlap': true,
                             'icon-ignore-placement': true
                         }
