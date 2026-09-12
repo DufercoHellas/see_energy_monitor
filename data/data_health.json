@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-12 06:30:54",
+  "timestamp": "2026-09-12 12:30:52",
   "today": "2026-09-12",
   "tomorrow": "2026-09-13",
   "is_after_dam_cutoff": false,
@@ -2673,7 +2673,7 @@
     "status": "healthy",
     "total_records": 35026,
     "unique_mrids": 13326,
-    "active_now": 1012,
+    "active_now": 1031,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2693,23 +2693,23 @@
       },
       "GR": {
         "records": 5376,
-        "active_now": 44,
-        "active_unavailable_mw": 15217.0
+        "active_now": 45,
+        "active_unavailable_mw": 16075.0
       },
       "DE_LU": {
         "records": 10096,
-        "active_now": 189,
-        "active_unavailable_mw": 53378.4
+        "active_now": 195,
+        "active_unavailable_mw": 56928.4
       },
       "FR": {
         "records": 4809,
-        "active_now": 310,
-        "active_unavailable_mw": 112666.3
+        "active_now": 320,
+        "active_unavailable_mw": 113158.3
       },
       "IT": {
         "records": 4589,
         "active_now": 188,
-        "active_unavailable_mw": 55880.0
+        "active_unavailable_mw": 55890.0
       },
       "RS": {
         "records": 206,
@@ -2723,8 +2723,8 @@
       },
       "SK": {
         "records": 738,
-        "active_now": 42,
-        "active_unavailable_mw": 9644.8
+        "active_now": 44,
+        "active_unavailable_mw": 10114.8
       },
       "SI": {
         "records": 31,
