@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-13 06:30:52",
+  "timestamp": "2026-09-13 12:30:53",
   "today": "2026-09-13",
   "tomorrow": "2026-09-14",
   "is_after_dam_cutoff": false,
@@ -2671,9 +2671,9 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 35384,
-    "unique_mrids": 13398,
-    "active_now": 1049,
+    "total_records": 35498,
+    "unique_mrids": 13440,
+    "active_now": 1078,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2682,9 +2682,9 @@
         "active_unavailable_mw": 6880.0
       },
       "HU": {
-        "records": 3510,
-        "active_now": 66,
-        "active_unavailable_mw": 10800.1
+        "records": 3528,
+        "active_now": 81,
+        "active_unavailable_mw": 11129.7
       },
       "BG": {
         "records": 120,
@@ -2693,31 +2693,31 @@
       },
       "GR": {
         "records": 5484,
-        "active_now": 48,
-        "active_unavailable_mw": 16975.0
+        "active_now": 49,
+        "active_unavailable_mw": 17833.0
       },
       "DE_LU": {
-        "records": 10189,
-        "active_now": 200,
-        "active_unavailable_mw": 60237.5
+        "records": 10260,
+        "active_now": 206,
+        "active_unavailable_mw": 64671.0
       },
       "FR": {
-        "records": 4853,
-        "active_now": 319,
-        "active_unavailable_mw": 120272.3
+        "records": 4867,
+        "active_now": 323,
+        "active_unavailable_mw": 124097.3
       },
       "IT": {
-        "records": 4604,
-        "active_now": 188,
-        "active_unavailable_mw": 55019.0
+        "records": 4611,
+        "active_now": 190,
+        "active_unavailable_mw": 55508.0
       },
       "RS": {
-        "records": 208,
-        "active_now": 22,
-        "active_unavailable_mw": 4084.0
+        "records": 209,
+        "active_now": 23,
+        "active_unavailable_mw": 4432.5
       },
       "CZ": {
-        "records": 2788,
+        "records": 2791,
         "active_now": 28,
         "active_unavailable_mw": 5302.0
       },
