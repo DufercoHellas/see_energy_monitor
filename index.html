@@ -11308,7 +11308,7 @@ function getYearlyBaselineCapacity(corridor) {
 // Look up detailed yearly auctions for a corridor on a given date (summing all concurrent cable streams)
 function getYearlyInfoForDate(corridor, dateStr) {
     const targetTime = new Date(dateStr).getTime();
-    const corrYearly = cablesLongData.filter(item => 
+    const corrYearly = cablesLongData.filter(item =>
         item.corridor_code === corridor && item.product === 'Yearly'
     );
     if (corrYearly.length === 0) return null;
@@ -11321,8 +11321,34 @@ function getYearlyInfoForDate(corridor, dateStr) {
 
     if (activeAuctions.length === 0) return null;
 
-    const totalAllocated = activeAuctions.reduce((sum, a) => sum + (parseFloat(a.allocated_capacity) || 0), 0);
-    const zeroCount = activeAuctions.filter(a => (parseFloat(a.allocated_capacity) || 0) === 0).length;
+    // Check if cable_outages shows a full corridor-wide outage for this date
+    // (original_capacity=0 means the daily NTC is 0 — covers all streams including yearly).
+    // JAO "Yearly" monthly-window records don't reflect maintenance curtailments internally,
+    // so we must zero out their contribution when cable_outages reports a complete 0 MW day.
+    const dayOutages = cableOutagesData.filter(item =>
+        item.corridor_code === corridor && item.trade_date === dateStr
+    );
+    const isFullDayOutage = dayOutages.length >= 24 &&
+        dayOutages.every(item => (parseFloat(item.remaining_capacity) || 0) === 0);
+
+    // Compute per-auction effective capacity
+    const augmentedAuctions = activeAuctions.map(a => {
+        let cap = parseFloat(a.allocated_capacity) || 0;
+        // If a full corridor outage is active and this is a short-window JAO entry
+        // (duration <= 35 days = monthly slice of yearly auction), treat it as 0 MW
+        if (isFullDayOutage && cap > 0 && a.office_name === 'JAO') {
+            const s = new Date(a.start_date.replace(" ", "T"));
+            const e = new Date(a.end_date.replace(" ", "T"));
+            const durationDays = (e - s) / (1000 * 60 * 60 * 24);
+            if (durationDays <= 35) {
+                cap = 0;
+            }
+        }
+        return { ...a, effective_capacity: cap };
+    });
+
+    const totalAllocated = augmentedAuctions.reduce((sum, a) => sum + a.effective_capacity, 0);
+    const zeroCount = augmentedAuctions.filter(a => a.effective_capacity === 0).length;
     const baseline = getYearlyBaselineCapacity(corridor);
 
     return {
@@ -11331,9 +11357,9 @@ function getYearlyInfoForDate(corridor, dateStr) {
         hasZeroAuction: zeroCount > 0,
         isCurtailed: zeroCount > 0 || (baseline > 0 && totalAllocated < baseline),
         isTotalOutage: totalAllocated === 0,
-        activeCount: activeAuctions.length,
+        activeCount: augmentedAuctions.length,
         curtailedCount: zeroCount,
-        auctions: activeAuctions
+        auctions: augmentedAuctions
     };
 }
 
