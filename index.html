@@ -11271,20 +11271,105 @@ function shiftOutagesGrid(amount) {
 }
 
 
-// Look up yearly allocated capacity for a corridor on a given date
-function getYearlyCapacityForDate(corridor, dateStr) {
-                const targetTime = new Date(dateStr).getTime();
-                const yearlyAuctions = cablesLongData.filter(item => 
-                    item.corridor_code === corridor && 
-                    item.product === 'Yearly' &&
-                    new Date(item.start_date.replace(" ", "T")).getTime() <= targetTime &&
-                    new Date(item.end_date.replace(" ", "T")).getTime() >= targetTime
-                );
-                if (yearlyAuctions.length > 0) {
-                    return parseFloat(yearlyAuctions[0].allocated_capacity) || 0;
-                }
-                return null;
+// ── Long-Term Auction Aggregation (Multi-auction Summation) ───────────────
+const yearlyBaselineMap = {};
+
+function getYearlyBaselineCapacity(corridor) {
+    if (yearlyBaselineMap[corridor] !== undefined) {
+        return yearlyBaselineMap[corridor];
+    }
+    const corrYearly = cablesLongData.filter(item => 
+        item.corridor_code === corridor && item.product === 'Yearly'
+    );
+    if (corrYearly.length === 0) {
+        yearlyBaselineMap[corridor] = 0;
+        return 0;
+    }
+    const sampleTimes = new Set();
+    corrYearly.forEach(item => {
+        sampleTimes.add(new Date(item.start_date.replace(" ", "T")).getTime());
+    });
+    let maxConcurrent = 0;
+    sampleTimes.forEach(t => {
+        let sumAtT = 0;
+        corrYearly.forEach(item => {
+            const s = new Date(item.start_date.replace(" ", "T")).getTime();
+            const e = new Date(item.end_date.replace(" ", "T")).getTime();
+            if (s <= t && e >= t) {
+                sumAtT += (parseFloat(item.allocated_capacity) || 0);
             }
+        });
+        if (sumAtT > maxConcurrent) maxConcurrent = sumAtT;
+    });
+    yearlyBaselineMap[corridor] = maxConcurrent;
+    return maxConcurrent;
+}
+
+// Look up detailed yearly auctions for a corridor on a given date (summing all concurrent cable streams)
+function getYearlyInfoForDate(corridor, dateStr) {
+    const targetTime = new Date(dateStr).getTime();
+    const corrYearly = cablesLongData.filter(item => 
+        item.corridor_code === corridor && item.product === 'Yearly'
+    );
+    if (corrYearly.length === 0) return null;
+
+    const activeAuctions = corrYearly.filter(item => {
+        const s = new Date(item.start_date.replace(" ", "T")).getTime();
+        const e = new Date(item.end_date.replace(" ", "T")).getTime();
+        return s <= targetTime && e >= targetTime;
+    });
+
+    if (activeAuctions.length === 0) return null;
+
+    const totalAllocated = activeAuctions.reduce((sum, a) => sum + (parseFloat(a.allocated_capacity) || 0), 0);
+    const zeroCount = activeAuctions.filter(a => (parseFloat(a.allocated_capacity) || 0) === 0).length;
+    const baseline = getYearlyBaselineCapacity(corridor);
+
+    return {
+        allocated: totalAllocated,
+        baseline: baseline,
+        hasZeroAuction: zeroCount > 0,
+        isCurtailed: zeroCount > 0 || (baseline > 0 && totalAllocated < baseline),
+        isTotalOutage: totalAllocated === 0,
+        activeCount: activeAuctions.length,
+        curtailedCount: zeroCount,
+        auctions: activeAuctions
+    };
+}
+
+// Look up total yearly allocated capacity for a corridor on a given date (sum of all active cables)
+function getYearlyCapacityForDate(corridor, dateStr) {
+    const info = getYearlyInfoForDate(corridor, dateStr);
+    return info ? info.allocated : null;
+}
+
+// Look up detailed monthly long-term auctions for a corridor on a given date (sum of all active monthly auctions)
+function getMonthlyLongInfoForDate(corridor, dateStr) {
+    const targetTime = new Date(dateStr).getTime();
+    const corrMonthly = cablesLongData.filter(item => 
+        item.corridor_code === corridor && item.product === 'Monthly'
+    );
+    if (corrMonthly.length === 0) return null;
+
+    const activeAuctions = corrMonthly.filter(item => {
+        const s = new Date(item.start_date.replace(" ", "T")).getTime();
+        const e = new Date(item.end_date.replace(" ", "T")).getTime();
+        return s <= targetTime && e >= targetTime;
+    });
+
+    if (activeAuctions.length === 0) return null;
+
+    const totalAllocated = activeAuctions.reduce((sum, a) => sum + (parseFloat(a.allocated_capacity) || 0), 0);
+    const zeroCount = activeAuctions.filter(a => (parseFloat(a.allocated_capacity) || 0) === 0).length;
+
+    return {
+        allocated: totalAllocated,
+        activeCount: activeAuctions.length,
+        curtailedCount: zeroCount,
+        hasZeroAuction: zeroCount > 0,
+        auctions: activeAuctions
+    };
+}
 
 // Toggle between matrix / daily / search views in the outages tab
 // ── Outages Grid View Switching ──────────────────────────────────────────
@@ -11456,13 +11541,8 @@ function renderCableOutagesGrid() {
                     if (maxMthNTC === 0) maxMthNTC = 100;
 
                     // Baseline Yearly NTC
-                    const corrYearlyAuctions = cablesLongData.filter(item => item.corridor_code === corr && item.product === 'Yearly');
-                    let maxYrNTC = 0;
-                    corrYearlyAuctions.forEach(item => {
-                        const cap = parseFloat(item.allocated_capacity) || 0;
-                        if (cap > maxYrNTC) maxYrNTC = cap;
-                    });
-                    const hasYearly = corrYearlyAuctions.length > 0;
+                    const yrBase = getYearlyBaselineCapacity(corr);
+                    const hasYearly = yrBase > 0;
 
                     let totalPossible = 0;
                     let totalDelivered = 0;
@@ -11491,16 +11571,14 @@ function renderCableOutagesGrid() {
                             mthDayAvail = sumRem / 24;
                         }
 
-                        // Yearly available on this date
+                        // Yearly available on this date (summing all concurrent active auctions)
                         let yrDayAvail = 0;
-                        let yrDayBase = 0;
                         if (hasYearly) {
-                            const yCap = getYearlyCapacityForDate(corr, dateStr);
-                            yrDayBase = maxYrNTC > 0 ? maxYrNTC : 30;
-                            yrDayAvail = (yCap !== null && yCap > 0) ? yCap : 0;
+                            const yInfo = getYearlyInfoForDate(corr, dateStr);
+                            yrDayAvail = yInfo ? yInfo.allocated : 0;
                         }
 
-                        const dayBase = maxMthNTC + yrDayBase;
+                        const dayBase = maxMthNTC + yrBase;
                         const dayActual = Math.min(dayBase, mthDayAvail + yrDayAvail);
 
                         totalPossible += dayBase;
@@ -11624,9 +11702,21 @@ function renderCableOutagesGrid() {
                         const tdStyle = `padding: 3px 2px; ${tdBorder} cursor: pointer; box-sizing: border-box;`;
 
                         const dayEntries = rangeOutages.filter(item => item.corridor_code === corr && item.trade_date === d.dateStr);
-                        const yearlyCap = getYearlyCapacityForDate(corr, d.dateStr);
-                        const yearlyText = yearlyCap !== null ? `Yr: ${yearlyCap} MW` : '';
-                        const isYrOutage = yearlyCap !== null && yearlyCap === 0;
+                        const yearlyInfo = getYearlyInfoForDate(corr, d.dateStr);
+                        const yearlyCap = yearlyInfo !== null ? yearlyInfo.allocated : null;
+                        const isYrTotalOutage = yearlyInfo !== null && yearlyInfo.isTotalOutage;
+                        const isYrPartialOutage = yearlyInfo !== null && yearlyInfo.hasZeroAuction && !yearlyInfo.isTotalOutage;
+                        
+                        let yearlyText = '';
+                        if (yearlyCap !== null) {
+                            if (isYrTotalOutage) {
+                                yearlyText = 'Yr: 0 MW';
+                            } else if (isYrPartialOutage) {
+                                yearlyText = `Yr: ${yearlyCap} MW ⚠️`;
+                            } else {
+                                yearlyText = `Yr: ${yearlyCap} MW`;
+                            }
+                        }
                         
                         const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
                         let fullNTC = null;
@@ -11659,7 +11749,7 @@ function renderCableOutagesGrid() {
 
                         if (isTotal24h) {
                             if (yearlyCap !== null && yearlyCap > 0) {
-                                // Monthly 0 MW, but Yearly is active (e.g. GR-AL: Mth 0 MW, Yr 200 MW; FR-IT 20.09: Mth 0 MW, Yr 30 MW)
+                                // Monthly 0 MW, but Yearly is active (e.g. GR-AL: Mth 0 MW, Yr 200 MW; FR-IT 20.09: Mth 0 MW, Yr 354 MW; IT-FR: Mth 0 MW, Yr 458 MW)
                                 const bgCol = dark ? '#4c051933' : '#fff1f2';
                                 const textCol = dark ? '#fb7185' : '#e11d48';
                                 const borderCol = dark ? '#9f1239' : '#fda4af';
@@ -11679,23 +11769,36 @@ function renderCableOutagesGrid() {
                                 html += `
                                     <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
                                         <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
-                                            ${isYrOutage ? `<div>Mth: 0 MW</div><div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">Yr: 0 MW</div>` : `<div>Mth/Yr: OUTAGE</div>`}
+                                            ${isYrTotalOutage ? `<div>Mth: 0 MW</div><div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">Yr: 0 MW</div>` : `<div>Mth/Yr: OUTAGE</div>`}
                                         </div>
                                     </td>
                                 `;
                             }
-                        } else if (isYrOutage) {
-                            // Yearly 0 MW (scheduled maintenance), Monthly is healthy or partial reduction
-                            // User: "FR-IT i see now its green even tho yearly is 0 it should be red saying Mth: 24 MW Yr: 0 MW"
+                        } else if (isYrTotalOutage) {
+                            // Yearly 0 MW (scheduled maintenance on ALL yearly cables), Monthly is healthy or partial reduction
                             const bgCol = dark ? '#4c051933' : '#fff1f2';
                             const textCol = dark ? '#fb7185' : '#e11d48';
                             const borderCol = dark ? '#9f1239' : '#fda4af';
                             const mthLabel = (curtailedEntries.length === 0) ? ntcLabel : (isAllDayReduction ? (minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining} MW`) : `${minRemaining === 0 ? 0 : minRemaining}/${maxOrig} MW (${curtailedEntries.length}h)`);
                             html += `
-                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Yearly Outage (0 MW) / Monthly ${mthLabel}">
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete Yearly Outage (0 MW) / Monthly ${mthLabel}">
                                     <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${mthLabel}</div>
                                         <div style="font-size: 11px; font-weight: 800; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap; color: #ef4444;">Yr: 0 MW</div>
+                                    </div>
+                                </td>
+                            `;
+                        } else if (isYrPartialOutage) {
+                            // Partial Yearly Outage (e.g. IT-FR: 1 cable is 0 MW, but other cables active with 458 MW total!)
+                            const bgCol = dark ? '#7c2d1233' : '#fff7ed';
+                            const textCol = dark ? '#fb923c' : '#c2410c';
+                            const borderCol = dark ? '#9a3412' : '#fed7aa';
+                            const mthLabel = (curtailedEntries.length === 0) ? ntcLabel : (isAllDayReduction ? (minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining} MW`) : `${minRemaining === 0 ? 0 : minRemaining}/${maxOrig} MW (${curtailedEntries.length}h)`);
+                            html += `
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Partial Yearly Cable Outage (${yearlyInfo.curtailedCount} of ${yearlyInfo.activeCount} cables down, ${yearlyCap} MW active) / Monthly ${mthLabel}">
+                                    <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
+                                        <div style="white-space: nowrap;">Mth: ${mthLabel}</div>
+                                        <div style="font-size: 11px; font-weight: 800; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap; color: #ea580c;">${yearlyText}</div>
                                     </div>
                                 </td>
                             `;
@@ -11990,40 +12093,41 @@ function showOutageGridDetails(corridor, dateStr) {
     const dayEntries = cableOutagesData.filter(item => item.corridor_code === corridor && item.trade_date === dateStr);
     
     // Look up Yearly and Monthly capacities for this corridor & date
-    const targetTime = new Date(dateStr).getTime();
-    const yearlyAuctions = cablesLongData.filter(item => 
-        item.corridor_code === corridor && 
-        item.product === 'Yearly' &&
-        new Date(item.start_date.replace(" ", "T")).getTime() <= targetTime &&
-        new Date(item.end_date.replace(" ", "T")).getTime() >= targetTime
-    );
-    const monthlyAuctions = cablesLongData.filter(item => 
-        item.corridor_code === corridor && 
-        item.product === 'Monthly' &&
-        new Date(item.start_date.replace(" ", "T")).getTime() <= targetTime &&
-        new Date(item.end_date.replace(" ", "T")).getTime() >= targetTime
-    );
+    const yearlyInfo = getYearlyInfoForDate(corridor, dateStr);
+    const yearlyCap = yearlyInfo !== null ? yearlyInfo.allocated : null;
+    const isYrTotalOutage = yearlyInfo !== null && yearlyInfo.isTotalOutage;
+    const isYrPartialOutage = yearlyInfo !== null && yearlyInfo.hasZeroAuction && !yearlyInfo.isTotalOutage;
 
-    let longTermHtml = "";
-    if (yearlyAuctions.length > 0 || monthlyAuctions.length > 0) {
-        let yCapStr = null;
-        if (yearlyAuctions.length > 0) {
-            const yVal = parseFloat(yearlyAuctions[0].allocated_capacity);
-            yCapStr = isNaN(yVal) ? '-' : (yVal === 0 ? '0 MW (Scheduled Yearly Maintenance)' : `${yVal} MW`);
-        }
-        let mCapStr = null;
-        if (monthlyAuctions.length > 0) {
-            const mVal = parseFloat(monthlyAuctions[0].allocated_capacity);
-            mCapStr = isNaN(mVal) ? '-' : (mVal === 0 ? '0 MW (Scheduled Monthly Maintenance)' : `${mVal} MW`);
-        }
-        longTermHtml = `
-            <div class="cable-modal-auction-card" style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12.5px; flex-shrink: 0;">
-                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                    <span>⚡</span> <span>Auction Capacities for ${dateStr}</span>
+    const monthlyLongInfo = getMonthlyLongInfoForDate(corridor, dateStr);
+    const monthlyLongCap = monthlyLongInfo !== null ? monthlyLongInfo.allocated : null;
+
+    let yearlyBreakdownHtml = "";
+    if (yearlyInfo && yearlyInfo.activeCount > 1) {
+        yearlyBreakdownHtml = `
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; font-size: 12px;">
+                <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                    <span>🔌 Yearly Cable Streams (${yearlyInfo.activeCount} concurrent auctions)</span>
+                    <span style="font-weight: 800; color: ${isYrPartialOutage ? '#ea580c' : '#0284c7'};">Sum: ${yearlyCap} MW</span>
                 </div>
-                <div style="display: flex; gap: 16px; color: var(--text-secondary); font-size: 12px; flex-wrap: wrap;">
-                    ${yCapStr ? `<span><strong>Yearly Auction:</strong> <span style="color:${yearlyAuctions[0].allocated_capacity == 0 ? '#ef4444' : '#0284c7'}; font-weight:700;">${yCapStr}</span></span>` : ''}
-                    ${mCapStr ? `<span><strong>Monthly Auction:</strong> <span style="color:${monthlyAuctions[0].allocated_capacity == 0 ? '#ef4444' : '#6366f1'}; font-weight:700;">${mCapStr}</span></span>` : ''}
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    ${yearlyInfo.auctions.map((a, idx) => {
+                        const cap = parseFloat(a.allocated_capacity) || 0;
+                        const isDown = cap === 0;
+                        const badgeBg = isDown ? '#fee2e2' : '#dbeafe';
+                        const badgeCol = isDown ? '#dc2626' : '#1d4ed8';
+                        const s = a.start_date ? a.start_date.substring(0, 10) : '';
+                        const e = a.end_date ? a.end_date.substring(0, 10) : '';
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: var(--bg-card); border-radius: 6px; border: 1px solid var(--border-color-subtle); font-size: 11.5px;">
+                                <div>
+                                    <strong>Cable Stream ${idx + 1}:</strong> <span style="color: var(--text-muted); font-size: 11px;">(${s} ➔ ${e})</span>
+                                </div>
+                                <span style="background: ${badgeBg}; color: ${badgeCol}; font-weight: 800; padding: 2px 8px; border-radius: 4px;">
+                                    ${isDown ? '0 MW (Outage)' : `${cap} MW (Active)`}
+                                </span>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -12069,8 +12173,6 @@ function showOutageGridDetails(corridor, dateStr) {
     }
 
     const curtailedCount = hours24.filter(item => item.rem < item.orig).length;
-    const yearlyCap = getYearlyCapacityForDate(corridor, dateStr);
-    const isYrOutage = (yearlyCap !== null && yearlyCap === 0);
     const isMthOutage = (curtailedCount >= 24 && Math.max(...hours24.map(h => h.rem)) === 0);
     const minRem = Math.min(...hours24.map(h => h.rem));
     const netDelivered = (isMthOutage ? 0 : minRem) + (yearlyCap || 0);
@@ -12081,9 +12183,9 @@ function showOutageGridDetails(corridor, dateStr) {
                 <span>⚡ Capacity Summary for ${dateStr}</span>
                 <span style="font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 700; ${
                     netDelivered === 0 ? 'background:#fee2e2; color:#dc2626;' : 
-                    (isMthOutage || isYrOutage || curtailedCount > 0 ? 'background:#ffedd5; color:#c2410c;' : 'background:#dcfce7; color:#15803d;')
+                    (isMthOutage || isYrTotalOutage || isYrPartialOutage || curtailedCount > 0 ? 'background:#ffedd5; color:#c2410c;' : 'background:#dcfce7; color:#15803d;')
                 }">
-                    ${netDelivered === 0 ? '⛔ Full Outage' : (isMthOutage || isYrOutage || curtailedCount > 0 ? '⚠️ Reduced Capacity' : '✅ Full Capacity')}
+                    ${netDelivered === 0 ? '⛔ Full Outage' : (isMthOutage || isYrTotalOutage || isYrPartialOutage || curtailedCount > 0 ? '⚠️ Reduced Capacity' : '✅ Full Capacity')}
                 </span>
             </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -12095,8 +12197,14 @@ function showOutageGridDetails(corridor, dateStr) {
                 </div>
                 <div style="background: var(--bg-card); padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border-color-subtle);">
                     <div style="color: var(--text-muted); font-size: 10.5px; font-weight: 600;">Yearly Auction Capacity</div>
-                    <div style="font-weight: 800; font-size: 13px; margin-top: 2px; color: ${yearlyCap === null ? 'var(--text-muted)' : (isYrOutage ? '#ef4444' : '#0284c7')};">
-                        ${yearlyCap === null ? 'None' : (isYrOutage ? '0 MW (Outage)' : `${yearlyCap} MW (Active)`)}
+                    <div style="font-weight: 800; font-size: 13px; margin-top: 2px; color: ${
+                        yearlyCap === null ? 'var(--text-muted)' : 
+                        (isYrTotalOutage ? '#ef4444' : (isYrPartialOutage ? '#ea580c' : '#0284c7'))
+                    };">
+                        ${yearlyCap === null ? 'None' : 
+                          (isYrTotalOutage ? '0 MW (Outage)' : 
+                           (isYrPartialOutage ? `${yearlyCap} MW (${yearlyInfo.curtailedCount} cable outage)` : `${yearlyCap} MW (Active)`))
+                        }
                     </div>
                 </div>
             </div>
@@ -12107,7 +12215,7 @@ function showOutageGridDetails(corridor, dateStr) {
         </div>
     `;
 
-    if (curtailedCount === 0 && !isYrOutage) {
+    if (curtailedCount === 0 && !isYrTotalOutage && !isYrPartialOutage) {
         panel.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
                 <div>
@@ -12117,6 +12225,7 @@ function showOutageGridDetails(corridor, dateStr) {
                 <button onclick="closeOutageDetailModal()" style="background:var(--bg-card-subtle-2); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='var(--bg-card-subtle-2)'; this.style.color='var(--text-secondary)'">&times;</button>
             </div>
             ${breakdownHtml}
+            ${yearlyBreakdownHtml}
             <div class="cable-modal-healthy-card" style="border-radius:10px; padding:20px; font-size:13.5px; font-weight:600; text-align:center;">
                 ✅ Full 100% capacity available all 24 hours (${fullNTC} MW). No curtailments or outages.
             </div>
@@ -12124,7 +12233,7 @@ function showOutageGridDetails(corridor, dateStr) {
         return;
     }
 
-    if (curtailedCount === 0 && isYrOutage) {
+    if (curtailedCount === 0 && isYrTotalOutage) {
         panel.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
                 <div>
@@ -12134,8 +12243,27 @@ function showOutageGridDetails(corridor, dateStr) {
                 <button onclick="closeOutageDetailModal()" style="background:var(--bg-card-subtle-2); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='var(--bg-card-subtle-2)'; this.style.color='var(--text-secondary)'">&times;</button>
             </div>
             ${breakdownHtml}
+            ${yearlyBreakdownHtml}
             <div style="background: #fff1f2; border: 1px solid #fda4af; color: #b91c1c; border-radius: 8px; padding: 14px 16px; font-size: 13px; font-weight: 600; line-height: 1.5;">
-                ⚠️ <strong>Yearly Auction Scheduled Maintenance (0 MW):</strong> The yearly capacity is unavailable on this date. Monthly transfer capacity remains active at ${fullNTC} MW.
+                ⛔ <strong>Total Yearly Auction Scheduled Maintenance (0 MW):</strong> All yearly capacity is unavailable on this date. Monthly transfer capacity remains active at ${fullNTC} MW.
+            </div>
+        `;
+        return;
+    }
+
+    if (curtailedCount === 0 && isYrPartialOutage) {
+        panel.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-color);">
+                <div>
+                    <h3 style="margin:0; font-size:16px; font-weight:800; color:var(--text-primary); letter-spacing: -0.3px;">${corridor}</h3>
+                    <div style="font-size: 13px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">📅 ${dateStr}</div>
+                </div>
+                <button onclick="closeOutageDetailModal()" style="background:var(--bg-card-subtle-2); border:none; color:var(--text-secondary); width:32px; height:32px; border-radius:8px; font-size:20px; cursor:pointer; font-weight:700; display:flex; align-items:center; justify-content:center; line-height:1; transition:all 0.2s;" onmouseover="this.style.background='var(--bg-hover)'; this.style.color='var(--text-primary)'" onmouseout="this.style.background='var(--bg-card-subtle-2)'; this.style.color='var(--text-secondary)'">&times;</button>
+            </div>
+            ${breakdownHtml}
+            ${yearlyBreakdownHtml}
+            <div style="background: #fff7ed; border: 1px solid #fed7aa; color: #c2410c; border-radius: 8px; padding: 14px 16px; font-size: 13px; font-weight: 600; line-height: 1.5;">
+                ⚠️ <strong>Partial Yearly Cable Outage:</strong> One or more yearly cable streams have an outage / capacity reduction on this date. Active yearly capacity is <strong>${yearlyCap} MW</strong> (out of ${yearlyInfo.baseline} MW baseline). Monthly transfer capacity is fully active at <strong>${fullNTC} MW</strong>.
             </div>
         `;
         return;
