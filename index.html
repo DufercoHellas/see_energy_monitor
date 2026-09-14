@@ -11331,12 +11331,26 @@ function getYearlyInfoForDate(corridor, dateStr) {
     const isFullDayOutage = dayOutages.length >= 24 &&
         dayOutages.every(item => (parseFloat(item.remaining_capacity) || 0) === 0);
 
+    // Check if an NTC increase / reopening message restored capacity for this date
+    // (e.g. SEECAO NTC Increase for MK-XK / XK-MK restoring 350 MW = 150 MW Yearly + 200 MW Monthly)
+    const isNtcRestored = dayOutages.some(item => {
+        const r = (item.reason || '').toLowerCase();
+        const rem = parseFloat(item.remaining_capacity) || 0;
+        return (r.includes('ntc increase') || r.includes('increase of ntc')) && rem >= 350;
+    });
+
+    const isMkXk = (corridor === 'MK-XK' || corridor === 'XK-MK');
+    const baseline = isMkXk ? 150 : getYearlyBaselineCapacity(corridor);
+
     // Compute per-auction effective capacity
     const augmentedAuctions = activeAuctions.map(a => {
         let cap = parseFloat(a.allocated_capacity) || 0;
-        // If a full corridor outage is active and this is a short-window JAO entry
-        // (duration <= 35 days = monthly slice of yearly auction), treat it as 0 MW
-        if (isFullDayOutage && cap > 0 && a.office_name === 'JAO') {
+        if (isNtcRestored && cap === 0) {
+            // Outage cancelled/reopened by NTC Increase notification (restoring baseline yearly capacity)
+            cap = baseline;
+        } else if (isFullDayOutage && cap > 0 && a.office_name === 'JAO') {
+            // If a full corridor outage is active and this is a short-window JAO entry
+            // (duration <= 35 days = monthly slice of yearly auction), treat it as 0 MW
             const s = new Date(a.start_date.replace(" ", "T"));
             const e = new Date(a.end_date.replace(" ", "T"));
             const durationDays = (e - s) / (1000 * 60 * 60 * 24);
@@ -11349,7 +11363,6 @@ function getYearlyInfoForDate(corridor, dateStr) {
 
     const totalAllocated = augmentedAuctions.reduce((sum, a) => sum + a.effective_capacity, 0);
     const zeroCount = augmentedAuctions.filter(a => a.effective_capacity === 0).length;
-    const baseline = getYearlyBaselineCapacity(corridor);
 
     return {
         allocated: totalAllocated,
