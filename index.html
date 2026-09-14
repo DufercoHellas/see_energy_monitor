@@ -2979,8 +2979,8 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card-subtle-2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <label for="econ_opt_ntc" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">GR-BG NTC:</label>
-                    <input type="number" id="econ_opt_ntc" value="2000" min="0" max="3000" step="100" onchange="runCoupledMeritOrderOptimizer()" style="width: 65px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 4px 6px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: right;">
+                    <label for="econ_opt_ntc" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">GR-BG ATC/NTC:</label>
+                    <input type="number" id="econ_opt_ntc" value="1400" min="0" max="3000" step="50" onchange="runCoupledMeritOrderOptimizer()" style="width: 65px; background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 4px 6px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: right;">
                     <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">MW</span>
                 </div>
 
@@ -7645,7 +7645,7 @@ function runCoupledMeritOrderOptimizer() {
     const targetDate = dateInput.value || new Date().toISOString().slice(0, 10);
 
     const ntcInput = document.getElementById("econ_opt_ntc");
-    const ntcLimitBG = ntcInput ? parseFloat(ntcInput.value) || 2000 : 2000;
+    const ntcLimitBG = ntcInput ? parseFloat(ntcInput.value) || 1400 : 1400;
 
     const hist = window.historicalData;
     if (!hist || !hist.GR) return;
