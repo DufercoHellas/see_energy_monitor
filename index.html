@@ -7752,10 +7752,10 @@ function runCoupledMeritOrderOptimizer() {
     function clearZonalSupplyGR(reqGen, totalDemand, regionalPriceAnchor) {
         const solarShare = totalDemand > 0 ? Math.max(0, Math.min(1, (totalDemand - reqGen) / totalDemand)) : 0;
 
-        // 1. IPTO Synchronous Inertia Floor: Greek transmission system requires at least ~850 MW of spinning thermal CCGTs
+        // 1. IPTO Synchronous Inertia Floor: Greek transmission system requires at least ~750 MW of spinning thermal CCGTs
         let effReq = reqGen;
-        if (solarShare > 0.40 && effReq < 850) {
-            effReq = 850; // Excess renewable generation is dynamically curtailed by TSO redispatch
+        if (solarShare > 0.40 && effReq < 750) {
+            effReq = 750; // Excess renewable generation is dynamically curtailed by TSO redispatch
         }
 
         if (effReq <= 0) {
@@ -7766,11 +7766,11 @@ function runCoupledMeritOrderOptimizer() {
             };
         }
 
-        // 2. Solar Midday Inelastic Floor Curve
+        // 2. Solar Midday Inelastic Floor Curve (Calibrated to Greek Day-Ahead Spot Reality)
         if (solarShare > 0.50 && effReq < 2200) {
             const sFrac = (solarShare - 0.50) / 0.50; // 0 to 1
-            const floorP = Math.max(70.0, 110.0 - 40.0 * sFrac); // Sits at ~€70 - €95 on high solar weekdays
-            const ceilingP = 155.0 - 25.0 * sFrac;
+            const floorP = Math.max(45.0, 85.0 - 40.0 * sFrac); // Sits at ~€45 - €70 during peak noon hours
+            const ceilingP = 145.0 - 30.0 * sFrac;
             const frac = Math.pow(effReq / 2200, 1.2);
             const p = floorP + (ceilingP - floorP) * frac;
             return {
@@ -7821,10 +7821,14 @@ function runCoupledMeritOrderOptimizer() {
         const resGR = grResiduals[h] || 0;
         const solarShare = Math.max(0, Math.min(1, (demGR - resGR) / demGR));
 
-        // Morning Ramp Scarcity Premium (06:00 - 09:00 CET)
+        // Morning Ramp & Industrial Startup Premium (06:00 - 09:00 CET / 07:00 - 10:00 EET)
         const prevDem = h > 0 ? (grDemand[h-1] || demGR) : demGR;
         const rampMw = demGR - prevDem;
-        const rampAdder = (h >= 5 && h <= 8 && rampMw > 250) ? Math.min(25, (rampMw - 250) * 0.06) : 0;
+        let rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(25, (rampMw - 200) * 0.06) : 0;
+        // Thermal unit startup & warm-cycling adder during morning peak (H06-H08)
+        if (h >= 5 && h <= 7) {
+            rampAdder += 15.0;
+        }
 
         // Northern / Bulgarian Clearing Reference:
         let bgBaseline = 145.0;
@@ -7853,8 +7857,8 @@ function runCoupledMeritOrderOptimizer() {
             const sol = clearZonalSupplyGR(reqGen, demGR, Math.max(bgBaseline, pIT));
             let p = sol.price;
 
-            // Apply morning ramp adder if thermal fleet is rapidly loading
-            if (rampAdder > 0 && reqGen > 2000) {
+            // Apply morning industrial startup & ramp adder
+            if (rampAdder > 0) {
                 p += rampAdder;
             }
 
