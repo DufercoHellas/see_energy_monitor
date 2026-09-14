@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-14 10:25:34",
+  "timestamp": "2026-09-14 11:47:34",
   "today": "2026-09-14",
   "tomorrow": "2026-09-15",
   "is_after_dam_cutoff": false,
@@ -2557,9 +2557,9 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 35814,
-    "unique_mrids": 13516,
-    "active_now": 1167,
+    "total_records": 35841,
+    "unique_mrids": 13527,
+    "active_now": 1178,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2573,39 +2573,39 @@
         "active_unavailable_mw": 10564.4
       },
       "BG": {
-        "records": 120,
+        "records": 121,
         "active_now": 16,
         "active_unavailable_mw": 3236.0
       },
       "GR": {
-        "records": 5612,
-        "active_now": 61,
-        "active_unavailable_mw": 21299.0
+        "records": 5621,
+        "active_now": 64,
+        "active_unavailable_mw": 22862.0
       },
       "DE_LU": {
-        "records": 10337,
-        "active_now": 190,
-        "active_unavailable_mw": 56762.0
+        "records": 10340,
+        "active_now": 191,
+        "active_unavailable_mw": 57267.0
       },
       "FR": {
-        "records": 4899,
-        "active_now": 355,
-        "active_unavailable_mw": 132668.1
+        "records": 4904,
+        "active_now": 359,
+        "active_unavailable_mw": 133798.1
       },
       "IT": {
-        "records": 4622,
+        "records": 4628,
         "active_now": 208,
-        "active_unavailable_mw": 60951.0
+        "active_unavailable_mw": 61412.0
       },
       "RS": {
-        "records": 216,
-        "active_now": 26,
-        "active_unavailable_mw": 5362.0
+        "records": 218,
+        "active_now": 27,
+        "active_unavailable_mw": 5467.0
       },
       "CZ": {
-        "records": 2810,
-        "active_now": 28,
-        "active_unavailable_mw": 5077.0
+        "records": 2811,
+        "active_now": 29,
+        "active_unavailable_mw": 5277.0
       },
       "SK": {
         "records": 776,
@@ -2624,8 +2624,8 @@
       },
       "BE": {
         "records": 1184,
-        "active_now": 26,
-        "active_unavailable_mw": 13415.1
+        "active_now": 27,
+        "active_unavailable_mw": 13573.1
       },
       "AT": {
         "records": 130,
