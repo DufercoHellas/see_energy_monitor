@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-14 09:32:13",
+  "timestamp": "2026-09-14 10:15:23",
   "today": "2026-09-14",
   "tomorrow": "2026-09-15",
   "is_after_dam_cutoff": false,
@@ -1448,62 +1448,6 @@
           "positions": 0
         }
       },
-      "GR-TR": {
-        "2026-09-07": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-10": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-11": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-12": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
-        "2026-09-13": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-14": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing Today",
-          "positions": 0
-        },
-        "2026-09-15": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
-        }
-      },
       "HR-BA": {
         "2026-09-07": {
           "status": "missing",
@@ -2456,62 +2400,6 @@
           "positions": 0
         }
       },
-      "TR-GR": {
-        "2026-09-07": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-08": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-09": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-10": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-11": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-12": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
-        "2026-09-13": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing",
-          "positions": 0
-        },
-        "2026-09-14": {
-          "status": "missing",
-          "badge": "🔴",
-          "description": "Missing Today",
-          "positions": 0
-        },
-        "2026-09-15": {
-          "status": "pending",
-          "badge": "⏳",
-          "description": "Pending DA",
-          "positions": 0
-        }
-      },
       "XK-ME": {
         "2026-09-07": {
           "status": "complete",
@@ -2635,7 +2523,6 @@
       "CH-IT",
       "GR-AL",
       "GR-MK",
-      "GR-TR",
       "HR-BA",
       "HU-RS",
       "IT-CH",
@@ -2653,7 +2540,6 @@
       "RS-HU",
       "RS-ME",
       "RS-MK",
-      "TR-GR",
       "XK-ME",
       "XK-MK"
     ],
@@ -2671,9 +2557,9 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 35787,
+    "total_records": 35813,
     "unique_mrids": 13516,
-    "active_now": 1135,
+    "active_now": 1166,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2692,19 +2578,19 @@
         "active_unavailable_mw": 3236.0
       },
       "GR": {
-        "records": 5592,
-        "active_now": 51,
-        "active_unavailable_mw": 17930.0
+        "records": 5612,
+        "active_now": 61,
+        "active_unavailable_mw": 21299.0
       },
       "DE_LU": {
-        "records": 10332,
-        "active_now": 186,
-        "active_unavailable_mw": 55433.0
+        "records": 10336,
+        "active_now": 189,
+        "active_unavailable_mw": 56312.0
       },
       "FR": {
-        "records": 4897,
-        "active_now": 338,
-        "active_unavailable_mw": 128969.6
+        "records": 4899,
+        "active_now": 355,
+        "active_unavailable_mw": 132668.1
       },
       "IT": {
         "records": 4622,
@@ -2713,8 +2599,8 @@
       },
       "RS": {
         "records": 216,
-        "active_now": 25,
-        "active_unavailable_mw": 5257.0
+        "active_now": 26,
+        "active_unavailable_mw": 5362.0
       },
       "CZ": {
         "records": 2810,
@@ -2734,7 +2620,7 @@
       "CH": {
         "records": 1364,
         "active_now": 23,
-        "active_unavailable_mw": 4765.0
+        "active_unavailable_mw": 4955.0
       },
       "BE": {
         "records": 1184,
@@ -2756,11 +2642,11 @@
   "cable_outages": {},
   "commodities": {
     "status": "healthy",
-    "latest_trade_date": "2026-09-15",
+    "latest_trade_date": "2026-09-16",
     "latest_ttf_price": 80.185,
     "latest_eua_price": 84.9,
-    "days_lag": -1,
-    "fetch_time": "2026-09-13 21:14:57"
+    "days_lag": -2,
+    "fetch_time": "2026-09-14 09:11:00"
   },
   "issues_critical": [],
   "issues_warning": [
@@ -2768,9 +2654,7 @@
     "Historical spot prices for SK on 2026-09-13 missing.",
     "Historical spot prices for HR on 2026-09-13 missing.",
     "Cable auction for BA-HR TODAY (2026-09-14) is missing.",
-    "Cable auction for GR-TR TODAY (2026-09-14) is missing.",
-    "Cable auction for HR-BA TODAY (2026-09-14) is missing.",
-    "Cable auction for TR-GR TODAY (2026-09-14) is missing."
+    "Cable auction for HR-BA TODAY (2026-09-14) is missing."
   ],
   "issues_info": []
 }
