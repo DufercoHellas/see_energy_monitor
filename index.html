@@ -7942,6 +7942,34 @@ function runCoupledMeritOrderOptimizer() {
     const atcImportBG = ntcLimitBG;
     const atcExportBG = Math.round(ntcLimitBG * (1170 / 1400));
 
+    // ── STRICT EX-ANTE REGIONAL BENCHMARK LOOKUP (Zero Leaks of Future Spot Prices) ──
+    // At Day-Ahead (before 12:00 CET), actual cleared prices DO NOT EXIST yet.
+    // We synthesize the ex-ante regional price reference strictly from:
+    // 1) Prior cleared auction benchmark for same day-type (P_prev_same_type, fully public ex-ante)
+    // 2) Day-Ahead EUA Carbon & TTF Commodity delta
+    // 3) Day-Ahead Regional Residual Load shift (ENTSO-E D+1 Demand minus Solar & Wind forecasts)
+
+    let priorClearedDate = null;
+    const histGR = hist.GR || {};
+    const histBG = hist.BG || {};
+    const priorDates = Object.keys(histGR).filter(d => d < targetDate && histGR[d] && histGR[d].prices && histGR[d].prices.some(p => p > 0)).sort();
+    
+    const targetDOW = new Date(targetDate).getDay(); // 0: Sun, 6: Sat
+    const isWeekend = (targetDOW === 0 || targetDOW === 6);
+
+    for (let i = priorDates.length - 1; i >= Math.max(0, priorDates.length - 14); i--) {
+        const pdow = new Date(priorDates[i]).getDay();
+        if ((targetDOW === 0 && pdow === 0) || (targetDOW === 6 && pdow === 6) || (!isWeekend && pdow >= 1 && pdow <= 5)) {
+            priorClearedDate = priorDates[i];
+            break;
+        }
+    }
+    if (!priorClearedDate && priorDates.length > 0) priorClearedDate = priorDates[priorDates.length - 1];
+
+    const prevEUA = (priorClearedDate && histGR[priorClearedDate] && histGR[priorClearedDate].eua_price) || euaPrice;
+    const euaDelta = (euaPrice - prevEUA) * (0.43 / 0.34); // Maritsa lignite carbon sensitivity
+    const ccgtSrmc = (ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5;
+
     // Solve simultaneous multi-border flow equilibrium for all 24 hours:
     // Borders: BG (calibrated ATC 1,400/1,170 MW), IT (500 MW HVDC), MK (600 MW), AL (350 MW)
     for (let h = 0; h < 24; h++) {
@@ -7953,66 +7981,41 @@ function runCoupledMeritOrderOptimizer() {
         const prevDem = h > 0 ? (grDemand[h-1] || demGR) : demGR;
         const rampMw = demGR - prevDem;
         let rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(25, (rampMw - 200) * 0.06) : 0;
-        // Thermal unit startup & warm-cycling adder during morning peak (H06-H08)
         if (h >= 5 && h <= 7) {
             rampAdder += 15.0;
         }
 
-        // ── STRICT EX-ANTE REGIONAL FORECASTING (Zero Leaks of Future Spot Prices) ──
-        // At Day-Ahead (before 12:00 CET), actual cleared prices DO NOT EXIST yet.
-        // We synthesize the ex-ante regional price reference (Bulgaria/SEE SDAC) strictly from:
-        // 1) Prior cleared auction benchmark for same day-type (P_prev_same_type, fully public ex-ante)
-        // 2) Day-Ahead EUA Carbon & TTF Commodity delta
-        // 3) Day-Ahead Regional Residual Load shift (ENTSO-E D+1 Demand minus Solar & Wind forecasts)
-        
         let bgBaseline = 145.0;
-        let pIT = 175.0;
-        let pMK = 170.0;
-        let pAL = 170.0;
+        if (priorClearedDate && histBG[priorClearedDate] && histBG[priorClearedDate].prices) {
+            const prevBgP = histBG[priorClearedDate].prices[h] || 145.0;
+            const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
+            const prevResBG = (histBG[priorClearedDate].residuals && histBG[priorClearedDate].residuals[h] !== undefined) ? histBG[priorClearedDate].residuals[h] : resBG;
+            const dResBG = resBG - prevResBG;
+            const dResGR = resGR - ((histGR[priorClearedDate] && histGR[priorClearedDate].residuals && histGR[priorClearedDate].residuals[h]) || resGR);
 
-        // Find most recent prior cleared date (strictly < targetDate) with same day-of-week profile
-        let priorClearedDate = null;
-        if (window.HISTORICAL_DATA && window.HISTORICAL_DATA.GR) {
-            const histGR = window.HISTORICAL_DATA.GR;
-            const histBG = window.HISTORICAL_DATA.BG || {};
-            const priorDates = Object.keys(histGR).filter(d => d < targetDate && histGR[d] && histGR[d].prices && histGR[d].prices.some(p => p > 0)).sort();
-            
-            const targetDOW = new Date(targetDate).getDay(); // 0: Sun, 6: Sat
-            const isWeekend = (targetDOW === 0 || targetDOW === 6);
+            bgBaseline = prevBgP + euaDelta + dResBG * 0.02 + dResGR * 0.015;
 
-            for (let i = priorDates.length - 1; i >= Math.max(0, priorDates.length - 14); i--) {
-                const pdow = new Date(priorDates[i]).getDay();
-                if ((targetDOW === 0 && pdow === 0) || (targetDOW === 6 && pdow === 6) || (!isWeekend && pdow >= 1 && pdow <= 5)) {
-                    priorClearedDate = priorDates[i];
-                    break;
-                }
+            // Weekend midday solar collapse in Bulgaria:
+            if (targetDOW === 0 && h >= 10 && h <= 15 && resBG < 800) {
+                bgBaseline = Math.max(0, (resBG / 800) * 8.0);
             }
-            if (!priorClearedDate && priorDates.length > 0) priorClearedDate = priorDates[priorDates.length - 1];
-
-            if (priorClearedDate && histBG[priorClearedDate] && histBG[priorClearedDate].prices) {
-                const prevBgP = histBG[priorClearedDate].prices[h] || 145.0;
-                const prevEUA = (histGR[priorClearedDate] && histGR[priorClearedDate].eua_price) || euaPrice;
-                const euaDelta = (euaPrice - prevEUA) * (0.43 / 0.34); // Maritsa lignite carbon sensitivity
-
-                const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
-                const prevResBG = (histBG[priorClearedDate].residuals && histBG[priorClearedDate].residuals[h] !== undefined) ? histBG[priorClearedDate].residuals[h] : resBG;
-                const dResBG = resBG - prevResBG;
-
-                bgBaseline = prevBgP + euaDelta + dResBG * 0.02;
-
-                // Weekend midday solar collapse in Bulgaria:
-                if (targetDOW === 0 && h >= 10 && h <= 15 && resBG < 800) {
-                    bgBaseline = Math.max(0, (resBG / 800) * 8.0);
-                }
-                bgBaseline = Math.max(0, bgBaseline);
+            bgBaseline = Math.max(0, bgBaseline);
+        } else {
+            // Fallback purely from ex-ante merit order stack
+            if (solarShare > 0.50 && resGR < 1500) {
+                bgBaseline = Math.max(30.0, 75.0 + (resGR / 1500) * 45.0);
+            } else if (h >= 18 && h <= 22) {
+                bgBaseline = ccgtSrmc + 45.0;
+            } else {
+                bgBaseline = ccgtSrmc;
             }
         }
 
         // Italian PUN gas proxy: CCGT SRMC + peak scarcity
-        pIT = (ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5 + (h >= 18 && h <= 21 ? 25.0 : 5.0);
+        const pIT = ccgtSrmc + (h >= 18 && h <= 21 ? 25.0 : 5.0);
         // Non-EU Balkan bilateral proxies (MK/AL lignite & hydro baseload)
-        pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5;
-        pAL = pMK;
+        const pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5;
+        const pAL = pMK;
 
         const actPgr = (grActualPrices[h] && grActualPrices[h] > 0) ? grActualPrices[h] : null;
 
