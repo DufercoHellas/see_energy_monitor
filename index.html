@@ -11726,9 +11726,10 @@ function renderCableOutagesGrid() {
                         });
                         const ntcLabel = fullNTC !== null ? `${fullNTC} MW` : '✓ Full';
 
+                        const baselineNTC = fullNTC || 0;
                         const curtailedEntries = dayEntries.filter(item => {
                             const rem = parseFloat(item.remaining_capacity) || 0;
-                            const orig = parseFloat(item.original_capacity) || 0;
+                            const orig = (parseFloat(item.original_capacity) > 0) ? parseFloat(item.original_capacity) : baselineNTC;
                             return rem < orig;
                         });
 
@@ -11737,7 +11738,7 @@ function renderCableOutagesGrid() {
                         let maxOrig = 0;
                         curtailedEntries.forEach(item => {
                             const rem = parseFloat(item.remaining_capacity) || 0;
-                            const orig = parseFloat(item.original_capacity) || 0;
+                            const orig = (parseFloat(item.original_capacity) > 0) ? parseFloat(item.original_capacity) : baselineNTC;
                             if (minRemaining === null || rem < minRemaining) minRemaining = rem;
                             if (maxRemaining === null || rem > maxRemaining) maxRemaining = rem;
                             if (orig > maxOrig) maxOrig = orig;
@@ -11896,6 +11897,13 @@ function renderCableDailyOutagesGrid() {
                  const corridorReducedHours = {};
                  
                  allCorridors.forEach(corr => {
+                     const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
+                     let fullNTC = 0;
+                     allCorrEntries.forEach(item => {
+                         const orig = parseFloat(item.original_capacity) || 0;
+                         if (orig > fullNTC) fullNTC = orig;
+                     });
+
                      let totalOrig = 0;
                      let totalRem = 0;
                      let reducedCount = 0;
@@ -11903,18 +11911,12 @@ function renderCableDailyOutagesGrid() {
                      for (let h = 1; h <= 24; h++) {
                          const entry = dayOutages.find(item => item.corridor_code === corr && item.position === h);
                          if (entry) {
-                             const orig = parseFloat(entry.original_capacity) || 0;
+                             const orig = (parseFloat(entry.original_capacity) > 0) ? parseFloat(entry.original_capacity) : fullNTC;
                              const rem = parseFloat(entry.remaining_capacity) || 0;
                              totalOrig += orig;
                              totalRem += rem;
                              if (rem < orig) reducedCount++;
                          } else {
-                             const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
-                             let fullNTC = 0;
-                             allCorrEntries.forEach(item => {
-                                 const orig = parseFloat(item.original_capacity) || 0;
-                                 if (orig > fullNTC) fullNTC = orig;
-                             });
                              totalOrig += fullNTC;
                              totalRem += fullNTC;
                          }
