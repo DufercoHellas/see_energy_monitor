@@ -2990,6 +2990,30 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
             </div>
         </div>
 
+        <!-- Day Average Baseload Forecast & Performance Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #2563eb;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Forecast Baseload (24h)</div>
+                <div id="econ_opt_pred_baseload" style="font-size: 22px; font-weight: 800; color: #2563eb; margin-top: 4px;">-- €/MWh</div>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Multi-Border Coupled Merit Order</div>
+            </div>
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #f59e0b;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Actual Cleared Baseload</div>
+                <div id="econ_opt_actual_baseload" style="font-size: 22px; font-weight: 800; color: #f59e0b; margin-top: 4px;">-- €/MWh</div>
+                <div id="econ_opt_actual_baseload_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">HEnEx SDAC Day-Ahead Clearing</div>
+            </div>
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #10b981;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Baseload Delta (Spread)</div>
+                <div id="econ_opt_baseload_delta" style="font-size: 22px; font-weight: 800; color: #10b981; margin-top: 4px;">-- €/MWh</div>
+                <div id="econ_opt_baseload_delta_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Forecast Error (Pred - Actual)</div>
+            </div>
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #8b5cf6;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Hourly Profile MAE</div>
+                <div id="econ_opt_hourly_mae" style="font-size: 22px; font-weight: 800; color: #8b5cf6; margin-top: 4px;">-- €/MWh</div>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Mean 24-Hour Shape Dispersion</div>
+            </div>
+        </div>
+
         <!-- 24-Hour Price Profile Chart: Model Solved vs Day-Ahead Actual -->
         <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -7929,14 +7953,53 @@ function render24hOptimizerProfileChart() {
         }
     });
 
-    // Compute MAE if actual prices exist
+    // Compute 24h Baseload Averages & Metrics
+    const predBaseloadEl = document.getElementById("econ_opt_pred_baseload");
+    const actualBaseloadEl = document.getElementById("econ_opt_actual_baseload");
+    const actualSubEl = document.getElementById("econ_opt_actual_baseload_sub");
+    const deltaEl = document.getElementById("econ_opt_baseload_delta");
+    const deltaSubEl = document.getElementById("econ_opt_baseload_delta_sub");
+    const hourlyMaeEl = document.getElementById("econ_opt_hourly_mae");
     const metricsEl = document.getElementById("econ_opt_summary_metrics");
-    if (metricsEl) {
-        if (hasActual) {
-            const validDeltas = data.filter(d => d.price_delta_gr !== null).map(d => Math.abs(d.price_delta_gr));
-            const mae = validDeltas.reduce((a, b) => a + b, 0) / validDeltas.length;
-            metricsEl.innerHTML = `Model vs Actual Cleared MAE: <span style="color:#10b981; font-weight:800;">€${mae.toFixed(2)}/MWh</span>`;
-        } else {
+
+    const avgPred = modelPrices.reduce((a, b) => a + b, 0) / modelPrices.length;
+    if (predBaseloadEl) predBaseloadEl.innerText = `€${avgPred.toFixed(2)}/MWh`;
+
+    if (hasActual) {
+        const validActuals = actualPrices.filter(p => p !== null && p > 0);
+        const avgActual = validActuals.reduce((a, b) => a + b, 0) / validActuals.length;
+        const delta = avgPred - avgActual;
+        const absDelta = Math.abs(delta);
+
+        const validDeltas = data.filter(d => d.price_delta_gr !== null).map(d => Math.abs(d.price_delta_gr));
+        const mae = validDeltas.reduce((a, b) => a + b, 0) / validDeltas.length;
+
+        if (actualBaseloadEl) actualBaseloadEl.innerText = `€${avgActual.toFixed(2)}/MWh`;
+        if (actualSubEl) actualSubEl.innerText = `${validActuals.length}/24 hours cleared`;
+
+        if (deltaEl) {
+            deltaEl.innerText = `${delta >= 0 ? '+' : ''}€${delta.toFixed(2)}/MWh`;
+            deltaEl.style.color = absDelta <= 2.0 ? '#10b981' : (absDelta <= 5.0 ? '#3b82f6' : '#f59e0b');
+        }
+        if (deltaSubEl) {
+            deltaSubEl.innerText = absDelta <= 2.0 ? '🎯 Within Target (≤ €2.00)' : `Spread: |Δ| = €${absDelta.toFixed(2)}`;
+        }
+
+        if (hourlyMaeEl) hourlyMaeEl.innerText = `€${mae.toFixed(2)}/MWh`;
+
+        if (metricsEl) {
+            metricsEl.innerHTML = `Baseload Δ: <b style="color:${absDelta <= 2 ? '#10b981' : '#f59e0b'}">${delta >= 0 ? '+' : ''}€${delta.toFixed(2)}</b> | 24h MAE: <b style="color:#8b5cf6">€${mae.toFixed(2)}</b>`;
+        }
+    } else {
+        if (actualBaseloadEl) actualBaseloadEl.innerText = `Pending`;
+        if (actualSubEl) actualSubEl.innerText = `SDAC clearing ~12:45 CET`;
+        if (deltaEl) {
+            deltaEl.innerText = `--`;
+            deltaEl.style.color = 'var(--text-muted)';
+        }
+        if (deltaSubEl) deltaSubEl.innerText = `Awaiting day-ahead auction`;
+        if (hourlyMaeEl) hourlyMaeEl.innerText = `--`;
+        if (metricsEl) {
             metricsEl.innerHTML = `<span style="color:var(--text-muted); font-weight:600;">Day-Ahead clearing pending</span>`;
         }
     }
