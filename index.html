@@ -2397,6 +2397,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
     <button class="tablinks active" onclick="openTab(event, 'Residuals')">📈 Forecast Residuals</button>
     <button class="tablinks" onclick="openTab(event, 'Outages')">⚡ Generation Outages</button>
     <button class="tablinks" onclick="openTab(event, 'Economics')">🏭 Plant Costs</button>
+    <button class="tablinks" onclick="openTab(event, 'PriceForecast')">⚡ Price Forecast</button>
     <button class="tablinks" onclick="openTab(event, 'Cables')">🔌 Cable Outages</button>
     <button class="tablinks" onclick="openTab(event, 'EUMap')">🗺️ EU Map</button>
     <button class="tablinks" onclick="openTab(event, 'CableCalculator')">🧮 Cable Calculator</button>
@@ -2949,8 +2950,119 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
             </table>
         </div>
     </div>
+</div>
 
-    <!-- ── COUPLED MERIT ORDER DISPATCH OPTIMIZER (METHOD 1) ── -->
+<!-- ── FORMULA & EFFICIENCIES MODAL ── -->
+<div id="econ_formula_modal" class="health-modal-backdrop" style="display: none;" onclick="closeEconomicsFormulaModal()">
+    <div class="health-modal-dialog" onclick="event.stopPropagation()" style="max-width: 650px;">
+        <div class="health-modal-header">
+            <h3 style="margin: 0; font-size: 17px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📐</span> Plant Running Cost Formulas (SRMC)
+            </h3>
+            <button class="health-modal-close" onclick="closeEconomicsFormulaModal()">&times;</button>
+        </div>
+
+        <div class="health-modal-body" style="line-height: 1.6; font-size: 13px; color: var(--text-primary);">
+            <div style="margin-bottom: 14px; background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <strong style="color: var(--accent-primary);">1. Gas Plant Running Cost Formula:</strong>
+                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
+                    Running Cost (€/MWh) = (Gas_Price / η) + (EUA × 0.202 / η) + VOM
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    • <strong>0.202 tCO2/MWh_th:</strong> Natural gas stoichiometric emission factor.<br>
+                    • <strong>η:</strong> Plant net electrical efficiency (e.g. 63.5% Komotini Power, 63.0% Ag. Nikolaos II, 58.2% Megalopolis V, 52.5% Lavrio IV).<br>
+                    • <strong>VOM:</strong> Variable Operation &amp; Maintenance (€2.50/MWh).
+                </div>
+            </div>
+
+            <div style="background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <strong style="color: var(--accent-primary);">2. Lignite Plant Running Cost Formula:</strong>
+                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
+                    Running Cost (€/MWh) = (Lignite_Cost / η) + (EUA × 0.400 / η) + VOM
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary);">
+                    • <strong>0.400 tCO2/MWh_th:</strong> Greek lignite carbon intensity (~0.96 t/MWh_e for Ptolemaida V).<br>
+                    • <strong>Lignite Fuel Cost:</strong> €18.00/MWh_th (PPC audited mine-mouth cost).<br>
+                    • <strong>η:</strong> 41.5% (Ptolemaida V Ultra-supercritical), 34.0% (Ag. Dimitrios / Megalopolis IV).<br>
+                    • <strong>VOM:</strong> €4.50/MWh.
+                </div>
+            </div>
+        </div>
+
+        <div class="health-modal-footer">
+            <button class="btn-modal-close-action" onclick="closeEconomicsFormulaModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+
+        <!-- ── TAB: Price Forecast & Dispatch Optimizer ── -->
+        <!-- ── TAB: Price Forecast & Coupled Dispatch Optimizer ── -->
+<div id="PriceForecast" class="tabcontent" style="display: none;">
+    <!-- Tab Top Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+        <div>
+            <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px 0; letter-spacing: -0.4px; display: flex; align-items: center; gap: 8px;">
+                <span>⚡</span> Day-Ahead Price Forecast &amp; Dispatch Optimizer
+            </h2>
+            <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+                Simulates 24-hour Day-Ahead market clearing across Greece and its 4 coupled borders (Bulgaria, Italy, North Macedonia, Albania).
+            </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn-inspect-health" onclick="openEconomicsFormulaModal()" style="display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 5px 10px; font-weight: 600; cursor: pointer;">
+                <span>📐</span> Model Formulas
+            </button>
+            <button type="button" onclick="runCoupledMeritOrderOptimizer()" class="btn-inspect-health" style="padding: 6px 14px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; background: linear-gradient(135deg, #0284c7, #2563eb); color: #fff; border: none; border-radius: 6px; box-shadow: 0 2px 6px rgba(37,99,235,0.3);">
+                <span>⚡</span> Re-Solve Cluster
+            </button>
+        </div>
+    </div>
+
+    <!-- Controls Bar: Date, Country, Hour, NTC -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+            <!-- Left Controls: Date & Country -->
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
+                <!-- Date Selector with D+1 Default -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label for="forecast_date" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                        📅 Delivery Date
+                    </label>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <input type="date" id="forecast_date" onchange="onPriceForecastDateChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 600; font-family: inherit;">
+                        <button type="button" id="btn_forecast_tomorrow" onclick="setForecastDatePreset('tomorrow')" class="inner-tablinks active" style="padding: 5px 8px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer;">D+1 (Day-Ahead)</button>
+                        <button type="button" id="btn_forecast_today" onclick="setForecastDatePreset('today')" class="inner-tablinks" style="padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer;">Today</button>
+                        <button type="button" id="btn_forecast_yesterday" onclick="setForecastDatePreset('yesterday')" class="inner-tablinks" style="padding: 5px 8px; font-size: 11px; font-weight: 600; border-radius: 6px; cursor: pointer;">Yesterday</button>
+                    </div>
+                </div>
+
+                <!-- Country Selector (Greece Auto-selected) -->
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <label for="forecast_country_select" style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary);">
+                        🌍 Target Zone
+                    </label>
+                    <select id="forecast_country_select" onchange="onForecastCountryChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 6px 10px; border-radius: 6px; font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer;">
+                        <option value="GR" selected>🇬🇷 Greece (GR)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right Controls: Status & Info -->
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="text-align: right;">
+                    <span id="forecast_status_badge" class="health-status-badge badge-healthy" style="font-size: 11px; padding: 4px 8px;">
+                        ⚡ Coupled Optimizer Active
+                    </span>
+                    <div id="forecast_price_updated_info" style="font-size: 10.5px; color: var(--text-muted); margin-top: 3px;">
+                        Multi-border SDAC LP solver
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- ── COUPLED MERIT ORDER DISPATCH OPTIMIZER (METHOD 1) ── -->
     <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
         <!-- Optimizer Header & Mode Selectors -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 14px;">
@@ -3135,49 +3247,6 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                     <!-- Populated dynamically -->
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- ── FORMULA & EFFICIENCIES MODAL ── -->
-<div id="econ_formula_modal" class="health-modal-backdrop" style="display: none;" onclick="closeEconomicsFormulaModal()">
-    <div class="health-modal-dialog" onclick="event.stopPropagation()" style="max-width: 650px;">
-        <div class="health-modal-header">
-            <h3 style="margin: 0; font-size: 17px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-                <span>📐</span> Plant Running Cost Formulas (SRMC)
-            </h3>
-            <button class="health-modal-close" onclick="closeEconomicsFormulaModal()">&times;</button>
-        </div>
-
-        <div class="health-modal-body" style="line-height: 1.6; font-size: 13px; color: var(--text-primary);">
-            <div style="margin-bottom: 14px; background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <strong style="color: var(--accent-primary);">1. Gas Plant Running Cost Formula:</strong>
-                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
-                    Running Cost (€/MWh) = (Gas_Price / η) + (EUA × 0.202 / η) + VOM
-                </div>
-                <div style="font-size: 12px; color: var(--text-secondary);">
-                    • <strong>0.202 tCO2/MWh_th:</strong> Natural gas stoichiometric emission factor.<br>
-                    • <strong>η:</strong> Plant net electrical efficiency (e.g. 63.5% Komotini Power, 63.0% Ag. Nikolaos II, 58.2% Megalopolis V, 52.5% Lavrio IV).<br>
-                    • <strong>VOM:</strong> Variable Operation &amp; Maintenance (€2.50/MWh).
-                </div>
-            </div>
-
-            <div style="background: var(--bg-card-subtle); padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border-color);">
-                <strong style="color: var(--accent-primary);">2. Lignite Plant Running Cost Formula:</strong>
-                <div style="font-family: monospace; font-size: 12px; margin: 6px 0; padding: 6px 10px; background: var(--bg-card); border-radius: 4px; border: 1px solid var(--border-color);">
-                    Running Cost (€/MWh) = (Lignite_Cost / η) + (EUA × 0.400 / η) + VOM
-                </div>
-                <div style="font-size: 12px; color: var(--text-secondary);">
-                    • <strong>0.400 tCO2/MWh_th:</strong> Greek lignite carbon intensity (~0.96 t/MWh_e for Ptolemaida V).<br>
-                    • <strong>Lignite Fuel Cost:</strong> €18.00/MWh_th (PPC audited mine-mouth cost).<br>
-                    • <strong>η:</strong> 41.5% (Ptolemaida V Ultra-supercritical), 34.0% (Ag. Dimitrios / Megalopolis IV).<br>
-                    • <strong>VOM:</strong> €4.50/MWh.
-                </div>
-            </div>
-        </div>
-
-        <div class="health-modal-footer">
-            <button class="btn-modal-close-action" onclick="closeEconomicsFormulaModal()">Close</button>
         </div>
     </div>
 </div>
@@ -4015,6 +4084,10 @@ function openTab(evt, tabName) {
     }
     if (tabName === 'Economics') {
         if (typeof renderPlantEconomicsTab === 'function') renderPlantEconomicsTab();
+    }
+    if (tabName === 'PriceForecast') {
+        if (typeof initPriceForecastTab === 'function') initPriceForecastTab();
+        else if (typeof runCoupledMeritOrderOptimizer === 'function') runCoupledMeritOrderOptimizer();
     }
     if (tabName === 'Analogues') {
         if (typeof findAnalogues === 'function' && (!currentTop7 || currentTop7.length === 0)) {
@@ -7637,12 +7710,70 @@ function onOptHourChange() {
     renderSelectedHourDetails();
 }
 
+function getTomorrowDateStr() {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().slice(0, 10);
+}
+
+function initPriceForecastTab() {
+    populateOptHourSelector();
+
+    const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
+    if (dateInput && !dateInput.value) {
+        // Automatically default to Day-Ahead (tomorrow)
+        dateInput.value = getTomorrowDateStr();
+    }
+
+    const countrySelect = document.getElementById("forecast_country_select");
+    if (countrySelect) countrySelect.value = "GR"; // Auto-select Greece
+
+    runCoupledMeritOrderOptimizer();
+}
+
+function setForecastDatePreset(preset) {
+    const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
+    if (!dateInput) return;
+
+    const now = new Date();
+    if (preset === 'today') {
+        dateInput.value = now.toISOString().slice(0, 10);
+    } else if (preset === 'tomorrow') {
+        dateInput.value = getTomorrowDateStr();
+    } else if (preset === 'yesterday') {
+        const y = new Date();
+        y.setDate(y.getDate() - 1);
+        dateInput.value = y.toISOString().slice(0, 10);
+    }
+
+    // Update active button state
+    ['btn_forecast_tomorrow', 'btn_forecast_today', 'btn_forecast_yesterday'].forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.remove('active');
+    });
+    const activeBtn = document.getElementById(`btn_forecast_${preset}`);
+    if (activeBtn) activeBtn.classList.add('active');
+
+    runCoupledMeritOrderOptimizer();
+}
+
+function onPriceForecastDateChange() {
+    runCoupledMeritOrderOptimizer();
+}
+
+function onForecastCountryChange() {
+    runCoupledMeritOrderOptimizer();
+}
+
 function runCoupledMeritOrderOptimizer() {
     populateOptHourSelector();
 
-    const dateInput = document.getElementById("econ_date");
+    const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
     if (!dateInput) return;
-    const targetDate = dateInput.value || new Date().toISOString().slice(0, 10);
+    if (!dateInput.value) {
+        dateInput.value = getTomorrowDateStr();
+    }
+    const targetDate = dateInput.value;
 
     const ntcInput = document.getElementById("econ_opt_ntc");
     const ntcLimitBG = ntcInput ? parseFloat(ntcInput.value) || 1400 : 1400;
