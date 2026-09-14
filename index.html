@@ -11558,6 +11558,9 @@ function renderCableOutagesGrid() {
 
                 const dark = isDarkMode();
 
+                const todayStr = dates[0] ? dates[0].dateStr : '';
+                const dayAheadStr = dates[1] ? dates[1].dateStr : '';
+
                 // 5. Build Table with 10-day view
                 let html = `
                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12.5px; table-layout: fixed;">
@@ -11567,10 +11570,28 @@ function renderCableOutagesGrid() {
                 `;
                 
                 displayDates.forEach(d => {
+                    const isToday = d.dateStr === todayStr;
+                    const isDayAhead = d.dateStr === dayAheadStr;
+
+                    let thBg = "var(--table-header-bg)";
+                    let thBorderTop = "none";
+                    let thBorderSides = "";
+                    let badgeHtml = "";
+
+                    if (isDayAhead) {
+                        thBg = dark ? "#1e3a8a33" : "#eff6ff";
+                        thBorderTop = "3px solid #2563eb";
+                        thBorderSides = "border-left: 2px solid #3b82f688; border-right: 2px solid #3b82f688;";
+                        badgeHtml = `<div style="background: #2563eb; color: #ffffff; font-size: 8.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 3px; letter-spacing: 0.5px; box-shadow: 0 1px 3px rgba(37,99,235,0.3);">DAY AHEAD</div>`;
+                    } else if (isToday) {
+                        badgeHtml = `<div style="background: ${dark ? '#334155' : '#e2e8f0'}; color: ${dark ? '#cbd5e1' : '#475569'}; font-size: 8.5px; font-weight: 700; padding: 1px 5px; border-radius: 4px; display: inline-block; margin-bottom: 3px;">TODAY</div>`;
+                    }
+
                     html += `
-                        <th style="padding: 8px 4px; font-weight: 700; color: var(--table-header-color); font-size: 11.5px; text-transform: uppercase; box-sizing: border-box; text-align: center;">
+                        <th style="padding: 6px 4px 8px 4px; font-weight: 700; color: ${isDayAhead ? (dark ? '#93c5fd' : '#1d4ed8') : 'var(--table-header-color)'}; font-size: 11.5px; text-transform: uppercase; box-sizing: border-box; text-align: center; background: ${thBg}; border-top: ${thBorderTop}; ${thBorderSides}">
+                            ${badgeHtml}
                             <div>${d.dayName}</div>
-                            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px;">${d.day}/${d.month}</div>
+                            <div style="font-size: 10px; color: ${isDayAhead ? (dark ? '#60a5fa' : '#2563eb') : 'var(--text-muted)'}; font-weight: ${isDayAhead ? '700' : '600'}; margin-top: 1px;">${d.day}/${d.month}</div>
                         </th>
                     `;
                 });
@@ -11596,9 +11617,16 @@ function renderCableOutagesGrid() {
                     `;
 
                     displayDates.forEach(d => {
+                        const isDayAhead = d.dateStr === dayAheadStr;
+                        const tdBorder = isDayAhead 
+                            ? `border-left: 2px solid #3b82f655; border-right: 2px solid #3b82f655; background: ${dark ? '#1e3a8a12' : '#eff6ff44'};` 
+                            : `border-right: 1px solid var(--border-color-subtle);`;
+                        const tdStyle = `padding: 3px 2px; ${tdBorder} cursor: pointer; box-sizing: border-box;`;
+
                         const dayEntries = rangeOutages.filter(item => item.corridor_code === corr && item.trade_date === d.dateStr);
                         const yearlyCap = getYearlyCapacityForDate(corr, d.dateStr);
                         const yearlyText = yearlyCap !== null ? `Yr: ${yearlyCap} MW` : '';
+                        const isYrOutage = yearlyCap !== null && yearlyCap === 0;
                         
                         const allCorrEntries = cableOutagesData.filter(item => item.corridor_code === corr);
                         let fullNTC = null;
@@ -11614,6 +11642,21 @@ function renderCableOutagesGrid() {
                             return rem < orig;
                         });
 
+                        let minRemaining = null;
+                        let maxRemaining = null;
+                        let maxOrig = 0;
+                        curtailedEntries.forEach(item => {
+                            const rem = parseFloat(item.remaining_capacity) || 0;
+                            const orig = parseFloat(item.original_capacity) || 0;
+                            if (minRemaining === null || rem < minRemaining) minRemaining = rem;
+                            if (maxRemaining === null || rem > maxRemaining) maxRemaining = rem;
+                            if (orig > maxOrig) maxOrig = orig;
+                        });
+                        if (maxOrig === 0 && fullNTC !== null) maxOrig = fullNTC;
+
+                        const isTotal24h = (curtailedEntries.length >= 24) && (maxRemaining === 0);
+                        const isAllDayReduction = (curtailedEntries.length >= 24) && (minRemaining > 0);
+
                         if (isTotal24h) {
                             if (yearlyCap !== null && yearlyCap > 0) {
                                 // Monthly 0 MW, but Yearly is active (e.g. GR-AL: Mth 0 MW, Yr 200 MW; FR-IT 20.09: Mth 0 MW, Yr 30 MW)
@@ -11621,7 +11664,7 @@ function renderCableOutagesGrid() {
                                 const textCol = dark ? '#fb7185' : '#e11d48';
                                 const borderCol = dark ? '#9f1239' : '#fda4af';
                                 html += `
-                                    <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Monthly Outage (0 MW) / Yearly ${yearlyCap} MW active">
+                                    <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Monthly Outage (0 MW) / Yearly ${yearlyCap} MW active">
                                         <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                             <div style="white-space: nowrap;">Mth: 0 MW</div>
                                             <div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap; color: ${dark ? '#38bdf8' : '#0284c7'};">${yearlyText}</div>
@@ -11634,7 +11677,7 @@ function renderCableOutagesGrid() {
                                 const textCol = dark ? '#f87171' : '#dc2626';
                                 const borderCol = dark ? '#991b1b' : '#fca5a5';
                                 html += `
-                                    <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
+                                    <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Complete 24h Total Outage (0 MW all 24 hours)">
                                         <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                             ${isYrOutage ? `<div>Mth: 0 MW</div><div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">Yr: 0 MW</div>` : `<div>Mth/Yr: OUTAGE</div>`}
                                         </div>
@@ -11649,7 +11692,7 @@ function renderCableOutagesGrid() {
                             const borderCol = dark ? '#9f1239' : '#fda4af';
                             const mthLabel = (curtailedEntries.length === 0) ? ntcLabel : (isAllDayReduction ? (minRemaining === maxRemaining ? `${minRemaining}/${maxOrig} MW` : `${minRemaining}-${maxRemaining} MW`) : `${minRemaining === 0 ? 0 : minRemaining}/${maxOrig} MW (${curtailedEntries.length}h)`);
                             html += `
-                                <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Yearly Outage (0 MW) / Monthly ${mthLabel}">
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Yearly Outage (0 MW) / Monthly ${mthLabel}">
                                     <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${mthLabel}</div>
                                         <div style="font-size: 11px; font-weight: 800; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap; color: #ef4444;">Yr: 0 MW</div>
@@ -11662,7 +11705,7 @@ function renderCableOutagesGrid() {
                             const textCol = dark ? '#fb923c' : '#c2410c';
                             const borderCol = dark ? '#9a3412' : '#fed7aa';
                             html += `
-                                <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel} / ${maxOrig} MW)">
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 24h capacity reduction (${remLabel} / ${maxOrig} MW)">
                                     <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${remLabel}</div>
                                         ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
@@ -11677,7 +11720,7 @@ function renderCableOutagesGrid() {
                             const textCol = dark ? '#a78bfa' : '#6d28d9';
                             const borderCol = dark ? '#5b21b6' : '#c4b5fd';
                             html += `
-                                <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: Hourly Outage for ${curtHours} of 24 hours (${subCap})">
                                     <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${subCap} (${curtHours}h)</div>
                                         ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
@@ -11690,7 +11733,7 @@ function renderCableOutagesGrid() {
                             const textCol = dark ? '#34d399' : '#059669';
                             const borderCol = dark ? '#065f46' : '#a7f3d0';
                             html += `
-                                <td style="padding: 3px 2px; border-right: 1px solid var(--border-color-subtle); cursor: pointer; box-sizing: border-box;" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 100% Full Capacity (${ntcLabel})">
+                                <td style="${tdStyle}" onclick="showOutageGridDetails('${corr}', '${d.dateStr}')" title="${corr} on ${d.dateStr}: 100% Full Capacity (${ntcLabel})">
                                     <div style="background: ${bgCol}; color: ${textCol}; border: 1.5px solid ${borderCol}; border-radius: 6px; padding: 5px 3px; width: 100%; min-height: 46px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; align-items: center; white-space: nowrap; font-size: 11px; font-weight: 700; line-height: 1.25; transition: all 0.2s;">
                                         <div style="white-space: nowrap;">Mth: ${ntcLabel}</div>
                                         ${yearlyText ? `<div style="font-size: 11px; font-weight: 700; margin-top: 2px; border-top: 1px dashed ${borderCol}; padding-top: 2px; width: 90%; text-align: center; white-space: nowrap;">${yearlyText}</div>` : ''}
