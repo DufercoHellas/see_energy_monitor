@@ -7999,7 +7999,7 @@ function runCoupledMeritOrderOptimizer() {
             if (targetDOW === 0 && h >= 10 && h <= 15 && resBG < 800) {
                 bgBaseline = Math.max(0, (resBG / 800) * 8.0);
             }
-            bgBaseline = Math.max(0, bgBaseline);
+            bgBaseline = Math.max(0, bgBaseline + rampAdder);
         } else {
             // Fallback purely from ex-ante merit order stack
             if (solarShare > 0.50 && resGR < 1500) {
@@ -8009,6 +8009,7 @@ function runCoupledMeritOrderOptimizer() {
             } else {
                 bgBaseline = ccgtSrmc;
             }
+            bgBaseline = Math.max(0, bgBaseline + rampAdder);
         }
 
         // Italian PUN gas proxy: CCGT SRMC + peak scarcity
@@ -8021,19 +8022,21 @@ function runCoupledMeritOrderOptimizer() {
 
         let bestP = 0, bestUnit = '', bestMarginalType = 'thermal';
         let bestNetImport = 0, bestFlowBG = 0, bestFlowIT = 0, bestFlowMK = 0, bestFlowAL = 0;
-        let minDiff = Infinity;
 
         // ── SDAC Karush-Kuhn-Tucker (KKT) Cross-Border Congestion Equilibrium ──
-        // 1. Calculate unconstrained domestic surplus when coupled with regional market (bgBaseline)
+        // 1. Calculate domestic autarky marginal cost in Greece (zero import reference)
+        const autarkic = clearZonalSupplyGR(resGR, demGR, bgBaseline);
+        const pAutarky = autarkic.price;
+
         const pminGR = 800; // Synchronous thermal technical minimum (MW)
         const surplusGR = Math.max(0, pminGR - resGR);
 
-        if (surplusGR > atcExportBG) {
+        if (surplusGR > atcExportBG && resGR < 0) {
             // CASE 2: CONGESTED EXPORT (Decoupled down)
             // Greek solar surplus exceeds the cable export capacity (1,170 MW).
             // Cable saturates at maximum export, trapping surplus in Greece and collapsing price.
             bestFlowBG = -atcExportBG;
-            bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15));
+            bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15.0));
             bestFlowMK = 0;
             bestFlowAL = 0;
             bestNetImport = bestFlowBG + bestFlowIT;
@@ -8044,20 +8047,51 @@ function runCoupledMeritOrderOptimizer() {
             bestUnit = 'Solar Surplus / Cable Congestion (Decoupled)';
             bestMarginalType = 'res_surplus';
         } else {
-            // CASE 1: UNCONGESTED CORRIDOR (Fully coupled with Bulgaria & SDAC)
-            // Cable has sufficient capacity. Price arbitrage guarantees P_GR = P_BG!
-            bestP = bgBaseline;
-            bestFlowBG = -surplusGR;
-            bestFlowIT = Math.max(-500, Math.min(500, (bestP - pIT) * 15));
-            bestFlowMK = Math.max(-600, Math.min(600, (bestP - pMK) * 10));
-            bestFlowAL = Math.max(-350, Math.min(350, (bestP - pAL) * 10));
+            // CASE 1: SDAC ECONOMIC ARBITRAGE (Bidirectional commercial flow)
+            // Flow responds to price differential: imports when GR autarky is higher than BG, exports when lower.
+            const spreadBG = pAutarky - bgBaseline;
+            if (spreadBG > 0) {
+                // Greece is more expensive: Commercial IMPORT from Bulgaria into Greece (+MW)
+                bestFlowBG = Math.min(atcImportBG, spreadBG * 35.0);
+            } else {
+                // Greece is cheaper: Commercial EXPORT from Greece to Bulgaria (-MW)
+                bestFlowBG = Math.max(-atcExportBG, spreadBG * 35.0);
+            }
+
+            // Physical solar surplus limit: if Greece is generating massive solar excess (resGR < 0),
+            // export to Bulgaria is driven by evacuating surplus up to export ATC.
+            if (resGR < 0) {
+                const solarSurplus = -resGR;
+                bestFlowBG = Math.max(-atcExportBG, -solarSurplus);
+            }
+
+            // Commercial flows with IT (HVDC), MK, AL based on regional benchmark spreads
+            bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15.0));
+            bestFlowMK = Math.max(-600, Math.min(600, (bgBaseline - pMK) * 10.0));
+            bestFlowAL = Math.max(-350, Math.min(350, (bgBaseline - pAL) * 10.0));
+
             bestNetImport = bestFlowBG + bestFlowIT + bestFlowMK + bestFlowAL;
-            bestUnit = h >= 18 && h <= 22 ? 'PPC Hydro Reservoirs (Peaking Call)' : (h >= 5 && h <= 8 ? 'CCGT Morning Ramp (Coupled)' : 'Regional SDAC Merit Stack (Coupled)');
-            bestMarginalType = 'coupled_market';
+            const reqGen = resGR - bestNetImport;
+
+            const isCongestedExport = (bestFlowBG <= -atcExportBG + 0.1);
+            const isCongestedImport = (bestFlowBG >= atcImportBG - 0.1);
+
+            const cleared = clearZonalSupplyGR(reqGen, demGR, bgBaseline);
+
+            if (isCongestedExport || isCongestedImport) {
+                // Saturated interconnector: domestic marginal stack determines price
+                bestP = cleared.price;
+                bestUnit = cleared.marginal_plant;
+                bestMarginalType = cleared.marginal_type;
+            } else {
+                // Uncongested: regional SDAC price convergence
+                bestP = bgBaseline;
+                bestUnit = h >= 18 && h <= 22 ? 'PPC Hydro Reservoirs (Peaking Call)' : (h >= 5 && h <= 8 ? 'CCGT Morning Ramp (Coupled)' : 'Regional SDAC Merit Stack (Coupled)');
+                bestMarginalType = 'coupled_market';
+            }
         }
 
         // Midday Sunday solar collapse when Greek domestic solar generation dominates
-        const targetDOW = new Date(targetDate).getDay();
         if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 500) {
             bestP = Math.min(bestP, Math.max(0, (resGR / 500) * 2.0));
         }
@@ -8078,7 +8112,7 @@ function runCoupledMeritOrderOptimizer() {
             marginal_type_gr: bestMarginalType,
             actual_price_gr: actPgr,
             price_delta_gr: actPgr !== null ? (bestP - actPgr) : null,
-            is_coupled: minDiff < 30.0
+            is_coupled: Math.abs(bestFlowBG) < atcImportBG - 0.1 && Math.abs(bestFlowBG) < atcExportBG - 0.1
         });
     }
 
@@ -8097,6 +8131,16 @@ function runCoupledMeritOrderOptimizer() {
 
     // Render 24h Breakdown Table
     renderOptimizerTable();
+
+    // Ensure Plotly plots resize to actual container dimensions after DOM paint
+    setTimeout(() => {
+        const p1 = document.getElementById("plot_econ_opt_24h_profile");
+        const p2 = document.getElementById("plot_econ_opt_merit_curve");
+        if (window.Plotly) {
+            if (p1) Plotly.Plots.resize(p1);
+            if (p2) Plotly.Plots.resize(p2);
+        }
+    }, 50);
 }
 
 function render24hOptimizerProfileChart() {
