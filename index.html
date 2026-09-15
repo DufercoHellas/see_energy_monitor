@@ -7977,13 +7977,10 @@ function runCoupledMeritOrderOptimizer() {
         const resGR = grResiduals[h] || 0;
         const solarShare = Math.max(0, Math.min(1, (demGR - resGR) / demGR));
 
-        // Morning Ramp & Industrial Startup Premium (06:00 - 09:00 CET / 07:00 - 10:00 EET)
+        // Morning Ramp & Industrial Startup Sensitivity
         const prevDem = h > 0 ? (grDemand[h-1] || demGR) : demGR;
         const rampMw = demGR - prevDem;
-        let rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(25, (rampMw - 200) * 0.06) : 0;
-        if (h >= 5 && h <= 7) {
-            rampAdder += 15.0;
-        }
+        const rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(18, (rampMw - 200) * 0.04) : 0;
 
         let bgBaseline = 145.0;
         if (priorClearedDate && histGR[priorClearedDate] && histGR[priorClearedDate].prices) {
@@ -7994,7 +7991,16 @@ function runCoupledMeritOrderOptimizer() {
             const dResBG = resBG - prevResBG;
             const dResGR = resGR - prevResGR;
 
-            bgBaseline = prevGrP + euaDelta + dResGR * 0.012 + dResBG * 0.008;
+            // Hourly tuned elasticity: higher sensitivity during morning ramp & solar hours
+            let betaGR = 0.012;
+            if (h >= 7 && h <= 10) betaGR = 0.024;
+            else if (h >= 11 && h <= 15) betaGR = 0.016;
+
+            // Mean reversion factor on prior day spot price:
+            const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
+            const pAnchor = 0.72 * prevGrP + 0.28 * pRegimeMean;
+
+            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + dResBG * 0.006;
 
             // Weekend midday solar collapse:
             if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 800) {
@@ -8045,9 +8051,9 @@ function runCoupledMeritOrderOptimizer() {
             bestNetImport = bestFlowBG + bestFlowIT;
 
             if (resGR < 0) {
-                bestP = Math.max(0.01, 12.0 + resGR * 0.02);
+                bestP = Math.max(0.01, 5.0 + resGR * 0.01);
             } else if (resGR < 600) {
-                bestP = Math.max(0.01, 20.0 + (resGR / 600) * 25.0);
+                bestP = Math.max(0.01, 15.0 + (resGR / 600) * 20.0);
             } else {
                 const trappedExcess = Math.max(0, surplusGR - atcExportBG);
                 const discount = Math.min(bgBaseline - 10.0, 35.0 + trappedExcess * 0.05);
