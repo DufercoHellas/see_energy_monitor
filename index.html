@@ -7986,20 +7986,21 @@ function runCoupledMeritOrderOptimizer() {
         }
 
         let bgBaseline = 145.0;
-        if (priorClearedDate && histBG[priorClearedDate] && histBG[priorClearedDate].prices) {
-            const prevBgP = histBG[priorClearedDate].prices[h] || 145.0;
+        if (priorClearedDate && histGR[priorClearedDate] && histGR[priorClearedDate].prices) {
+            const prevGrP = histGR[priorClearedDate].prices[h] || 145.0;
             const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
-            const prevResBG = (histBG[priorClearedDate].residuals && histBG[priorClearedDate].residuals[h] !== undefined) ? histBG[priorClearedDate].residuals[h] : resBG;
+            const prevResBG = (histBG[priorClearedDate] && histBG[priorClearedDate].residuals && histBG[priorClearedDate].residuals[h] !== undefined) ? histBG[priorClearedDate].residuals[h] : resBG;
+            const prevResGR = (histGR[priorClearedDate].residuals && histGR[priorClearedDate].residuals[h] !== undefined) ? histGR[priorClearedDate].residuals[h] : resGR;
             const dResBG = resBG - prevResBG;
-            const dResGR = resGR - ((histGR[priorClearedDate] && histGR[priorClearedDate].residuals && histGR[priorClearedDate].residuals[h]) || resGR);
+            const dResGR = resGR - prevResGR;
 
-            bgBaseline = prevBgP + euaDelta + dResBG * 0.02 + dResGR * 0.015;
+            bgBaseline = prevGrP + euaDelta + dResGR * 0.012 + dResBG * 0.008;
 
-            // Weekend midday solar collapse in Bulgaria:
-            if (targetDOW === 0 && h >= 10 && h <= 15 && resBG < 800) {
-                bgBaseline = Math.max(0, (resBG / 800) * 8.0);
+            // Weekend midday solar collapse:
+            if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 800) {
+                bgBaseline = Math.max(0.01, (resGR / 800) * 8.0);
             }
-            bgBaseline = Math.max(0, bgBaseline + rampAdder);
+            bgBaseline = Math.max(0.01, bgBaseline + rampAdder);
         } else {
             // Fallback purely from ex-ante merit order stack
             if (solarShare > 0.50 && resGR < 1500) {
@@ -8009,7 +8010,7 @@ function runCoupledMeritOrderOptimizer() {
             } else {
                 bgBaseline = ccgtSrmc;
             }
-            bgBaseline = Math.max(0, bgBaseline + rampAdder);
+            bgBaseline = Math.max(0.01, bgBaseline + rampAdder);
         }
 
         // Italian PUN gas proxy: CCGT SRMC + peak scarcity
@@ -8107,12 +8108,6 @@ function runCoupledMeritOrderOptimizer() {
         // Sunset steep ramp (Hour 18 CET / 19 EET) when solar generation vanishes
         if (h === 17 && resGR > 2800) {
             bestP = Math.max(bestP, 160.0 + (resGR - 2800) * 0.025);
-        }
-
-        // Evening peak scarcity calibration (Hours 19-22 CET / 20-23 EET):
-        if (h >= 18 && h <= 21 && resGR > 3300) {
-            const scarcityBoost = Math.min(45.0, (resGR - 3300) * 0.03);
-            bestP += scarcityBoost;
         }
 
         hourlyResults.push({
