@@ -3103,26 +3103,31 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
         </div>
 
         <!-- Day Average Baseload Forecast & Performance Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #2563eb;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Forecast Baseload (24h)</div>
-                <div id="econ_opt_pred_baseload" style="font-size: 22px; font-weight: 800; color: #2563eb; margin-top: 4px;">-- €/MWh</div>
-                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Multi-Border Coupled Merit Order</div>
-            </div>
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #f59e0b;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Actual Cleared Baseload</div>
-                <div id="econ_opt_actual_baseload" style="font-size: 22px; font-weight: 800; color: #f59e0b; margin-top: 4px;">-- €/MWh</div>
-                <div id="econ_opt_actual_baseload_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">HEnEx SDAC Day-Ahead Clearing</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;">
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #0284c7;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Regional SEE Anchor</div>
+                <div id="econ_opt_regional_anchor" style="font-size: 22px; font-weight: 800; color: #0284c7; margin-top: 4px;">-- €/MWh</div>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Coupled Balkan Baseline</div>
             </div>
             <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #10b981;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Baseload Delta (Spread)</div>
-                <div id="econ_opt_baseload_delta" style="font-size: 22px; font-weight: 800; color: #10b981; margin-top: 4px;">-- €/MWh</div>
-                <div id="econ_opt_baseload_delta_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Forecast Error (Pred - Actual)</div>
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Predicted GR-BG Spread</div>
+                <div id="econ_opt_pred_spread" style="font-size: 22px; font-weight: 800; color: #10b981; margin-top: 4px;">-- €/MWh</div>
+                <div id="econ_opt_pred_spread_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Cable Congestion Arbitrage</div>
+            </div>
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #2563eb;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Greece Forecast (24h)</div>
+                <div id="econ_opt_pred_baseload" style="font-size: 22px; font-weight: 800; color: #2563eb; margin-top: 4px;">-- €/MWh</div>
+                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Anchor + Spread Clearing</div>
+            </div>
+            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #f59e0b;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Actual Cleared Spot</div>
+                <div id="econ_opt_actual_baseload" style="font-size: 22px; font-weight: 800; color: #f59e0b; margin-top: 4px;">-- €/MWh</div>
+                <div id="econ_opt_actual_baseload_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">HEnEx SDAC Clearing</div>
             </div>
             <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #8b5cf6;">
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Hourly Profile MAE</div>
                 <div id="econ_opt_hourly_mae" style="font-size: 22px; font-weight: 800; color: #8b5cf6; margin-top: 4px;">-- €/MWh</div>
-                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Mean 24-Hour Shape Dispersion</div>
+                <div id="econ_opt_baseload_delta_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">24h Forecast Dispersion</div>
             </div>
         </div>
 
@@ -8136,6 +8141,8 @@ function runCoupledMeritOrderOptimizer() {
             flow_mk: bestFlowMK,
             flow_al: bestFlowAL,
             gr_required_gen: resGR - bestNetImport,
+            regional_anchor: bgBaseline,
+            pred_spread: bestP - bgBaseline,
             model_price_gr: bestP,
             marginal_plant_gr: bestUnit,
             marginal_type_gr: bestMarginalType,
@@ -8222,6 +8229,8 @@ function render24hOptimizerProfileChart() {
     });
 
     // Compute 24h Baseload Averages & Metrics
+    const regionalAnchorEl = document.getElementById("econ_opt_regional_anchor");
+    const predSpreadEl = document.getElementById("econ_opt_pred_spread");
     const predBaseloadEl = document.getElementById("econ_opt_pred_baseload");
     const actualBaseloadEl = document.getElementById("econ_opt_actual_baseload");
     const actualSubEl = document.getElementById("econ_opt_actual_baseload_sub");
@@ -8230,7 +8239,16 @@ function render24hOptimizerProfileChart() {
     const hourlyMaeEl = document.getElementById("econ_opt_hourly_mae");
     const metricsEl = document.getElementById("econ_opt_summary_metrics");
 
+    const avgAnchor = data.reduce((a, b) => a + (b.regional_anchor || 145.0), 0) / data.length;
+    const avgSpread = data.reduce((a, b) => a + (b.pred_spread || 0), 0) / data.length;
     const avgPred = modelPrices.reduce((a, b) => a + b, 0) / modelPrices.length;
+
+    if (regionalAnchorEl) regionalAnchorEl.innerText = `€${avgAnchor.toFixed(2)}/MWh`;
+    if (predSpreadEl) {
+        const sign = avgSpread >= 0 ? '+' : '';
+        predSpreadEl.innerText = `${sign}€${avgSpread.toFixed(2)}/MWh`;
+        predSpreadEl.style.color = Math.abs(avgSpread) < 3 ? '#10b981' : (avgSpread < 0 ? '#f97316' : '#2563eb');
+    }
     if (predBaseloadEl) predBaseloadEl.innerText = `€${avgPred.toFixed(2)}/MWh`;
 
     if (hasActual) {
