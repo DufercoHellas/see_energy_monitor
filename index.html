@@ -7980,6 +7980,9 @@ function runCoupledMeritOrderOptimizer() {
     else if (targetDOW === 6) wImm = 0.25;  // Saturday: 75% weight on last Saturday
     else if (targetDOW === 0) wImm = 0.45;  // Sunday: 55% weight on last Sunday
 
+    // Monday structural resumption step (re-engaging commercial industrial demand)
+    const mondayBonus = (targetDOW === 1) ? 12.0 : 0.0;
+
     const refDate = priorImm || priorSameDow;
     const prevEUA = (refDate && histGR[refDate] && histGR[refDate].eua_price) || euaPrice;
     const euaDelta = (euaPrice - prevEUA) * (0.43 / 0.34); // Maritsa lignite carbon sensitivity
@@ -7995,13 +7998,16 @@ function runCoupledMeritOrderOptimizer() {
         // Morning Ramp & Industrial Startup Sensitivity
         const prevDem = h > 0 ? (grDemand[h-1] || demGR) : demGR;
         const rampMw = demGR - prevDem;
-        const rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(18, (rampMw - 200) * 0.04) : 0;
+        let rampAdder = 0;
+        if (h >= 5 && h <= 8 && rampMw > 200) {
+            rampAdder = (h === 8) ? Math.min(8.0, (rampMw - 200) * 0.02) : Math.min(16.0, (rampMw - 200) * 0.035);
+        }
 
         let bgBaseline = 145.0;
         if (refDate && histGR[refDate] && histGR[refDate].prices) {
             const pImm = (priorImm && histGR[priorImm] && histGR[priorImm].prices) ? (histGR[priorImm].prices[h] || 145.0) : 145.0;
             const pSame = (priorSameDow && histGR[priorSameDow] && histGR[priorSameDow].prices) ? (histGR[priorSameDow].prices[h] || 145.0) : pImm;
-            const prevGrP = wImm * pImm + (1.0 - wImm) * pSame;
+            const prevGrP = wImm * pImm + (1.0 - wImm) * pSame + mondayBonus;
 
             const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
             const prevResBG = (histBG[refDate] && histBG[refDate].residuals && histBG[refDate].residuals[h] !== undefined) ? histBG[refDate].residuals[h] : resBG;
@@ -8013,6 +8019,13 @@ function runCoupledMeritOrderOptimizer() {
             let betaGR = 0.007;
             if (h >= 7 && h <= 10) betaGR = 0.015;
             else if (h >= 11 && h <= 15) betaGR = 0.010;
+
+            // Evening Peak Non-Linear Peaker Relief:
+            // When evening residual collapses from prior day extreme peak, marginal costs plunge rapidly off peakers
+            let eveningRelief = 0;
+            if (h >= 19 && h <= 22 && dResGR < -600) {
+                eveningRelief = -Math.min(75.0, (-dResGR - 600) * 0.045);
+            }
 
             // Anchor formulation with 90% weighting on recent calibrated levels
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
@@ -8027,7 +8040,7 @@ function runCoupledMeritOrderOptimizer() {
                 }
             }
 
-            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + dResBG * 0.006 + seeAdder;
+            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + eveningRelief + dResBG * 0.006 + seeAdder;
 
             // Weekend midday solar collapse:
             if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 800) {
@@ -8067,7 +8080,9 @@ function runCoupledMeritOrderOptimizer() {
         const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2000;
         const isNoonHour = (h >= 9 && h <= 15);
 
-        if (surplusGR > atcExportBG || (isNoonHour && (resGR < 0 || (resGR < 600 && resBG < 1000)))) {
+        // Midday Solar Decoupling Condition:
+        // Decouple to local solar floor ONLY IF Greek surplus exceeds cable ATC OR Bulgaria is also low residual (ResBG < 700 MW)
+        if (surplusGR > atcExportBG || (isNoonHour && (resGR < 0 || (resGR < 600 && resBG < 700)))) {
             // CASE 2: CONGESTED EXPORT (Decoupled down)
             // Greek solar generation saturates the export corridor to Bulgaria (1,170 MW).
             // Surplus is trapped in Greece, forcing local clearing down to the solar floor.
@@ -8088,6 +8103,17 @@ function runCoupledMeritOrderOptimizer() {
             }
             bestUnit = 'Solar Surplus / Export Cable Congestion (Decoupled)';
             bestMarginalType = 'res_surplus';
+        } else if (isNoonHour && resGR < 600 && resBG >= 700) {
+            // CASE 2B: REGIONALLY SUPPORTED SOLAR EXPORT
+            // Greece exports at full capacity, but Bulgaria has high residual demand and absorbs the surplus at regional price
+            bestFlowBG = -atcExportBG;
+            bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15.0));
+            bestFlowMK = 0;
+            bestFlowAL = 0;
+            bestNetImport = bestFlowBG + bestFlowIT;
+            bestP = Math.max(35.0, (bgBaseline + 75.0 + (resBG / 1000) * 25.0) / 2.0);
+            bestUnit = 'Regional Solar Export Absorption (BG Supported)';
+            bestMarginalType = 'coupled_market';
         } else {
             // CASE 1: SDAC ECONOMIC ARBITRAGE (Bidirectional commercial flow)
             // Flow responds to price differential: imports when GR autarky is higher than BG, exports when lower.
@@ -8140,16 +8166,7 @@ function runCoupledMeritOrderOptimizer() {
 
         // Sunset steep ramp (Hour 18 CET / 19 EET) when solar generation vanishes
         if (h === 17 && resGR > 2800) {
-            bestP = Math.max(bestP, 160.0 + (resGR - 2800) * 0.025);
-        }
-
-        // Evening Peak Hydro Scarcity & Peaker Curvature (Hours 20-21 CET / 21-22 EET)
-        if (h === 19 || h === 20) {
-            if (resGR > 6800) {
-                bestP += Math.min(30.0, (resGR - 6800) * 0.03);
-            } else if (resGR < 5200) {
-                bestP -= Math.min(25.0, (5200 - resGR) * 0.025);
-            }
+            bestP = Math.max(bestP, 155.0 + (resGR - 2800) * 0.02);
         }
 
         hourlyResults.push({
