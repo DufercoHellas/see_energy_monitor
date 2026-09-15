@@ -7980,12 +7980,23 @@ function runCoupledMeritOrderOptimizer() {
     else if (targetDOW === 6) wImm = 0.25;  // Saturday: 75% weight on last Saturday
     else if (targetDOW === 0) wImm = 0.45;  // Sunday: 55% weight on last Sunday
 
-    // Monday structural resumption step (re-engaging commercial industrial demand)
-    const mondayBonus = (targetDOW === 1) ? 12.0 : 0.0;
+    // Monday dynamic structural resumption step:
+    // Combines +12 EUR base resumption with demand/residual ramp elasticity vs Friday baseline
+    let mondayBonus = 0.0;
+    if (targetDOW === 1 && priorSameDow) {
+        const friResAvg = (histGR[priorSameDow] && histGR[priorSameDow].residuals) ? (histGR[priorSameDow].residuals.reduce((a,b)=>a+b,0)/24) : 2500;
+        const monResAvg = grResiduals.reduce((a,b)=>a+b,0)/24;
+        const dResFriMon = monResAvg - friResAvg;
+        mondayBonus = 12.0 + dResFriMon * 0.020;
+    }
 
     const refDate = priorImm || priorSameDow;
     const prevEUA = (refDate && histGR[refDate] && histGR[refDate].eua_price) || euaPrice;
     const euaDelta = (euaPrice - prevEUA) * (0.43 / 0.34); // Maritsa lignite carbon sensitivity
+
+    // TTF Natural Gas marginal shift on CCGTs
+    const prevTTF = (refDate && histGR[refDate] && histGR[refDate].ttf_price) || ttfPrice;
+    const ttfDelta = ((ttfPrice - prevTTF) / 0.55) * 0.30;
     const ccgtSrmc = (ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5;
 
     // Solve simultaneous multi-border flow equilibrium for all 24 hours:
@@ -8005,8 +8016,8 @@ function runCoupledMeritOrderOptimizer() {
 
         let bgBaseline = 145.0;
         if (refDate && histGR[refDate] && histGR[refDate].prices) {
-            const pImm = (priorImm && histGR[priorImm] && histGR[priorImm].prices) ? (histGR[priorImm].prices[h] || 145.0) : 145.0;
-            const pSame = (priorSameDow && histGR[priorSameDow] && histGR[priorSameDow].prices) ? (histGR[priorSameDow].prices[h] || 145.0) : pImm;
+            const pImm = (priorImm && histGR[priorImm] && histGR[priorImm].prices) ? (histGR[priorImm].prices[h] !== undefined ? histGR[priorImm].prices[h] : 145.0) : 145.0;
+            const pSame = (priorSameDow && histGR[priorSameDow] && histGR[priorSameDow].prices) ? (histGR[priorSameDow].prices[h] !== undefined ? histGR[priorSameDow].prices[h] : 145.0) : pImm;
             const prevGrP = wImm * pImm + (1.0 - wImm) * pSame + mondayBonus;
 
             const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
@@ -8016,9 +8027,9 @@ function runCoupledMeritOrderOptimizer() {
             const dResGR = resGR - prevResGR;
 
             // Hourly tuned elasticity: higher sensitivity during morning ramp & solar hours
-            let betaGR = 0.007;
-            if (h >= 7 && h <= 10) betaGR = 0.015;
-            else if (h >= 11 && h <= 15) betaGR = 0.010;
+            let betaGR = 0.006;
+            if (h >= 7 && h <= 10) betaGR = 0.012;
+            else if (h >= 11 && h <= 15) betaGR = 0.008;
 
             // Evening Peak Non-Linear Peaker Relief:
             // When evening residual collapses from prior day extreme peak, marginal costs plunge rapidly off peakers
@@ -8027,9 +8038,9 @@ function runCoupledMeritOrderOptimizer() {
                 eveningRelief = -Math.min(75.0, (-dResGR - 600) * 0.045);
             }
 
-            // Anchor formulation with 90% weighting on recent calibrated levels
+            // Anchor formulation with 92% weighting on recent calibrated levels
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
-            const pAnchor = 0.90 * prevGrP + 0.10 * pRegimeMean;
+            const pAnchor = 0.92 * prevGrP + 0.08 * pRegimeMean;
 
             // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
             let seeAdder = 0;
@@ -8040,7 +8051,7 @@ function runCoupledMeritOrderOptimizer() {
                 }
             }
 
-            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + eveningRelief + dResBG * 0.006 + seeAdder;
+            bgBaseline = pAnchor + euaDelta + ttfDelta + dResGR * betaGR + eveningRelief + dResBG * 0.006 + seeAdder;
 
             // Weekend midday solar collapse:
             if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 800) {
