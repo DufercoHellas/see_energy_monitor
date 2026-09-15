@@ -8030,21 +8030,29 @@ function runCoupledMeritOrderOptimizer() {
 
         const pminGR = 800; // Synchronous thermal technical minimum (MW)
         const surplusGR = Math.max(0, pminGR - resGR);
+        const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2000;
+        const isNoonHour = (h >= 9 && h <= 15);
 
-        if (surplusGR > atcExportBG && resGR < 0) {
+        if (surplusGR > atcExportBG || (isNoonHour && (resGR < 0 || (resGR < 600 && resBG < 1000)))) {
             // CASE 2: CONGESTED EXPORT (Decoupled down)
-            // Greek solar surplus exceeds the cable export capacity (1,170 MW).
-            // Cable saturates at maximum export, trapping surplus in Greece and collapsing price.
+            // Greek solar generation saturates the export corridor to Bulgaria (1,170 MW).
+            // Surplus is trapped in Greece, forcing local clearing down to the solar floor.
             bestFlowBG = -atcExportBG;
             bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15.0));
             bestFlowMK = 0;
             bestFlowAL = 0;
             bestNetImport = bestFlowBG + bestFlowIT;
 
-            const trappedExcess = surplusGR - atcExportBG;
-            const discount = Math.min(bgBaseline - 10.0, 35.0 + trappedExcess * 0.05);
-            bestP = Math.max(0.01, bgBaseline - discount);
-            bestUnit = 'Solar Surplus / Cable Congestion (Decoupled)';
+            if (resGR < 0) {
+                bestP = Math.max(0.01, 12.0 + resGR * 0.02);
+            } else if (resGR < 600) {
+                bestP = Math.max(0.01, 20.0 + (resGR / 600) * 25.0);
+            } else {
+                const trappedExcess = Math.max(0, surplusGR - atcExportBG);
+                const discount = Math.min(bgBaseline - 10.0, 35.0 + trappedExcess * 0.05);
+                bestP = Math.max(0.01, bgBaseline - discount);
+            }
+            bestUnit = 'Solar Surplus / Export Cable Congestion (Decoupled)';
             bestMarginalType = 'res_surplus';
         } else {
             // CASE 1: SDAC ECONOMIC ARBITRAGE (Bidirectional commercial flow)
@@ -8096,9 +8104,14 @@ function runCoupledMeritOrderOptimizer() {
             bestP = Math.min(bestP, Math.max(0.01, (resGR / 500) * 2.0));
         }
 
+        // Sunset steep ramp (Hour 18 CET / 19 EET) when solar generation vanishes
+        if (h === 17 && resGR > 2800) {
+            bestP = Math.max(bestP, 160.0 + (resGR - 2800) * 0.025);
+        }
+
         // Evening peak scarcity calibration (Hours 19-22 CET / 20-23 EET):
-        if (h >= 18 && h <= 21 && resGR > 3200) {
-            const scarcityBoost = Math.min(60.0, (resGR - 3200) * 0.04);
+        if (h >= 18 && h <= 21 && resGR > 3300) {
+            const scarcityBoost = Math.min(45.0, (resGR - 3300) * 0.03);
             bestP += scarcityBoost;
         }
 
