@@ -8116,6 +8116,15 @@ function runCoupledMeritOrderOptimizer() {
             bestP = Math.max(bestP, 160.0 + (resGR - 2800) * 0.025);
         }
 
+        // Evening Peak Hydro Scarcity & Peaker Curvature (Hours 20-21 CET / 21-22 EET)
+        if (h === 19 || h === 20) {
+            if (resGR > 6800) {
+                bestP += Math.min(30.0, (resGR - 6800) * 0.03);
+            } else if (resGR < 5200) {
+                bestP -= Math.min(25.0, (5200 - resGR) * 0.025);
+            }
+        }
+
         hourlyResults.push({
             hour: h + 1,
             gr_demand: demGR,
