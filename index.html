@@ -7962,16 +7962,26 @@ function runCoupledMeritOrderOptimizer() {
     const targetDOW = new Date(targetDate).getDay(); // 0: Sun, 6: Sat
     const isWeekend = (targetDOW === 0 || targetDOW === 6);
 
+    const priorImm = priorDates.length > 0 ? priorDates[priorDates.length - 1] : null;
+
+    let priorSameDow = null;
     for (let i = priorDates.length - 1; i >= Math.max(0, priorDates.length - 14); i--) {
         const pdow = new Date(priorDates[i]).getDay();
         if ((targetDOW === 0 && pdow === 0) || (targetDOW === 6 && pdow === 6) || (!isWeekend && pdow >= 1 && pdow <= 5)) {
-            priorClearedDate = priorDates[i];
+            priorSameDow = priorDates[i];
             break;
         }
     }
-    if (!priorClearedDate && priorDates.length > 0) priorClearedDate = priorDates[priorDates.length - 1];
+    if (!priorSameDow) priorSameDow = priorImm;
 
-    const prevEUA = (priorClearedDate && histGR[priorClearedDate] && histGR[priorClearedDate].eua_price) || euaPrice;
+    // Optimal empirical blend weights between immediate prior day and same DOW last week
+    let wImm = 0.35;
+    if (targetDOW === 1) wImm = 0.20;       // Monday: 80% weight on Friday profile
+    else if (targetDOW === 6) wImm = 0.25;  // Saturday: 75% weight on last Saturday
+    else if (targetDOW === 0) wImm = 0.45;  // Sunday: 55% weight on last Sunday
+
+    const refDate = priorImm || priorSameDow;
+    const prevEUA = (refDate && histGR[refDate] && histGR[refDate].eua_price) || euaPrice;
     const euaDelta = (euaPrice - prevEUA) * (0.43 / 0.34); // Maritsa lignite carbon sensitivity
     const ccgtSrmc = (ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5;
 
@@ -7988,22 +7998,25 @@ function runCoupledMeritOrderOptimizer() {
         const rampAdder = (h >= 5 && h <= 8 && rampMw > 200) ? Math.min(18, (rampMw - 200) * 0.04) : 0;
 
         let bgBaseline = 145.0;
-        if (priorClearedDate && histGR[priorClearedDate] && histGR[priorClearedDate].prices) {
-            const prevGrP = histGR[priorClearedDate].prices[h] || 145.0;
+        if (refDate && histGR[refDate] && histGR[refDate].prices) {
+            const pImm = (priorImm && histGR[priorImm] && histGR[priorImm].prices) ? (histGR[priorImm].prices[h] || 145.0) : 145.0;
+            const pSame = (priorSameDow && histGR[priorSameDow] && histGR[priorSameDow].prices) ? (histGR[priorSameDow].prices[h] || 145.0) : pImm;
+            const prevGrP = wImm * pImm + (1.0 - wImm) * pSame;
+
             const resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2500;
-            const prevResBG = (histBG[priorClearedDate] && histBG[priorClearedDate].residuals && histBG[priorClearedDate].residuals[h] !== undefined) ? histBG[priorClearedDate].residuals[h] : resBG;
-            const prevResGR = (histGR[priorClearedDate].residuals && histGR[priorClearedDate].residuals[h] !== undefined) ? histGR[priorClearedDate].residuals[h] : resGR;
+            const prevResBG = (histBG[refDate] && histBG[refDate].residuals && histBG[refDate].residuals[h] !== undefined) ? histBG[refDate].residuals[h] : resBG;
+            const prevResGR = (histGR[refDate] && histGR[refDate].residuals && histGR[refDate].residuals[h] !== undefined) ? histGR[refDate].residuals[h] : resGR;
             const dResBG = resBG - prevResBG;
             const dResGR = resGR - prevResGR;
 
             // Hourly tuned elasticity: higher sensitivity during morning ramp & solar hours
-            let betaGR = 0.012;
-            if (h >= 7 && h <= 10) betaGR = 0.024;
-            else if (h >= 11 && h <= 15) betaGR = 0.016;
+            let betaGR = 0.007;
+            if (h >= 7 && h <= 10) betaGR = 0.015;
+            else if (h >= 11 && h <= 15) betaGR = 0.010;
 
-            // Mean reversion factor on prior day spot price:
+            // Anchor formulation with 90% weighting on recent calibrated levels
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
-            const pAnchor = 0.72 * prevGrP + 0.28 * pRegimeMean;
+            const pAnchor = 0.90 * prevGrP + 0.10 * pRegimeMean;
 
             // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
             let seeAdder = 0;
