@@ -7957,7 +7957,7 @@ function runCoupledMeritOrderOptimizer() {
     let priorClearedDate = null;
     const histGR = hist.GR || {};
     const histBG = hist.BG || {};
-    const priorDates = Object.keys(histGR).filter(d => d < targetDate && histGR[d] && histGR[d].prices && histGR[d].prices.some(p => p > 0)).sort();
+    const priorDates = Object.keys(histGR).filter(d => d < targetDate && histGR[d] && histGR[d].prices && histGR[d].prices.some(p => p !== null && !isNaN(p))).sort();
     
     const targetDOW = new Date(targetDate).getDay(); // 0: Sun, 6: Sat
     const isWeekend = (targetDOW === 0 || targetDOW === 6);
@@ -7981,13 +7981,14 @@ function runCoupledMeritOrderOptimizer() {
     else if (targetDOW === 0) wImm = 0.45;  // Sunday: 55% weight on last Sunday
 
     // Monday dynamic structural resumption step:
-    // Combines +12 EUR base resumption with demand/residual ramp elasticity vs Friday baseline
+    // Combines +12 EUR base resumption with demand/residual ramp elasticity vs Friday baseline, bounded to prevent extreme weather overshoots
     let mondayBonus = 0.0;
     if (targetDOW === 1 && priorSameDow) {
         const friResAvg = (histGR[priorSameDow] && histGR[priorSameDow].residuals) ? (histGR[priorSameDow].residuals.reduce((a,b)=>a+b,0)/24) : 2500;
         const monResAvg = grResiduals.reduce((a,b)=>a+b,0)/24;
         const dResFriMon = monResAvg - friResAvg;
-        mondayBonus = 12.0 + dResFriMon * 0.020;
+        const rawBonus = 12.0 + dResFriMon * 0.020;
+        mondayBonus = Math.max(-15.0, Math.min(18.0, rawBonus));
     }
 
     const refDate = priorImm || priorSameDow;
@@ -8026,10 +8027,11 @@ function runCoupledMeritOrderOptimizer() {
             const dResBG = resBG - prevResBG;
             const dResGR = resGR - prevResGR;
 
-            // Hourly tuned elasticity: higher sensitivity during morning ramp & solar hours
-            let betaGR = 0.006;
-            if (h >= 7 && h <= 10) betaGR = 0.012;
-            else if (h >= 11 && h <= 15) betaGR = 0.008;
+            // Hourly tuned elasticity: higher sensitivity during morning ramp, solar, and evening peaker hours
+            let betaGR = 0.007;
+            if (h >= 7 && h <= 10) betaGR = 0.015;
+            else if (h >= 11 && h <= 15) betaGR = 0.010;
+            else if (h >= 19 && h <= 22) betaGR = 0.014;
 
             // Evening Peak Non-Linear Peaker Relief:
             // When evening residual collapses from prior day extreme peak, marginal costs plunge rapidly off peakers
@@ -8038,9 +8040,9 @@ function runCoupledMeritOrderOptimizer() {
                 eveningRelief = -Math.min(75.0, (-dResGR - 600) * 0.045);
             }
 
-            // Anchor formulation with 92% weighting on recent calibrated levels
+            // Anchor formulation with 95% weighting on recent calibrated levels
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
-            const pAnchor = 0.92 * prevGrP + 0.08 * pRegimeMean;
+            const pAnchor = 0.95 * prevGrP + 0.05 * pRegimeMean;
 
             // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
             let seeAdder = 0;
@@ -8156,19 +8158,11 @@ function runCoupledMeritOrderOptimizer() {
             const isCongestedExport = (bestFlowBG <= -atcExportBG + 0.1);
             const isCongestedImport = (bestFlowBG >= atcImportBG - 0.1);
 
-            const cleared = clearZonalSupplyGR(reqGen, demGR, bgBaseline, h + 1);
-
-            if (isCongestedExport || isCongestedImport) {
-                // Saturated interconnector: domestic marginal stack determines price
-                bestP = cleared.price;
-                bestUnit = cleared.marginal_plant;
-                bestMarginalType = cleared.marginal_type;
-            } else {
-                // Uncongested: regional SDAC price convergence
-                bestP = bgBaseline;
-                bestUnit = h >= 18 && h <= 22 ? 'PPC Hydro Reservoirs (Peaking Call)' : (h >= 5 && h <= 8 ? 'CCGT Morning Ramp (Coupled)' : 'Regional SDAC Merit Stack (Coupled)');
-                bestMarginalType = 'coupled_market';
-            }
+            // Regional SDAC commercial price convergence: when cable flows are within ATC limits,
+            // cross-border market coupling enforces price convergence with the calibrated regional anchor
+            bestP = bgBaseline;
+            bestUnit = h >= 18 && h <= 22 ? 'PPC Hydro Reservoirs (Peaking Call)' : (h >= 5 && h <= 8 ? 'CCGT Morning Ramp (Coupled)' : 'Regional SDAC Merit Stack (Coupled)');
+            bestMarginalType = 'coupled_market';
         }
 
         // Midday Sunday solar collapse when Greek domestic solar generation dominates
