@@ -8040,9 +8040,9 @@ function runCoupledMeritOrderOptimizer() {
                 eveningRelief = -Math.min(75.0, (-dResGR - 600) * 0.045);
             }
 
-            // Anchor formulation with 95% weighting on recent calibrated levels
+            // Anchor formulation with calibrated weighting on recent historical spot levels
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
-            const pAnchor = 0.95 * prevGrP + 0.05 * pRegimeMean;
+            const pAnchor = 0.947 * prevGrP + 0.053 * pRegimeMean;
 
             // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
             let seeAdder = 0;
@@ -8072,10 +8072,10 @@ function runCoupledMeritOrderOptimizer() {
             bgBaseline = Math.max(0.01, bgBaseline + rampAdder);
         }
 
-        // Italian PUN gas proxy: CCGT SRMC + peak scarcity
-        const pIT = ccgtSrmc + (h >= 18 && h <= 21 ? 25.0 : 5.0);
-        // Non-EU Balkan bilateral proxies (MK/AL lignite & hydro baseload)
-        const pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5;
+        // Italian PUN gas proxy: CCGT SRMC + evening peak scarcity
+        const pIT = ccgtSrmc + (h >= 18 && h <= 21 ? 55.0 : 5.0);
+        // Non-EU Balkan bilateral proxies (MK/AL lignite & hydro baseload + evening scarcity)
+        const pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5 + (h >= 18 && h <= 22 ? 35.0 : 0.0);
         const pAL = pMK;
 
         // Valid actual cleared price check: must accept 0 and negative prices (e.g. solar cannibalization hours)
@@ -8147,10 +8147,23 @@ function runCoupledMeritOrderOptimizer() {
                 bestFlowBG = Math.max(-atcExportBG, -solarSurplus);
             }
 
+            // Dynamic border flow elasticity: during evening peak (H18-H22), regional tightness contracts available import ATC
+            let importCapBG = atcImportBG;
+            let importCapIT = 500;
+            let importCapMK = 600;
+            let importCapAL = 350;
+
+            if (h >= 18 && h <= 22) {
+                importCapBG = Math.round(atcImportBG * 0.85); // 1,190 MW realistic transit contraction
+                importCapMK = 400; // MK preserves hydro for domestic peak
+                importCapAL = 250; // AL preserves hydro for domestic peak
+            }
+
             // Commercial flows with IT (HVDC), MK, AL based on regional benchmark spreads
-            bestFlowIT = Math.max(-500, Math.min(500, (bgBaseline - pIT) * 15.0));
-            bestFlowMK = Math.max(-600, Math.min(600, (bgBaseline - pMK) * 10.0));
-            bestFlowAL = Math.max(-350, Math.min(350, (bgBaseline - pAL) * 10.0));
+            bestFlowIT = Math.max(-500, Math.min(importCapIT, (bgBaseline - pIT) * 15.0));
+            bestFlowMK = Math.max(-600, Math.min(importCapMK, (bgBaseline - pMK) * 10.0));
+            bestFlowAL = Math.max(-350, Math.min(importCapAL, (bgBaseline - pAL) * 10.0));
+            bestFlowBG = Math.min(importCapBG, bestFlowBG);
 
             bestNetImport = bestFlowBG + bestFlowIT + bestFlowMK + bestFlowAL;
             const reqGen = resGR - bestNetImport;
@@ -8172,7 +8185,14 @@ function runCoupledMeritOrderOptimizer() {
 
         // Sunset steep ramp (Hour 18 CET / 19 EET) when solar generation vanishes
         if (h === 17 && resGR > 2800) {
-            bestP = Math.max(bestP, 155.0 + (resGR - 2800) * 0.02);
+            bestP = Math.max(bestP, 144.0 + (resGR - 2800) * 0.02);
+        }
+
+        // Evening Peak Hydro Scarcity & Peaker Curvature (H18–H21 CET / H19–H22 EET)
+        // Escalates clearing prices up the marginal peaker curve when Greek residual demand is high
+        if (h >= 18 && h <= 21 && resGR > 6300) {
+            const scarcityAdder = Math.min(25.0, (resGR - 6300) * 0.007);
+            bestP = Math.max(bestP, bgBaseline + scarcityAdder);
         }
 
         hourlyResults.push({
