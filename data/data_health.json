@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-15 12:30:52",
+  "timestamp": "2026-09-15 13:30:56",
   "today": "2026-09-15",
   "tomorrow": "2026-09-16",
   "is_after_dam_cutoff": false,
@@ -451,10 +451,10 @@
           "description": "24 hrs"
         },
         "2026-09-16": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "AT": {
@@ -731,10 +731,10 @@
           "description": "24 hrs"
         },
         "2026-09-16": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "MK": {
@@ -787,10 +787,10 @@
           "description": "24 hrs"
         },
         "2026-09-16": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       },
       "ME": {
@@ -899,10 +899,10 @@
           "description": "24 hrs"
         },
         "2026-09-16": {
-          "status": "pending",
-          "badge": "⏳",
-          "hours": 0,
-          "description": "Pending DA"
+          "status": "complete",
+          "badge": "🟢",
+          "hours": 24,
+          "description": "24 hrs"
         }
       }
     },
@@ -936,8 +936,8 @@
       "2026-09-16"
     ],
     "summary": {
-      "complete_days": 127,
-      "pending_days": 14,
+      "complete_days": 131,
+      "pending_days": 10,
       "missing_days": 3,
       "partial_days": 0
     }
@@ -2557,9 +2557,9 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 36470,
-    "unique_mrids": 13687,
-    "active_now": 1260,
+    "total_records": 36476,
+    "unique_mrids": 13691,
+    "active_now": 1275,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2580,22 +2580,22 @@
       "GR": {
         "records": 5757,
         "active_now": 67,
-        "active_unavailable_mw": 21196.0
+        "active_unavailable_mw": 21199.0
       },
       "DE_LU": {
-        "records": 10536,
-        "active_now": 209,
-        "active_unavailable_mw": 60591.1
+        "records": 10538,
+        "active_now": 223,
+        "active_unavailable_mw": 65409.1
       },
       "FR": {
-        "records": 4990,
-        "active_now": 386,
-        "active_unavailable_mw": 144305.2
+        "records": 4992,
+        "active_now": 387,
+        "active_unavailable_mw": 144720.2
       },
       "IT": {
-        "records": 4738,
-        "active_now": 240,
-        "active_unavailable_mw": 5682401.0
+        "records": 4740,
+        "active_now": 241,
+        "active_unavailable_mw": 5682657.0
       },
       "RS": {
         "records": 219,
@@ -2619,8 +2619,8 @@
       },
       "CH": {
         "records": 1405,
-        "active_now": 26,
-        "active_unavailable_mw": 5910.0
+        "active_now": 25,
+        "active_unavailable_mw": 5570.0
       },
       "BE": {
         "records": 1186,
