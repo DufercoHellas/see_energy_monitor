@@ -8005,7 +8005,16 @@ function runCoupledMeritOrderOptimizer() {
             const pRegimeMean = (h >= 10 && h <= 15) ? 48.0 : ((h >= 19 && h <= 21) ? 200.0 : 158.0);
             const pAnchor = 0.72 * prevGrP + 0.28 * pRegimeMean;
 
-            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + dResBG * 0.006;
+            // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
+            let seeAdder = 0;
+            if (h >= 18 && h <= 22 && roEntry && roEntry.residuals && huEntry && huEntry.residuals) {
+                const seeRes = (roEntry.residuals[h] || 0) + (huEntry.residuals[h] || 0);
+                if (seeRes > 9000) {
+                    seeAdder = Math.min(60, (seeRes - 9000) * 0.02) * 0.5;
+                }
+            }
+
+            bgBaseline = pAnchor + euaDelta + dResGR * betaGR + dResBG * 0.006 + seeAdder;
 
             // Weekend midday solar collapse:
             if (targetDOW === 0 && h >= 10 && h <= 15 && resGR < 800) {
