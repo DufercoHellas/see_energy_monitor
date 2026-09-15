@@ -8065,7 +8065,8 @@ function runCoupledMeritOrderOptimizer() {
         const pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5;
         const pAL = pMK;
 
-        const actPgr = (grActualPrices[h] && grActualPrices[h] > 0) ? grActualPrices[h] : null;
+        // Valid actual cleared price check: must accept 0 and negative prices (e.g. solar cannibalization hours)
+        const actPgr = (grActualPrices[h] !== undefined && grActualPrices[h] !== null && !isNaN(grActualPrices[h])) ? grActualPrices[h] : null;
 
         let bestP = 0, bestUnit = '', bestMarginalType = 'thermal';
         let bestNetImport = 0, bestFlowBG = 0, bestFlowIT = 0, bestFlowMK = 0, bestFlowAL = 0;
@@ -8228,7 +8229,7 @@ function render24hOptimizerProfileChart() {
     const actualPrices = data.map(d => d.actual_price_gr);
     const netImports = data.map(d => d.net_import_total);
 
-    const hasActual = actualPrices.some(p => p !== null && p > 0);
+    const hasActual = actualPrices.some(p => p !== null && !isNaN(p));
 
     const traces = [
         {
@@ -8291,7 +8292,8 @@ function render24hOptimizerProfileChart() {
     if (predBaseloadEl) predBaseloadEl.innerText = `€${avgPred.toFixed(2)}/MWh`;
 
     if (hasActual) {
-        const validActuals = actualPrices.filter(p => p !== null && p > 0);
+        // Full 24-hour actual baseload: 0.00 and negative prices are valid cleared clearing prices!
+        const validActuals = actualPrices.filter(p => p !== null && !isNaN(p));
         const avgActual = validActuals.reduce((a, b) => a + b, 0) / validActuals.length;
         const delta = avgPred - avgActual;
         const absDelta = Math.abs(delta);
