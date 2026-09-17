@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-09-17 05:34:51",
+  "timestamp": "2026-09-17 06:31:09",
   "today": "2026-09-17",
   "tomorrow": "2026-09-18",
   "is_after_dam_cutoff": false,
@@ -2557,9 +2557,9 @@
   },
   "outages": {
     "status": "healthy",
-    "total_records": 37292,
-    "unique_mrids": 13955,
-    "active_now": 1221,
+    "total_records": 37297,
+    "unique_mrids": 13958,
+    "active_now": 1222,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
@@ -2585,12 +2585,12 @@
       "DE_LU": {
         "records": 10798,
         "active_now": 195,
-        "active_unavailable_mw": 56669.5
+        "active_unavailable_mw": 56464.5
       },
       "FR": {
-        "records": 5105,
-        "active_now": 366,
-        "active_unavailable_mw": 135328.0
+        "records": 5110,
+        "active_now": 367,
+        "active_unavailable_mw": 135838.0
       },
       "IT": {
         "records": 4898,
