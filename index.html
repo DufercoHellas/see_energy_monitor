@@ -4951,14 +4951,14 @@ function getDayAveragePriceWithFallback(c, date) {
 function getRealizedPriceWithFallback(c, h, date) {
     if (typeof currentTargetDate !== 'undefined' && currentTargetDate && date > currentTargetDate) return 0.0;
     let prices = historicalData[c]?.[date]?.prices;
-    if (prices && prices[h] > 0) return prices[h] || 0;
+    if (prices && prices[h] !== null && prices[h] !== undefined && !isNaN(prices[h])) return prices[h];
     if (c === 'ME')      prices = historicalData['RS']?.[date]?.prices;
     else if (c === 'XK') prices = historicalData['AL']?.[date]?.prices;
     else if (c === 'BA') prices = historicalData['RS']?.[date]?.prices;
     else if (c === 'DE' && historicalData['DE_LU'])      prices = historicalData['DE_LU']?.[date]?.prices;
     else if (c === 'DE_LU' && historicalData['DE'])      prices = historicalData['DE']?.[date]?.prices;
     else return 0.0;
-    return (prices && prices[h] > 0) ? prices[h] : 0.0;
+    return (prices && prices[h] !== null && prices[h] !== undefined && !isNaN(prices[h])) ? prices[h] : 0.0;
 }
 
 
@@ -23990,7 +23990,7 @@ async function initDashboardData() {
                     // Fetch a JSON file (supports .gz decompression via pako, safe for file://)
                     const fetchJSON = (url) => {
                         var doFetch = function(u) {
-                            return fetch(u).then(function(r) {
+                            return fetch(u, { cache: 'no-cache' }).then(function(r) {
                                 if (!r.ok) throw new Error('HTTP ' + r.status);
                                 return r.arrayBuffer();
                             }).then(function(buf) {
