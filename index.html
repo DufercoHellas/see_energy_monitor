@@ -23270,39 +23270,45 @@ function renderArbitragePanel() {
                 const allRouteMg = []; // collect margins for summary
 
                 sortedGroups.forEach(group => {
-                    const corridorList = Object.values(group.corridors);
+                    if (!group || !group.corridors || Object.keys(group.corridors).length === 0) return;
+                    try {
+                        const corridorList = Object.values(group.corridors);
 
-                    // Collect all unique hours with best-corridor winner per hour
-                    const bestByHour = {}; // hour -> {netMargin, corridorKey, ...}
-                    corridorList.forEach(cor => {
-                        cor.hours.forEach(res => {
-                            uniqueProfitableHours.add(res.hour);
-                            if (!bestByHour[res.hour] || res.netMargin > bestByHour[res.hour].netMargin) {
-                                bestByHour[res.hour] = { ...res, corridorKey: cor.routeKey, routeName: cor.routeName };
-                            }
+                        // Collect all unique hours with best-corridor winner per hour
+                        const bestByHour = {}; // hour -> {netMargin, corridorKey, ...}
+                        corridorList.forEach(cor => {
+                            if (!cor || !Array.isArray(cor.hours)) return;
+                            cor.hours.forEach(res => {
+                                uniqueProfitableHours.add(res.hour);
+                                if (!bestByHour[res.hour] || res.netMargin > bestByHour[res.hour].netMargin) {
+                                    bestByHour[res.hour] = { ...res, corridorKey: cor.routeKey, routeName: cor.routeName };
+                                }
+                            });
                         });
-                    });
 
-                    const allHours = Object.values(bestByHour);
-                    allHours.forEach(h => allRouteMg.push({
-                        netMargin: h.netMargin,
-                        hour: h.hour,
-                        src: group.start,
-                        dst: group.end,
-                        transitCost: h.transitCost
-                    }));
-                    const maxMargin = Math.max(...allHours.map(h => h.netMargin));
-                    const avgMargin = allHours.reduce((s, h) => s + h.netMargin, 0) / allHours.length;
-                    const bestHourEntry = allHours.reduce((best, h) => h.netMargin > best.netMargin ? h : best, allHours[0]);
+                        const allHours = Object.values(bestByHour);
+                        if (allHours.length === 0) return;
 
-                    if (maxMargin > maxSpreadVal) {
-                        maxSpreadVal = maxMargin;
-                        bestPathDesc = `${group.start} ➔ ${group.end} via ${bestHourEntry.routeName} (H${bestHourEntry.hour+1}: ${maxMargin.toFixed(2)} €/MWh)`;
-                    }
+                        allHours.forEach(h => allRouteMg.push({
+                            netMargin: h.netMargin,
+                            hour: h.hour,
+                            src: group.start,
+                            dst: group.end,
+                            transitCost: h.transitCost
+                        }));
+                        const maxMargin = Math.max(...allHours.map(h => h.netMargin));
+                        const avgMargin = allHours.reduce((s, h) => s + h.netMargin, 0) / allHours.length;
+                        const bestHourEntry = allHours.reduce((best, h) => h.netMargin > best.netMargin ? h : best, allHours[0]);
 
-                    // Filter to only corridors that are best for at least one hour
-                    const bestCorridorKeys = new Set(Object.values(bestByHour).map(h => h.corridorKey));
-                    const effectiveCorridorList = corridorList.filter(cor => bestCorridorKeys.has(cor.routeKey));
+                        if (bestHourEntry && maxMargin > maxSpreadVal) {
+                            maxSpreadVal = maxMargin;
+                            bestPathDesc = `${group.start} ➔ ${group.end} via ${bestHourEntry.routeName} (H${bestHourEntry.hour+1}: ${maxMargin.toFixed(2)} €/MWh)`;
+                        }
+
+                        // Filter to only corridors that are best for at least one hour
+                        const bestCorridorKeys = new Set(Object.values(bestByHour).map(h => h.corridorKey));
+                        const effectiveCorridorList = corridorList.filter(cor => bestCorridorKeys.has(cor.routeKey));
+                        if (effectiveCorridorList.length === 0) return;
 
                     const cid = `arb_card_${cardIdx++}`;
 
@@ -23589,6 +23595,9 @@ function renderArbitragePanel() {
                         </div>
                         ${toggleBtn}
                     </div>`;
+                    } catch (cardErr) {
+                        console.error("Error rendering arbitrage card for group", group, cardErr);
+                    }
                 });
 
                 profitableHoursCount = uniqueProfitableHours.size;
