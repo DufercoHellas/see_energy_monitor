@@ -21365,14 +21365,21 @@ function findAnalogues() {
                 }
                 
                 const tRaw = historicalData[country][targetDate];
-                let tRes = tRaw.residuals;
-                if (forecastRun === 'gate' && tRaw.residuals_gate && tRaw.residuals_gate.some(v => v !== 0)) {
-                    tRes = tRaw.residuals_gate;
-                } else if (forecastRun === 'latest' && tRaw.residuals_latest && tRaw.residuals_latest.some(v => v !== 0)) {
-                    tRes = tRaw.residuals_latest;
-                } else if (tRaw.residuals_morning && tRaw.residuals_morning.some(v => v !== 0)) {
-                    tRes = tRaw.residuals_morning;
+                function getResidualsForRun(dataObj, run) {
+                    if (!dataObj) return null;
+                    if (run === 'gate' && dataObj.residuals_gate && dataObj.residuals_gate.some(v => v !== 0)) {
+                        return dataObj.residuals_gate;
+                    }
+                    if (run === 'latest' && dataObj.residuals_latest && dataObj.residuals_latest.some(v => v !== 0)) {
+                        return dataObj.residuals_latest;
+                    }
+                    if (dataObj.residuals_morning && dataObj.residuals_morning.some(v => v !== 0)) {
+                        return dataObj.residuals_morning;
+                    }
+                    return dataObj.residuals || null;
                 }
+
+                let tRes = getResidualsForRun(tRaw, forecastRun);
 
                 // Check data integrity:
                 const resHasData = tRes && Array.isArray(tRes) && tRes.length === 24 && tRes.some(v => v !== 0 && !isNaN(v));
@@ -21451,7 +21458,9 @@ function findAnalogues() {
                     
                     let distDeRes = Infinity;
                     if (deDataT && deDataC) {
-                        distDeRes = euclideanDistance(deDataT.residuals, deDataC.residuals);
+                        const tDeRes = getResidualsForRun(deDataT, forecastRun);
+                        const cDeRes = deDataC.residuals_morning || deDataC.residuals;
+                        if (tDeRes && cDeRes) distDeRes = euclideanDistance(tDeRes, cDeRes);
                     }
                     
                     const bgDataT = (historicalData['BG'] && historicalData['BG'][targetDate]) ? historicalData['BG'][targetDate] : null;
@@ -21459,7 +21468,9 @@ function findAnalogues() {
                     
                     let distBgRes = Infinity;
                     if (bgDataT && bgDataC) {
-                        distBgRes = euclideanDistance(bgDataT.residuals, bgDataC.residuals);
+                        const tBgRes = getResidualsForRun(bgDataT, forecastRun);
+                        const cBgRes = bgDataC.residuals_morning || bgDataC.residuals;
+                        if (tBgRes && cBgRes) distBgRes = euclideanDistance(tBgRes, cBgRes);
                     }
                     
                     // Prior day price profile similarities
@@ -21518,7 +21529,9 @@ function findAnalogues() {
                     const itDataC = (historicalData['IT'] && historicalData['IT'][date]) ? historicalData['IT'][date] : null;
                     let distItRes = Infinity;
                     if (itDataT && itDataC) {
-                        distItRes = euclideanDistance(itDataT.residuals, itDataC.residuals);
+                        const tItRes = getResidualsForRun(itDataT, forecastRun);
+                        const cItRes = itDataC.residuals_morning || itDataC.residuals;
+                        if (tItRes && cItRes) distItRes = euclideanDistance(tItRes, cItRes);
                     }
 
                     // Always include candidates where core data (residuals + demand) exists.
