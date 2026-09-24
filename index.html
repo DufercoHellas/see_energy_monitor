@@ -21493,18 +21493,19 @@ function findAnalogues() {
                 const dePriorNormFactor = get95thPercentile(allMatches.map(m => m.distDePrior));
                 const bgPriorNormFactor = get95thPercentile(allMatches.map(m => m.distBgPrior));
                 const itResNormFactor = get95thPercentile(allMatches.map(m => m.distItRes));
-                // Get weights once (with NaN protection for models that don't use all dims)
-                var w_res = parseFloat(document.getElementById("w_res").value) || 0;
-                var w_eua = parseFloat(document.getElementById("w_eua").value) || 0;
-                var w_de_res = parseFloat(document.getElementById("w_de_res").value) || 0;
-                var w_bg_res = parseFloat(document.getElementById("w_bg_res").value) || 0;
-                var w_ttf = parseFloat(document.getElementById("w_ttf").value) || 0;
-                var w_gr_prior = parseFloat(document.getElementById("w_gr_prior").value) || 0;
-                var w_de_prior = parseFloat(document.getElementById("w_de_prior").value) || 0;
-                var w_bg_prior = parseFloat(document.getElementById("w_bg_prior").value) || 0;
-                var w_it_res = (PRODUCTION_WEIGHTS.it_res || 0) / 100.0;
+                // Get weights once (with robust production fallbacks if elements are loading/missing)
+                var w_res = (document.getElementById("w_res") && !isNaN(parseFloat(document.getElementById("w_res").value))) ? parseFloat(document.getElementById("w_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.res) || 25);
+                var w_eua = (document.getElementById("w_eua") && !isNaN(parseFloat(document.getElementById("w_eua").value))) ? parseFloat(document.getElementById("w_eua").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.eua) || 21);
+                var w_de_res = (document.getElementById("w_de_res") && !isNaN(parseFloat(document.getElementById("w_de_res").value))) ? parseFloat(document.getElementById("w_de_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.de_res) || 9);
+                var w_bg_res = (document.getElementById("w_bg_res") && !isNaN(parseFloat(document.getElementById("w_bg_res").value))) ? parseFloat(document.getElementById("w_bg_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.bg_res) || 9);
+                var w_ttf = (document.getElementById("w_ttf") && !isNaN(parseFloat(document.getElementById("w_ttf").value))) ? parseFloat(document.getElementById("w_ttf").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.ttf) || 4);
+                var w_gr_prior = (document.getElementById("w_gr_prior") && !isNaN(parseFloat(document.getElementById("w_gr_prior").value))) ? parseFloat(document.getElementById("w_gr_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.gr_prior) || 7);
+                var w_de_prior = (document.getElementById("w_de_prior") && !isNaN(parseFloat(document.getElementById("w_de_prior").value))) ? parseFloat(document.getElementById("w_de_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.de_prior) || 9);
+                var w_bg_prior = (document.getElementById("w_bg_prior") && !isNaN(parseFloat(document.getElementById("w_bg_prior").value))) ? parseFloat(document.getElementById("w_bg_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.bg_prior) || 8);
+                var w_it_res = (document.getElementById("w_it_res") && !isNaN(parseFloat(document.getElementById("w_it_res").value))) ? parseFloat(document.getElementById("w_it_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.it_res) || 8);
                 w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
                 w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
+                w_it_res /= 100.0;
 
                 // Normalize all matches using the 95th percentile normalization factors
                 allMatches.forEach(m => {
