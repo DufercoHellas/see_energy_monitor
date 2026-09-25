@@ -47,7 +47,8 @@
         "efficiency": 0.635,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "KOMOTINI_POWER"
       },
       {
         "id": "AG_NIKOLAOS2",
@@ -58,7 +59,8 @@
         "efficiency": 0.63,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "AG_NIKOLAOS2"
       },
       {
         "id": "ALIVERI V",
@@ -69,7 +71,8 @@
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "ALIVERI5"
       },
       {
         "id": "MEGALOPOLI V",
@@ -80,7 +83,8 @@
         "efficiency": 0.582,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "MEGALOPOLI_V"
       },
       {
         "id": "LAVRIO V",
@@ -91,7 +95,8 @@
         "efficiency": 0.578,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "status": "retired"
       },
       {
         "id": "HERON_II",
@@ -103,7 +108,8 @@
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "HERON_CC"
       },
       {
         "id": "THESSALONIKI_CC",
@@ -115,7 +121,8 @@
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "THESSALONIKI_CC"
       },
       {
         "id": "THISVI_CC",
@@ -127,7 +134,8 @@
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "THISVI_CC"
       },
       {
         "id": "KORINTHOS_POWER",
@@ -138,7 +146,8 @@
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "KORINTHOS_POWER"
       },
       {
         "id": "PROTERGIA_CC",
@@ -149,7 +158,8 @@
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "PROTERGIA_CC"
       },
       {
         "id": "ALOUMINIO",
@@ -160,7 +170,8 @@
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.5,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "ALOUMINIO"
       },
       {
         "id": "LAVRIO IV",
@@ -171,7 +182,8 @@
         "efficiency": 0.525,
         "emission_factor": 0.202,
         "vom": 2.75,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "LAVRIO4"
       },
       {
         "id": "KOMOTINI",
@@ -182,7 +194,8 @@
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.75,
-        "hub_default": "VTP_GR"
+        "hub_default": "VTP_GR",
+        "admie_id": "KOMOTINI"
       },
       {
         "id": "PTOLEMAIDA5",
@@ -193,7 +206,8 @@
         "efficiency": 0.415,
         "emission_factor": 0.4,
         "fuel_cost_th": 18.0,
-        "vom": 4.5
+        "vom": 4.5,
+        "admie_id": "PTOLEMAIDA5"
       },
       {
         "id": "KREMASTA",
