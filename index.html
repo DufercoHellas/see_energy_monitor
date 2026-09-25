@@ -7387,29 +7387,21 @@ function runCoupledMeritOrderOptimizer() {
         const effReqAfterTrade = effReqAutarky - bestNetImport;
         const clearedTrade = clearZonalSupplyGR(effReqAfterTrade, demGR, bgBaseline, h + 1);
 
-        // 4. SDAC Congestion & Market Equilibrium
+        // 4. Coupled by default; decouple only on solar-surplus (export) or scarcity (import).
+        // GR is coupled with BG ~66-85% of hours (mainly evenings/nights/autumn/winter), so
+        // coupling is the prior and decoupling is the exception we must detect.
         const isExportCongested = (bestFlowBG <= -hAtcExportBG + 15.0);
         const isImportCongested = (bestFlowBG >= importCapBG - 15.0);
-
-        if (isExportCongested) {
-            if (clearedTrade.price > bgBaseline) {
-                bestP = bgBaseline;
-                bestUnit = 'SDAC Coupling Equilibrium (Export ATC Not Binding)';
-                bestMarginalType = 'coupled_market';
-            } else {
-                bestP = clearedTrade.price;
-                bestUnit = clearedTrade.marginal_plant + ' (Decoupled Export)';
-                bestMarginalType = clearedTrade.marginal_type;
-            }
-        } else if (isImportCongested) {
-            // Greece is importing at maximum ATC from Bulgaria -> Decoupled upwards to domestic peaking
+        const isSolarMidday = (h >= 9 && h <= 15);
+        const decoupleExport = isExportCongested && isSolarMidday && (resGR < -200);
+        const decoupleImport = isImportCongested && (resGR > 4500);
+        if (decoupleExport || decoupleImport) {
             bestP = clearedTrade.price;
-            bestUnit = clearedTrade.marginal_plant + ' (Decoupled Import)';
+            bestUnit = clearedTrade.marginal_plant + (decoupleExport ? ' (Decoupled Export)' : ' (Decoupled Import)');
             bestMarginalType = clearedTrade.marginal_type;
         } else {
-            // Uncongested corridor -> Coupled with regional market (Bulgaria)
             bestP = bgBaseline;
-            bestUnit = h >= 18 && h <= 22 ? 'PPC Hydro Reservoirs (Peaking Call)' : (h >= 5 && h <= 8 ? 'CCGT Morning Ramp (Coupled)' : 'Regional SDAC Merit Stack (Coupled)');
+            bestUnit = 'SDAC Coupled';
             bestMarginalType = 'coupled_market';
         }
 
