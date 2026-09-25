@@ -1,0 +1,106 @@
+{
+  "validation_timestamp": "2026-09-25T11:17:19.213516",
+  "evaluation_window": {
+    "start_date": "2026-09-19",
+    "end_date": "2026-09-25",
+    "days": 7
+  },
+  "overall_metrics": {
+    "fleet_commitment_accuracy_pct": 70.3,
+    "mandatory_hydro_mae_mw": 87.3,
+    "total_hourly_intervals_evaluated": 2184
+  },
+  "plants": {
+    "ALIVERI V": {
+      "admie_name": "ALIVERI5",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 97.0,
+      "avg_dispatched_mw": 310.7,
+      "actual_online_pct": 97.0
+    },
+    "LAVRIO IV": {
+      "admie_name": "LAVRIO4",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 57.7,
+      "avg_dispatched_mw": 244.7,
+      "actual_online_pct": 77.4
+    },
+    "KOMOTINI": {
+      "admie_name": "KOMOTINI",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 82.1,
+      "avg_dispatched_mw": 243.0,
+      "actual_online_pct": 82.1
+    },
+    "MEGALOPOLI V": {
+      "admie_name": "MEGALOPOLI_V",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 39.9,
+      "avg_dispatched_mw": 28.9,
+      "actual_online_pct": 23.2
+    },
+    "HERON_II": {
+      "admie_name": "HERON_CC",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 95.2,
+      "avg_dispatched_mw": 288.5,
+      "actual_online_pct": 95.2
+    },
+    "THESSALONIKI_CC": {
+      "admie_name": "THESSALONIKI_CC",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 16.7,
+      "avg_dispatched_mw": 0.0,
+      "actual_online_pct": 0.0
+    },
+    "THISVI_CC": {
+      "admie_name": "THISVI_CC",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 94.6,
+      "avg_dispatched_mw": 230.2,
+      "actual_online_pct": 94.6
+    },
+    "ALOUMINIO": {
+      "admie_name": "ALOUMINIO",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 100.0,
+      "avg_dispatched_mw": 128.2,
+      "actual_online_pct": 100.0
+    },
+    "PROTERGIA_CC": {
+      "admie_name": "PROTERGIA_CC",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 91.1,
+      "avg_dispatched_mw": 264.0,
+      "actual_online_pct": 91.1
+    },
+    "KORINTHOS_POWER": {
+      "admie_name": "KORINTHOS_POWER",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 94.0,
+      "avg_dispatched_mw": 278.4,
+      "actual_online_pct": 94.0
+    },
+    "PTOLEMAIDA5": {
+      "admie_name": "PTOLEMAIDA5",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 20.8,
+      "avg_dispatched_mw": 89.4,
+      "actual_online_pct": 20.8
+    },
+    "AG_NIKOLAOS2": {
+      "admie_name": "AG_NIKOLAOS2",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 100.0,
+      "avg_dispatched_mw": 0.0,
+      "actual_online_pct": 0.0
+    },
+    "KOMOTINI_POWER": {
+      "admie_name": "KOMOTINI_POWER",
+      "eval_hours": 168,
+      "commitment_accuracy_pct": 25.0,
+      "avg_dispatched_mw": 0.0,
+      "actual_online_pct": 0.0
+    }
+  }
+}
