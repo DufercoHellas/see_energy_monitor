@@ -4781,6 +4781,8 @@ function selectCorridorTab(cid, selectedIdx, count) {
             CALIB.ssf = CALIB.solarDOY[doy];
         } catch (e) {
             CALIB.error = String(e);
+            (window._engineDataWarnings = window._engineDataWarnings || []).push('dynamic calibration failed: ' + CALIB.error);
+            if (typeof console !== 'undefined' && console.warn) console.warn('[calib] dynamic calibration failed; using fallback constants:', CALIB.error);
         }
         window._calibCache = { date: targetDate, calib: CALIB };
         window._CALIB = CALIB;
@@ -5373,8 +5375,8 @@ function renderPlantEconomicsTab() {
         if (spec.fuel === 'hydro') return; // Exclude hydro completely
 
         const nominal = spec.nominal_mw || 0;
-        const vom = spec.vom || 2.50;
-        const eta = spec.efficiency || 0.55;
+        const vom = _specField(spec, 'vom', 2.50);
+        const eta = _specField(spec, 'efficiency', 0.55);
 
         let fuelCostEur = 0;
         let carbonCostEur = 0;
@@ -5385,17 +5387,17 @@ function renderPlantEconomicsTab() {
             const plantGasPrice = ttfPrice + plantHubBasis;
 
             fuelCostEur = plantGasPrice / eta;
-            carbonCostEur = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+            carbonCostEur = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'lignite') {
-            const ligCostTh = spec.fuel_cost_th || ligniteCostTh;
+            const ligCostTh = _specField(spec, 'fuel_cost_th', ligniteCostTh);
             fuelCostEur = ligCostTh / eta;
-            carbonCostEur = (euaPrice * (spec.emission_factor || 0.400)) / eta;
+            carbonCostEur = (euaPrice * _specField(spec, 'emission_factor', 0.400)) / eta;
         } else if (spec.fuel === 'coal') {
-            const plantCoalCostTh = coalCostTh > 0 ? coalCostTh : (spec.fuel_cost_th || 16.00);
+            const plantCoalCostTh = coalCostTh > 0 ? coalCostTh : _specField(spec, 'fuel_cost_th', 16.00);
             fuelCostEur = plantCoalCostTh / eta;
-            carbonCostEur = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+            carbonCostEur = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'nuclear') {
-            fuelCostEur = (spec.fuel_cost_th || 1.50) / eta;
+            fuelCostEur = _specField(spec, 'fuel_cost_th', 1.50) / eta;
             carbonCostEur = 0;
         }
 
@@ -7613,7 +7615,8 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
             fuelCost = _specField(spec, 'fuel_cost_th', 14.0) / eta;
             carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'gas') {
-            const gasP = ttfPrice + 2.50;
+            const bgHub = (spec.hub_default && plantSpecsData.hubs && plantSpecsData.hubs[spec.hub_default]) ? plantSpecsData.hubs[spec.hub_default].basis_eur : 2.50;
+            const gasP = ttfPrice + bgHub;
             fuelCost = gasP / eta;
             carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'hydro') {
@@ -8115,7 +8118,8 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
             fuelCost = _specField(spec, 'fuel_cost_th', 13.0) / eta;
             carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'gas') {
-            const gasP = ttfPrice + 2.00;
+            const roHub = (spec.hub_default && plantSpecsData.hubs && plantSpecsData.hubs[spec.hub_default]) ? plantSpecsData.hubs[spec.hub_default].basis_eur : 2.00;
+            const gasP = ttfPrice + roHub;
             fuelCost = gasP / eta;
             carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'hydro') {
