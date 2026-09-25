@@ -8958,6 +8958,40 @@ function _mlIsWeekend(dt, grD) {
     return (dow === 0 || dow === 6) || (grD && grD.is_holiday);
 }
 
+// Single source of truth for gas reference cost: capacity-weighted CCGT
+// economics derived from plant_specs_reference.json (no shadow constants).
+function _refGasParams(zone) {
+    window._refParamsCache = window._refParamsCache || {};
+    if (window._refParamsCache[zone] !== undefined) return window._refParamsCache[zone];
+    const doc = (typeof plantSpecsData !== 'undefined' && plantSpecsData) ? plantSpecsData : null;
+    const list = (doc && doc.plants && doc.plants[zone]) ? doc.plants[zone] : null;
+    let result = null;
+    if (list && list.length) {
+        const hubs = doc.hubs || {};
+        const weighted = (allowAll) => {
+            let w = 0, eta = 0, ef = 0, vom = 0, hub = 0;
+            for (const p of list) {
+                if (!p || p.fuel !== 'gas') continue;
+                const t = (p.tech || '').toLowerCase();
+                if (!allowAll && (t.includes('chp') || t.includes('cogeneration') || t.includes('ocgt') || t.includes('peaker') || t.includes('steam') || t.includes('topping') || t.includes('biomass'))) continue;
+                const mw = p.nominal_mw || 0, e = p.efficiency;
+                if (!(mw > 0) || !(e > 0)) continue;
+                const b = (p.hub_default && hubs[p.hub_default]) ? hubs[p.hub_default].basis_eur : 2.2;
+                w += mw; eta += mw * e; ef += mw * (p.emission_factor || 0.202); vom += mw * (p.vom || 2.5); hub += mw * b;
+            }
+            return w > 0 ? { eta: eta / w, ef: ef / w, vom: vom / w, hub: hub / w } : null;
+        };
+        result = weighted(false) || weighted(true);
+    }
+    window._refParamsCache[zone] = result;
+    return result;
+}
+function refGasSrmc(zone, ttf, eua) {
+    const p = _refGasParams(zone);
+    if (!p) return null;
+    return (ttf + p.hub) / p.eta + (eua * p.ef) / p.eta + p.vom;
+}
+
 function knnForecastPrice(hist, targetDate, ttfPrice, euaPrice) {
     const grT = hist.GR && hist.GR[targetDate];
     if (!grT || !grT.residuals) return null;
@@ -8969,7 +9003,8 @@ function knnForecastPrice(hist, targetDate, ttfPrice, euaPrice) {
     const resTCentered = resT.map(x => x - resTLevel);
     const windT = (grT.wind ? grT.wind.reduce((a, b) => a + b, 0) / 24 : 0);
     const ttfT = ttfPrice > 0 ? ttfPrice : (grT.ttf_price || 0);
-    const ccgtT = (ttfT + 2.20) / 0.55 + ((euaPrice > 0 ? euaPrice : 0) * 0.202) / 0.55 + 2.5;
+    const _euaT = (euaPrice > 0 ? euaPrice : 0);
+    const ccgtT = refGasSrmc('GR', ttfT, _euaT) || ((ttfT + 2.20) / 0.55 + (_euaT * 0.202) / 0.55 + 2.5);
 
     const cands = [];
     for (const ds of Object.keys(hist.GR)) {
@@ -8991,7 +9026,7 @@ function knnForecastPrice(hist, targetDate, ttfPrice, euaPrice) {
         const dttf = Math.abs(ttfT - (c.ttf_price || 0)) / 9.7;
         const windC = (c.wind ? c.wind.reduce((a, b) => a + b, 0) / 24 : 0);
         const dw = Math.abs(windT - windC) / 728.0;
-        const ccgtC = ((c.ttf_price || 0) + 2.20) / 0.55 + ((c.eua_price || 0) * 0.202) / 0.55 + 2.5;
+        const ccgtC = refGasSrmc('GR', (c.ttf_price || 0), (c.eua_price || 0)) || (((c.ttf_price || 0) + 2.20) / 0.55 + ((c.eua_price || 0) * 0.202) / 0.55 + 2.5);
         cands.push({ ds: ds, dist: dl + dshape + dttf + 0.5 * dw, price: c.prices, ccgt: ccgtC });
     }
     if (cands.length === 0) return null;
@@ -9025,7 +9060,7 @@ function knnForecastPriceBG(hist, targetDate, ttfPrice, euaPrice) {
     const windT = (bgT.wind ? bgT.wind.reduce((a, b) => a + b, 0) / 24 : 0);
     const ttfT = ttfPrice > 0 ? ttfPrice : (bgT.ttf_price || 0);
     const euaT = euaPrice > 0 ? euaPrice : 0;
-    const ccgtT = (ttfT + 2.50) / 0.38 + (euaT * 0.202) / 0.38 + 2.5;
+    const ccgtT = refGasSrmc('BG', ttfT, euaT) || ((ttfT + 2.50) / 0.38 + (euaT * 0.202) / 0.38 + 2.5);
 
     const cands = [];
     for (const ds of Object.keys(hist.BG)) {
@@ -9049,7 +9084,7 @@ function knnForecastPriceBG(hist, targetDate, ttfPrice, euaPrice) {
         const dttf = Math.abs(ttfT - (c.ttf_price || 0)) / 9.7;
         const windC = (c.wind ? c.wind.reduce((a, b) => a + b, 0) / 24 : 0);
         const dw = Math.abs(windT - windC) / 728.0;
-        const ccgtC = ((c.ttf_price || 0) + 2.50) / 0.38 + ((c.eua_price || 0) * 0.202) / 0.38 + 2.5;
+        const ccgtC = refGasSrmc('BG', (c.ttf_price || 0), (c.eua_price || 0)) || (((c.ttf_price || 0) + 2.50) / 0.38 + ((c.eua_price || 0) * 0.202) / 0.38 + 2.5);
         cands.push({ ds: ds, dist: dl + dshape + dttf + 0.5 * dw, price: c.prices, ccgt: ccgtC });
     }
     if (cands.length === 0) return null;
@@ -9082,7 +9117,7 @@ function knnForecastPriceRO(hist, targetDate, ttfPrice, euaPrice) {
     const windT = (roT.wind ? roT.wind.reduce((a, b) => a + b, 0) / 24 : 0);
     const ttfT = ttfPrice > 0 ? ttfPrice : (roT.ttf_price || 0);
     const euaT = euaPrice > 0 ? euaPrice : 0;
-    const ccgtT = (ttfT + 2.00) / 0.57 + (euaT * 0.202) / 0.57 + 2.5;
+    const ccgtT = refGasSrmc('RO', ttfT, euaT) || ((ttfT + 2.00) / 0.57 + (euaT * 0.202) / 0.57 + 2.5);
 
     const cands = [];
     for (const ds of Object.keys(hist.RO)) {
@@ -9107,7 +9142,7 @@ function knnForecastPriceRO(hist, targetDate, ttfPrice, euaPrice) {
         const dttf = Math.abs(ttfT - (c.ttf_price || 0)) / 10.0;
         const windC = (c.wind ? c.wind.reduce((a, b) => a + b, 0) / 24 : 0);
         const dw = Math.abs(windT - windC) / 600.0;
-        const ccgtC = ((c.ttf_price || 0) + 2.00) / 0.57 + ((c.eua_price || 0) * 0.202) / 0.57 + 2.5;
+        const ccgtC = refGasSrmc('RO', (c.ttf_price || 0), (c.eua_price || 0)) || (((c.ttf_price || 0) + 2.00) / 0.57 + ((c.eua_price || 0) * 0.202) / 0.57 + 2.5);
         cands.push({ ds: ds, dist: dl + dshape + dttf + 0.5 * dw, price: c.prices, ccgt: ccgtC });
     }
     if (cands.length === 0) return null;
@@ -9145,7 +9180,7 @@ function knnForecastPriceHU(hist, targetDate, ttfPrice, euaPrice) {
     const windT = (huT.wind ? huT.wind.reduce((a, b) => a + b, 0) / 24 : 0);
     const ttfT = ttfPrice > 0 ? ttfPrice : (huT.ttf_price || 0);
     const euaT = euaPrice > 0 ? euaPrice : 0;
-    const ccgtT = (ttfT + 1.40) / 0.55 + (euaT * 0.202) / 0.55 + 2.5;
+    const ccgtT = refGasSrmc('HU', ttfT, euaT) || ((ttfT + 1.40) / 0.55 + (euaT * 0.202) / 0.55 + 2.5);
 
     const cands = [];
     for (const ds of Object.keys(hist.HU)) {
@@ -9169,7 +9204,7 @@ function knnForecastPriceHU(hist, targetDate, ttfPrice, euaPrice) {
         const dttf = Math.abs(ttfT - (c.ttf_price || 0)) / 9.7;
         const windC = (c.wind ? c.wind.reduce((a, b) => a + b, 0) / 24 : 0);
         const dw = Math.abs(windT - windC) / 728.0;
-        const ccgtC = ((c.ttf_price || 0) + 1.40) / 0.55 + ((c.eua_price || 0) * 0.202) / 0.55 + 2.5;
+        const ccgtC = refGasSrmc('HU', (c.ttf_price || 0), (c.eua_price || 0)) || (((c.ttf_price || 0) + 1.40) / 0.55 + ((c.eua_price || 0) * 0.202) / 0.55 + 2.5);
         cands.push({ ds: ds, dist: dl + dshape + dttf + 0.5 * dw, price: c.prices, ccgt: ccgtC });
     }
     if (cands.length === 0) return null;
@@ -9485,7 +9520,7 @@ function runCoupledMeritOrderOptimizer() {
 
         // ── TIER 3: PPC HYDRO PEAKING WATER VALUE TRANCHES ─────────────────────────
         // Net commercial hydro peaking after 400 MW mandatory base and 1,100 MW spinning reserve lockout
-        const ccgtBenchmarkSrmc = (ttfPrice + 2.20) / 0.58 + (euaPrice * 0.202) / 0.58 + 2.50;
+        const ccgtBenchmarkSrmc = refGasSrmc(countryCode, ttfPrice, euaPrice) || ((ttfPrice + 2.20) / 0.58 + (euaPrice * 0.202) / 0.58 + 2.50);
         const hydroWaterBase = Math.round(ccgtBenchmarkSrmc + 28.0);
 
         fleet.push({
@@ -9666,7 +9701,7 @@ function runCoupledMeritOrderOptimizer() {
     // TTF Natural Gas marginal shift on CCGTs
     const prevTTF = (refDate && histGR[refDate] && histGR[refDate].ttf_price) || ttfPrice;
     const ttfDelta = ((ttfPrice - prevTTF) / 0.55) * 0.30;
-    const ccgtSrmc = (ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5;
+    const ccgtSrmc = refGasSrmc('GR', ttfPrice, euaPrice) || ((ttfPrice + 2.20) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5);
 
     // Solve simultaneous multi-border flow equilibrium for all 24 hours:
     // Uses dynamic DB forecast_transfer_capacities if loaded, falling back to calibrated defaults
