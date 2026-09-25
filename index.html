@@ -7690,6 +7690,18 @@ function closeEconomicsFormulaModal() {
 
 // ── Outage Matching Helper ────────────────────────────────────────────────
 function getPlantOutageInfo(plantSpec, country, targetDate) {
+    const cache = window._outageInfoCache || (window._outageInfoCache = { key: null, map: {} });
+    const ckey = country + '|' + targetDate;
+    if (cache.key !== ckey) { cache.key = ckey; cache.map = {}; }
+    const pkey = plantSpec.id || plantSpec.psr_id || plantSpec.name || '';
+    if (!pkey) return _computePlantOutageInfo(plantSpec, country, targetDate);
+    if (cache.map[pkey] !== undefined) return cache.map[pkey];
+    const res = _computePlantOutageInfo(plantSpec, country, targetDate);
+    cache.map[pkey] = res;
+    return res;
+}
+
+function _computePlantOutageInfo(plantSpec, country, targetDate) {
     const outages = window.outagesData || (typeof outagesData !== 'undefined' ? outagesData : []);
     const nom = plantSpec.nominal_mw || 0;
 
@@ -8370,30 +8382,6 @@ function onForecastCountryChange() {
     runCoupledMeritOrderOptimizer();
 }
 
-function setForecastDatePreset(preset) {
-    const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
-    if (!dateInput) return;
-
-    if (preset === 'today') {
-        dateInput.value = getTodayDateStr();
-    } else if (preset === 'tomorrow') {
-        dateInput.value = getTomorrowDateStr();
-    } else if (preset === 'yesterday') {
-        dateInput.value = getYesterdayDateStr();
-    }
-
-
-    // Update active button state
-    ['btn_forecast_tomorrow', 'btn_forecast_today', 'btn_forecast_yesterday'].forEach(id => {
-        const b = document.getElementById(id);
-        if (b) b.classList.remove('active');
-    });
-    const activeBtn = document.getElementById(`btn_forecast_${preset}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
-    runCoupledMeritOrderOptimizer();
-}
-
 function onPriceForecastDateChange() {
     runCoupledMeritOrderOptimizer();
 }
@@ -8598,11 +8586,6 @@ const TIGHTNESS_REF = 6500.0;
 const TIGHTNESS_HINGE = { GR: 0.0, BG: 0.0, RO: 0.024, HU: 0.038 };
 const EASING_ALPHA = { GR: 0.0, BG: 0.006, RO: 0.006, HU: 0.0 };
 var TIGHTNESS_HINGE_THR = 8200.0;
-// Solar-surplus guard: when GR midday residual is below this (MW), the ML /
-// persistence ensemble is not allowed to lift the price above the calibrated
-// solar floor (prevents over-pricing deeply solar-crushed hours).
-var ML_CAP_RES_GR = -750.0;
-
 // ── DE-LU residual-delta shock (macro European scarcity signal) ──────────────
 // A day-on-day jump in German thermal residual (demand - wind - solar) signals
 // Central-European scarcity that lifts every coupled SDAC clearing price.
@@ -8685,6 +8668,25 @@ function _dailyMeanResidual(zone, d) {
 // by a fraction of the mean prior error of the OTHER zones. Ex-ante.
 const XZONE_ALPHA = { GR: 0.20, BG: 0.30, RO: 0.00, HU: 0.00 };
 const ZONE_ORDER = ['GR', 'BG', 'RO', 'HU'];
+
+const OPT_LABELS = {
+    GR: { title: "Greece Forecast (24h)", sub: "HEnEx SDAC Clearing", country: "Greece", fleet: "Greek", req: "Required Greek Generation:", cables: "BG / IT / MK / AL (MW)" },
+    BG: { title: "Bulgaria Forecast (24h)", sub: "IBEX SDAC Clearing", country: "Bulgaria", fleet: "Bulgarian", req: "Required Bulgarian Generation:", cables: "RO / GR / RS / MK (MW)" },
+    RO: { title: "Romania Forecast (24h)", sub: "OPCOM SDAC Clearing", country: "Romania", fleet: "Romanian", req: "Required Romanian Generation:", cables: "HU / BG / RS / UA (MW)" },
+    HU: { title: "Hungary Forecast (24h)", sub: "HUPX SDAC Clearing", country: "Hungary", fleet: "Hungarian", req: "Required Hungarian Generation:", cables: "AT / SK / RO / HR / SI / RS (MW)" }
+};
+function applyOptimizerLabels(zone) {
+    const L = OPT_LABELS[zone];
+    if (!L) return;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+    set("econ_opt_pred_baseload_title", L.title);
+    set("econ_opt_actual_baseload_sub", L.sub);
+    set("econ_opt_merit_title_country", L.country);
+    set("econ_opt_fleet_country", L.fleet);
+    set("econ_opt_req_gen_label", L.req);
+    set("econ_opt_th_cables", L.cables);
+}
+
 window._engineBaseDailyCache = window._engineBaseDailyCache || {};
 function _engineEnsureBaseDaily(zone, date) {
     const key = zone + '|' + date;
@@ -8695,12 +8697,15 @@ function _engineEnsureBaseDaily(zone, date) {
     const od = dEl.value, oc = cEl.value;
     const pc = window._engineComputeOnly, ps = window._engineAr1Skip;
     const saved = lastSolvedOptimization;
+    const savedCalib = window._CALIB;
     window._engineComputeOnly = true; window._engineAr1Skip = true;
     dEl.value = date; cEl.value = zone;
     try { runCoupledMeritOrderOptimizer(); } catch (e) { /* ignore */ }
     window._engineComputeOnly = pc; window._engineAr1Skip = ps;
+    window._CALIB = savedCalib;
     dEl.value = od; cEl.value = oc;
     lastSolvedOptimization = saved;
+    applyOptimizerLabels(oc);
 }
 
 function _priorPremium(zone, d) {
@@ -9221,7 +9226,7 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
 }
 
 function runCoupledMeritOrderOptimizer() {
-    populateOptHourSelector();
+    if (!window._engineComputeOnly) populateOptHourSelector();
 
     const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
     if (!dateInput) return;
@@ -9243,19 +9248,7 @@ function runCoupledMeritOrderOptimizer() {
         return runCoupledMeritOrderOptimizerHU(targetDate);
     }
 
-    // Reset Greek UI labels
-    const predTitle = document.getElementById("econ_opt_pred_baseload_title");
-    if (predTitle) predTitle.innerText = "Greece Forecast (24h)";
-    const actSub = document.getElementById("econ_opt_actual_baseload_sub");
-    if (actSub) actSub.innerText = "HEnEx SDAC Clearing";
-    const meritCountry = document.getElementById("econ_opt_merit_title_country");
-    if (meritCountry) meritCountry.innerText = "Greece";
-    const fleetCountry = document.getElementById("econ_opt_fleet_country");
-    if (fleetCountry) fleetCountry.innerText = "Greek";
-    const reqLabel = document.getElementById("econ_opt_req_gen_label");
-    if (reqLabel) reqLabel.innerText = "Required Greek Generation:";
-    const thCables = document.getElementById("econ_opt_th_cables");
-    if (thCables) thCables.innerText = "BG / IT / MK / AL (MW)";
+    applyOptimizerLabels('GR');
 
     const ntcInput = document.getElementById("econ_opt_ntc");
     const ntcLimitBG = ntcInput ? parseFloat(ntcInput.value) || 1400 : 1400;
@@ -9289,15 +9282,12 @@ function runCoupledMeritOrderOptimizer() {
     // Hourly residuals & actual prices across cluster
     const grEntry = hist.GR && hist.GR[targetDate];
     const bgEntry = hist.BG && hist.BG[targetDate];
-    const itEntry = hist.IT && hist.IT[targetDate];
-    const mkEntry = hist.MK && hist.MK[targetDate];
-    const alEntry = hist.AL && hist.AL[targetDate];
     const huEntry = hist.HU && hist.HU[targetDate];
     const roEntry = hist.RO && hist.RO[targetDate];
 
     if (!grEntry || !grEntry.residuals) {
         const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (profileContainer) {
+        if (!window._engineComputeOnly && profileContainer) {
             if (window.Plotly) Plotly.purge(profileContainer);
             profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Greece on this date.</div>';
         }
@@ -9353,7 +9343,7 @@ function runCoupledMeritOrderOptimizer() {
 
     // As-of ISP1 baseline: the rolling schedule published D-1 18:00 for the latest
     // delivery day before the target. Used for baseload identification and commitment.
-    const isp1 = (window.greekFleetEmpirical && !window.greekFleetEmpirical.error) ? window.greekFleetEmpirical : null;
+    const isp1 = (window.greekFleetEmpirical && !window.greekFleetEmpirical.error && window.greekFleetEmpirical.end_date && targetDate > window.greekFleetEmpirical.end_date) ? window.greekFleetEmpirical : null;
     function isp1Prob(admieName, targetHour) {
         if (!isp1 || !isp1.plants || !isp1.plants[admieName] || !isp1.plants[admieName].online_prob) return null;
         const arr = isp1.plants[admieName].online_prob;
@@ -9578,7 +9568,7 @@ function runCoupledMeritOrderOptimizer() {
                 }
 
                 // Must-run / Pmin floor (Tier 1: CCGT Technical Minimum)
-                if (u.tier === 'pmin' || (u.tier && u.tier.startsWith('must_run'))) {
+                if (u.tier === 'pmin') {
                     const isNoonHour = (hour !== undefined && hour >= 10 && hour <= 16);
                     // Empirical Pmin bidding in Greek DAM: CCGTs bid ~35% of SRMC during solar hours to avoid cold start shutdowns
                     const pMinPrice = (isNoonHour || solarShare > 0.40) ? Math.max(0.01, ccgtSrmc * 0.35) : ccgtSrmc * 0.70;
@@ -9631,7 +9621,6 @@ function runCoupledMeritOrderOptimizer() {
     // 2) Day-Ahead EUA Carbon & TTF Commodity delta
     // 3) Day-Ahead Regional Residual Load shift (ENTSO-E D+1 Demand minus Solar & Wind forecasts)
 
-    let priorClearedDate = null;
     const histGR = hist.GR || {};
     const histBG = hist.BG || {};
     const priorDates = Object.keys(histGR).filter(d => d < targetDate && histGR[d] && histGR[d].prices && histGR[d].prices.some(p => p !== null && !isNaN(p))).sort();
@@ -9682,24 +9671,6 @@ function runCoupledMeritOrderOptimizer() {
     // Solve simultaneous multi-border flow equilibrium for all 24 hours:
     // Uses dynamic DB forecast_transfer_capacities if loaded, falling back to calibrated defaults
     const dayFcaps = (typeof window !== 'undefined' && window.forecastCapacitiesData && window.forecastCapacitiesData[targetDate]) ? window.forecastCapacitiesData[targetDate] : null;
-
-    // Calibrated midday solar price curve: maps the D-1 forecast residual
-    // (net thermal load) to the typical day-ahead midday clearing price.
-    // Replaces the persistence anchor during solar hours (H10-H16), where the
-    // prior-day price structurally over-predicts the actual solar-crash floor.
-    const MIDDAY_CURVE_X = (window._CALIB && window._CALIB.midday) ? window._CALIB.midday.X : [-2000, -500, -100, 0, 200, 500, 1000, 2000, 4000];
-    const MIDDAY_CURVE_Y = (window._CALIB && window._CALIB.midday) ? window._CALIB.midday.Y : [0, 0, 8.5, 10.4, 16, 20, 50, 81, 100];
-    function middaySolarCurve(res) {
-        if (res <= MIDDAY_CURVE_X[0]) return Math.max(0, MIDDAY_CURVE_Y[0]);
-        if (res >= MIDDAY_CURVE_X[MIDDAY_CURVE_X.length - 1]) return MIDDAY_CURVE_Y[MIDDAY_CURVE_Y.length - 1];
-        for (let i = 0; i < MIDDAY_CURVE_X.length - 1; i++) {
-            if (res >= MIDDAY_CURVE_X[i] && res < MIDDAY_CURVE_X[i + 1]) {
-                const t = (res - MIDDAY_CURVE_X[i]) / (MIDDAY_CURVE_X[i + 1] - MIDDAY_CURVE_X[i]);
-                return MIDDAY_CURVE_Y[i] + t * (MIDDAY_CURVE_Y[i + 1] - MIDDAY_CURVE_Y[i]);
-            }
-        }
-        return 0;
-    }
 
     // Seasonal solar factor: scales the midday solar-price curve and the
     // residual forecast-bias correction. 1.0 = summer (fitted), 0.0 = winter
@@ -10030,19 +10001,7 @@ function runCoupledMeritOrderOptimizer() {
 }
 
 function runCoupledMeritOrderOptimizerBG(targetDate) {
-    // 1. Set Bulgarian UI labels & table headers
-    const predTitle = document.getElementById("econ_opt_pred_baseload_title");
-    if (predTitle) predTitle.innerText = "Bulgaria Forecast (24h)";
-    const actSub = document.getElementById("econ_opt_actual_baseload_sub");
-    if (actSub) actSub.innerText = "IBEX SDAC Clearing";
-    const meritCountry = document.getElementById("econ_opt_merit_title_country");
-    if (meritCountry) meritCountry.innerText = "Bulgaria";
-    const fleetCountry = document.getElementById("econ_opt_fleet_country");
-    if (fleetCountry) fleetCountry.innerText = "Bulgarian";
-    const reqLabel = document.getElementById("econ_opt_req_gen_label");
-    if (reqLabel) reqLabel.innerText = "Required Bulgarian Generation:";
-    const thCables = document.getElementById("econ_opt_th_cables");
-    if (thCables) thCables.innerText = "RO / GR / RS / MK (MW)";
+    applyOptimizerLabels('BG');
 
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
@@ -10074,12 +10033,10 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
     const roEntry = hist.RO && hist.RO[targetDate];
     const grEntry = hist.GR && hist.GR[targetDate];
     const huEntry = hist.HU && hist.HU[targetDate];
-    const rsEntry = hist.RS && hist.RS[targetDate];
-    const mkEntry = hist.MK && hist.MK[targetDate];
 
     if (!bgEntry || !bgEntry.residuals) {
         const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (profileContainer) {
+        if (!window._engineComputeOnly && profileContainer) {
             if (window.Plotly) Plotly.purge(profileContainer);
             profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Bulgaria on this date.</div>';
         }
@@ -10467,6 +10424,7 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
             flow_mk: flowMK,
             bg_required_gen: reqGen,
             marginal_plant_bg: cleared.marginal_plant,
+            marginal_type_bg: cleared.marginal_type,
             model_price_bg: modelP,
             actual_price_bg: actP,
             price_delta_bg: actP !== null ? (modelP - actP) : null,
@@ -10543,19 +10501,7 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
 }
 
 function runCoupledMeritOrderOptimizerRO(targetDate) {
-    // 1. Set Romanian UI labels & table headers
-    const predTitle = document.getElementById("econ_opt_pred_baseload_title");
-    if (predTitle) predTitle.innerText = "Romania Forecast (24h)";
-    const actSub = document.getElementById("econ_opt_actual_baseload_sub");
-    if (actSub) actSub.innerText = "OPCOM SDAC Clearing";
-    const meritCountry = document.getElementById("econ_opt_merit_title_country");
-    if (meritCountry) meritCountry.innerText = "Romania";
-    const fleetCountry = document.getElementById("econ_opt_fleet_country");
-    if (fleetCountry) fleetCountry.innerText = "Romanian";
-    const reqLabel = document.getElementById("econ_opt_req_gen_label");
-    if (reqLabel) reqLabel.innerText = "Required Romanian Generation:";
-    const thCables = document.getElementById("econ_opt_th_cables");
-    if (thCables) thCables.innerText = "HU / BG / RS / UA (MW)";
+    applyOptimizerLabels('RO');
 
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
@@ -10586,11 +10532,10 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
     const roEntry = hist.RO && hist.RO[targetDate];
     const huEntry = hist.HU && hist.HU[targetDate];
     const bgEntry = hist.BG && hist.BG[targetDate];
-    const rsEntry = hist.RS && hist.RS[targetDate];
 
     if (!roEntry || !roEntry.residuals) {
         const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (profileContainer) {
+        if (!window._engineComputeOnly && profileContainer) {
             if (window.Plotly) Plotly.purge(profileContainer);
             profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Romania on this date.</div>';
         }
@@ -10927,6 +10872,7 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
             flow_ua: flowUA,
             ro_required_gen: reqGen,
             marginal_plant_ro: cleared.marginal_plant,
+            marginal_type_ro: cleared.marginal_type,
             model_price_ro: modelP,
             actual_price_ro: actP,
             price_delta_ro: actP !== null ? (modelP - actP) : null,
@@ -11042,7 +10988,7 @@ function buildAvailableFleetHU(plantList, ttfPrice, euaPrice, targetDate) {
 
 function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, fleet) {
     if (reqGen <= 0) {
-        return { price: Math.max(0.01, 15.0 + reqGen * 0.02), marginal_plant: 'RES / Nuclear Surplus Floor' };
+        return { price: Math.max(0.01, 15.0 + reqGen * 0.02), marginal_plant: 'RES / Nuclear Surplus Floor', marginal_type: 'res_surplus' };
     }
     const solarShare = totalDemand > 0 ? Math.max(0, Math.min(1, (totalDemand - reqGen) / totalDemand)) : 0;
     const isNoonHour = (hour !== undefined && hour >= 10 && hour <= 16);
@@ -11050,20 +10996,22 @@ function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, flee
         const frac = Math.max(0.0, Math.min(1.0, reqGen / 2400.0));
         return {
             price: Math.max(0.5, 25.0 + frac * 45.0),
-            marginal_plant: reqGen < 1500 ? 'Paks Nuclear / Solar Surplus' : 'Mátra Lignite Min-Load'
+            marginal_plant: reqGen < 1500 ? 'Paks Nuclear / Solar Surplus' : 'Mátra Lignite Min-Load',
+            marginal_type: 'nuclear_solar_floor'
         };
     }
     let cum = 0;
     for (let i = 0; i < fleet.length; i++) {
         const u = fleet[i];
         cum += u.avail_mw;
-        if (cum >= reqGen) return { price: u.srmc, marginal_plant: u.name };
+        if (cum >= reqGen) return { price: u.srmc, marginal_plant: u.name, marginal_type: u.fuel || 'thermal' };
     }
     const deficit = reqGen - cum;
     const ref = Math.max(regionalPriceAnchor || _bref('HU'), _bref('HU', 195.0));
     return {
         price: Math.min(_bh('HU', 400.0), Math.max(_bl('HU', 240.0), ref + 25.0 + deficit * 0.06)),
-        marginal_plant: 'Emergency Reserve / Scarcity'
+        marginal_plant: 'Emergency Reserve / Scarcity',
+        marginal_type: 'scarcity'
     };
 }
 
@@ -11207,6 +11155,7 @@ function solveHUForecast(targetDate) {
             flow_rs: flows.RS,
             hu_required_gen: reqGen,
             marginal_plant_hu: cleared.marginal_plant,
+            marginal_type_hu: cleared.marginal_type,
             model_price_hu: modelP,
             actual_price_hu: actP,
             price_delta_hu: actP !== null ? (modelP - actP) : null,
@@ -11243,24 +11192,12 @@ function solveHUForecast(targetDate) {
 }
 
 function runCoupledMeritOrderOptimizerHU(targetDate) {
-    // UI labels & table headers
-    const predTitle = document.getElementById("econ_opt_pred_baseload_title");
-    if (predTitle) predTitle.innerText = "Hungary Forecast (24h)";
-    const actSub = document.getElementById("econ_opt_actual_baseload_sub");
-    if (actSub) actSub.innerText = "HUPX SDAC Clearing";
-    const meritCountry = document.getElementById("econ_opt_merit_title_country");
-    if (meritCountry) meritCountry.innerText = "Hungary";
-    const fleetCountry = document.getElementById("econ_opt_fleet_country");
-    if (fleetCountry) fleetCountry.innerText = "Hungarian";
-    const reqLabel = document.getElementById("econ_opt_req_gen_label");
-    if (reqLabel) reqLabel.innerText = "Required Hungarian Generation:";
-    const thCables = document.getElementById("econ_opt_th_cables");
-    if (thCables) thCables.innerText = "AT / SK / RO / HR / SI / RS (MW)";
+    applyOptimizerLabels('HU');
 
     const solved = solveHUForecast(targetDate);
     const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
     if (!solved) {
-        if (profileContainer) {
+        if (!window._engineComputeOnly && profileContainer) {
             if (window.Plotly) Plotly.purge(profileContainer);
             profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Hungary on this date.</div>';
         }
@@ -11321,8 +11258,6 @@ function render24hOptimizerProfileChart() {
         container.innerHTML = '';
     }
 
-    const isBG = (lastSolvedOptimization && lastSolvedOptimization.country === 'BG');
-    const isRO = (lastSolvedOptimization && lastSolvedOptimization.country === 'RO');
     const data = lastSolvedOptimization.hourly;
     const hours = data.map(d => `H${String(d.hour).padStart(2, '0')}`);
     const modelPrices = data.map(d => optP(d, 'model_price'));
@@ -24318,6 +24253,10 @@ async function initDashboardData() {
                     window.strategyRollingStats   = stratStats || window.strategyRollingStats || null;
                     window.generationMixData      = generationMixData = genMix || {};
                     window.greekFleetEmpirical    = grkEmp || null;
+
+                    // Fresh data invalidates the optimizer's cached ex-ante daily levels
+                    window._engineBaseDailyCache = {};
+                    window._outageInfoCache = { key: null, map: {} };
 
                     // Pre-load EU Map GeoJSON in the background for instant rendering
                     fetch('data/europe.geojson').then(r => r.json()).then(data => { window._euMapGeoJsonCache = data; }).catch(() => {});
