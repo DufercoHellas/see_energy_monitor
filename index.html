@@ -9307,45 +9307,184 @@ function runCoupledMeritOrderOptimizer() {
     // Build thermal fleet supply stacks for GR with physical REMIT outages applied
     const plantsGR = (plantSpecsData.plants && plantSpecsData.plants.GR) || (PLANT_SPECS_FALLBACK.plants.GR) || [];
 
+    // ── Empirical ISP1 Greece System Fleet Specification ──────────────────────────
+    // Derived from 88 daily ISP1 execution files (8,439 quarter-hourly settlement intervals
+    // between July 1 and September 25, 2026). Captures true physical baserun probabilities,
+    // technical minimums (Pmin), mandatory hydro base, and balancing reserve head-room lockouts.
+    const GREEK_ISP1_EMPIRICAL_SPECS = {
+        mandatory_hydro_mw: 400.0,
+        thermal_reserve_lockout_total: 550.0,
+        plants: {
+            'ALOUMINIO':       { pmin: 110.0, baserun_mw: 128.0, is_chp_must_run: true },
+            'ALIVERI V':       { pmin: 100.0, reserve_share: 45.0, baserun: true },
+            'HERON_II':        { pmin: 175.0, reserve_share: 50.0, baserun: true },
+            'PROTERGIA_CC':    { pmin: 160.0, reserve_share: 45.0, baserun: true },
+            'MEGALOPOLI V':    { pmin: 128.0, reserve_share: 70.0, baserun: true },
+            'PTOLEMAIDA5':     { pmin: 302.0, reserve_share: 50.0, baserun: true },
+            'KORINTHOS_POWER': { pmin: 180.0, reserve_share: 45.0, baserun: true },
+            'KOMOTINI_POWER':  { pmin: 350.0, reserve_share: 80.0, baserun: true },
+            'THESSALONIKI_CC': { pmin: 172.0, reserve_share: 40.0, baserun: true },
+            'AG_NIKOLAOS2':    { pmin: 300.0, reserve_share: 70.0, baserun: false },
+            'THISVI_CC':       { pmin: 160.0, reserve_share: 35.0, baserun: false },
+            'KOMOTINI':        { pmin: 115.0, reserve_share: 25.0, baserun: false },
+            'LAVRIO IV':       { pmin: 65.0,  reserve_share: 35.0, baserun: false }
+        }
+    };
+
     function buildAvailableFleet(plantList, countryCode, defaultGasHub) {
         const fleet = [];
+        const EXCLUDED_PLANTS = ['AG_DIMITRIOS1', 'AG_DIMITRIOS2', 'AG_DIMITRIOS3', 'AG_DIMITRIOS4', 'AG_DIMITRIOS5', 'MEGALOPOLI4', 'LAVRIO V'];
+
+        // ── TIER 0: MANDATORY NON-DISPATCHABLE BASE (0 €/MWh) ──────────────────────
+        // 1. Mandatory Hydro Injections: Environmental & irrigation base water releases (empirical mean: 470 MW)
+        fleet.push({
+            id: 'MANDATORY_HYDRO_BASE',
+            name: 'Mandatory Hydro Injections (PPC / IPTO)',
+            tech: 'Run-of-River / Environmental Flow',
+            fuel: 'hydro',
+            nominal_mw: 470.0,
+            avail_mw: GREEK_ISP1_EMPIRICAL_SPECS.mandatory_hydro_mw,
+            srmc: 0.00,
+            tier: 'must_run_hydro',
+            tier_label: '💧 Mandatory Hydro Base',
+            operator: 'PPC / DEI'
+        });
+
+        // 2. Alouminio CHP: Industrial must-run cogeneration (runs 100% of all hours in ISP1)
+        const aloumSpec = plantList.find(p => p.id === 'ALOUMINIO');
+        const aloumOut = aloumSpec ? getPlantOutageInfo(aloumSpec, countryCode, targetDate) : { avail_mw: 334.0 };
+        const aloumBaseAvail = Math.min(aloumOut.avail_mw, 128.0);
+        if (aloumBaseAvail > 10.0) {
+            fleet.push({
+                id: 'ALOUMINIO_MUST_RUN',
+                plant_id: 'ALOUMINIO',
+                name: 'Alouminio CHP (Industrial Must-Run)',
+                tech: 'CCGT Cogeneration (CHP Must-Run)',
+                fuel: 'gas',
+                nominal_mw: 132.0,
+                avail_mw: aloumBaseAvail,
+                srmc: 0.01,
+                tier: 'must_run_chp',
+                tier_label: '🏭 Industrial CHP Must-Run',
+                operator: 'Metlen Energy & Metals'
+            });
+        }
+
+        // ── TIER 1: SYNCHRONIZED TECHNICAL MINIMUMS (Pmin Must-Run Floor @ 0.05 €) ──
+        const activeThermalPlants = [];
         plantList.forEach(spec => {
-            if (spec.fuel === 'hydro') return; // Hydro handled as peaking call above thermal stack
+            if (spec.fuel === 'hydro') return;
+            if (EXCLUDED_PLANTS.includes(spec.id)) return;
 
             const outInfo = getPlantOutageInfo(spec, countryCode, targetDate);
-            const avail = outInfo.avail_mw;
-            const eta = spec.efficiency || 0.55;
-            const vom = spec.vom || 2.50;
+            if (outInfo.avail_mw <= 15.0) return; // Unit is fully on outage
 
-            let fuelCost = 0;
-            let carbonCost = 0;
+            const emp = GREEK_ISP1_EMPIRICAL_SPECS.plants[spec.id] || { pmin: Math.round(spec.nominal_mw * 0.40), reserve_share: 40.0 };
+            activeThermalPlants.push({ spec, outInfo, emp });
 
-            if (spec.fuel === 'gas') {
-                const hubKey = spec.hub_default || defaultGasHub;
-                const hubBasis = (plantSpecsData.hubs && plantSpecsData.hubs[hubKey]) ? plantSpecsData.hubs[hubKey].basis_eur : 2.20;
-                const gasP = ttfPrice + hubBasis;
-                fuelCost = gasP / eta;
-                carbonCost = (euaPrice * (spec.emission_factor || 0.202)) / eta;
-            } else if (spec.fuel === 'lignite') {
-                const ligTh = spec.fuel_cost_th || 18.0;
-                fuelCost = ligTh / eta;
-                carbonCost = (euaPrice * (spec.emission_factor || 0.400)) / eta;
-            } else if (spec.fuel === 'coal') {
-                fuelCost = 16.0 / eta;
-                carbonCost = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+            if (spec.id === 'ALOUMINIO') return; // Handled in Tier 0
+
+            const pminAvail = Math.min(outInfo.avail_mw, emp.pmin);
+            if (pminAvail > 10.0) {
+                fleet.push({
+                    id: spec.id + '_PMIN',
+                    plant_id: spec.id,
+                    name: spec.name + ' [Pmin Must-Run]',
+                    tech: spec.tech,
+                    fuel: spec.fuel,
+                    nominal_mw: emp.pmin,
+                    avail_mw: pminAvail,
+                    srmc: 0.05,
+                    tier: 'pmin',
+                    tier_label: '⚡ Synchronized Pmin Floor',
+                    operator: getPlantOperator({ spec })
+                });
             }
+        });
 
-            const srmc = fuelCost + carbonCost + vom;
-            fleet.push({
-                id: spec.id,
-                name: spec.name,
-                tech: spec.tech,
-                fuel: spec.fuel,
-                nominal_mw: spec.nominal_mw,
-                avail_mw: avail,
-                srmc: srmc,
-                operator: getPlantOperator({ spec })
-            });
+        // ── TIER 2: INCREMENTAL COMMERCIAL THERMAL DISPATCH (Pmin -> Pmax - Reserves) ──
+        activeThermalPlants.forEach(({ spec, outInfo, emp }) => {
+            const baseMw = (spec.id === 'ALOUMINIO') ? aloumBaseAvail : Math.min(outInfo.avail_mw, emp.pmin);
+            const resShare = emp.reserve_share || 40.0;
+            const incAvail = Math.max(0, outInfo.avail_mw - baseMw - resShare);
+
+            if (incAvail > 10.0) {
+                const eta = spec.efficiency || 0.55;
+                const vom = spec.vom || 2.50;
+                let fuelCost = 0;
+                let carbonCost = 0;
+
+                if (spec.fuel === 'gas') {
+                    const hubKey = spec.hub_default || defaultGasHub;
+                    const hubBasis = (plantSpecsData.hubs && plantSpecsData.hubs[hubKey]) ? plantSpecsData.hubs[hubKey].basis_eur : 2.20;
+                    const gasP = ttfPrice + hubBasis;
+                    fuelCost = gasP / eta;
+                    carbonCost = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+                } else if (spec.fuel === 'lignite') {
+                    const ligTh = spec.fuel_cost_th || 18.0;
+                    fuelCost = ligTh / eta;
+                    carbonCost = (euaPrice * (spec.emission_factor || 0.400)) / eta;
+                }
+
+                const srmc = Math.round((fuelCost + carbonCost + vom) * 100) / 100;
+                fleet.push({
+                    id: spec.id + '_INC',
+                    plant_id: spec.id,
+                    name: spec.name + ' [Incremental Dispatch]',
+                    tech: spec.tech,
+                    fuel: spec.fuel,
+                    nominal_mw: spec.nominal_mw - baseMw,
+                    avail_mw: incAvail,
+                    srmc: srmc,
+                    tier: 'incremental_thermal',
+                    tier_label: '🔥 CCGT Commercial Stack',
+                    operator: getPlantOperator({ spec })
+                });
+            }
+        });
+
+        // ── TIER 3: PPC HYDRO PEAKING WATER VALUE TRANCHES ─────────────────────────
+        // Net commercial hydro peaking after 400 MW mandatory base and 1,100 MW spinning reserve lockout
+        const ccgtBenchmarkSrmc = (ttfPrice + 2.20) / 0.58 + (euaPrice * 0.202) / 0.58 + 2.50;
+        const hydroWaterBase = Math.round(ccgtBenchmarkSrmc + 28.0);
+
+        fleet.push({
+            id: 'PPC_HYDRO_ACHELOOS',
+            name: 'PPC Hydro Reservoirs — Acheloos Complex (Kremasta, Kastraki, Stratos)',
+            tech: 'Hydro Reservoir Peaking',
+            fuel: 'hydro',
+            nominal_mw: 913.0,
+            avail_mw: 500.0,
+            srmc: hydroWaterBase,
+            tier: 'hydro_peaker',
+            tier_label: '💧 PPC Hydro Water Value',
+            operator: 'PPC / DEI'
+        });
+
+        fleet.push({
+            id: 'PPC_HYDRO_ALIAKMONAS',
+            name: 'PPC Hydro Reservoirs — Aliakmonas & Nestos (Polyphyto, Ilarionas, Aoos)',
+            tech: 'Hydro Reservoir Peaking',
+            fuel: 'hydro',
+            nominal_mw: 954.0,
+            avail_mw: 550.0,
+            srmc: hydroWaterBase + 26.0,
+            tier: 'hydro_peaker',
+            tier_label: '💧 PPC Hydro Water Value',
+            operator: 'PPC / DEI'
+        });
+
+        fleet.push({
+            id: 'PPC_HYDRO_PUMPED_STORAGE',
+            name: 'PPC Pumped Storage Peakers (Sfikia & Thisavros)',
+            tech: 'Hydro Pumped Storage Fast-Start Peaking',
+            fuel: 'hydro',
+            nominal_mw: 699.0,
+            avail_mw: 550.0,
+            srmc: hydroWaterBase + 60.0,
+            tier: 'hydro_peaker',
+            tier_label: '💧 PPC Hydro Water Value',
+            operator: 'PPC / DEI'
         });
 
         return fleet.filter(u => u.avail_mw > 0.1).sort((a, b) => a.srmc - b.srmc);
@@ -9357,12 +9496,7 @@ function runCoupledMeritOrderOptimizer() {
     // Incorporates Must-Run Technical Minimums (Pmin), Sigmoid Solar Cannibalization, and Dynamic PPC Hydro Value
     function clearZonalSupplyGR(reqGen, totalDemand, regionalPriceAnchor, hour) {
         const solarShare = totalDemand > 0 ? Math.max(0, Math.min(1, (totalDemand - reqGen) / totalDemand)) : 0;
-
-        // 1. IPTO Synchronous Inertia Floor: Greek transmission system requires at least ~750 MW of spinning thermal CCGTs
         let effReq = reqGen;
-        if (solarShare > 0.40 && effReq < 750) {
-            effReq = 750; // Excess renewable generation is dynamically curtailed by TSO redispatch
-        }
 
         if (effReq <= 0) {
             return {
@@ -9372,45 +9506,51 @@ function runCoupledMeritOrderOptimizer() {
             };
         }
 
-        // 2. Solar Midday Sigmoid Floor Curve (Calibrated to Greek Day-Ahead Spot Reality)
-        const isNoonHour = (hour !== undefined && hour >= 10 && hour <= 16);
-        if ((isNoonHour || solarShare > 0.50) && effReq < 2200) {
-            const sFrac = Math.max(0, (solarShare - 0.50) / 0.50);
-            const sigmoid = 1.0 / (1.0 + Math.exp(-(sFrac - 0.25) * 8.0));
-            const floorP = Math.max(0.01, 35.0 - 35.0 * sigmoid);
-            const ceilingP = Math.max(45.0, 135.0 - 65.0 * sigmoid);
-            const frac = Math.pow(Math.max(0, effReq / 2200), 1.3);
-            const p = floorP + (ceilingP - floorP) * frac;
-            return {
-                price: Math.max(0.01, p),
-                marginal_plant: effReq < 950 ? 'IPTO Inertia Must-Run Min-Load / Solar Curtailment' : 'Ptolemaida V / CCGT Min-Load',
-                marginal_type: 'min_load'
-            };
-        }
-
-        // 3. Normal Thermal Merit Order Stack
+        // Stepping through the empirical 4-tier fleet
         let cum = 0;
         for (let i = 0; i < fleetGR.length; i++) {
             const u = fleetGR[i];
             cum += u.avail_mw;
             if (cum >= effReq) {
+                // Must-run / Pmin floor
+                if (u.tier === 'pmin' || (u.tier && u.tier.startsWith('must_run'))) {
+                    const isNoonHour = (hour !== undefined && hour >= 10 && hour <= 16);
+                    let pMinPrice = 0.05;
+                    if (isNoonHour || solarShare > 0.40) {
+                        const sFrac = Math.max(0, (effReq - 400) / 1600);
+                        pMinPrice = Math.max(0.01, sFrac * 25.0);
+                    }
+                    return {
+                        price: pMinPrice,
+                        marginal_plant: u.name,
+                        marginal_type: 'min_load'
+                    };
+                }
+
+                if (u.tier === 'incremental_thermal') {
+                    return {
+                        price: u.srmc,
+                        marginal_plant: u.name,
+                        marginal_type: 'thermal'
+                    };
+                }
+
                 return {
                     price: u.srmc,
                     marginal_plant: u.name,
-                    marginal_type: 'thermal'
+                    marginal_type: 'hydro_peaker'
                 };
             }
         }
 
-        // 4. Deficit above all available thermal fleet: PPC Hydro Opportunity Cost (Dynamic Water Value)
-        const totalThermal = cum;
-        const deficit = effReq - totalThermal;
+        // Deficit above all available capacity: emergency peaking
+        const deficit = effReq - cum;
         const refAnchor = Math.max(regionalPriceAnchor || _bref('GR'), _bref('GR'));
-        const hydroWaterValue = Math.min(_bh('GR', 320.0), refAnchor + 12.0 + (deficit * 0.05));
+        const hydroWaterValue = Math.min(_bh('GR', 320.0), refAnchor + 25.0 + (deficit * 0.08));
 
         return {
             price: hydroWaterValue,
-            marginal_plant: 'PPC Hydro Reservoirs (Peaking Call / Water Value)',
+            marginal_plant: 'Emergency Peaking / Scarcity Call',
             marginal_type: 'hydro_peaker'
         };
     }
@@ -11441,6 +11581,7 @@ function renderHourlySupplyCurve(hourData) {
     const markerX = [];
     const markerY = [];
     const markerText = [];
+    const markerColors = [];
 
     fleet.forEach(u => {
         const cost = u.srmc;
@@ -11457,11 +11598,20 @@ function renderHourlySupplyCurve(hourData) {
 
         // Add distinct step markers at corners and midpoint so hover triggers easily
         const fuelType = (u.fuel || 'thermal').toLowerCase();
-        const icon = fuelType === 'nuclear' ? '⚛️' : (fuelType === 'hydro' ? '💧' : (fuelType === 'gas' ? '🔥' : '🏭'));
-        const plantLabel = `${icon} <b>${u.name}</b> (${fuelType.toUpperCase()})<br>Segment: <b>${startMw.toFixed(0)} – ${endMw.toFixed(0)} MW</b> (Avail: ${u.avail_mw.toFixed(0)} MW)<br>Marginal Cost: <b>${cost.toFixed(2)} €/MWh</b>`;
+        const icon = (u.tier === 'must_run_hydro' || u.tier === 'hydro_peaker' || fuelType === 'hydro') ? '💧'
+            : (u.tier === 'must_run_chp' ? '🏭'
+            : (u.tier === 'pmin' ? '⚡'
+            : (fuelType === 'nuclear' ? '⚛️' : (fuelType === 'lignite' ? '⛏️' : '🔥'))));
+        const tierBadge = u.tier_label ? ` [${u.tier_label}]` : '';
+        const plantLabel = `${icon} <b>${u.name}</b>${tierBadge}<br>Segment: <b>${startMw.toFixed(0)} – ${endMw.toFixed(0)} MW</b> (Band: ${u.avail_mw.toFixed(0)} MW)<br>Marginal Cost: <b>${cost.toFixed(2)} €/MWh</b>`;
+        
+        const mColor = (u.tier === 'pmin' || (u.tier && u.tier.startsWith('must_run'))) ? '#0284c7'
+            : (u.tier === 'hydro_peaker' ? '#6366f1' : '#10b981');
+
         markerX.push(startMw, (startMw + endMw) / 2, endMw);
         markerY.push(cost, cost, cost);
         markerText.push(plantLabel, plantLabel, plantLabel);
+        markerColors.push(mColor, mColor, mColor);
     });
 
     if (optIsRegional()) {
@@ -11486,14 +11636,15 @@ function renderHourlySupplyCurve(hourData) {
         markerX.push(totalFleet, (totalFleet + scarcityEnd) / 2, scarcityEnd);
         markerY.push(scarcityStartP, (scarcityStartP + scarcityEndP) / 2, scarcityEndP);
         markerText.push(scarcityLabel, scarcityLabel, scarcityLabel);
-    } else {
-        // Add Hydro Peaking segment for Greece (PPC hydro reservoirs)
+        markerColors.push('#f59e0b', '#f59e0b', '#f59e0b');
+    } else if (optSuffix() !== '') {
+        // Add peaker segment for non-regional foreign zones if not already present
         const totalThermal = cumMw;
-        const hydroCap = 2500;
+        const hydroCap = 1500;
         const hydroEnd = totalThermal + hydroCap;
-        const hydroStartP = 205.0;
-        const hydroEndP = 320.0;
-        const hydroName = 'PPC Hydro Reservoirs (Peaking)';
+        const hydroStartP = 180.0;
+        const hydroEndP = 300.0;
+        const hydroName = 'Hydro & Fast-Start Peaking Reserves';
 
         curveX.push(totalThermal);
         curveY.push(hydroStartP);
@@ -11507,6 +11658,7 @@ function renderHourlySupplyCurve(hourData) {
         markerX.push(totalThermal, (totalThermal + hydroEnd) / 2, hydroEnd);
         markerY.push(hydroStartP, (hydroStartP + hydroEndP) / 2, hydroEndP);
         markerText.push(hydroLabel, hydroLabel, hydroLabel);
+        markerColors.push('#6366f1', '#6366f1', '#6366f1');
     }
 
     const curveName = (optSuffix() === 'ro') ? 'Romanian Merit Order Curve'
@@ -11534,7 +11686,7 @@ function renderHourlySupplyCurve(hourData) {
         name: 'Generating Plants',
         marker: {
             size: 7,
-            color: '#10b981',
+            color: markerColors,
             symbol: 'circle',
             line: { color: isDarkMode() ? '#064e3b' : '#ffffff', width: 1.5 }
         },
