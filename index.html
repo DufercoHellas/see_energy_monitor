@@ -6517,7 +6517,7 @@ function _deriveGrCalibration(hist, targetDate) {
     // off-peak ratio and hydro water premium are confounded by regional coupling,
     // so they stay at their validated priors rather than being derived freely.
     const res = {
-        pminSolar: (solar.length >= 20) ? clamp(med(solar), 0.15, 0.50) : 0.35,
+        pminSolar: (solar.length >= 20) ? clamp(med(solar), 0.05, 0.50) : 0.35,
         pminOff: 0.70,
         waterBase: 28.0
     };
