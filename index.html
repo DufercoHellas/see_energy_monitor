@@ -6337,7 +6337,7 @@ function mlForecastPrice(hist, targetDate, h, ttfPrice, euaPrice) {
     const is_holiday = grD.is_holiday ? 1 : 0;
 
     const residual_GR = grD.residuals[h] || 0;
-    const demand_GR = (grD.demand && grD.demand[h] > 0) ? grD.demand[h] : 5000;
+    const demand_GR = (grD.demand && grD.demand[h] > 0) ? grD.demand[h] : _carryForward('GR', targetDate, 'demand', h, 5000);
     const wind_GR = (grD.wind && grD.wind[h]) || 0;
     const solar_GR = (grD.solar && grD.solar[h]) || 0;
     const hydro_GR = (grD.hydro && grD.hydro[h]) || 0;
@@ -6456,10 +6456,73 @@ function _specField(spec, field, fallback) {
     return v;
 }
 
+// Previous-day value for the same hour, used instead of inventing a level when
+// the target day is missing data. Records a low-confidence flag when used.
+function _priorDates(zone, targetDate) {
+    window._priorDatesCache = window._priorDatesCache || {};
+    const key = zone + '|' + targetDate;
+    if (window._priorDatesCache[key]) return window._priorDatesCache[key];
+    const hc = window.historicalData && window.historicalData[zone];
+    const dates = hc ? Object.keys(hc).filter(d => d < targetDate) : [];
+    dates.sort();
+    window._priorDatesCache[key] = dates;
+    return dates;
+}
+function _priorHourValue(zone, targetDate, field, h) {
+    const dates = _priorDates(zone, targetDate);
+    for (let i = dates.length - 1; i >= 0 && i >= dates.length - 7; i--) {
+        const e = window.historicalData[zone][dates[i]];
+        if (e && e[field] && e[field][h] !== undefined && e[field][h] !== null) return e[field][h];
+    }
+    return null;
+}
+function _carryForward(zone, targetDate, field, h, fallback) {
+    window._engineLowConfidence = window._engineLowConfidence || {};
+    const v = _priorHourValue(zone, targetDate, field, h);
+    if (v !== null) {
+        const k = zone + '.' + field + '.carried';
+        window._engineLowConfidence[k] = (window._engineLowConfidence[k] || 0) + 1;
+        return v;
+    }
+    const k = zone + '.' + field + '.defaulted';
+    window._engineLowConfidence[k] = (window._engineLowConfidence[k] || 0) + 1;
+    return fallback;
+}
+
 function refGasSrmc(zone, ttf, eua) {
     const p = _refGasParams(zone);
     if (!p) return null;
     return (ttf + p.hub) / p.eta + (eua * p.ef) / p.eta + p.vom;
+}
+
+// Derive GR merit-order bid ratios and hydro water premium from the trailing
+// realised price-vs-SRMC relationship (replaces the fixed 0.35/0.70 and +28).
+function _deriveGrCalibration(hist, targetDate) {
+    window._grCalibCache = window._grCalibCache || {};
+    if (window._grCalibCache[targetDate]) return window._grCalibCache[targetDate];
+    const hc = (hist && hist.GR) ? hist.GR : {};
+    const dates = Object.keys(hc).filter(d => d < targetDate).sort().slice(-60);
+    const solar = [];
+    for (const d of dates) {
+        const e = hc[d];
+        if (!e || !e.prices || !e.ttf_price || !e.eua_price) continue;
+        const ref = refGasSrmc('GR', e.ttf_price, e.eua_price);
+        if (!ref || ref <= 0) continue;
+        const rr = e.residuals || [];
+        for (let h = 10; h <= 15; h++) { const p = e.prices[h]; if (p != null && isFinite(p) && rr[h] != null && rr[h] < 1500) solar.push(p / ref); }
+    }
+    const med = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+    // Only the solar-surplus Pmin ratio is identifiable from realised prices; the
+    // off-peak ratio and hydro water premium are confounded by regional coupling,
+    // so they stay at their validated priors rather than being derived freely.
+    const res = {
+        pminSolar: (solar.length >= 20) ? clamp(med(solar), 0.15, 0.50) : 0.35,
+        pminOff: 0.70,
+        waterBase: 28.0
+    };
+    window._grCalibCache[targetDate] = res;
+    return res;
 }
 
 function knnForecastPrice(hist, targetDate, ttfPrice, euaPrice) {
@@ -6806,30 +6869,6 @@ function runCoupledMeritOrderOptimizer() {
     // Build thermal fleet supply stacks for GR with physical REMIT outages applied
     const plantsGR = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.GR) || [];
 
-    // ── Empirical ISP1 Greece System Fleet Specification ──────────────────────────
-    // Derived from 88 daily ISP1 execution files (8,439 quarter-hourly settlement intervals
-    // between July 1 and September 25, 2026). Captures true physical baserun probabilities,
-    // technical minimums (Pmin), mandatory hydro base, and balancing reserve head-room lockouts.
-    const GREEK_ISP1_EMPIRICAL_SPECS = {
-        mandatory_hydro_mw: 400.0,
-        thermal_reserve_lockout_total: 550.0,
-        plants: {
-            'ALOUMINIO':       { pmin: 110.0, baserun_mw: 128.0, is_chp_must_run: true },
-            'ALIVERI V':       { pmin: 100.0, reserve_share: 45.0, baserun: true },
-            'HERON_II':        { pmin: 175.0, reserve_share: 50.0, baserun: true },
-            'PROTERGIA_CC':    { pmin: 160.0, reserve_share: 45.0, baserun: true },
-            'MEGALOPOLI V':    { pmin: 128.0, reserve_share: 70.0, baserun: true },
-            'PTOLEMAIDA5':     { pmin: 302.0, reserve_share: 50.0, baserun: true },
-            'KORINTHOS_POWER': { pmin: 180.0, reserve_share: 45.0, baserun: true },
-            'KOMOTINI_POWER':  { pmin: 350.0, reserve_share: 80.0, baserun: true },
-            'THESSALONIKI_CC': { pmin: 172.0, reserve_share: 40.0, baserun: true },
-            'AG_NIKOLAOS2':    { pmin: 300.0, reserve_share: 70.0, baserun: false },
-            'THISVI_CC':       { pmin: 160.0, reserve_share: 35.0, baserun: false },
-            'KOMOTINI':        { pmin: 115.0, reserve_share: 25.0, baserun: false },
-            'LAVRIO IV':       { pmin: 65.0,  reserve_share: 35.0, baserun: false }
-        }
-    };
-
     // As-of ISP1 baseline: the rolling schedule published D-1 18:00 for the latest
     // delivery day before the target. Used for baseload identification and commitment.
     const isp1 = (window.greekFleetEmpirical && !window.greekFleetEmpirical.error && window.greekFleetEmpirical.end_date && targetDate > window.greekFleetEmpirical.end_date) ? window.greekFleetEmpirical : null;
@@ -6843,7 +6882,8 @@ function runCoupledMeritOrderOptimizer() {
     function buildAvailableFleet(plantList, countryCode, defaultGasHub, targetHour) {
         const fleet = [];
 
-        let dynMandatoryHydro = GREEK_ISP1_EMPIRICAL_SPECS.mandatory_hydro_mw;
+        let dynMandatoryHydro = (plantSpecsData && typeof plantSpecsData.mandatory_hydro_mw === 'number')
+            ? plantSpecsData.mandatory_hydro_mw : 400.0;
         if (isp1 && isp1.hourly_mandatory_hydro) {
             const arr = isp1.hourly_mandatory_hydro;
             dynMandatoryHydro = (targetHour !== undefined && arr[targetHour] !== undefined)
@@ -6895,10 +6935,11 @@ function runCoupledMeritOrderOptimizer() {
             const outInfo = getPlantOutageInfo(spec, countryCode, targetDate);
             if (outInfo.avail_mw <= 15.0) return; // Unit is fully on outage
 
-            const staticEmp = GREEK_ISP1_EMPIRICAL_SPECS.plants[spec.id] || { pmin: Math.round(spec.nominal_mw * 0.40), reserve_share: 40.0 };
             const admieName = spec.admie_id || spec.id;
             const dynPlant = (isp1 && isp1.plants) ? isp1.plants[admieName] : null;
-            const dynPmin = (dynPlant && dynPlant.pmin) ? dynPlant.pmin : staticEmp.pmin;
+            const staticPmin = _specField(spec, 'pmin', Math.round(spec.nominal_mw * 0.40));
+            const staticReserve = _specField(spec, 'reserve_mw', 40.0);
+            const dynPmin = (dynPlant && dynPlant.pmin) ? dynPlant.pmin : staticPmin;
             const probRaw = isp1Prob(admieName, targetHour);
             const role = dynPlant ? dynPlant.role : null;
             const isBaseload = role ? (role === 'baseload') : !!(dynPlant && (dynPlant.is_must_run || dynPlant.mean_24h_prob >= 0.85));
@@ -6907,7 +6948,7 @@ function runCoupledMeritOrderOptimizer() {
             const firmMw = (isBaseload && dynPlant && dynPlant.avg_mw_online && targetHour !== undefined && dynPlant.avg_mw_online[targetHour] !== undefined)
                 ? dynPlant.avg_mw_online[targetHour]
                 : dynPmin;
-            const emp = { pmin: dynPmin, firm_mw: firmMw, reserve_share: staticEmp.reserve_share || 40.0, commit: commit };
+            const emp = { pmin: dynPmin, firm_mw: firmMw, reserve_share: staticReserve, commit: commit };
             activeThermalPlants.push({ spec, outInfo, emp });
         });
 
@@ -6993,51 +7034,44 @@ function runCoupledMeritOrderOptimizer() {
         });
 
         // ── TIER 3: PPC HYDRO PEAKING WATER VALUE TRANCHES ─────────────────────────
-        // Net commercial hydro peaking after 400 MW mandatory base and 1,100 MW spinning reserve lockout
+        // Capacity from the plant table's hydro complexes, outage-adjusted; water
+        // premium derived from the trailing price-vs-SRMC relationship.
         const ccgtBenchmarkSrmc = refGasSrmc(countryCode, ttfPrice, euaPrice) || ((ttfPrice + 2.20) / 0.58 + (euaPrice * 0.202) / 0.58 + 2.50);
-        const hydroWaterBase = Math.round(ccgtBenchmarkSrmc + 28.0);
-
-        fleet.push({
-            id: 'PPC_HYDRO_ACHELOOS',
-            name: 'PPC Hydro Reservoirs — Acheloos Complex (Kremasta, Kastraki, Stratos)',
-            tech: 'Hydro Reservoir Peaking',
-            fuel: 'hydro',
-            nominal_mw: 913.0,
-            avail_mw: 500.0,
-            srmc: hydroWaterBase,
-            tier: 'hydro_peaker',
-            tier_label: '💧 PPC Hydro Water Value',
-            operator: 'PPC / DEI'
-        });
-
-        fleet.push({
-            id: 'PPC_HYDRO_ALIAKMONAS',
-            name: 'PPC Hydro Reservoirs — Aliakmonas & Nestos (Polyphyto, Ilarionas, Aoos)',
-            tech: 'Hydro Reservoir Peaking',
-            fuel: 'hydro',
-            nominal_mw: 954.0,
-            avail_mw: 550.0,
-            srmc: hydroWaterBase + 26.0,
-            tier: 'hydro_peaker',
-            tier_label: '💧 PPC Hydro Water Value',
-            operator: 'PPC / DEI'
-        });
-
-        fleet.push({
-            id: 'PPC_HYDRO_PUMPED_STORAGE',
-            name: 'PPC Pumped Storage Peakers (Sfikia & Thisavros)',
-            tech: 'Hydro Pumped Storage Fast-Start Peaking',
-            fuel: 'hydro',
-            nominal_mw: 699.0,
-            avail_mw: 550.0,
-            srmc: hydroWaterBase + 60.0,
-            tier: 'hydro_peaker',
-            tier_label: '💧 PPC Hydro Water Value',
-            operator: 'PPC / DEI'
-        });
+        const hydroWaterBase = Math.round(ccgtBenchmarkSrmc + grCalib.waterBase);
+        const hydroComplexes = (plantSpecsData && plantSpecsData.hydro_complexes) ? plantSpecsData.hydro_complexes : null;
+        if (hydroComplexes) {
+            Object.keys(hydroComplexes).forEach(cid => {
+                const cx = hydroComplexes[cid];
+                let nominal = 0, outageAdj = 0;
+                (cx.members || []).forEach(mid => {
+                    const ms = plantList.find(p => p.id === mid);
+                    if (!ms) return;
+                    nominal += ms.nominal_mw || 0;
+                    outageAdj += getPlantOutageInfo(ms, countryCode, targetDate).avail_mw || 0;
+                });
+                const avail = Math.min(nominal, outageAdj) * (cx.peaking_factor || 0.6);
+                if (avail <= 1.0) return;
+                fleet.push({
+                    id: cid + '_PEAK',
+                    name: cx.name || cid,
+                    tech: 'Hydro Reservoir Peaking',
+                    fuel: 'hydro',
+                    nominal_mw: Math.round(nominal),
+                    avail_mw: Math.round(avail * 10) / 10,
+                    srmc: hydroWaterBase + (cx.water_offset || 0),
+                    tier: 'hydro_peaker',
+                    tier_label: '💧 PPC Hydro Water Value',
+                    operator: 'PPC / DEI'
+                });
+            });
+        } else {
+            (window._engineDataWarnings = window._engineDataWarnings || []).push('hydro_complexes missing from plant table');
+        }
 
         return fleet.filter(u => u.avail_mw > 0.1).sort((a, b) => a.srmc - b.srmc);
     }
+
+    const grCalib = _deriveGrCalibration(hist, targetDate);
 
     const hourlyFleetsGR = [];
     for (let h = 0; h < 24; h++) {
@@ -7080,7 +7114,7 @@ function runCoupledMeritOrderOptimizer() {
                 if (u.tier === 'pmin') {
                     const isNoonHour = (hour !== undefined && hour >= 10 && hour <= 16);
                     // Empirical Pmin bidding in Greek DAM: CCGTs bid ~35% of SRMC during solar hours to avoid cold start shutdowns
-                    const pMinPrice = (isNoonHour || solarShare > 0.40) ? Math.max(0.01, ccgtSrmc * 0.35) : ccgtSrmc * 0.70;
+                    const pMinPrice = (isNoonHour || solarShare > 0.40) ? Math.max(0.01, ccgtSrmc * grCalib.pminSolar) : ccgtSrmc * grCalib.pminOff;
                     return {
                         price: pMinPrice,
                         marginal_plant: u.name,
@@ -7206,11 +7240,11 @@ function runCoupledMeritOrderOptimizer() {
     const knn24 = knnForecastPrice(hist, targetDate, ttfPrice, euaPrice);
 
     for (let h = 0; h < 24; h++) {
-        const demGR = (grDemand[h] && grDemand[h] > 0) ? grDemand[h] : 5000;
+        const demGR = (grDemand[h] && grDemand[h] > 0) ? grDemand[h] : _carryForward('GR', targetDate, 'demand', h, 5000);
         let resGR = grResiduals[h] || 0;
-        let resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : 2000;
-        let resHU = (huEntry && huEntry.residuals && huEntry.residuals[h] !== undefined) ? huEntry.residuals[h] : 2500;
-        let resRO = (roEntry && roEntry.residuals && roEntry.residuals[h] !== undefined) ? roEntry.residuals[h] : 2500;
+        let resBG = (bgEntry && bgEntry.residuals && bgEntry.residuals[h] !== undefined) ? bgEntry.residuals[h] : _carryForward('BG', targetDate, 'residuals', h, 2000);
+        let resHU = (huEntry && huEntry.residuals && huEntry.residuals[h] !== undefined) ? huEntry.residuals[h] : _carryForward('HU', targetDate, 'residuals', h, 2500);
+        let resRO = (roEntry && roEntry.residuals && roEntry.residuals[h] !== undefined) ? roEntry.residuals[h] : _carryForward('RO', targetDate, 'residuals', h, 2500);
 
         // Residual forecast-error correction (ex-ante): the D-1 ENTSO-E forecast
         // systematically over-predicts solar/wind, so the D-1 residual is too
@@ -7270,7 +7304,7 @@ function runCoupledMeritOrderOptimizer() {
             }
 
             // Anchor formulation with calibrated weighting on recent historical spot levels
-            const pRegimeMean = (h >= 10 && h <= 15) ? (ccgtSrmc * 0.35) : ((h >= 19 && h <= 21) ? (ccgtSrmc + 30.0) : ccgtSrmc);
+            const pRegimeMean = (h >= 10 && h <= 15) ? (ccgtSrmc * grCalib.pminSolar) : ((h >= 19 && h <= 21) ? (ccgtSrmc + 30.0) : ccgtSrmc);
             const persist = (h >= 17 && h <= 21) ? 0.60 : 0.80;
             const pAnchor = persist * prevGrP + (1.0 - persist) * pRegimeMean;
 
@@ -7562,26 +7596,26 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
     plantsBG.forEach(spec => {
         const outInfo = getPlantOutageInfo(spec, 'BG', targetDate);
         const avail = outInfo.avail_mw;
-        const eta = spec.efficiency || 0.35;
-        const vom = spec.vom || 3.0;
+        const eta = _specField(spec, 'efficiency', 0.35);
+        const vom = _specField(spec, 'vom', 3.0);
 
         let fuelCost = 0;
         let carbonCost = 0;
 
         if (spec.fuel === 'nuclear') {
-            fuelCost = (spec.fuel_cost_th || 1.50) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 1.50) / eta;
             carbonCost = 0;
         } else if (spec.fuel === 'lignite') {
-            const ligTh = spec.fuel_cost_th || 16.0;
+            const ligTh = _specField(spec, 'fuel_cost_th', 16.0);
             fuelCost = ligTh / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.430)) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.430)) / eta;
         } else if (spec.fuel === 'coal') {
-            fuelCost = (spec.fuel_cost_th || 14.0) / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 14.0) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'gas') {
             const gasP = ttfPrice + 2.50;
             fuelCost = gasP / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'hydro') {
             // NEK Hydro Cascades opportunity water values (peaking & reserve)
             // Dispatches above lignite (~160-165 €) and before expensive gas peaking (TPP Varna ~257 €)
@@ -8064,26 +8098,26 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
 
         const outInfo = getPlantOutageInfo(spec, 'RO', targetDate);
         const avail = outInfo.avail_mw;
-        const eta = spec.efficiency || 0.35;
-        const vom = spec.vom || 3.0;
+        const eta = _specField(spec, 'efficiency', 0.35);
+        const vom = _specField(spec, 'vom', 3.0);
 
         let fuelCost = 0;
         let carbonCost = 0;
 
         if (spec.fuel === 'nuclear') {
-            fuelCost = (spec.fuel_cost_th || 1.50) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 1.50) / eta;
             carbonCost = 0;
         } else if (spec.fuel === 'lignite') {
-            const ligTh = spec.fuel_cost_th || 17.0;
+            const ligTh = _specField(spec, 'fuel_cost_th', 17.0);
             fuelCost = ligTh / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.420)) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.420)) / eta;
         } else if (spec.fuel === 'coal') {
-            fuelCost = (spec.fuel_cost_th || 13.0) / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 13.0) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'gas') {
             const gasP = ttfPrice + 2.00;
             fuelCost = gasP / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'hydro') {
             // Hidroelectrica reservoir cascades opportunity water values
             if (spec.id === 'HPP_Lotru') {
@@ -8454,25 +8488,25 @@ function buildAvailableFleetHU(plantList, ttfPrice, euaPrice, targetDate) {
     (plantList || []).forEach(spec => {
         const outInfo = getPlantOutageInfo(spec, 'HU', targetDate);
         const avail = outInfo.avail_mw;
-        const eta = spec.efficiency || 0.40;
-        const vom = (spec.vom !== undefined && spec.vom !== null) ? spec.vom : 3.0;
+        const eta = _specField(spec, 'efficiency', 0.40);
+        const vom = _specField(spec, 'vom', 3.0);
 
         let fuelCost = 0;
         let carbonCost = 0;
         if (spec.fuel === 'nuclear') {
-            fuelCost = (spec.fuel_cost_th || 1.50) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 1.50) / eta;
             carbonCost = 0;
         } else if (spec.fuel === 'lignite') {
-            fuelCost = (spec.fuel_cost_th || 17.0) / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.425)) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 17.0) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.425)) / eta;
         } else if (spec.fuel === 'coal') {
-            fuelCost = (spec.fuel_cost_th || 16.0) / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.340)) / eta;
+            fuelCost = _specField(spec, 'fuel_cost_th', 16.0) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.340)) / eta;
         } else if (spec.fuel === 'gas') {
             const hubKey = spec.hub_default || 'CEEGEX_HU';
             const basis = (plantSpecsData.hubs && plantSpecsData.hubs[hubKey]) ? plantSpecsData.hubs[hubKey].basis_eur : 1.40;
             fuelCost = (ttfPrice + basis) / eta;
-            carbonCost = (euaPrice * (spec.emission_factor || 0.202)) / eta;
+            carbonCost = (euaPrice * _specField(spec, 'emission_factor', 0.202)) / eta;
         } else if (spec.fuel === 'hydro') {
             fuelCost = 180.0;
             carbonCost = 0;
@@ -8594,7 +8628,7 @@ function solveHUForecast(targetDate) {
 
     const hourlyResults = [];
     for (let h = 0; h < 24; h++) {
-        const demHU = (huDemand[h] && huDemand[h] > 0) ? huDemand[h] : 5000.0;
+        const demHU = (huDemand[h] && huDemand[h] > 0) ? huDemand[h] : _carryForward('HU', targetDate, 'demand', h, 5000.0);
         const resHU = huResiduals[h] !== undefined && huResiduals[h] !== null ? huResiduals[h] : 0;
         const prevResHU = (prevResHUArr && prevResHUArr[h] !== undefined && prevResHUArr[h] !== null) ? prevResHUArr[h] : resHU;
         const solarShare = demHU > 0 ? Math.max(0, Math.min(1, (demHU - resHU) / demHU)) : 0;

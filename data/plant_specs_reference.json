@@ -48,7 +48,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "KOMOTINI_POWER"
+        "admie_id": "KOMOTINI_POWER",
+        "pmin": 350.0,
+        "reserve_mw": 80.0
       },
       {
         "id": "AG_NIKOLAOS2",
@@ -60,7 +62,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "AG_NIKOLAOS2"
+        "admie_id": "AG_NIKOLAOS2",
+        "pmin": 300.0,
+        "reserve_mw": 70.0
       },
       {
         "id": "ALIVERI V",
@@ -72,7 +76,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "ALIVERI5"
+        "admie_id": "ALIVERI5",
+        "pmin": 100.0,
+        "reserve_mw": 45.0
       },
       {
         "id": "MEGALOPOLI V",
@@ -84,7 +90,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "MEGALOPOLI_V"
+        "admie_id": "MEGALOPOLI_V",
+        "pmin": 128.0,
+        "reserve_mw": 70.0
       },
       {
         "id": "LAVRIO V",
@@ -109,7 +117,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "HERON_CC"
+        "admie_id": "HERON_CC",
+        "pmin": 175.0,
+        "reserve_mw": 50.0
       },
       {
         "id": "THESSALONIKI_CC",
@@ -122,7 +132,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "THESSALONIKI_CC"
+        "admie_id": "THESSALONIKI_CC",
+        "pmin": 172.0,
+        "reserve_mw": 40.0
       },
       {
         "id": "THISVI_CC",
@@ -135,7 +147,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "THISVI_CC"
+        "admie_id": "THISVI_CC",
+        "pmin": 160.0,
+        "reserve_mw": 35.0
       },
       {
         "id": "KORINTHOS_POWER",
@@ -147,7 +161,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "KORINTHOS_POWER"
+        "admie_id": "KORINTHOS_POWER",
+        "pmin": 180.0,
+        "reserve_mw": 45.0
       },
       {
         "id": "PROTERGIA_CC",
@@ -159,7 +175,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "PROTERGIA_CC"
+        "admie_id": "PROTERGIA_CC",
+        "pmin": 160.0,
+        "reserve_mw": 45.0
       },
       {
         "id": "ALOUMINIO",
@@ -171,7 +189,9 @@
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
-        "admie_id": "ALOUMINIO"
+        "admie_id": "ALOUMINIO",
+        "pmin": 110.0,
+        "reserve_mw": 40.0
       },
       {
         "id": "LAVRIO IV",
@@ -183,7 +203,9 @@
         "emission_factor": 0.202,
         "vom": 2.75,
         "hub_default": "VTP_GR",
-        "admie_id": "LAVRIO4"
+        "admie_id": "LAVRIO4",
+        "pmin": 65.0,
+        "reserve_mw": 35.0
       },
       {
         "id": "KOMOTINI",
@@ -195,7 +217,9 @@
         "emission_factor": 0.202,
         "vom": 2.75,
         "hub_default": "VTP_GR",
-        "admie_id": "KOMOTINI"
+        "admie_id": "KOMOTINI",
+        "pmin": 115.0,
+        "reserve_mw": 25.0
       },
       {
         "id": "PTOLEMAIDA5",
@@ -207,7 +231,9 @@
         "emission_factor": 0.4,
         "fuel_cost_th": 18.0,
         "vom": 4.5,
-        "admie_id": "PTOLEMAIDA5"
+        "admie_id": "PTOLEMAIDA5",
+        "pmin": 302.0,
+        "reserve_mw": 50.0
       },
       {
         "id": "KREMASTA",
@@ -4339,5 +4365,41 @@
         "vom": 4.0
       }
     ]
+  },
+  "mandatory_hydro_mw": 400.0,
+  "hydro_complexes": {
+    "GR_ACHELOOS": {
+      "name": "PPC Hydro Reservoirs — Acheloos (Kremasta, Kastraki, Stratos)",
+      "members": [
+        "KREMASTA",
+        "KASTRAKI",
+        "STRATOS"
+      ],
+      "peaking_factor": 0.55,
+      "water_offset": 0.0
+    },
+    "GR_ALIAKMONAS": {
+      "name": "PPC Hydro Reservoirs — Aliakmonas & Nestos (Polyfyto, Ilarionas, Aoos, Asomata, Platanovrysi)",
+      "members": [
+        "POLYFYTO",
+        "ILARIONAS",
+        "AOOS",
+        "ASOMATA",
+        "PLATANOVRYSI"
+      ],
+      "peaking_factor": 0.57,
+      "water_offset": 26.0
+    },
+    "GR_PUMPED": {
+      "name": "PPC Pumped Storage Peakers (Sfikia & Thisavros)",
+      "members": [
+        "SFIKIA",
+        "THESAVROS I_HYDRO",
+        "THESAVROS II_HYDRO",
+        "THESAVROS III_HYDRO"
+      ],
+      "peaking_factor": 0.79,
+      "water_offset": 60.0
+    }
   }
 }
