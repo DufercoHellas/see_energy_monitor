@@ -9351,19 +9351,26 @@ function runCoupledMeritOrderOptimizer() {
         'KOMOTINI_POWER': 'KOMOTINI_POWER',
     };
 
+    // As-of ISP1 baseline: the rolling schedule published D-1 18:00 for the latest
+    // delivery day before the target. Used for baseload identification and commitment.
+    const isp1 = (window.greekFleetEmpirical && !window.greekFleetEmpirical.error) ? window.greekFleetEmpirical : null;
+    function isp1Prob(admieName, targetHour) {
+        if (!isp1 || !isp1.plants || !isp1.plants[admieName] || !isp1.plants[admieName].online_prob) return null;
+        const arr = isp1.plants[admieName].online_prob;
+        if (targetHour !== undefined && arr[targetHour] !== undefined) return arr[targetHour];
+        return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+
     function buildAvailableFleet(plantList, countryCode, defaultGasHub, targetHour) {
         const fleet = [];
         const EXCLUDED_PLANTS = ['AG_DIMITRIOS1', 'AG_DIMITRIOS2', 'AG_DIMITRIOS3', 'AG_DIMITRIOS4', 'AG_DIMITRIOS5', 'MEGALOPOLI4', 'LAVRIO V'];
 
-        // Dynamic mandatory hydro from ISP1 empirical cache
         let dynMandatoryHydro = GREEK_ISP1_EMPIRICAL_SPECS.mandatory_hydro_mw;
-        if (window.greekFleetEmpirical && window.greekFleetEmpirical.hourly_mandatory_hydro) {
-            if (targetHour !== undefined && window.greekFleetEmpirical.hourly_mandatory_hydro[targetHour] !== undefined) {
-                dynMandatoryHydro = window.greekFleetEmpirical.hourly_mandatory_hydro[targetHour];
-            } else {
-                const arr = window.greekFleetEmpirical.hourly_mandatory_hydro;
-                dynMandatoryHydro = Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
-            }
+        if (isp1 && isp1.hourly_mandatory_hydro) {
+            const arr = isp1.hourly_mandatory_hydro;
+            dynMandatoryHydro = (targetHour !== undefined && arr[targetHour] !== undefined)
+                ? arr[targetHour]
+                : Math.round(arr.reduce((a, b) => a + b, 0) / arr.length);
         }
 
         // ── TIER 0: MANDATORY NON-DISPATCHABLE BASE (0 €/MWh) ──────────────────────
@@ -9410,31 +9417,24 @@ function runCoupledMeritOrderOptimizer() {
             const outInfo = getPlantOutageInfo(spec, countryCode, targetDate);
             if (outInfo.avail_mw <= 15.0) return; // Unit is fully on outage
 
-            const admieName = PLANT_TO_ADMIE[spec.id] || spec.id;
-            const dynPlant = (window.greekFleetEmpirical && window.greekFleetEmpirical.plants) ? window.greekFleetEmpirical.plants[admieName] : null;
             const staticEmp = GREEK_ISP1_EMPIRICAL_SPECS.plants[spec.id] || { pmin: Math.round(spec.nominal_mw * 0.40), reserve_share: 40.0 };
-            const empPmin = (dynPlant && dynPlant.pmin) ? dynPlant.pmin : staticEmp.pmin;
-
-            // Dynamic commitment check: if historical online probability for this hour is below threshold (< 0.25),
-            // unit is not synchronized during midday / off-peak.
-            if (targetHour !== undefined && dynPlant && dynPlant.online_prob) {
-                const prob = dynPlant.online_prob[targetHour];
-                if (prob < 0.25) return; // Unit de-committed this hour
-            }
-
-            // Dynamic reserve share
-            let resShare = staticEmp.reserve_share || 40.0;
-            if (targetHour !== undefined && window.greekFleetEmpirical && window.greekFleetEmpirical.hourly_reserves && window.greekFleetEmpirical.hourly_reserves.thermal_lockout) {
-                const totalLockout = window.greekFleetEmpirical.hourly_reserves.thermal_lockout[targetHour] || 550.0;
-                resShare = Math.round(resShare * (totalLockout / 550.0));
-            }
-
-            const emp = { pmin: empPmin, reserve_share: resShare };
+            const admieName = PLANT_TO_ADMIE[spec.id] || spec.id;
+            const dynPlant = (isp1 && isp1.plants) ? isp1.plants[admieName] : null;
+            const dynPmin = (dynPlant && dynPlant.pmin) ? dynPlant.pmin : staticEmp.pmin;
+            const probRaw = isp1Prob(admieName, targetHour);
+            const role = dynPlant ? dynPlant.role : null;
+            const isBaseload = role ? (role === 'baseload') : !!(dynPlant && (dynPlant.is_must_run || dynPlant.mean_24h_prob >= 0.85));
+            const isOff = role === 'off';
+            const commit = isOff ? 0.0 : (isBaseload ? 1.0 : (probRaw === null ? 1.0 : Math.max(0, Math.min(1, probRaw))));
+            const firmMw = (isBaseload && dynPlant && dynPlant.avg_mw_online && targetHour !== undefined && dynPlant.avg_mw_online[targetHour] !== undefined)
+                ? dynPlant.avg_mw_online[targetHour]
+                : dynPmin;
+            const emp = { pmin: dynPmin, firm_mw: firmMw, reserve_share: staticEmp.reserve_share || 40.0, commit: commit };
             activeThermalPlants.push({ spec, outInfo, emp });
 
             if (spec.id === 'ALOUMINIO') return; // Handled in Tier 0
 
-            const pminAvail = Math.min(outInfo.avail_mw, emp.pmin);
+            const pminAvail = Math.min(outInfo.avail_mw, emp.firm_mw) * emp.commit;
             if (pminAvail > 10.0) {
                 fleet.push({
                     id: spec.id + '_PMIN',
@@ -9454,9 +9454,9 @@ function runCoupledMeritOrderOptimizer() {
 
         // ── TIER 2: INCREMENTAL COMMERCIAL THERMAL DISPATCH (Pmin -> Pmax - Reserves) ──
         activeThermalPlants.forEach(({ spec, outInfo, emp }) => {
-            const baseMw = (spec.id === 'ALOUMINIO') ? aloumBaseAvail : Math.min(outInfo.avail_mw, emp.pmin);
+            const baseMw = (spec.id === 'ALOUMINIO') ? aloumBaseAvail : Math.min(outInfo.avail_mw, emp.firm_mw) * emp.commit;
             const resShare = emp.reserve_share || 40.0;
-            const incAvail = Math.max(0, outInfo.avail_mw - baseMw - resShare);
+            const incAvail = Math.max(0, outInfo.avail_mw - baseMw - resShare) * emp.commit;
 
             if (incAvail > 10.0) {
                 const eta = spec.efficiency || 0.55;
@@ -9873,9 +9873,9 @@ function runCoupledMeritOrderOptimizer() {
 
         // ── SDAC Karush-Kuhn-Tucker (KKT) Cross-Border Congestion Equilibrium ──
         // 1. Calculate domestic autarky marginal cost in Greece (zero import reference)
-        // Incorporate rolling empirical pumping load and battery storage net injection from ISP1
-        const pumpMw = (window.greekFleetEmpirical && window.greekFleetEmpirical.hourly_pumping_load) ? (window.greekFleetEmpirical.hourly_pumping_load[h] || 0) : 0;
-        const storNetMw = (window.greekFleetEmpirical && window.greekFleetEmpirical.hourly_storage_net) ? (window.greekFleetEmpirical.hourly_storage_net[h] || 0) : 0;
+        // Pumping is extra load; storage production offsets load. Both from the as-of ISP1 baseline.
+        const pumpMw = (isp1 && isp1.hourly_pumping_load) ? (isp1.hourly_pumping_load[h] || 0) : 0;
+        const storNetMw = (isp1 && isp1.hourly_storage_net) ? (isp1.hourly_storage_net[h] || 0) : 0;
         const effReqAutarky = resGR + pumpMw - storNetMw;
 
         const autarkic = clearZonalSupplyGR(effReqAutarky, demGR, bgBaseline, h + 1);
@@ -9917,10 +9917,15 @@ function runCoupledMeritOrderOptimizer() {
         const isImportCongested = (bestFlowBG >= importCapBG - 15.0);
 
         if (isExportCongested) {
-            // Greece is exporting at maximum ATC to Bulgaria -> Decoupled downwards to domestic clearing
-            bestP = clearedTrade.price;
-            bestUnit = clearedTrade.marginal_plant + ' (Decoupled Export)';
-            bestMarginalType = clearedTrade.marginal_type;
+            if (clearedTrade.price > bgBaseline) {
+                bestP = bgBaseline;
+                bestUnit = 'SDAC Coupling Equilibrium (Export ATC Not Binding)';
+                bestMarginalType = 'coupled_market';
+            } else {
+                bestP = clearedTrade.price;
+                bestUnit = clearedTrade.marginal_plant + ' (Decoupled Export)';
+                bestMarginalType = clearedTrade.marginal_type;
+            }
         } else if (isImportCongested) {
             // Greece is importing at maximum ATC from Bulgaria -> Decoupled upwards to domestic peaking
             bestP = clearedTrade.price;
@@ -9958,8 +9963,7 @@ function runCoupledMeritOrderOptimizer() {
         }
 
         // ML ensemble: ridge (level) + KNN analogue (shape) + fundamental
-        // Only blend ML when market is in coupled regime, so ML doesn't override physical congestion decoupling
-        if (!isExportCongested && !isImportCongested) {
+        if (bestMarginalType !== 'res_surplus') {
             const mlP = mlForecastPrice(hist, targetDate, h, ttfPrice, euaPrice);
             const knnP = knn24 ? knn24[h] : null;
             if (mlP != null && mlP > 0) {
