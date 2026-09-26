@@ -2279,7 +2279,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-09-25 16:05</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-09-26 12:07</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2400,7 +2400,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-09-25 16:05
+                Last DB Audit: 2026-09-26 12:07
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -9319,9 +9319,9 @@ function renderOptimizerTable() {
             const countryNames = Object.assign({}, FLAG_MAP, {"DE_LU": "Germany", "DE": "Germany", "FR": "France", "IT": "Italy", "IT_SUD": "Italy South", "IT_CSUD": "Italy Centre-South", "AT": "Austria", "CH": "Switzerland", "BE": "Belgium", "CZ": "Czech Republic", "PL": "Poland", "HU": "Hungary", "RO": "Romania", "BG": "Bulgaria", "GR": "Greece", "SK": "Slovakia", "SI": "Slovenia", "HR": "Croatia", "RS": "Serbia", "MK": "North Macedonia", "ME": "Montenegro", "BA": "Bosnia & Herzegovina", "AL": "Albania", "XK": "Kosovo", "NL": "Netherlands", "ES": "Spain", "PT": "Portugal"});
             const holidaysData = {"AL": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2024-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2024-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2024-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2024-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2025-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2025-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2025-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2025-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2026-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2026-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2026-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2026-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2027-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2027-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2027-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2027-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2028-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2028-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2028-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2028-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2029-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2029-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2029-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2029-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2030-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2030-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2030-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2030-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-03-14", "name": "Summer Day", "is_recurring": 1, "month_day": "03-14"}, {"date": "2031-03-22", "name": "Nevruz Day", "is_recurring": 1, "month_day": "03-22"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-10-19", "name": "Mother Teresa Day", "is_recurring": 1, "month_day": "10-19"}, {"date": "2031-11-28", "name": "Independence Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2031-11-29", "name": "Liberation Day", "is_recurring": 1, "month_day": "11-29"}, {"date": "2031-12-08", "name": "Youth Day", "is_recurring": 1, "month_day": "12-08"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}], "AT": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2024-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2025-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2026-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2027-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2028-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2029-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2030-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-10-26", "name": "National Day", "is_recurring": 1, "month_day": "10-26"}, {"date": "2031-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}], "BA": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2024-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2025-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2026-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2027-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2028-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2029-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2030-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-01-09", "name": "RS Entity Day", "is_recurring": 1, "month_day": "01-09"}, {"date": "2031-03-01", "name": "Independence Day", "is_recurring": 1, "month_day": "03-01"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-11-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "11-25"}], "BG": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2024-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2024-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2025-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2025-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2025-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2026-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2026-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2026-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2027-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2027-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2027-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2028-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2028-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2028-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2029-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2029-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2029-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2030-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2030-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2030-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-03-03", "name": "Liberation Day", "is_recurring": 1, "month_day": "03-03"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-06", "name": "St. George's Day", "is_recurring": 1, "month_day": "05-06"}, {"date": "2031-05-24", "name": "Education & Culture Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-09-06", "name": "Unification Day", "is_recurring": 1, "month_day": "09-06"}, {"date": "2031-09-22", "name": "Independence Day", "is_recurring": 1, "month_day": "09-22"}, {"date": "2031-11-01", "name": "Day of National Leaders", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-12-24", "name": "Christmas Eve", "is_recurring": 1, "month_day": "12-24"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "DE": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-10-03", "name": "German Unity Day", "is_recurring": 1, "month_day": "10-03"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "GR": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2024-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2025-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2026-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2027-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2028-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2029-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2030-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2031-03-25", "name": "Independence Day", "is_recurring": 1, "month_day": "03-25"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-10-28", "name": "Ohi Day", "is_recurring": 1, "month_day": "10-28"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "HR": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2024-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2024-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2024-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2025-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2025-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2025-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2026-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2026-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2026-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2027-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2027-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2027-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2027-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2028-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2028-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2028-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2029-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2029-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2029-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2030-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2030-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2030-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-30", "name": "National Day", "is_recurring": 1, "month_day": "05-30"}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-22", "name": "Anti-Fascism Day", "is_recurring": 1, "month_day": "06-22"}, {"date": "2031-08-05", "name": "Victory Day", "is_recurring": 1, "month_day": "08-05"}, {"date": "2031-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-10-08", "name": "Independence Day", "is_recurring": 1, "month_day": "10-08"}, {"date": "2031-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-11-18", "name": "Remembrance Day", "is_recurring": 1, "month_day": "11-18"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}], "HU": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2024-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2024-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2025-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2025-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2026-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2026-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2027-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2027-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2028-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2028-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2029-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2029-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2030-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2030-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-03-15", "name": "National Day", "is_recurring": 1, "month_day": "03-15"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-20", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "08-20"}, {"date": "2031-10-23", "name": "Republic Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2031-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "IT": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2024-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2027-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2029-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-06", "name": "Epiphany", "is_recurring": 1, "month_day": "01-06"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-25", "name": "Liberation Day", "is_recurring": 1, "month_day": "04-25"}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Republic Day", "is_recurring": 1, "month_day": "06-02"}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-15", "name": "Ferragosto", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-12-08", "name": "Immaculate Conception", "is_recurring": 1, "month_day": "12-08"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "St. Stephen's Day", "is_recurring": 1, "month_day": "12-26"}], "ME": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2024-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2025-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2026-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2027-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2028-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2029-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2030-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-27", "name": "Independence Day 1941", "is_recurring": 1, "month_day": "04-27"}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2031-05-21", "name": "Independence Day", "is_recurring": 1, "month_day": "05-21"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-07-13", "name": "State Day", "is_recurring": 1, "month_day": "07-13"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "MK": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2024-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2024-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2024-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2024-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2025-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2025-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2025-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2025-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2026-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2026-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2026-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2026-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2027-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2027-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2027-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2027-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2028-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2028-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2028-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2028-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2029-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2029-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2029-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2029-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2030-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2030-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2030-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2030-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2031-01-14", "name": "Orthodox New Year (Julian)", "is_recurring": 1, "month_day": "01-14"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-24", "name": "Sts Cyril & Methodius Day", "is_recurring": 1, "month_day": "05-24"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-02", "name": "Republic Day", "is_recurring": 1, "month_day": "08-02"}, {"date": "2031-09-08", "name": "Independence Day", "is_recurring": 1, "month_day": "09-08"}, {"date": "2031-10-11", "name": "National Uprising Day", "is_recurring": 1, "month_day": "10-11"}, {"date": "2031-10-23", "name": "Revolution Day", "is_recurring": 1, "month_day": "10-23"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}], "RO": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2024-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2025-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2026-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2027-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2028-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2029-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2029-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2030-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-01-24", "name": "Union Day", "is_recurring": 1, "month_day": "01-24"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-06-01", "name": "Children's Day", "is_recurring": 1, "month_day": "06-01"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-11-30", "name": "St. Andrew's Day", "is_recurring": 1, "month_day": "11-30"}, {"date": "2031-12-01", "name": "National Day", "is_recurring": 1, "month_day": "12-01"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "2nd Day of Christmas", "is_recurring": 1, "month_day": "12-26"}], "RS": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2024-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2024-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2025-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2025-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2026-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2026-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2027-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2027-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2028-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2028-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2029-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2029-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2030-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2030-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "New Year's Holiday", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2031-02-15", "name": "Statehood Day", "is_recurring": 1, "month_day": "02-15"}, {"date": "2031-02-16", "name": "Statehood Day (cont.)", "is_recurring": 1, "month_day": "02-16"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-02", "name": "Labour Day (cont.)", "is_recurring": 1, "month_day": "05-02"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-11-11", "name": "Armistice Day", "is_recurring": 1, "month_day": "11-11"}], "SI": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2024-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2024-03-29", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-03-31", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-01", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2024-05-09", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-20", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-30", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2024-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2024-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2024-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2024-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2024-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2025-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2025-04-18", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2025-05-29", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-09", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-19", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2025-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2025-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2025-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2026-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2026-04-03", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-05", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-06", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2026-05-14", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-25", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-04", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2026-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2026-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2026-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2027-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2027-03-26", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-28", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-03-29", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2027-05-06", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-17", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-27", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2027-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2027-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2027-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2027-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2028-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2028-04-14", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2028-05-25", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-05", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-15", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2028-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2028-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2028-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2029-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2029-03-30", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-01", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-02", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2029-05-10", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-21", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-05-31", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2029-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2029-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2029-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2029-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2030-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2030-04-19", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-21", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-22", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2030-05-30", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-10", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-20", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2030-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2030-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2030-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2030-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-02", "name": "2nd Day of New Year", "is_recurring": 1, "month_day": "01-02"}, {"date": "2031-02-08", "name": "Prešeren Day", "is_recurring": 1, "month_day": "02-08"}, {"date": "2031-04-11", "name": "Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-27", "name": "Resistance Day", "is_recurring": 1, "month_day": "04-27"}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-02", "name": "2nd Day of Labour", "is_recurring": 1, "month_day": "05-02"}, {"date": "2031-05-22", "name": "Ascension Day", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-02", "name": "Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Corpus Christi", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-25", "name": "Statehood Day", "is_recurring": 1, "month_day": "06-25"}, {"date": "2031-08-15", "name": "Assumption of Mary", "is_recurring": 1, "month_day": "08-15"}, {"date": "2031-10-31", "name": "Reformation Day", "is_recurring": 1, "month_day": "10-31"}, {"date": "2031-11-01", "name": "All Saints' Day", "is_recurring": 1, "month_day": "11-01"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-12-26", "name": "Independence & Unity Day", "is_recurring": 1, "month_day": "12-26"}], "XK": [{"date": "2024-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2024-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2024-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2024-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2024-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2024-05-03", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-05", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-06", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2024-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2024-06-24", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2024-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2024-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2025-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2025-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2025-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2025-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2025-04-18", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-20", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-04-21", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2025-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2025-06-09", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2025-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2025-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2025-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2026-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2026-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2026-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2026-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2026-04-10", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-12", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-04-13", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2026-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2026-06-01", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2026-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2026-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2026-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2027-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2027-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2027-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2027-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2027-04-30", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2027-05-02", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-03", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2027-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2027-06-21", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2027-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2027-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2028-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2028-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2028-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2028-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2028-04-14", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-16", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-04-17", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2028-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2028-06-05", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2028-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2028-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2028-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2029-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2029-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2029-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2029-04-06", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-08", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2029-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2029-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2029-05-28", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2029-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2029-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2029-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2030-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2030-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2030-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2030-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2030-04-26", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-28", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-04-29", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2030-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2030-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2030-06-17", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2030-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2030-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}, {"date": "2031-01-01", "name": "New Year's Day", "is_recurring": 1, "month_day": "01-01"}, {"date": "2031-01-07", "name": "Orthodox Christmas", "is_recurring": 1, "month_day": "01-07"}, {"date": "2031-02-17", "name": "Independence Day", "is_recurring": 1, "month_day": "02-17"}, {"date": "2031-04-09", "name": "Constitution Day", "is_recurring": 1, "month_day": "04-09"}, {"date": "2031-04-11", "name": "Orthodox Good Friday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-13", "name": "Orthodox Easter Sunday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-04-14", "name": "Orthodox Easter Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-05-01", "name": "Labour Day", "is_recurring": 1, "month_day": "05-01"}, {"date": "2031-05-09", "name": "Europe Day", "is_recurring": 1, "month_day": "05-09"}, {"date": "2031-06-02", "name": "Orthodox Whit Monday", "is_recurring": 0, "month_day": NaN}, {"date": "2031-06-12", "name": "Kosovo Verification Day", "is_recurring": 1, "month_day": "06-12"}, {"date": "2031-11-28", "name": "Flag Day", "is_recurring": 1, "month_day": "11-28"}, {"date": "2031-12-25", "name": "Christmas Day", "is_recurring": 1, "month_day": "12-25"}]};
             const dataHealth = {
-  "timestamp": "2026-09-25 16:06:47",
-  "today": "2026-09-25",
-  "tomorrow": "2026-09-26",
+  "timestamp": "2026-09-26 12:07:46",
+  "today": "2026-09-26",
+  "tomorrow": "2026-09-27",
   "is_after_dam_cutoff": false,
   "dam_cutoff_hour": 18,
   "overall_status": "HEALTHY",
@@ -9330,12 +9330,6 @@ function renderOptimizerTable() {
   "spot_prices": {
     "matrix": {
       "GR": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9383,15 +9377,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "BG": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9439,15 +9433,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "RO": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9495,15 +9489,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "HU": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9551,15 +9545,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "RS": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9607,15 +9601,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "IT": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9663,15 +9657,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "DE_LU": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9719,15 +9713,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "CZ": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9775,15 +9769,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "AT": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9831,15 +9825,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "SK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9887,15 +9881,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "SI": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9943,15 +9937,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "HR": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -9999,15 +9993,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "AL": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10055,15 +10049,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "MK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10111,15 +10105,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10167,15 +10161,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       },
       "XK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "hours": 24,
-          "description": "24 hrs"
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10223,6 +10217,12 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "hours": 24,
           "description": "24 hrs"
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "hours": 0,
+          "description": "Pending DA"
         }
       }
     },
@@ -10245,7 +10245,6 @@ function renderOptimizerTable() {
       "XK"
     ],
     "dates": [
-      "2026-09-18",
       "2026-09-19",
       "2026-09-20",
       "2026-09-21",
@@ -10253,11 +10252,12 @@ function renderOptimizerTable() {
       "2026-09-23",
       "2026-09-24",
       "2026-09-25",
-      "2026-09-26"
+      "2026-09-26",
+      "2026-09-27"
     ],
     "summary": {
-      "complete_days": 144,
-      "pending_days": 0,
+      "complete_days": 128,
+      "pending_days": 16,
       "missing_days": 0,
       "partial_days": 0
     }
@@ -10265,12 +10265,6 @@ function renderOptimizerTable() {
   "cables_daily": {
     "matrix": {
       "AL-GR": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10314,6 +10308,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10321,12 +10321,6 @@ function renderOptimizerTable() {
         }
       },
       "AL-ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10370,6 +10364,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10377,12 +10377,6 @@ function renderOptimizerTable() {
         }
       },
       "BA-ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10426,6 +10420,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10433,12 +10433,6 @@ function renderOptimizerTable() {
         }
       },
       "BG-MK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10482,6 +10476,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10489,12 +10489,6 @@ function renderOptimizerTable() {
         }
       },
       "BG-RS": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10538,6 +10532,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10545,12 +10545,6 @@ function renderOptimizerTable() {
         }
       },
       "CH-IT": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10598,15 +10592,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "description": "24 pos",
           "positions": 24
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
         }
       },
       "GR-AL": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10650,6 +10644,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10657,12 +10657,6 @@ function renderOptimizerTable() {
         }
       },
       "GR-MK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10706,6 +10700,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10713,12 +10713,6 @@ function renderOptimizerTable() {
         }
       },
       "HU-RS": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10762,6 +10756,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10769,12 +10769,6 @@ function renderOptimizerTable() {
         }
       },
       "IT-CH": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10822,15 +10816,15 @@ function renderOptimizerTable() {
           "badge": "🟢",
           "description": "24 pos",
           "positions": 24
+        },
+        "2026-09-27": {
+          "status": "pending",
+          "badge": "⏳",
+          "description": "Pending DA",
+          "positions": 0
         }
       },
       "IT-ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10874,6 +10868,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10881,12 +10881,6 @@ function renderOptimizerTable() {
         }
       },
       "ME-AL": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10930,6 +10924,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10937,12 +10937,6 @@ function renderOptimizerTable() {
         }
       },
       "ME-BA": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -10986,6 +10980,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -10993,12 +10993,6 @@ function renderOptimizerTable() {
         }
       },
       "ME-IT": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11042,6 +11036,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11049,12 +11049,6 @@ function renderOptimizerTable() {
         }
       },
       "ME-RS": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11098,6 +11092,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11105,12 +11105,6 @@ function renderOptimizerTable() {
         }
       },
       "ME-XK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11154,6 +11148,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11161,12 +11161,6 @@ function renderOptimizerTable() {
         }
       },
       "MK-BG": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11210,6 +11204,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11217,12 +11217,6 @@ function renderOptimizerTable() {
         }
       },
       "MK-GR": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11266,6 +11260,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11273,12 +11273,6 @@ function renderOptimizerTable() {
         }
       },
       "MK-RS": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11322,6 +11316,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11329,12 +11329,6 @@ function renderOptimizerTable() {
         }
       },
       "MK-XK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11378,6 +11372,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11385,12 +11385,6 @@ function renderOptimizerTable() {
         }
       },
       "RS-BG": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11434,6 +11428,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11441,12 +11441,6 @@ function renderOptimizerTable() {
         }
       },
       "RS-HU": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11490,6 +11484,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11497,12 +11497,6 @@ function renderOptimizerTable() {
         }
       },
       "RS-ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11546,6 +11540,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11553,12 +11553,6 @@ function renderOptimizerTable() {
         }
       },
       "RS-MK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11602,6 +11596,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11609,12 +11609,6 @@ function renderOptimizerTable() {
         }
       },
       "XK-ME": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11658,6 +11652,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11665,12 +11665,6 @@ function renderOptimizerTable() {
         }
       },
       "XK-MK": {
-        "2026-09-18": {
-          "status": "complete",
-          "badge": "🟢",
-          "description": "24 pos",
-          "positions": 24
-        },
         "2026-09-19": {
           "status": "complete",
           "badge": "🟢",
@@ -11714,6 +11708,12 @@ function renderOptimizerTable() {
           "positions": 24
         },
         "2026-09-26": {
+          "status": "complete",
+          "badge": "🟢",
+          "description": "24 pos",
+          "positions": 24
+        },
+        "2026-09-27": {
           "status": "complete",
           "badge": "🟢",
           "description": "24 pos",
@@ -11750,7 +11750,6 @@ function renderOptimizerTable() {
       "XK-MK"
     ],
     "dates": [
-      "2026-09-18",
       "2026-09-19",
       "2026-09-20",
       "2026-09-21",
@@ -11758,65 +11757,66 @@ function renderOptimizerTable() {
       "2026-09-23",
       "2026-09-24",
       "2026-09-25",
-      "2026-09-26"
+      "2026-09-26",
+      "2026-09-27"
     ]
   },
   "outages": {
     "status": "healthy",
-    "total_records": 41810,
-    "unique_mrids": 15484,
-    "active_now": 1443,
+    "total_records": 42301,
+    "unique_mrids": 15584,
+    "active_now": 1380,
     "max_end_date": "2100-01-01 01:00:00",
     "country_breakdown": {
       "RO": {
-        "records": 162,
-        "active_now": 42,
-        "active_unavailable_mw": 6767.0
+        "records": 163,
+        "active_now": 38,
+        "active_unavailable_mw": 6367.0
       },
       "HU": {
-        "records": 3776,
-        "active_now": 81,
-        "active_unavailable_mw": 11291.4
+        "records": 3796,
+        "active_now": 82,
+        "active_unavailable_mw": 11310.0
       },
       "BG": {
-        "records": 138,
+        "records": 139,
         "active_now": 20,
-        "active_unavailable_mw": 3786.0
+        "active_unavailable_mw": 3912.0
       },
       "GR": {
-        "records": 6225,
-        "active_now": 68,
-        "active_unavailable_mw": 24382.0
+        "records": 6257,
+        "active_now": 70,
+        "active_unavailable_mw": 25033.0
       },
       "DE_LU": {
-        "records": 12136,
-        "active_now": 216,
-        "active_unavailable_mw": 58797.1
+        "records": 12231,
+        "active_now": 201,
+        "active_unavailable_mw": 56941.9
       },
       "FR": {
-        "records": 5478,
-        "active_now": 346,
-        "active_unavailable_mw": 145078.8
+        "records": 5526,
+        "active_now": 291,
+        "active_unavailable_mw": 151257.6
       },
       "IT": {
-        "records": 6024,
-        "active_now": 400,
-        "active_unavailable_mw": 53059718.0
+        "records": 6088,
+        "active_now": 406,
+        "active_unavailable_mw": 52670004.0
       },
       "RS": {
-        "records": 243,
-        "active_now": 24,
-        "active_unavailable_mw": 4874.5
+        "records": 244,
+        "active_now": 14,
+        "active_unavailable_mw": 3673.0
       },
       "CZ": {
-        "records": 3348,
-        "active_now": 28,
-        "active_unavailable_mw": 4956.0
+        "records": 3355,
+        "active_now": 27,
+        "active_unavailable_mw": 5211.0
       },
       "SK": {
-        "records": 1058,
-        "active_now": 130,
-        "active_unavailable_mw": 24019.2
+        "records": 1076,
+        "active_now": 134,
+        "active_unavailable_mw": 24734.0
       },
       "SI": {
         "records": 31,
@@ -11824,19 +11824,19 @@ function renderOptimizerTable() {
         "active_unavailable_mw": 3594.0
       },
       "CH": {
-        "records": 1790,
+        "records": 1970,
         "active_now": 35,
-        "active_unavailable_mw": 16094.0
+        "active_unavailable_mw": 10798.0
       },
       "BE": {
-        "records": 1259,
-        "active_now": 27,
-        "active_unavailable_mw": 13224.2
+        "records": 1283,
+        "active_now": 37,
+        "active_unavailable_mw": 14860.9
       },
       "AT": {
         "records": 130,
-        "active_now": 8,
-        "active_unavailable_mw": 1857.0
+        "active_now": 7,
+        "active_unavailable_mw": 1722.0
       },
       "MK": {
         "records": 12,
@@ -11848,11 +11848,11 @@ function renderOptimizerTable() {
   "cable_outages": {},
   "commodities": {
     "status": "healthy",
-    "latest_trade_date": "2026-09-27",
-    "latest_ttf_price": 76.034,
-    "latest_eua_price": 86.41,
+    "latest_trade_date": "2026-09-28",
+    "latest_ttf_price": 71.552,
+    "latest_eua_price": 86.23,
     "days_lag": -2,
-    "fetch_time": "2026-09-25 09:06:58"
+    "fetch_time": "2026-09-26 09:06:10"
   },
   "issues_critical": [],
   "issues_warning": [],
@@ -21803,7 +21803,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher (Option C: Notification with Refresh Button) ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-09-25 16:05";
+                const currentBuildTime = "2026-09-26 12:07";
                 let notificationShown = false;
 
                 setInterval(async function() {
