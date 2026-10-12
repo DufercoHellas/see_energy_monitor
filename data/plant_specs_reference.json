@@ -2,7 +2,7 @@
   "hubs": {
     "TTF": {
       "name": "Dutch TTF Hub (Base)",
-      "basis_eur": 0.0
+      "basis_eur": 0
     },
     "VTP_GR": {
       "name": "Greece DESFA VTP (TTF + €2.20 entry/tariff)",
@@ -26,7 +26,11 @@
     },
     "RO_VTP": {
       "name": "Romania BRM VTP (TTF + €2.00)",
-      "basis_eur": 2.0
+      "basis_eur": 2
+    },
+    "CEGH_AT": {
+      "name": "Austria CEGH / VTP (TTF + €0.80)",
+      "basis_eur": 0.8
     }
   },
   "emission_factors": {
@@ -43,63 +47,63 @@
         "name": "Komotini Power (GEK TERNA / Motor Oil)",
         "fuel": "gas",
         "tech": "CCGT (Siemens SGT5-9000HL)",
-        "nominal_mw": 858.0,
+        "nominal_mw": 858,
         "efficiency": 0.635,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "KOMOTINI_POWER",
-        "pmin": 350.0,
-        "reserve_mw": 80.0
+        "pmin": 350,
+        "reserve_mw": 80
       },
       {
         "id": "AG_NIKOLAOS2",
         "name": "Agios Nikolaos II (Metlen Energy & Metals)",
         "fuel": "gas",
         "tech": "CCGT (Ansaldo GT36)",
-        "nominal_mw": 803.0,
+        "nominal_mw": 803,
         "efficiency": 0.63,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "AG_NIKOLAOS2",
-        "pmin": 300.0,
-        "reserve_mw": 70.0
+        "pmin": 300,
+        "reserve_mw": 70
       },
       {
         "id": "ALIVERI V",
         "name": "Aliveri V (PPC / DEI)",
         "fuel": "gas",
         "tech": "CCGT (Alstom GT26)",
-        "nominal_mw": 417.0,
+        "nominal_mw": 417,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "ALIVERI5",
-        "pmin": 100.0,
-        "reserve_mw": 45.0
+        "pmin": 100,
+        "reserve_mw": 45
       },
       {
         "id": "MEGALOPOLI V",
         "name": "Megalopolis V (PPC / DEI)",
         "fuel": "gas",
         "tech": "CCGT (GE 9FB 2x1)",
-        "nominal_mw": 811.0,
+        "nominal_mw": 811,
         "efficiency": 0.582,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "MEGALOPOLI_V",
-        "pmin": 128.0,
-        "reserve_mw": 70.0
+        "pmin": 128,
+        "reserve_mw": 70
       },
       {
         "id": "LAVRIO V",
         "name": "Lavrio V (PPC / DEI)",
         "fuel": "gas",
         "tech": "CCGT (Alstom GT26)",
-        "nominal_mw": 378.0,
+        "nominal_mw": 378,
         "efficiency": 0.578,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -112,14 +116,14 @@
         "alt_id": "HERON_CC",
         "fuel": "gas",
         "tech": "CCGT (GE 9FB)",
-        "nominal_mw": 435.0,
+        "nominal_mw": 435,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "HERON_CC",
-        "pmin": 175.0,
-        "reserve_mw": 50.0
+        "pmin": 175,
+        "reserve_mw": 50
       },
       {
         "id": "THESSALONIKI_CC",
@@ -127,14 +131,14 @@
         "alt_id": "THESSALONIKI_CC",
         "fuel": "gas",
         "tech": "CCGT (Ansaldo V94.3A)",
-        "nominal_mw": 400.0,
+        "nominal_mw": 400,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "THESSALONIKI_CC",
-        "pmin": 172.0,
-        "reserve_mw": 40.0
+        "pmin": 172,
+        "reserve_mw": 40
       },
       {
         "id": "THISVI_CC",
@@ -142,14 +146,14 @@
         "alt_id": "THISVI_CC",
         "fuel": "gas",
         "tech": "CCGT (Ansaldo GT26)",
-        "nominal_mw": 410.0,
+        "nominal_mw": 410,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "THISVI_CC",
-        "pmin": 160.0,
-        "reserve_mw": 35.0
+        "pmin": 160,
+        "reserve_mw": 35
       },
       {
         "id": "KORINTHOS_POWER",
@@ -162,8 +166,8 @@
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "KORINTHOS_POWER",
-        "pmin": 180.0,
-        "reserve_mw": 45.0
+        "pmin": 180,
+        "reserve_mw": 45
       },
       {
         "id": "PROTERGIA_CC",
@@ -176,64 +180,64 @@
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "PROTERGIA_CC",
-        "pmin": 160.0,
-        "reserve_mw": 45.0
+        "pmin": 160,
+        "reserve_mw": 45
       },
       {
         "id": "ALOUMINIO",
         "name": "Alouminio CHP (Metlen)",
         "fuel": "gas",
         "tech": "CCGT Cogeneration (CHP)",
-        "nominal_mw": 334.0,
+        "nominal_mw": 334,
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.5,
         "hub_default": "VTP_GR",
         "admie_id": "ALOUMINIO",
-        "pmin": 110.0,
-        "reserve_mw": 40.0
+        "pmin": 110,
+        "reserve_mw": 40
       },
       {
         "id": "LAVRIO IV",
         "name": "Lavrio IV (PPC / DEI)",
         "fuel": "gas",
         "tech": "CCGT (ABB GT13E2)",
-        "nominal_mw": 536.0,
+        "nominal_mw": 536,
         "efficiency": 0.525,
         "emission_factor": 0.202,
         "vom": 2.75,
         "hub_default": "VTP_GR",
         "admie_id": "LAVRIO4",
-        "pmin": 65.0,
-        "reserve_mw": 35.0
+        "pmin": 65,
+        "reserve_mw": 35
       },
       {
         "id": "KOMOTINI",
         "name": "Komotini CCGT (PPC / DEI)",
         "fuel": "gas",
         "tech": "CCGT (Alstom GT13E2)",
-        "nominal_mw": 472.0,
+        "nominal_mw": 472,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.75,
         "hub_default": "VTP_GR",
         "admie_id": "KOMOTINI",
-        "pmin": 115.0,
-        "reserve_mw": 25.0
+        "pmin": 115,
+        "reserve_mw": 25
       },
       {
         "id": "PTOLEMAIDA5",
         "name": "Ptolemaida V (PPC / DEI)",
         "fuel": "lignite",
         "tech": "Ultra-supercritical Lignite",
-        "nominal_mw": 616.0,
+        "nominal_mw": 616,
         "efficiency": 0.415,
         "emission_factor": 0.4,
-        "fuel_cost_th": 18.0,
+        "fuel_cost_th": 18,
         "vom": 4.5,
         "admie_id": "PTOLEMAIDA5",
-        "pmin": 302.0,
-        "reserve_mw": 50.0
+        "pmin": 302,
+        "reserve_mw": 50
       },
       {
         "id": "KREMASTA",
@@ -241,8 +245,8 @@
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Acheloos)",
         "nominal_mw": 437.2,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -250,9 +254,9 @@
         "name": "Thisavros I (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (Nestos)",
-        "nominal_mw": 128.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 128,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -260,9 +264,9 @@
         "name": "Thisavros II (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (Nestos)",
-        "nominal_mw": 128.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 128,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -270,9 +274,9 @@
         "name": "Thisavros III (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (Nestos)",
-        "nominal_mw": 128.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 128,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -280,9 +284,9 @@
         "name": "Polyphyto (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Aliakmonas)",
-        "nominal_mw": 375.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 375,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -290,9 +294,9 @@
         "name": "Kastraki (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Acheloos)",
-        "nominal_mw": 320.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 320,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -300,9 +304,9 @@
         "name": "Sfikia (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (Aliakmonas)",
-        "nominal_mw": 315.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 315,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -310,9 +314,9 @@
         "name": "Pournari I (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Arachthos)",
-        "nominal_mw": 300.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 300,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -320,9 +324,9 @@
         "name": "Piges Aoou (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Aoos)",
-        "nominal_mw": 210.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 210,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -330,9 +334,9 @@
         "name": "Stratos I & II (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Acheloos)",
-        "nominal_mw": 156.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 156,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -340,9 +344,9 @@
         "name": "Ilarionas (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Aliakmonas)",
-        "nominal_mw": 153.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 153,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -351,8 +355,8 @@
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Megdovas)",
         "nominal_mw": 129.9,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -360,9 +364,9 @@
         "name": "Platanovrysi (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Nestos)",
-        "nominal_mw": 116.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 116,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -370,9 +374,9 @@
         "name": "Asomata (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Aliakmonas)",
-        "nominal_mw": 108.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 108,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -380,9 +384,9 @@
         "name": "Ladon (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Ladon)",
-        "nominal_mw": 70.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 70,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -390,9 +394,9 @@
         "name": "Pournari II (PPC / DEI)",
         "fuel": "hydro",
         "tech": "Hydro Reservoir (Arachthos)",
-        "nominal_mw": 33.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 33,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       }
     ],
@@ -403,7 +407,7 @@
         "name": "Simeri Crichi (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 885.0,
+        "nominal_mw": 885,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -415,7 +419,7 @@
         "name": "Torviscosa (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 867.0,
+        "nominal_mw": 867,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -427,7 +431,7 @@
         "name": "Chivasso Unit 1 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F Advanced (Ansaldo AE94.3A)",
-        "nominal_mw": 820.0,
+        "nominal_mw": 820,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -439,7 +443,7 @@
         "name": "Porto Marghera Levante Unit 5 (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class H (Ansaldo GT36)",
-        "nominal_mw": 817.0,
+        "nominal_mw": 817,
         "efficiency": 0.63,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -451,7 +455,7 @@
         "name": "Sparanise / Sorgenia (Sorgenia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 810.0,
+        "nominal_mw": 810,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -463,7 +467,7 @@
         "name": "Altomonte (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 808.0,
+        "nominal_mw": 808,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -475,7 +479,7 @@
         "name": "Piacenza Levante Unit 4 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class H (Ansaldo GT36)",
-        "nominal_mw": 806.0,
+        "nominal_mw": 806,
         "efficiency": 0.625,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -487,7 +491,7 @@
         "name": "Turbigo Unit 4 (Iren)",
         "fuel": "gas",
         "tech": "CCGT Class H (Ansaldo GT36 Repowered)",
-        "nominal_mw": 800.0,
+        "nominal_mw": 800,
         "efficiency": 0.625,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -499,7 +503,7 @@
         "name": "Terni CCGT (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 800.0,
+        "nominal_mw": 800,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -511,7 +515,7 @@
         "name": "Fusina Unit 7 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class H (Ansaldo GT36)",
-        "nominal_mw": 796.0,
+        "nominal_mw": 796,
         "efficiency": 0.625,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -523,7 +527,7 @@
         "name": "Tavazzano Montanaso Unit 6/Unit 1 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class H (Ansaldo GT36)",
-        "nominal_mw": 790.0,
+        "nominal_mw": 790,
         "efficiency": 0.628,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -535,7 +539,7 @@
         "name": "Torrevaldaliga Nord CCGT Unit 5 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA 2x1)",
-        "nominal_mw": 790.0,
+        "nominal_mw": 790,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -547,7 +551,7 @@
         "name": "Livorno Ferraris (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 776.0,
+        "nominal_mw": 776,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -559,7 +563,7 @@
         "name": "Termoli CCGT (Sorgenia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 769.0,
+        "nominal_mw": 769,
         "efficiency": 0.578,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -571,7 +575,7 @@
         "name": "Sermide Unit 4 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F 2x1)",
-        "nominal_mw": 766.0,
+        "nominal_mw": 766,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -583,7 +587,7 @@
         "name": "Vado Ligure Unit 5 (Tirreno Power)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F 2x1)",
-        "nominal_mw": 760.0,
+        "nominal_mw": 760,
         "efficiency": 0.578,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -595,7 +599,7 @@
         "name": "Termini Imerese Unit 6 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA 2x1)",
-        "nominal_mw": 756.0,
+        "nominal_mw": 756,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -607,7 +611,7 @@
         "name": "Cassano d'Adda Unit 7 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 755.0,
+        "nominal_mw": 755,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -619,7 +623,7 @@
         "name": "Ostiglia Unit 12 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A 2x1)",
-        "nominal_mw": 751.0,
+        "nominal_mw": 751,
         "efficiency": 0.58,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -631,7 +635,7 @@
         "name": "Cassano d'Adda Unit 2 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 748.0,
+        "nominal_mw": 748,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -643,7 +647,7 @@
         "name": "Tavazzano Montanaso Unit 5 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 740.0,
+        "nominal_mw": 740,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -655,12 +659,12 @@
         "name": "Torrevaldaliga Nord Unit 3 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical USC",
-        "nominal_mw": 625.0,
+        "nominal_mw": 625,
         "efficiency": 0.415,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S12TRRLUP_TORREVALN_2",
@@ -668,12 +672,12 @@
         "name": "Torrevaldaliga Nord Unit 2 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical USC",
-        "nominal_mw": 625.0,
+        "nominal_mw": 625,
         "efficiency": 0.415,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S12TRRLUP_TORREVALN_4",
@@ -681,12 +685,12 @@
         "name": "Torrevaldaliga Nord Unit 4 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical USC",
-        "nominal_mw": 615.0,
+        "nominal_mw": 615,
         "efficiency": 0.415,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S16BSCRUP_BRNDSSUDCE_4",
@@ -694,12 +698,12 @@
         "name": "Brindisi Sud Federico II Unit 4 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical",
-        "nominal_mw": 605.0,
+        "nominal_mw": 605,
         "efficiency": 0.41,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S16BSCRUP_BRNDSSUDCE_1",
@@ -707,12 +711,12 @@
         "name": "Brindisi Sud Federico II Unit 1 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical",
-        "nominal_mw": 605.0,
+        "nominal_mw": 605,
         "efficiency": 0.41,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S16BSCRUP_BRNDSSUDCE_3",
@@ -720,12 +724,12 @@
         "name": "Brindisi Sud Federico II Unit 3 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical",
-        "nominal_mw": 605.0,
+        "nominal_mw": 605,
         "efficiency": 0.41,
         "emission_factor": 0.34,
         "vom": 3.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S13CDGNUP_GISSI_1",
@@ -733,7 +737,7 @@
         "name": "Gissi CCGT Unit 1 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 420.0,
+        "nominal_mw": 420,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -745,7 +749,7 @@
         "name": "Turbigo Unit 3 (Iren)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 419.0,
+        "nominal_mw": 419,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -757,7 +761,7 @@
         "name": "Scandale CCGT Unit 1 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 410.0,
+        "nominal_mw": 410,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -769,7 +773,7 @@
         "name": "Teverola CCGT (Sorgenia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 404.0,
+        "nominal_mw": 404,
         "efficiency": 0.572,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -781,7 +785,7 @@
         "name": "Candela CCGT (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 401.0,
+        "nominal_mw": 401,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -793,7 +797,7 @@
         "name": "Napoli Levante Unit 4 (Tirreno Power)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 400.0,
+        "nominal_mw": 400,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -805,7 +809,7 @@
         "name": "Voghera Energia CCGT (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 396.0,
+        "nominal_mw": 396,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -817,7 +821,7 @@
         "name": "Mantova CCGT Unit 3 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 395.0,
+        "nominal_mw": 395,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -829,7 +833,7 @@
         "name": "Ravenna CCGT Unit 11 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 395.0,
+        "nominal_mw": 395,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -841,7 +845,7 @@
         "name": "Santa Barbara CCGT (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 391.0,
+        "nominal_mw": 391,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -853,7 +857,7 @@
         "name": "Torrevaldaliga Nord CCGT Unit 6 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 390.0,
+        "nominal_mw": 390,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -865,7 +869,7 @@
         "name": "Porto Marghera Levante Unit 3 (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 388.0,
+        "nominal_mw": 388,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -877,7 +881,7 @@
         "name": "Sermide Unit 3 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 385.0,
+        "nominal_mw": 385,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -889,7 +893,7 @@
         "name": "Leinì CCGT (Engie)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 385.0,
+        "nominal_mw": 385,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -901,7 +905,7 @@
         "name": "Brindisi EniPower Unit 8 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -913,7 +917,7 @@
         "name": "Brindisi EniPower Unit 10 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -925,7 +929,7 @@
         "name": "Ferrara EniPower Unit 2 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -937,7 +941,7 @@
         "name": "Brindisi EniPower Unit 9 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -949,7 +953,7 @@
         "name": "Moncalieri Unit 2 (Iren)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -961,7 +965,7 @@
         "name": "Ferrara EniPower Unit 3 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -973,7 +977,7 @@
         "name": "Ferrara CTE Unit 9 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -985,7 +989,7 @@
         "name": "Mantova CCGT Unit 2 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -997,7 +1001,7 @@
         "name": "Ravenna CCGT Unit 10 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 381.0,
+        "nominal_mw": 381,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1009,7 +1013,7 @@
         "name": "Roselectra CCGT (Edison)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 380.0,
+        "nominal_mw": 380,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1021,7 +1025,7 @@
         "name": "Sparanise Unit 2 (Calenia Energia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 380.0,
+        "nominal_mw": 380,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1033,7 +1037,7 @@
         "name": "Rizziconi Unit 1 (Rizziconi Energia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 380.0,
+        "nominal_mw": 380,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1045,7 +1049,7 @@
         "name": "Rizziconi Unit 2 (Rizziconi Energia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 380.0,
+        "nominal_mw": 380,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1057,7 +1061,7 @@
         "name": "Sparanise Unit 1 (Calenia Energia)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 380.0,
+        "nominal_mw": 380,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1069,7 +1073,7 @@
         "name": "Moncalieri Unit 3 (Iren)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 373.0,
+        "nominal_mw": 373,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1081,7 +1085,7 @@
         "name": "Ostiglia Unit 3 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 373.0,
+        "nominal_mw": 373,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1093,7 +1097,7 @@
         "name": "Tavazzano Montanaso Unit 6 (EP Produzione)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 371.0,
+        "nominal_mw": 371,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1105,7 +1109,7 @@
         "name": "Chivasso Unit 2 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Class F (Ansaldo AE94.3A)",
-        "nominal_mw": 370.0,
+        "nominal_mw": 370,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1117,7 +1121,7 @@
         "name": "La Casella Unit 4 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 369.0,
+        "nominal_mw": 369,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1129,7 +1133,7 @@
         "name": "Porto Corsini Unit 4 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 368.0,
+        "nominal_mw": 368,
         "efficiency": 0.555,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1141,7 +1145,7 @@
         "name": "Torino Nord CCGT (Iren)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F Cogen)",
-        "nominal_mw": 368.0,
+        "nominal_mw": 368,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1153,7 +1157,7 @@
         "name": "La Casella Unit 2 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 367.0,
+        "nominal_mw": 367,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1165,7 +1169,7 @@
         "name": "Pietrafitta Unit 5 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 365.0,
+        "nominal_mw": 365,
         "efficiency": 0.555,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1177,7 +1181,7 @@
         "name": "La Casella Unit 3 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 365.0,
+        "nominal_mw": 365,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1189,7 +1193,7 @@
         "name": "Priolo Gargallo CCGT (Erg Power)",
         "fuel": "gas",
         "tech": "CCGT Class F (Siemens SGT5-4000F)",
-        "nominal_mw": 360.0,
+        "nominal_mw": 360,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1201,7 +1205,7 @@
         "name": "Porto Corsini Unit 3 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA)",
-        "nominal_mw": 350.0,
+        "nominal_mw": 350,
         "efficiency": 0.555,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -1213,7 +1217,7 @@
         "name": "Rosignano CCGT (Engie / Solvay)",
         "fuel": "gas",
         "tech": "CCGT Class F Cogen",
-        "nominal_mw": 325.0,
+        "nominal_mw": 325,
         "efficiency": 0.55,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1225,7 +1229,7 @@
         "name": "Montalto di Castro Unit 2 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Repowered (Alstom)",
-        "nominal_mw": 295.0,
+        "nominal_mw": 295,
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1237,12 +1241,12 @@
         "name": "San Filippo del Mela Unit 6 (A2A)",
         "fuel": "oil",
         "tech": "Fuel Oil Steam Turbine",
-        "nominal_mw": 288.0,
+        "nominal_mw": 288,
         "efficiency": 0.37,
         "emission_factor": 0.28,
         "vom": 4.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 22.0
+        "fuel_cost_th": 22
       },
       {
         "id": "IM_S19SDMCUP_S.F._DEL_5",
@@ -1250,12 +1254,12 @@
         "name": "San Filippo del Mela Unit 5 (A2A)",
         "fuel": "oil",
         "tech": "Fuel Oil Steam Turbine",
-        "nominal_mw": 288.0,
+        "nominal_mw": 288,
         "efficiency": 0.37,
         "emission_factor": 0.28,
         "vom": 4.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 22.0
+        "fuel_cost_th": 22
       },
       {
         "id": "IM_S20FOMSUP_FIUMESANT_4",
@@ -1263,12 +1267,12 @@
         "name": "Fiumesanto Unit 4 (EP Produzione)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical",
-        "nominal_mw": 267.0,
+        "nominal_mw": 267,
         "efficiency": 0.385,
         "emission_factor": 0.34,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S20FOMSUP_FIUMESANT_3",
@@ -1276,12 +1280,12 @@
         "name": "Fiumesanto Unit 3 (EP Produzione)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical",
-        "nominal_mw": 267.0,
+        "nominal_mw": 267,
         "efficiency": 0.385,
         "emission_factor": 0.34,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S20SCLCUP_SULCIS_CEN_2",
@@ -1289,12 +1293,12 @@
         "name": "Sulcis Grazia Deledda Unit 2 (Enel)",
         "fuel": "coal",
         "tech": "Hard Coal / Lignite CFB Subcritical",
-        "nominal_mw": 250.0,
+        "nominal_mw": 250,
         "efficiency": 0.38,
         "emission_factor": 0.34,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "IM_S05AZTTUP_AZOTATI_5",
@@ -1302,7 +1306,7 @@
         "name": "Azotati Marghera Unit 5 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Industrial (GE 6FA)",
-        "nominal_mw": 236.0,
+        "nominal_mw": 236,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1314,7 +1318,7 @@
         "name": "Ferrara CTE Unit 10 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Class F (GE 9FA Cogen)",
-        "nominal_mw": 230.0,
+        "nominal_mw": 230,
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1326,7 +1330,7 @@
         "name": "Corigliano / Crotone Unit 3 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Standard (Ansaldo)",
-        "nominal_mw": 223.0,
+        "nominal_mw": 223,
         "efficiency": 0.535,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1338,7 +1342,7 @@
         "name": "Corigliano / Crotone Unit 2 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Standard (Ansaldo)",
-        "nominal_mw": 223.0,
+        "nominal_mw": 223,
         "efficiency": 0.535,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1350,10 +1354,10 @@
         "name": "Livorno EniPower Unit 7 (EniPower)",
         "fuel": "gas",
         "tech": "CCGT Cogen",
-        "nominal_mw": 149.0,
+        "nominal_mw": 149,
         "efficiency": 0.51,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1362,7 +1366,7 @@
         "name": "Montalto di Castro Unit 1 (Enel)",
         "fuel": "gas",
         "tech": "CCGT Repowered (Alstom)",
-        "nominal_mw": 148.0,
+        "nominal_mw": 148,
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1374,10 +1378,10 @@
         "name": "Termini Imerese Turbogas 53 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker (Fiat TG50)",
-        "nominal_mw": 147.0,
+        "nominal_mw": 147,
         "efficiency": 0.35,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1386,10 +1390,10 @@
         "name": "Termini Imerese Turbogas 43 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker (Fiat TG50)",
-        "nominal_mw": 147.0,
+        "nominal_mw": 147,
         "efficiency": 0.35,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1398,12 +1402,12 @@
         "name": "San Filippo del Mela Unit 1 (A2A)",
         "fuel": "oil",
         "tech": "Fuel Oil Steam Turbine",
-        "nominal_mw": 145.0,
+        "nominal_mw": 145,
         "efficiency": 0.365,
         "emission_factor": 0.28,
         "vom": 4.5,
         "hub_default": "PSV_IT",
-        "fuel_cost_th": 22.0
+        "fuel_cost_th": 22
       },
       {
         "id": "IM_S19TMRCUP_MILAZZO_1",
@@ -1411,10 +1415,10 @@
         "name": "Milazzo CCGT (Termica Milazzo)",
         "fuel": "gas",
         "tech": "CCGT Cogen (Ansaldo)",
-        "nominal_mw": 145.0,
+        "nominal_mw": 145,
         "efficiency": 0.515,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1423,10 +1427,10 @@
         "name": "Larino Turbogas Unit 1 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker",
-        "nominal_mw": 124.0,
+        "nominal_mw": 124,
         "efficiency": 0.36,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1435,10 +1439,10 @@
         "name": "Larino Turbogas Unit 2 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker",
-        "nominal_mw": 124.0,
+        "nominal_mw": 124,
         "efficiency": 0.36,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1447,10 +1451,10 @@
         "name": "Bussi sul Tirino CCGT",
         "fuel": "gas",
         "tech": "CCGT Industrial Cogen",
-        "nominal_mw": 122.0,
+        "nominal_mw": 122,
         "efficiency": 0.505,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1459,10 +1463,10 @@
         "name": "Cittadella CCGT",
         "fuel": "gas",
         "tech": "CCGT Industrial Cogen",
-        "nominal_mw": 115.0,
+        "nominal_mw": 115,
         "efficiency": 0.505,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1471,10 +1475,10 @@
         "name": "Rossano Calabro Turbogas 3 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker",
-        "nominal_mw": 112.0,
+        "nominal_mw": 112,
         "efficiency": 0.35,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1483,10 +1487,10 @@
         "name": "Servola Trieste CCGT",
         "fuel": "gas",
         "tech": "CCGT Industrial Cogen",
-        "nominal_mw": 111.0,
+        "nominal_mw": 111,
         "efficiency": 0.5,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1495,7 +1499,7 @@
         "name": "Cassano d'Adda Unit 3 (A2A)",
         "fuel": "gas",
         "tech": "CCGT Cogen (Ansaldo)",
-        "nominal_mw": 110.0,
+        "nominal_mw": 110,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.75,
@@ -1507,10 +1511,10 @@
         "name": "Trapani Turbogas 1 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker (Fiat TG50)",
-        "nominal_mw": 106.0,
+        "nominal_mw": 106,
         "efficiency": 0.35,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1519,10 +1523,10 @@
         "name": "Trapani Turbogas 2 (Enel)",
         "fuel": "gas",
         "tech": "OCGT Peaker (Fiat TG50)",
-        "nominal_mw": 106.0,
+        "nominal_mw": 106,
         "efficiency": 0.35,
         "emission_factor": 0.202,
-        "vom": 4.0,
+        "vom": 4,
         "hub_default": "PSV_IT"
       },
       {
@@ -1531,10 +1535,10 @@
         "name": "Duino CCGT (Burgo)",
         "fuel": "gas",
         "tech": "CCGT Industrial Cogen",
-        "nominal_mw": 105.0,
+        "nominal_mw": 105,
         "efficiency": 0.5,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1543,10 +1547,10 @@
         "name": "Pomigliano d'Arco CCGT",
         "fuel": "gas",
         "tech": "CCGT Industrial Cogen",
-        "nominal_mw": 105.0,
+        "nominal_mw": 105,
         "efficiency": 0.5,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "PSV_IT"
       },
       {
@@ -1555,11 +1559,11 @@
         "alt_id": "IM_S13S2GCUP_SGIACOMO_3",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 490.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 490,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S05FDLTUP_FADALTO_1",
@@ -1567,11 +1571,11 @@
         "alt_id": "IM_S05FDLTUP_FADALTO_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 220.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 220,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S15PRSNUP_PRESENZAN_1",
@@ -1579,11 +1583,11 @@
         "alt_id": "IM_S15PRSNUP_PRESENZAN_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 985.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 985,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S03GRGNUP_GARGNANO_1",
@@ -1591,11 +1595,11 @@
         "alt_id": "IM_S03GRGNUP_GARGNANO_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 137.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 137,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S01VNSEUP_VENAUS_1",
@@ -1603,11 +1607,11 @@
         "alt_id": "IM_S01VNSEUP_VENAUS_1",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 230.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 230,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S19ANPAUP_ANAPO_CL_1",
@@ -1615,11 +1619,11 @@
         "alt_id": "IM_S19ANPAUP_ANAPO_C.L_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 500.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 500,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S03EDLOUP_EDOLO_1",
@@ -1627,11 +1631,11 @@
         "alt_id": "IM_S03EDLOUP_EDOLO_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 950.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 950,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_SMASSCL_1",
@@ -1639,11 +1643,11 @@
         "alt_id": "IMAI_S.MASS.CL_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 497.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 497,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S01ENTRUP_ETQCHIOTAS_1",
@@ -1651,11 +1655,11 @@
         "alt_id": "IM_S01ENTRUP_ETQCHIOTAS_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 1064.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 1064,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S13MNTRUP_MONTORIO_1",
@@ -1663,11 +1667,11 @@
         "alt_id": "IM_S13MNTRUP_MONTORIO_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 110.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 110,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_VALMALENCO_1",
@@ -1675,11 +1679,11 @@
         "alt_id": "IMAI_VALMALENCO_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 350.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 350,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S04CRDAUP_CARDANO_1",
@@ -1687,11 +1691,11 @@
         "alt_id": "IM_S04CRDAUP_CARDANO_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 121.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 121,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S03RNCVUP_RONCOVALG_1",
@@ -1699,11 +1703,11 @@
         "alt_id": "IM_S03RNCVUP_RONCOVALG_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 1000.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 1000,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S04NATRUP_CNTRLNTRNO_11",
@@ -1711,11 +1715,11 @@
         "alt_id": "IM_S04NATRUP_CNTRLNTRNO_11",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 175.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 175,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S05SVRZUP_SOVERZENE_1",
@@ -1723,11 +1727,11 @@
         "alt_id": "IM_S05SVRZUP_SOVERZENE_1",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 158.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 158,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_M03SFRNUP_SFRNGNRZNE_2",
@@ -1735,11 +1739,11 @@
         "alt_id": "IM_M03SFRNUP_SFRNGNRZNE_2",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 268.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 268,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_NERAVELINO_1",
@@ -1747,11 +1751,11 @@
         "alt_id": "IMAI_NERAVELINO_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 295.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 295,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S03SFRNUP_SFIORANO_1",
@@ -1759,11 +1763,11 @@
         "alt_id": "IM_S03SFRNUP_S.FIORANO_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 272.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 272,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S13PRVVUP_PROVVIDEN_1",
@@ -1771,11 +1775,11 @@
         "alt_id": "IM_S13PRVVUP_PROVVIDEN_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 139.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 139,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S10GLLTUP_GALLETO_2",
@@ -1783,11 +1787,11 @@
         "alt_id": "IM_S10GLLTUP_GALLETO_2",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 166.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 166,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S02AVSIUP_AVISE_1",
@@ -1795,11 +1799,11 @@
         "alt_id": "IM_S02AVSIUP_AVISE_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 127.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 127,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_CHIESE_1",
@@ -1807,11 +1811,11 @@
         "alt_id": "IMAI_CHIESE_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 335.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 335,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_MUCONE_1",
@@ -1819,11 +1823,11 @@
         "alt_id": "IMAI_MUCONE_1",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 169.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 169,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_ALTOADDA_1",
@@ -1831,11 +1835,11 @@
         "alt_id": "IMAI_ALTOADDA_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 327.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 327,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_T20TLRAUP_TALORO1_1",
@@ -1843,11 +1847,11 @@
         "alt_id": "IM_T20TLRAUP_TALORO1_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 240.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 240,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IMAI_PONTVENTOUX_1",
@@ -1855,11 +1859,11 @@
         "alt_id": "IMAI_PONTVENTOUX_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 150.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 150,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S15CPRTUP_CAPRIATI_1",
@@ -1867,11 +1871,11 @@
         "alt_id": "IM_S15CPRTUP_CAPRIATI_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 113.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 113,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S04RDGLUP_RIVADEL_3",
@@ -1879,11 +1883,11 @@
         "alt_id": "IM_S04RDGLUP_RIVADEL_3",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 117.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 117,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S03FERRUP_NPWRFRRRRB_8",
@@ -1891,10 +1895,10 @@
         "alt_id": "IM_S03FERRUP_NPWRFRRRRB_8",
         "fuel": "gas",
         "tech": "Fossil Gas",
-        "nominal_mw": 395.0,
+        "nominal_mw": 395,
         "efficiency": 0.55,
         "emission_factor": 0.202,
-        "fuel_cost_th": 0.0,
+        "fuel_cost_th": 0,
         "vom": 2.5,
         "hub_default": "PSV_IT"
       },
@@ -1904,11 +1908,11 @@
         "alt_id": "IM_R01ENTRUP_ETQ_ROVINA_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 125.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 125,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S08BCRGUP_BARGI_CEN_1",
@@ -1916,11 +1920,11 @@
         "alt_id": "IM_S08BCRGUP_BARGI_CEN_1",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 281.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 281,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "IM_S02VLPLUP_VALPELLIN_1",
@@ -1928,11 +1932,11 @@
         "alt_id": "IM_S02VLPLUP_VALPELLIN_1",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 130.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 130,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       }
     ],
     "BG": [
@@ -1941,21 +1945,21 @@
         "name": "AES Galabovo (Maritsa East 1)",
         "fuel": "lignite",
         "tech": "Circulating Fluidized Bed Lignite",
-        "nominal_mw": 686.0,
+        "nominal_mw": 686,
         "efficiency": 0.38,
         "emission_factor": 0.41,
-        "fuel_cost_th": 16.0,
-        "vom": 4.0
+        "fuel_cost_th": 16,
+        "vom": 4
       },
       {
         "id": "TPP_MI_2",
         "name": "Maritsa East 2 (TPP MI-2 EAD)",
         "fuel": "lignite",
         "tech": "Subcritical Lignite Units 1-8",
-        "nominal_mw": 1610.0,
+        "nominal_mw": 1610,
         "efficiency": 0.34,
         "emission_factor": 0.43,
-        "fuel_cost_th": 16.0,
+        "fuel_cost_th": 16,
         "vom": 4.5
       },
       {
@@ -1963,10 +1967,10 @@
         "name": "Bobov Dol (TEC Bobov Dol)",
         "fuel": "lignite",
         "tech": "Subcritical Lignite Units 1-3",
-        "nominal_mw": 570.0,
+        "nominal_mw": 570,
         "efficiency": 0.33,
         "emission_factor": 0.43,
-        "fuel_cost_th": 16.0,
+        "fuel_cost_th": 16,
         "vom": 4.5
       },
       {
@@ -1975,11 +1979,11 @@
         "alt_id": "NPP_KOZLODUY",
         "fuel": "nuclear",
         "tech": "VVER-1000 (Pressurized Water Reactor)",
-        "nominal_mw": 2000.0,
+        "nominal_mw": 2000,
         "efficiency": 0.33,
-        "emission_factor": 0.0,
+        "emission_factor": 0,
         "fuel_cost_th": 1.5,
-        "vom": 3.0
+        "vom": 3
       },
       {
         "id": "PSHPP_CHAIRA_GEN",
@@ -1987,11 +1991,11 @@
         "alt_id": "PSHPP_CHAIRA_GEN",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 227.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 227,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "TPP_MI_3",
@@ -1999,10 +2003,10 @@
         "alt_id": "TPP_MI3",
         "fuel": "lignite",
         "tech": "Subcritical Lignite",
-        "nominal_mw": 926.0,
+        "nominal_mw": 926,
         "efficiency": 0.34,
         "emission_factor": 0.43,
-        "fuel_cost_th": 16.0,
+        "fuel_cost_th": 16,
         "vom": 4.5,
         "_note": "ENTSO-E outage code: TPP_MI3"
       },
@@ -2012,10 +2016,10 @@
         "alt_id": "TEC_MARITSA_3_AD",
         "fuel": "lignite",
         "tech": "Subcritical Lignite",
-        "nominal_mw": 120.0,
+        "nominal_mw": 120,
         "efficiency": 0.33,
         "emission_factor": 0.43,
-        "fuel_cost_th": 16.0,
+        "fuel_cost_th": 16,
         "vom": 4.5
       },
       {
@@ -2024,10 +2028,10 @@
         "alt_id": "TOPLO_RUSE",
         "fuel": "coal",
         "tech": "Hard Coal Cogeneration / CHP",
-        "nominal_mw": 110.0,
+        "nominal_mw": 110,
         "efficiency": 0.35,
         "emission_factor": 0.34,
-        "fuel_cost_th": 14.0,
+        "fuel_cost_th": 14,
         "vom": 3.5
       },
       {
@@ -2036,7 +2040,7 @@
         "alt_id": "TPP_VARNA_BG",
         "fuel": "gas",
         "tech": "Fossil Gas Steam Turbine",
-        "nominal_mw": 420.0,
+        "nominal_mw": 420,
         "efficiency": 0.38,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2048,11 +2052,11 @@
         "alt_id": "HPP_SESTRIMO",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir / Pumped Storage",
-        "nominal_mw": 615.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 615,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "PSHPP_CHAIRA_REMAINING",
@@ -2060,11 +2064,11 @@
         "alt_id": "PSHPP_CHAIRA_REMAINING",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage",
-        "nominal_mw": 637.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0,
+        "nominal_mw": 637,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1,
         "_note": "ENTSO-E only tracks Unit 1 (227 MW). Units 2-4 are static capacity."
       }
     ],
@@ -2076,11 +2080,11 @@
         "name": "Bergkamen BERGKAMEN_A (Steag / Iqony)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 717.0,
+        "nominal_mw": 717,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_BEXBACH_BEXBACH_A_GESAMT",
@@ -2089,11 +2093,11 @@
         "name": "Bexbach BEXBACH_A_GESAMT (Steag / Iqony)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 726.0,
+        "nominal_mw": 726,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_DATTELN_DATTELN_4",
@@ -2102,7 +2106,7 @@
         "name": "Datteln Datteln 4 (Uniper)",
         "fuel": "coal",
         "tech": "Hard Coal Ultra-Supercritical",
-        "nominal_mw": 1052.0,
+        "nominal_mw": 1052,
         "efficiency": 0.455,
         "emission_factor": 0.335,
         "vom": 3.2,
@@ -2115,7 +2119,7 @@
         "name": "Emsland Emsland B (RWE)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 475.0,
+        "nominal_mw": 475,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2128,7 +2132,7 @@
         "name": "Emsland Emsland C (RWE)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 475.0,
+        "nominal_mw": 475,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2141,7 +2145,7 @@
         "name": "Emsland Emsland D (RWE)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 870.0,
+        "nominal_mw": 870,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2154,7 +2158,7 @@
         "name": "Franken I Franken I Block 1 (Uniper)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 383.0,
+        "nominal_mw": 383,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2167,7 +2171,7 @@
         "name": "Franken I Franken I Block 2 + GT (Uniper)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 440.0,
+        "nominal_mw": 440,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2180,7 +2184,7 @@
         "name": "GKB Mittelsbueren GKB Mittelsbueren GuD (Vattenfall)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 450.0,
+        "nominal_mw": 450,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2193,7 +2197,7 @@
         "name": "GTHKW Nossener Bruecke (SachsenEnergie Dresden)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 260.0,
+        "nominal_mw": 260,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2206,7 +2210,7 @@
         "name": "GuD Dormagen (RWE)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 562.0,
+        "nominal_mw": 562,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2219,7 +2223,7 @@
         "name": "GuD Ludwigshafen Mitte Block GT 11 (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 206.0,
+        "nominal_mw": 206,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2232,7 +2236,7 @@
         "name": "GuD Ludwigshafen Mitte Block GT 12 (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 206.0,
+        "nominal_mw": 206,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2245,7 +2249,7 @@
         "name": "GuD Ludwigshafen Süd Block GT 1 (BASF)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 178.0,
+        "nominal_mw": 178,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2258,7 +2262,7 @@
         "name": "GuD Marzahn (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 264.0,
+        "nominal_mw": 264,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2271,7 +2275,7 @@
         "name": "HAMBORN-KW HAMBORN-3 (Thyssenkrupp Steel)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 60.0,
+        "nominal_mw": 60,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -2284,7 +2288,7 @@
         "name": "HAMBORN-KW HAMBORN-4 (Thyssenkrupp Steel)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 100.0,
+        "nominal_mw": 100,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -2297,7 +2301,7 @@
         "name": "HERDECKE HERDECKE_H6 (Mark-E / Statkraft)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 424.0,
+        "nominal_mw": 424,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2310,11 +2314,11 @@
         "name": "HKW Altbach/Deizisau HKW Altbach/Deizisau 2 (EnBW)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 336.0,
+        "nominal_mw": 336,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_KLINGENBERG_HKW_KLINGENBERG_1_3",
@@ -2323,7 +2327,7 @@
         "name": "HKW Klingenberg HKW Klingenberg 1-3 (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 164.0,
+        "nominal_mw": 164,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2336,7 +2340,7 @@
         "name": "HKW Lichterfelde Lichterfelde GUD (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 300.0,
+        "nominal_mw": 300,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2349,7 +2353,7 @@
         "name": "HKW Merkenich GuD-Anlage-HKW-Merkenich (RheinEnergie)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 110.0,
+        "nominal_mw": 110,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2362,7 +2366,7 @@
         "name": "HKW Mitte HKW Mitte GUD (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 444.0,
+        "nominal_mw": 444,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2375,7 +2379,7 @@
         "name": "HKW Niehl DT HKW-Niehl-2 (RheinEnergie)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 147.0,
+        "nominal_mw": 147,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2388,7 +2392,7 @@
         "name": "HKW Niehl GT HKW-Niehl-2 (RheinEnergie)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 266.0,
+        "nominal_mw": 266,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2401,7 +2405,7 @@
         "name": "HKW Niehl HKW-Niehl-3 (RheinEnergie)",
         "fuel": "gas",
         "tech": "CCGT Class H Advanced",
-        "nominal_mw": 453.0,
+        "nominal_mw": 453,
         "efficiency": 0.615,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -2414,7 +2418,7 @@
         "name": "HKW Nord HKW Nord GuD Nord (Stadtwerke München (SWM))",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 167.0,
+        "nominal_mw": 167,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2427,11 +2431,11 @@
         "name": "HKW Reuter West HKW Reuter West Block D (Vattenfall)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 282.0,
+        "nominal_mw": 282,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_REUTER_WEST_HKW_REUTER_WEST_BLOCK_E",
@@ -2440,11 +2444,11 @@
         "name": "HKW Reuter West HKW Reuter West Block E (Vattenfall)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 282.0,
+        "nominal_mw": 282,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_TIEFSTACK_HKW_TIEFSTACK_BLOCK_2",
@@ -2453,11 +2457,11 @@
         "name": "HKW Tiefstack HKW Tiefstack Block 2 (Hamburger Energiewerke)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 189.0,
+        "nominal_mw": 189,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_TIEFSTACK_HKW_TIEFSTACK_GUD",
@@ -2466,11 +2470,11 @@
         "name": "HKW Tiefstack HKW Tiefstack GuD (Hamburger Energiewerke)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 127.0,
+        "nominal_mw": 127,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_WEDEL_HKW_WEDEL_BLOCK_1",
@@ -2479,11 +2483,11 @@
         "name": "HKW Wedel HKW Wedel Block 1 (Hamburger Energiewerke)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 134.0,
+        "nominal_mw": 134,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HKW_WEST_HKW_WEST_BLOCK_4",
@@ -2505,7 +2509,7 @@
         "name": "Herne GUD_HERNE_6 (Steag / Iqony)",
         "fuel": "gas",
         "tech": "CCGT Class H Advanced",
-        "nominal_mw": 608.0,
+        "nominal_mw": 608,
         "efficiency": 0.615,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -2518,11 +2522,11 @@
         "name": "Herne HERNE_4 (Steag / Iqony)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 460.0,
+        "nominal_mw": 460,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_HUCKINGEN_HKM_HUCKINGEN_A",
@@ -2531,7 +2535,7 @@
         "name": "Huckingen (HKM) Huckingen A (HKM / Hüttenwerke Krupp Mannesmann)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 300.0,
+        "nominal_mw": 300,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -2544,7 +2548,7 @@
         "name": "Huckingen (HKM) Huckingen B (HKM / Hüttenwerke Krupp Mannesmann)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 300.0,
+        "nominal_mw": 300,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -2557,7 +2561,7 @@
         "name": "Huntorf Huntorf GT (Uniper)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 321.0,
+        "nominal_mw": 321,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2570,7 +2574,7 @@
         "name": "Irsching Irsching 4 (Uniper)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 576.0,
+        "nominal_mw": 576,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2583,7 +2587,7 @@
         "name": "Irsching Irsching 5 (Uniper)",
         "fuel": "gas",
         "tech": "CCGT Class H Advanced",
-        "nominal_mw": 846.0,
+        "nominal_mw": 846,
         "efficiency": 0.615,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -2596,7 +2600,7 @@
         "name": "KMW_GENERATION KMW_KW2GT (Kraftwerke Mainz-Wiesbaden)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 90.0,
+        "nominal_mw": 90,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2609,7 +2613,7 @@
         "name": "KMW_GENERATION KMW_KW3 (Kraftwerke Mainz-Wiesbaden)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 431.0,
+        "nominal_mw": 431,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2622,7 +2626,7 @@
         "name": "KMW_GENERATION KW5 (Kraftwerke Mainz-Wiesbaden)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 99.0,
+        "nominal_mw": 99,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -2635,11 +2639,11 @@
         "name": "KW Boxberg KW Boxberg Block N (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 500.0,
+        "nominal_mw": 500,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_BOXBERG_KW_BOXBERG_BLOCK_P",
@@ -2648,11 +2652,11 @@
         "name": "KW Boxberg KW Boxberg Block P (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 500.0,
+        "nominal_mw": 500,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_BOXBERG_KW_BOXBERG_BLOCK_Q",
@@ -2661,11 +2665,11 @@
         "name": "KW Boxberg KW Boxberg Block Q (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 840.0,
+        "nominal_mw": 840,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_BOXBERG_KW_BOXBERG_BLOCK_R",
@@ -2674,11 +2678,11 @@
         "name": "KW Boxberg KW Boxberg Block R (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 630.0,
+        "nominal_mw": 630,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_HAMM_UENTROP_KW_HAMM_UENTROP_BLOCK_20",
@@ -2687,7 +2691,7 @@
         "name": "KW Hamm-Uentrop KW Hamm-Uentrop Block 20 (Trianel)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 425.0,
+        "nominal_mw": 425,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2700,7 +2704,7 @@
         "name": "KW Hastedt KW Hastedt BHKW (swb Erzeugung Bremen)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 106.0,
+        "nominal_mw": 106,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2713,11 +2717,11 @@
         "name": "KW Jänschwalde KW Jänschwalde Block B (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 500.0,
+        "nominal_mw": 500,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_J_NSCHWALDE_KW_J_NSCHWALDE_BLOCK_C",
@@ -2726,11 +2730,11 @@
         "name": "KW Jänschwalde KW Jänschwalde Block C (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 500.0,
+        "nominal_mw": 500,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_J_NSCHWALDE_KW_J_NSCHWALDE_BLOCK_D",
@@ -2739,11 +2743,11 @@
         "name": "KW Jänschwalde KW Jänschwalde Block D (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 500.0,
+        "nominal_mw": 500,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_K_HTAI_MASCHINE_1",
@@ -2753,8 +2757,8 @@
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
         "nominal_mw": 144.5,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -2765,8 +2769,8 @@
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
         "nominal_mw": 144.5,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -2776,11 +2780,11 @@
         "name": "KW Lippendorf KW Lippendorf Block R (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 891.0,
+        "nominal_mw": 891,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_LIPPENDORF_KW_LIPPENDORF_BLOCK_S",
@@ -2789,11 +2793,11 @@
         "name": "KW Lippendorf KW Lippendorf Block S (EnBW)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 891.0,
+        "nominal_mw": 891,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_L_NEN_KW_L_NEN_BLOCK_1",
@@ -2802,7 +2806,7 @@
         "name": "KW Lünen KW Lünen Block 1 (Trianel)",
         "fuel": "coal",
         "tech": "Hard Coal Modern Supercritical",
-        "nominal_mw": 746.0,
+        "nominal_mw": 746,
         "efficiency": 0.435,
         "emission_factor": 0.34,
         "vom": 3.4,
@@ -2815,11 +2819,11 @@
         "name": "KW Mehrum (KWM) Block 3 (Kraftwerk Mehrum GmbH)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 690.0,
+        "nominal_mw": 690,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_KW_MITTELSBUEREN_KW_MITTELSBUEREN_BLOCK_4",
@@ -2828,7 +2832,7 @@
         "name": "KW Mittelsbueren KW Mittelsbueren Block 4 (Vattenfall)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 176.0,
+        "nominal_mw": 176,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2841,11 +2845,11 @@
         "name": "KW Schwarze Pumpe KW Schwarze Pumpe Block A (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 755.0,
+        "nominal_mw": 755,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_SCHWARZE_PUMPE_KW_SCHWARZE_PUMPE_BLOCK_B",
@@ -2854,11 +2858,11 @@
         "name": "KW Schwarze Pumpe KW Schwarze Pumpe Block B (LEAG)",
         "fuel": "lignite",
         "tech": "Lignite Modern Supercritical",
-        "nominal_mw": 755.0,
+        "nominal_mw": 755,
         "efficiency": 0.41,
         "emission_factor": 0.4,
         "vom": 4.2,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_KW_SILZ_MASCHINE_1",
@@ -2867,9 +2871,9 @@
         "name": "KW Silz Maschine 1 (TIWAG)",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 250.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 250,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -2879,9 +2883,9 @@
         "name": "KW Silz Maschine 2 (TIWAG)",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir",
-        "nominal_mw": 250.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 250,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -2891,7 +2895,7 @@
         "name": "Knapsack 1 (Statkraft)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 784.0,
+        "nominal_mw": 784,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2904,7 +2908,7 @@
         "name": "Knapsack 2 (Statkraft)",
         "fuel": "gas",
         "tech": "CCGT Class F Combined Cycle",
-        "nominal_mw": 426.0,
+        "nominal_mw": 426,
         "efficiency": 0.585,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -2917,9 +2921,9 @@
         "name": "Koepchenwerk (RWE)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 162.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 162,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -2929,7 +2933,7 @@
         "name": "Kraftwerk Lausward Block AGuD (Stadtwerke Düsseldorf)",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 100.0,
+        "nominal_mw": 100,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -2942,7 +2946,7 @@
         "name": "Kraftwerk Lausward Block F (Stadtwerke Düsseldorf)",
         "fuel": "gas",
         "tech": "CCGT Class H Advanced",
-        "nominal_mw": 595.0,
+        "nominal_mw": 595,
         "efficiency": 0.615,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -2955,7 +2959,7 @@
         "name": "Kraftwerk Rostock (EnBW / RheinEnergie)",
         "fuel": "coal",
         "tech": "Hard Coal Modern Supercritical",
-        "nominal_mw": 514.0,
+        "nominal_mw": 514,
         "efficiency": 0.435,
         "emission_factor": 0.34,
         "vom": 3.4,
@@ -2968,11 +2972,11 @@
         "name": "Kraftwerk Walheim Kraftwerk Wahlheim GT D (EnBW)",
         "fuel": "oil",
         "tech": "Fuel Oil Peaking Turbine",
-        "nominal_mw": 136.0,
+        "nominal_mw": 136,
         "efficiency": 0.35,
         "emission_factor": 0.27,
-        "vom": 4.0,
-        "fuel_cost_th": 25.0
+        "vom": 4,
+        "fuel_cost_th": 25
       },
       {
         "id": "DE_KRAFTWERK_WILHELMSHAVEN_DEWHV_1",
@@ -2981,11 +2985,11 @@
         "name": "Kraftwerk Wilhelmshaven DEWHV______1_____ (Uniper)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 726.0,
+        "nominal_mw": 726,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_K_STENKRAFTWERK_K_STENKRAFTWERK",
@@ -3007,11 +3011,11 @@
         "name": "Neurath Neurath F (RWE)",
         "fuel": "lignite",
         "tech": "Lignite BoA Supercritical",
-        "nominal_mw": 1053.0,
+        "nominal_mw": 1053,
         "efficiency": 0.43,
         "emission_factor": 0.39,
-        "vom": 4.0,
-        "fuel_cost_th": 15.0
+        "vom": 4,
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_NEURATH_NEURATH_G",
@@ -3020,11 +3024,11 @@
         "name": "Neurath Neurath G (RWE)",
         "fuel": "lignite",
         "tech": "Lignite BoA Supercritical",
-        "nominal_mw": 1058.0,
+        "nominal_mw": 1058,
         "efficiency": 0.43,
         "emission_factor": 0.39,
-        "vom": 4.0,
-        "fuel_cost_th": 15.0
+        "vom": 4,
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_NIEDERAUSSEM_NIEDERAUSSEM_G",
@@ -3033,11 +3037,11 @@
         "name": "Niederaußem Niederaußem G (RWE)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 632.0,
+        "nominal_mw": 632,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_NIEDERAUSSEM_NIEDERAUSSEM_H",
@@ -3046,11 +3050,11 @@
         "name": "Niederaußem Niederaußem H (RWE)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 638.0,
+        "nominal_mw": 638,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_NIEDERAUSSEM_NIEDERAUSSEM_K_BOA_1",
@@ -3059,11 +3063,11 @@
         "name": "Niederaußem Niederaußem K (BoA 1) (RWE)",
         "fuel": "lignite",
         "tech": "Lignite BoA Supercritical",
-        "nominal_mw": 927.0,
+        "nominal_mw": 927,
         "efficiency": 0.43,
         "emission_factor": 0.39,
-        "vom": 4.0,
-        "fuel_cost_th": 15.0
+        "vom": 4,
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_PSW_GEESTHACHT_GEESTHACHT_A_C",
@@ -3072,9 +3076,9 @@
         "name": "PSW Geesthacht Geesthacht A-C (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 120.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 120,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3084,9 +3088,9 @@
         "name": "PSW Goldisthal PSW Goldisthal PSS C (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 265.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 265,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3096,9 +3100,9 @@
         "name": "PSW Goldisthal PSW Goldisthal PSS D (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 265.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 265,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3108,9 +3112,9 @@
         "name": "PSW Hohenwarte II PSW Hohenwarte II PSS A-H (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 320.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 320,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3120,9 +3124,9 @@
         "name": "PSW Markersbach PSW Markersbach PSS A (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 160.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 160,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3132,9 +3136,9 @@
         "name": "PSW Markersbach PSW Markersbach PSS C (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 160.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 160,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3144,9 +3148,9 @@
         "name": "PSW Markersbach PSW Markersbach PSS D (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 160.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 160,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3156,9 +3160,9 @@
         "name": "PSW Markersbach PSW Markersbach PSS E (Vattenfall)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 160.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 160,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3168,9 +3172,9 @@
         "name": "PSW-ROENK-KW ROENKHAUSEN_PSW1 (German Fleet)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 70.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 70,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3180,9 +3184,9 @@
         "name": "PSW-ROENK-KW ROENKHAUSEN_PSW2 (German Fleet)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 70.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 70,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3192,7 +3196,7 @@
         "name": "RUHRORT-KW RUHRORT-2 (Thyssenkrupp Steel)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 60.0,
+        "nominal_mw": 60,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -3205,7 +3209,7 @@
         "name": "RUHRORT-KW RUHRORT-3 (Thyssenkrupp Steel)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 95.0,
+        "nominal_mw": 95,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -3218,7 +3222,7 @@
         "name": "RUHRORT-KW RUHRORT-4 (Thyssenkrupp Steel)",
         "fuel": "gas",
         "tech": "Blast Furnace / Metallurgical Gas Turbine",
-        "nominal_mw": 165.0,
+        "nominal_mw": 165,
         "efficiency": 0.41,
         "emission_factor": 0.36,
         "vom": 3.2,
@@ -3231,7 +3235,7 @@
         "name": "Rheinhafen-Dampfkraftwerk Karlsruhe RDK 8 (EnBW)",
         "fuel": "coal",
         "tech": "Hard Coal Ultra-Supercritical",
-        "nominal_mw": 842.0,
+        "nominal_mw": 842,
         "efficiency": 0.455,
         "emission_factor": 0.335,
         "vom": 3.2,
@@ -3244,11 +3248,11 @@
         "name": "Schkopau Schkopau A (Saale Energie / EPH)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 450.0,
+        "nominal_mw": 450,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_SCHKOPAU_SCHKOPAU_B",
@@ -3257,11 +3261,11 @@
         "name": "Schkopau Schkopau B (Saale Energie / EPH)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 450.0,
+        "nominal_mw": 450,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_SCHLUCHSEE_WEHR",
@@ -3270,9 +3274,9 @@
         "name": "Schluchsee Wehr (Schluchseewerk (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 455.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 455,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3282,9 +3286,9 @@
         "name": "Schluchsee Witznau (Schluchseewerk (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 110.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 110,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3294,9 +3298,9 @@
         "name": "Schluchseewerk AG Kraftwerk Wehr (Schluchseewerk (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 455.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 455,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3306,9 +3310,9 @@
         "name": "Schluchseewerk AG Kraftwerk Witznau (Schluchseewerk (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 110.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 110,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3318,7 +3322,7 @@
         "name": "Scholven Scholven 1 (Uniper)",
         "fuel": "gas",
         "tech": "Gas Turbine Peaker / OCGT",
-        "nominal_mw": 138.0,
+        "nominal_mw": 138,
         "efficiency": 0.4,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -3331,7 +3335,7 @@
         "name": "Sued GuD1 Sued GuD1 GT3 (Stadtwerke München (SWM))",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 108.0,
+        "nominal_mw": 108,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -3344,7 +3348,7 @@
         "name": "Sued GuD2 Sued GuD2 DT60 (Stadtwerke München (SWM))",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 128.0,
+        "nominal_mw": 128,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -3357,7 +3361,7 @@
         "name": "Sued GuD2 Sued GuD2 GT61 (Stadtwerke München (SWM))",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 136.0,
+        "nominal_mw": 136,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -3370,7 +3374,7 @@
         "name": "Sued GuD2 Sued GuD2 GT62 (Stadtwerke München (SWM))",
         "fuel": "gas",
         "tech": "Gas Cogeneration (CHP) / District Heat",
-        "nominal_mw": 136.0,
+        "nominal_mw": 136,
         "efficiency": 0.53,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -3383,9 +3387,9 @@
         "name": "Vianden Vianden 1 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3395,9 +3399,9 @@
         "name": "Vianden Vianden 10 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 196.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 196,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3407,9 +3411,9 @@
         "name": "Vianden Vianden 11 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 198.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 198,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3419,9 +3423,9 @@
         "name": "Vianden Vianden 2 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3431,9 +3435,9 @@
         "name": "Vianden Vianden 4 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3443,9 +3447,9 @@
         "name": "Vianden Vianden 6 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3455,9 +3459,9 @@
         "name": "Vianden Vianden 7 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3467,9 +3471,9 @@
         "name": "Vianden Vianden 8 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3479,9 +3483,9 @@
         "name": "Vianden Vianden 9 (SEO Vianden (RWE/EnBW))",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 100.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 100,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3491,11 +3495,11 @@
         "name": "Voelklingen VOELKLINGEN_HKV (German Fleet)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 211.0,
+        "nominal_mw": 211,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_VOELKLINGEN_VOELKLINGEN_MKV",
@@ -3504,11 +3508,11 @@
         "name": "Voelklingen VOELKLINGEN_MKV (German Fleet)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 179.0,
+        "nominal_mw": 179,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_VORARLBERGER_ILLWERKE_AG_KOPSWERK_2_M2",
@@ -3517,9 +3521,9 @@
         "name": "Vorarlberger Illwerke AG Kopswerk 2 M2 (Illwerke VKW)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 175.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 175,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3529,9 +3533,9 @@
         "name": "Vorarlberger Illwerke AG Obervermuntwerk 2 M1 (Illwerke VKW)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 180.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 180,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3541,9 +3545,9 @@
         "name": "Vorarlberger Illwerke AG Obervermuntwerk 2 M2 (Illwerke VKW)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 180.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 180,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3553,9 +3557,9 @@
         "name": "Vorarlberger Illwerke AG Rodund 2 (Illwerke VKW)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 295.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 295,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3565,9 +3569,9 @@
         "name": "Waldeck II Waldeck II M5 (Uniper)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 240.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 240,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3577,9 +3581,9 @@
         "name": "Waldeck II Waldeck II M6 (Uniper)",
         "fuel": "hydro",
         "tech": "Hydro Pumped Storage (PSW)",
-        "nominal_mw": 240.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
+        "nominal_mw": 240,
+        "efficiency": 1,
+        "emission_factor": 0,
         "vom": 1.5
       },
       {
@@ -3589,11 +3593,11 @@
         "name": "Walsum WALSUM_10 (Steag / Iqony)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical / CHP",
-        "nominal_mw": 725.0,
+        "nominal_mw": 725,
         "efficiency": 0.395,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_WEISWEILER_WEISWEILER_G",
@@ -3602,11 +3606,11 @@
         "name": "Weisweiler Weisweiler G (RWE)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 656.0,
+        "nominal_mw": 656,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_WEISWEILER_WEISWEILER_H",
@@ -3615,11 +3619,11 @@
         "name": "Weisweiler Weisweiler H (RWE)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical",
-        "nominal_mw": 668.0,
+        "nominal_mw": 668,
         "efficiency": 0.365,
         "emission_factor": 0.415,
         "vom": 4.5,
-        "fuel_cost_th": 15.0
+        "fuel_cost_th": 15
       },
       {
         "id": "DE_GKM_BLOCK_9",
@@ -3628,7 +3632,7 @@
         "name": "Grosskraftwerk Mannheim Block 9 (GKM AG)",
         "fuel": "coal",
         "tech": "Hard Coal Ultra-Supercritical / CHP",
-        "nominal_mw": 911.0,
+        "nominal_mw": 911,
         "efficiency": 0.46,
         "emission_factor": 0.335,
         "vom": 3.2,
@@ -3641,7 +3645,7 @@
         "name": "Grosskraftwerk Mannheim Block 8 (GKM AG)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical / CHP",
-        "nominal_mw": 480.0,
+        "nominal_mw": 480,
         "efficiency": 0.435,
         "emission_factor": 0.34,
         "vom": 3.4,
@@ -3667,7 +3671,7 @@
         "name": "Kraftwerk Zolling (Onyx Power)",
         "fuel": "coal",
         "tech": "Hard Coal Supercritical",
-        "nominal_mw": 472.0,
+        "nominal_mw": 472,
         "efficiency": 0.43,
         "emission_factor": 0.34,
         "vom": 3.4,
@@ -3680,11 +3684,11 @@
         "name": "Kraftwerk Weiher 3 (Steag / Iqony)",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical",
-        "nominal_mw": 656.0,
+        "nominal_mw": 656,
         "efficiency": 0.4,
         "emission_factor": 0.345,
         "vom": 3.6,
-        "fuel_cost_th": 16.0
+        "fuel_cost_th": 16
       },
       {
         "id": "DE_GERSTEINWERK_K",
@@ -3693,7 +3697,7 @@
         "name": "Gersteinwerk Block K (RWE)",
         "fuel": "gas",
         "tech": "Gas Turbine Combined Cycle",
-        "nominal_mw": 405.0,
+        "nominal_mw": 405,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -3706,7 +3710,7 @@
         "name": "Gemeinschaftskraftwerk Hannover Stöcken (enercity)",
         "fuel": "coal",
         "tech": "Hard Coal Cogeneration CHP",
-        "nominal_mw": 136.0,
+        "nominal_mw": 136,
         "efficiency": 0.42,
         "emission_factor": 0.34,
         "vom": 3.4,
@@ -3719,7 +3723,7 @@
         "name": "HKW Nord Block 2 (Stadtwerke München)",
         "fuel": "gas",
         "tech": "Gas Cogeneration CHP",
-        "nominal_mw": 333.0,
+        "nominal_mw": 333,
         "efficiency": 0.55,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -3732,7 +3736,7 @@
         "name": "HKW Stuttgart-Münster (EnBW)",
         "fuel": "gas",
         "tech": "Gas Cogeneration CHP",
-        "nominal_mw": 180.0,
+        "nominal_mw": 180,
         "efficiency": 0.54,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -3745,7 +3749,7 @@
         "name": "Kraftwerk Burghausen (OMV / Wacker)",
         "fuel": "gas",
         "tech": "Industrial CCGT Cogeneration",
-        "nominal_mw": 120.0,
+        "nominal_mw": 120,
         "efficiency": 0.56,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -3758,7 +3762,7 @@
         "name": "Kraftwerk GuD 40 (Uniper)",
         "fuel": "gas",
         "tech": "Gas Turbine Combined Cycle",
-        "nominal_mw": 101.0,
+        "nominal_mw": 101,
         "efficiency": 0.55,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -3772,11 +3776,11 @@
         "alt_id": "NPP Cernavoda",
         "fuel": "nuclear",
         "tech": "CANDU-6 PHWR (2x 650 MW)",
-        "nominal_mw": 1300.0,
+        "nominal_mw": 1300,
         "efficiency": 0.33,
-        "emission_factor": 0.0,
+        "emission_factor": 0,
         "fuel_cost_th": 1.5,
-        "vom": 3.0
+        "vom": 3
       },
       {
         "id": "RO_ROVINARI",
@@ -3784,10 +3788,10 @@
         "alt_id": "TPP Rovinari",
         "fuel": "lignite",
         "tech": "Lignite Subcritical (3x 330 MW)",
-        "nominal_mw": 990.0,
+        "nominal_mw": 990,
         "efficiency": 0.33,
         "emission_factor": 0.42,
-        "fuel_cost_th": 17.0,
+        "fuel_cost_th": 17,
         "vom": 4.5
       },
       {
@@ -3796,10 +3800,10 @@
         "alt_id": "TPP Turceni",
         "fuel": "lignite",
         "tech": "Lignite Subcritical (2x 330 MW)",
-        "nominal_mw": 660.0,
+        "nominal_mw": 660,
         "efficiency": 0.325,
         "emission_factor": 0.42,
-        "fuel_cost_th": 17.0,
+        "fuel_cost_th": 17,
         "vom": 4.5
       },
       {
@@ -3808,7 +3812,7 @@
         "alt_id": "CET Craiova",
         "fuel": "lignite",
         "tech": "Lignite Cogeneration / CHP (2x 150 MW)",
-        "nominal_mw": 300.0,
+        "nominal_mw": 300,
         "efficiency": 0.31,
         "emission_factor": 0.43,
         "fuel_cost_th": 17.5,
@@ -3820,11 +3824,11 @@
         "alt_id": "TPP Paroseni",
         "fuel": "coal",
         "tech": "Hard Coal Subcritical (Jiu Valley)",
-        "nominal_mw": 150.0,
+        "nominal_mw": 150,
         "efficiency": 0.33,
         "emission_factor": 0.34,
-        "fuel_cost_th": 13.0,
-        "vom": 4.0
+        "fuel_cost_th": 13,
+        "vom": 4
       },
       {
         "id": "RO_CCGT_BRAZI",
@@ -3832,7 +3836,7 @@
         "alt_id": "TPP Brazi",
         "fuel": "gas",
         "tech": "CCGT (GE 9FB 2x1)",
-        "nominal_mw": 860.0,
+        "nominal_mw": 860,
         "efficiency": 0.57,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -3844,7 +3848,7 @@
         "alt_id": "TPP Iernut",
         "fuel": "gas",
         "tech": "CCGT / Conventional Gas Steam",
-        "nominal_mw": 430.0,
+        "nominal_mw": 430,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -3856,7 +3860,7 @@
         "alt_id": "TPP Bucuresti Sud",
         "fuel": "gas",
         "tech": "Gas Cogeneration / CHP",
-        "nominal_mw": 350.0,
+        "nominal_mw": 350,
         "efficiency": 0.45,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -3868,11 +3872,11 @@
         "alt_id": "HPP Portile de Fier I",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage (6x 194 MW)",
-        "nominal_mw": 1166.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 1166,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "HPP_Portile_de_Fier_II",
@@ -3880,11 +3884,11 @@
         "alt_id": "HPP Portile de Fier II",
         "fuel": "hydro",
         "tech": "Hydro Run-of-river and poundage",
-        "nominal_mw": 251.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 251,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "HPP_Lotru",
@@ -3892,11 +3896,11 @@
         "alt_id": "HPP Lotru",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir (Peaking)",
-        "nominal_mw": 507.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 507,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "HPP_Raul_Mare",
@@ -3904,11 +3908,11 @@
         "alt_id": "HPP Raul Mare",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir (Peaking)",
-        "nominal_mw": 335.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 335,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "HPP_Vidraru",
@@ -3916,11 +3920,11 @@
         "alt_id": "HPP Vidraru",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir (Peaking)",
-        "nominal_mw": 220.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 220,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       },
       {
         "id": "HPP_Bicaz",
@@ -3928,11 +3932,11 @@
         "alt_id": "HPP Bicaz",
         "fuel": "hydro",
         "tech": "Hydro Water Reservoir (Peaking)",
-        "nominal_mw": 210.0,
-        "efficiency": 1.0,
-        "emission_factor": 0.0,
-        "fuel_cost_th": 0.0,
-        "vom": 1.0
+        "nominal_mw": 210,
+        "efficiency": 1,
+        "emission_factor": 0,
+        "fuel_cost_th": 0,
+        "vom": 1
       }
     ],
     "HU": [
@@ -3942,11 +3946,11 @@
         "name": "Paks Nuclear Power Plant (MVM)",
         "fuel": "nuclear",
         "tech": "VVER-440/V-213 (4x 500 MW)",
-        "nominal_mw": 2000.0,
+        "nominal_mw": 2000,
         "efficiency": 0.33,
-        "emission_factor": 0.0,
+        "emission_factor": 0,
         "fuel_cost_th": 1.5,
-        "vom": 3.0
+        "vom": 3
       },
       {
         "id": "HU_GONYU_CCGT",
@@ -3955,7 +3959,7 @@
         "name": "Gönyű CCGT (Uniper)",
         "fuel": "gas",
         "tech": "CCGT (Siemens SGT5-4000F 1S)",
-        "nominal_mw": 427.0,
+        "nominal_mw": 427,
         "efficiency": 0.59,
         "emission_factor": 0.202,
         "vom": 2.2,
@@ -3968,7 +3972,7 @@
         "name": "Dunamenti G3 GT7 (MET Group)",
         "fuel": "gas",
         "tech": "CCGT G3 (GE 9FA Combined Cycle)",
-        "nominal_mw": 269.0,
+        "nominal_mw": 269,
         "efficiency": 0.575,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -3981,7 +3985,7 @@
         "name": "Dunamenti G3 GT8 (MET Group)",
         "fuel": "gas",
         "tech": "CCGT G3 Steam/Gas Train",
-        "nominal_mw": 132.0,
+        "nominal_mw": 132,
         "efficiency": 0.565,
         "emission_factor": 0.202,
         "vom": 2.4,
@@ -3994,7 +3998,7 @@
         "name": "Csepel CCGT GT1 (Alpiq)",
         "fuel": "gas",
         "tech": "CCGT (GE Frame 9E)",
-        "nominal_mw": 142.0,
+        "nominal_mw": 142,
         "efficiency": 0.535,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -4007,7 +4011,7 @@
         "name": "Csepel CCGT GT2 (Alpiq)",
         "fuel": "gas",
         "tech": "CCGT (GE Frame 9E)",
-        "nominal_mw": 142.0,
+        "nominal_mw": 142,
         "efficiency": 0.535,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -4020,7 +4024,7 @@
         "name": "Csepel CCGT ST (Alpiq)",
         "fuel": "gas",
         "tech": "CCGT Steam Turbine",
-        "nominal_mw": 118.0,
+        "nominal_mw": 118,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -4046,10 +4050,10 @@
         "name": "Mátra Unit 3 (MVM)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical Pulverized",
-        "nominal_mw": 200.0,
+        "nominal_mw": 200,
         "efficiency": 0.32,
         "emission_factor": 0.425,
-        "fuel_cost_th": 17.0,
+        "fuel_cost_th": 17,
         "vom": 4.5
       },
       {
@@ -4059,10 +4063,10 @@
         "name": "Mátra Unit 4 (MVM)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical Pulverized",
-        "nominal_mw": 206.0,
+        "nominal_mw": 206,
         "efficiency": 0.32,
         "emission_factor": 0.425,
-        "fuel_cost_th": 17.0,
+        "fuel_cost_th": 17,
         "vom": 4.5
       },
       {
@@ -4072,10 +4076,10 @@
         "name": "Mátra Unit 5 (MVM)",
         "fuel": "lignite",
         "tech": "Lignite Subcritical Pulverized",
-        "nominal_mw": 207.0,
+        "nominal_mw": 207,
         "efficiency": 0.325,
         "emission_factor": 0.425,
-        "fuel_cost_th": 17.0,
+        "fuel_cost_th": 17,
         "vom": 4.5
       },
       {
@@ -4085,7 +4089,7 @@
         "name": "Mátra Topping GT6 (MVM)",
         "fuel": "gas",
         "tech": "Gas Turbine Topping Unit",
-        "nominal_mw": 33.0,
+        "nominal_mw": 33,
         "efficiency": 0.345,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4098,7 +4102,7 @@
         "name": "Mátra Topping GT7 (MVM)",
         "fuel": "gas",
         "tech": "Gas Turbine Topping Unit",
-        "nominal_mw": 33.0,
+        "nominal_mw": 33,
         "efficiency": 0.345,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4111,7 +4115,7 @@
         "name": "Kelenföld CCGT GT (MVM)",
         "fuel": "gas",
         "tech": "CCGT CHP (Siemens V94.2)",
-        "nominal_mw": 125.0,
+        "nominal_mw": 125,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -4124,7 +4128,7 @@
         "name": "Kelenföld CCGT ST (MVM)",
         "fuel": "gas",
         "tech": "CCGT CHP Steam Turbine",
-        "nominal_mw": 48.0,
+        "nominal_mw": 48,
         "efficiency": 0.5,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -4137,7 +4141,7 @@
         "name": "Kispest CCGT (MVM)",
         "fuel": "gas",
         "tech": "CCGT CHP (LM6000 Combined)",
-        "nominal_mw": 109.0,
+        "nominal_mw": 109,
         "efficiency": 0.505,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -4150,7 +4154,7 @@
         "name": "Újpest CCGT GT (MVM)",
         "fuel": "gas",
         "tech": "CCGT CHP Gas Turbine",
-        "nominal_mw": 69.0,
+        "nominal_mw": 69,
         "efficiency": 0.5,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -4163,7 +4167,7 @@
         "name": "Újpest CCGT ST (MVM)",
         "fuel": "gas",
         "tech": "CCGT CHP Steam Turbine",
-        "nominal_mw": 33.0,
+        "nominal_mw": 33,
         "efficiency": 0.48,
         "emission_factor": 0.202,
         "vom": 2.5,
@@ -4176,7 +4180,7 @@
         "name": "Debrecen CCGT (E.ON)",
         "fuel": "gas",
         "tech": "CCGT CHP (GE Frame 6FA)",
-        "nominal_mw": 95.0,
+        "nominal_mw": 95,
         "efficiency": 0.52,
         "emission_factor": 0.202,
         "vom": 2.6,
@@ -4189,7 +4193,7 @@
         "name": "Nyíregyháza CCGT (E.ON)",
         "fuel": "gas",
         "tech": "CCGT CHP (LM6000)",
-        "nominal_mw": 47.0,
+        "nominal_mw": 47,
         "efficiency": 0.5,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -4202,7 +4206,7 @@
         "name": "Litér Peaker GT (MVM)",
         "fuel": "gas",
         "tech": "OCGT Fast-Start Peaker (Frame 9E)",
-        "nominal_mw": 120.0,
+        "nominal_mw": 120,
         "efficiency": 0.35,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4215,7 +4219,7 @@
         "name": "Sajószöged Peaker GT (MVM)",
         "fuel": "gas",
         "tech": "OCGT Fast-Start Peaker (Frame 9E)",
-        "nominal_mw": 120.0,
+        "nominal_mw": 120,
         "efficiency": 0.35,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4228,7 +4232,7 @@
         "name": "Lőrinci Peaker GT (MVM)",
         "fuel": "gas",
         "tech": "OCGT Fast-Start Peaker (Frame 9E)",
-        "nominal_mw": 170.0,
+        "nominal_mw": 170,
         "efficiency": 0.345,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4241,7 +4245,7 @@
         "name": "Bakonyi Peaker GT1 (Veolia)",
         "fuel": "gas",
         "tech": "OCGT Peaker (LM6000)",
-        "nominal_mw": 57.0,
+        "nominal_mw": 57,
         "efficiency": 0.355,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4254,7 +4258,7 @@
         "name": "Bakonyi Peaker GT2 (Veolia)",
         "fuel": "gas",
         "tech": "OCGT Peaker (LM6000)",
-        "nominal_mw": 57.0,
+        "nominal_mw": 57,
         "efficiency": 0.355,
         "emission_factor": 0.202,
         "vom": 3.5,
@@ -4267,7 +4271,7 @@
         "name": "Ajka Thermal G2-6 (Bakonyi Erőmű)",
         "fuel": "lignite",
         "tech": "Brown Coal / Biomass Cogeneration",
-        "nominal_mw": 93.0,
+        "nominal_mw": 93,
         "efficiency": 0.3,
         "emission_factor": 0.425,
         "fuel_cost_th": 17.5,
@@ -4283,7 +4287,7 @@
         "nominal_mw": 39.6,
         "efficiency": 0.41,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "CEEGEX_HU"
       },
       {
@@ -4296,7 +4300,7 @@
         "nominal_mw": 19.5,
         "efficiency": 0.4,
         "emission_factor": 0.202,
-        "vom": 3.0,
+        "vom": 3,
         "hub_default": "CEEGEX_HU"
       },
       {
@@ -4319,7 +4323,7 @@
         "name": "Tatabánya CHP G2 (Tatabánya)",
         "fuel": "gas",
         "tech": "Gas Cogeneration CHP",
-        "nominal_mw": 25.0,
+        "nominal_mw": 25,
         "efficiency": 0.48,
         "emission_factor": 0.202,
         "vom": 2.7,
@@ -4358,15 +4362,405 @@
         "name": "Pécs PannonGreen G6 (Veolia)",
         "fuel": "lignite",
         "tech": "Biomass / Solid Fuel Steam",
-        "nominal_mw": 44.0,
+        "nominal_mw": 44,
         "efficiency": 0.32,
         "emission_factor": 0.4,
-        "fuel_cost_th": 16.0,
-        "vom": 4.0
+        "fuel_cost_th": 16,
+        "vom": 4
+      }
+    ],
+    "AT": [
+      {
+        "id": "AT_MELLACH_CCGT_1",
+        "psr_id": "GDK-Mellach",
+        "alt_id": "Gas- und Dampfkraftwerk Mellach Block 1",
+        "name": "Mellach CCGT Block 1 (Verbund)",
+        "fuel": "gas",
+        "tech": "CCGT (Siemens SGT5-4000F)",
+        "nominal_mw": 421,
+        "efficiency": 0.592,
+        "emission_factor": 0.202,
+        "vom": 2.6,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_MELLACH_CCGT_2",
+        "psr_id": "GDK-Mellach",
+        "alt_id": "Gas- und Dampfkraftwerk Mellach Block 2",
+        "name": "Mellach CCGT Block 2 (Verbund)",
+        "fuel": "gas",
+        "tech": "CCGT (Siemens SGT5-4000F)",
+        "nominal_mw": 417,
+        "efficiency": 0.592,
+        "emission_factor": 0.202,
+        "vom": 2.6,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_TIMELKAM_CCGT",
+        "psr_id": "Kraftwerk Timelkam Gesamtanlage",
+        "alt_id": "GuD-Kraftwerk Timelkam",
+        "name": "Timelkam CCGT (Energie AG)",
+        "fuel": "gas",
+        "tech": "CCGT (Siemens SGT5-4000F Single-Shaft)",
+        "nominal_mw": 400,
+        "efficiency": 0.585,
+        "emission_factor": 0.202,
+        "vom": 2.8,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_DONAUSTADT_3",
+        "psr_id": "KW Donaustadt",
+        "alt_id": "Kraftwerk Donaustadt Block 3",
+        "name": "Donaustadt 3 CCGT (Wien Energie)",
+        "fuel": "gas",
+        "tech": "CCGT CHP (Siemens SGT5-4000F)",
+        "nominal_mw": 395,
+        "efficiency": 0.58,
+        "emission_factor": 0.202,
+        "vom": 2.7,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_SIMMERING_1",
+        "psr_id": "KW Simmering",
+        "alt_id": "Kraftwerk Simmering Block 1+2",
+        "name": "Simmering 1 CCGT (Wien Energie)",
+        "fuel": "gas",
+        "tech": "CCGT CHP",
+        "nominal_mw": 295,
+        "efficiency": 0.58,
+        "emission_factor": 0.202,
+        "vom": 2.8,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_THEISS_B",
+        "psr_id": "Kraftwerk Theiß",
+        "alt_id": "Kraftwerk Theiß Block B",
+        "name": "Theiß Peaker / CCGT Block B (EVN)",
+        "fuel": "gas",
+        "tech": "CCGT / Gas Turbine Peaker",
+        "nominal_mw": 255,
+        "efficiency": 0.435,
+        "emission_factor": 0.202,
+        "vom": 3.8,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_LINZ_MITTE",
+        "psr_id": "Linz-Mitte",
+        "alt_id": "Fernheizkraftwerk Linz-Mitte",
+        "name": "Linz-Mitte GuD (LINZ AG)",
+        "fuel": "gas",
+        "tech": "CCGT CHP",
+        "nominal_mw": 227,
+        "efficiency": 0.54,
+        "emission_factor": 0.202,
+        "vom": 3.2,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_LINZ_SUED",
+        "psr_id": "Linz-Süd",
+        "alt_id": "Fernheizkraftwerk Linz-Süd",
+        "name": "Linz-Süd GuD (LINZ AG)",
+        "fuel": "gas",
+        "tech": "Gas Turbine / Steam CHP",
+        "nominal_mw": 172,
+        "efficiency": 0.51,
+        "emission_factor": 0.202,
+        "vom": 3.5,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_FHKW_MELLACH",
+        "psr_id": "FHKW Mellach",
+        "alt_id": "Fernheizkraftwerk Mellach",
+        "name": "Fernheizkraftwerk Mellach (Energie Steiermark)",
+        "fuel": "gas",
+        "tech": "Gas-fired CHP",
+        "nominal_mw": 165,
+        "efficiency": 0.5,
+        "emission_factor": 0.202,
+        "vom": 3.5,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_LEOPOLDAU_GT",
+        "psr_id": "KW Leopoldau",
+        "alt_id": "Kraftwerk Leopoldau Gasturbine",
+        "name": "Leopoldau Peaker GT (Wien Energie)",
+        "fuel": "gas",
+        "tech": "OCGT Peaker",
+        "nominal_mw": 140,
+        "efficiency": 0.38,
+        "emission_factor": 0.202,
+        "vom": 4.2,
+        "hub_default": "CEGH_AT"
+      },
+      {
+        "id": "AT_MALTA_HAUPTSTUFE",
+        "psr_id": "Malta-Hauptstufe",
+        "alt_id": "Maltakraftwerke Hauptstufe",
+        "name": "Malta Hauptstufe (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 730,
+        "efficiency": 0.78,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "AT_LIMBERG_2",
+        "psr_id": "Limberg II",
+        "alt_id": "Pumpspeicherkraftwerk Limberg II",
+        "name": "Kaprun Limberg II (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 480,
+        "efficiency": 0.8,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "AT_LIMBERG_3",
+        "psr_id": "Limberg III",
+        "alt_id": "Pumpspeicherkraftwerk Limberg III",
+        "name": "Kaprun Limberg III (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 480,
+        "efficiency": 0.82,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "AT_REISSECK_2",
+        "psr_id": "Reisseck 2",
+        "alt_id": "Pumpspeicherkraftwerk Reisseck 2",
+        "name": "Reisseck 2 (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 430,
+        "efficiency": 0.8,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "AT_HAEUSLING",
+        "psr_id": "Häusling",
+        "alt_id": "Kraftwerk Häusling",
+        "name": "Zillertal Häusling (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 360,
+        "efficiency": 0.78,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "AT_GERLOS",
+        "psr_id": "Gerlos",
+        "alt_id": "Kraftwerk Gerlos",
+        "name": "Gerlos Speicher (Verbund)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 200,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.5
+      }
+    ],
+    "CH": [
+      {
+        "id": "CH_KKL_LEIBSTADT",
+        "psr_id": "KKL - KernKW Leibstadt AG",
+        "alt_id": "Kernkraftwerk Leibstadt",
+        "name": "Kernkraftwerk Leibstadt (Axpo / Alpiq)",
+        "fuel": "nuclear",
+        "tech": "BWR (General Electric)",
+        "nominal_mw": 1233,
+        "efficiency": 0.35,
+        "emission_factor": 0,
+        "vom": 2.2,
+        "fuel_cost_th": 4.8
+      },
+      {
+        "id": "CH_KKG_GOESGEN",
+        "psr_id": "Kernkraftwerk Gösgen",
+        "alt_id": "Kernkraftwerk Gösgen-Däniken",
+        "name": "Kernkraftwerk Gösgen (Alpiq / Axpo)",
+        "fuel": "nuclear",
+        "tech": "PWR (Siemens / KWU)",
+        "nominal_mw": 1020,
+        "efficiency": 0.34,
+        "emission_factor": 0,
+        "vom": 2.2,
+        "fuel_cost_th": 4.8
+      },
+      {
+        "id": "CH_KKB_BEZNAU_1",
+        "psr_id": "KKB - KernKW Beznau",
+        "alt_id": "Kernkraftwerk Beznau Block 1",
+        "name": "Kernkraftwerk Beznau 1 (Axpo)",
+        "fuel": "nuclear",
+        "tech": "PWR (Westinghouse)",
+        "nominal_mw": 365,
+        "efficiency": 0.33,
+        "emission_factor": 0,
+        "vom": 2.5,
+        "fuel_cost_th": 5
+      },
+      {
+        "id": "CH_KKB_BEZNAU_2",
+        "psr_id": "KKB - KernKW Beznau",
+        "alt_id": "Kernkraftwerk Beznau Block 2",
+        "name": "Kernkraftwerk Beznau 2 (Axpo)",
+        "fuel": "nuclear",
+        "tech": "PWR (Westinghouse)",
+        "nominal_mw": 365,
+        "efficiency": 0.33,
+        "emission_factor": 0,
+        "vom": 2.5,
+        "fuel_cost_th": 5
+      },
+      {
+        "id": "CH_NANT_DE_DRANCE",
+        "psr_id": "Nant de Drance (NDD)",
+        "alt_id": "Pumpspeicherkraftwerk Nant de Drance",
+        "name": "Nant de Drance (Alpiq / SBB / IWB)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 930,
+        "efficiency": 0.81,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "CH_GRANDE_DIXENCE",
+        "psr_id": "Gde-Dixence (GD)",
+        "alt_id": "Cleuson-Dixence Bieudron & Fionnay",
+        "name": "Grande Dixence (Alpiq / Axpo)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 1254,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
+      },
+      {
+        "id": "CH_OBERHASLI_KWO",
+        "psr_id": "KW Oberhasli AG (KWO)",
+        "alt_id": "Kraftwerke Oberhasli Grimsel",
+        "name": "KW Oberhasli Grimsel (BKW / EBM)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 1307,
+        "efficiency": 0.8,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "CH_LINTH_LIMMERN",
+        "psr_id": "KLL - KW Linth-Limmern AG",
+        "alt_id": "Pumpspeicherwerk Limmern",
+        "name": "Linth-Limmern (Axpo)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 1000,
+        "efficiency": 0.8,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "CH_HONGRIN_LEMAN",
+        "psr_id": "Hongrin-Léman (FMHL)",
+        "alt_id": "Forces Motrices Hongrin-Léman",
+        "name": "Hongrin-Léman (Romande Energie / Alpiq)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 484,
+        "efficiency": 0.79,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "CH_ELECTRA_MASSA",
+        "psr_id": "Electra-Massa (EM)",
+        "alt_id": "Speicherkraftwerk Bitsch",
+        "name": "Electra-Massa (Alpiq)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 340,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
+      },
+      {
+        "id": "CH_EMOSSON",
+        "psr_id": "Emosson (ESA)",
+        "alt_id": "Electricité d Emosson",
+        "name": "Emosson (Alpiq / EDF)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 230,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
+      },
+      {
+        "id": "CH_AET_LEVENTINA",
+        "psr_id": "AET Leventina",
+        "alt_id": "Nuova Piottino & Biaschina",
+        "name": "AET Leventina (AET Ticino)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 226,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
+      },
+      {
+        "id": "CH_BERGELL",
+        "psr_id": "Kraftwerk Bergell",
+        "alt_id": "Kraftwerke Bergell Albigna",
+        "name": "Bergell Albigna (ewz Zürich)",
+        "fuel": "hydro",
+        "tech": "Hydro Pumped Storage",
+        "nominal_mw": 192.7,
+        "efficiency": 0.78,
+        "emission_factor": 0,
+        "vom": 1.5
+      },
+      {
+        "id": "CH_MAGGIA_OFIMA",
+        "psr_id": "Maggia (OFIMA)",
+        "alt_id": "Officine Idroelettriche della Maggia",
+        "name": "Maggia OFIMA (Axpo / Alpiq)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 155,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
+      },
+      {
+        "id": "CH_BLENIO_OFIBLE",
+        "psr_id": "Blenio (OFIBLE)",
+        "alt_id": "Officine Idroelettriche di Blenio",
+        "name": "Blenio OFIBLE (Axpo / AET)",
+        "fuel": "hydro",
+        "tech": "Hydro Water Reservoir",
+        "nominal_mw": 120,
+        "efficiency": 0.85,
+        "emission_factor": 0,
+        "vom": 1.2
       }
     ]
   },
-  "mandatory_hydro_mw": 400.0,
+  "mandatory_hydro_mw": 400,
   "hydro_complexes": {
     "GR_ACHELOOS": {
       "name": "PPC Hydro Reservoirs — Acheloos (Kremasta, Kastraki, Stratos)",
@@ -4376,7 +4770,7 @@
         "STRATOS"
       ],
       "peaking_factor": 0.55,
-      "water_offset": 0.0
+      "water_offset": 0
     },
     "GR_ALIAKMONAS": {
       "name": "PPC Hydro Reservoirs — Aliakmonas & Nestos (Polyfyto, Ilarionas, Aoos, Asomata, Platanovrysi)",
@@ -4388,7 +4782,7 @@
         "PLATANOVRYSI"
       ],
       "peaking_factor": 0.57,
-      "water_offset": 26.0
+      "water_offset": 26
     },
     "GR_PUMPED": {
       "name": "PPC Pumped Storage Peakers (Sfikia & Thisavros)",
@@ -4399,7 +4793,7 @@
         "THESAVROS III_HYDRO"
       ],
       "peaking_factor": 0.79,
-      "water_offset": 60.0
+      "water_offset": 60
     }
   }
 }
