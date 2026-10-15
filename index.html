@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 13:49</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 14:16</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-15 13:49
+                Last DB Audit: 2026-10-15 14:16
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12208,7 +12208,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-15 13:49";
+                const currentBuildTime = "2026-10-15 14:16";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -12391,7 +12391,7 @@ const DAILY_NEIGH = {
     RO: ['HU', 'BG', 'RS', 'GR', 'SK'],
     HU: ['AT', 'SK', 'RO', 'CZ', 'DE_LU', 'SI']
 };
-const DAILY_LEVEL_PHYS_W = { GR: 0.60, BG: 0.35, RO: 0.35, HU: 0.75 };
+const DAILY_LEVEL_PHYS_W = { GR: 0.60, BG: 0.35, RO: 0.35, HU: 0.58 };
 const DAILY_LEVEL_RIDGE = {
     GR: { cols: ["p_imm","res","res_reg","res_prior_own","res_reg_prior","ttf","eua","msin","mcos","wk"],
           coef: [-27.900, 0.557, 0.015, 0.003, -0.010, -0.003, 0.440, 0.568, -2.826, 2.058, -6.877] },
@@ -12434,8 +12434,9 @@ function deZoneGain(zone) {
 // Half-strength day-of-week bias correction, ex-ante. The engine under-predicts
 // Mondays (post-weekend tightness) and over-predicts Fridays, most strongly on
 // RO/HU. Values are -0.5 * mean(pred - actual) by JS getDay (0=Sun..6=Sat),
-// calibrated on 2026-06..09. GR is already well-calibrated and excluded.
+// calibrated on 2026-06..09.
 const DOW_BIAS_HALF = {
+    GR: { 0: +1.20, 1: +4.50, 2: +3.80, 3: -3.50, 4: +8.50, 5: +5.50, 6: +0.20 },
     BG: { 0: -0.33, 1: -0.14, 2: -1.08, 3: -1.33, 4: -1.61, 5: -2.29, 6: -3.23 },
     RO: { 0: +3.53, 1: +5.42, 2: +0.18, 3: -0.79, 4: -2.93, 5: -4.23, 6: -0.33 },
     HU: { 0: +0.17, 1: +1.50, 2: +0.80, 3: -0.36, 4: -2.39, 5: -4.22, 6: -1.21 }
@@ -15623,8 +15624,8 @@ function runCoupledMeritOrderOptimizer() {
         const prevDem = h > 0 ? (grDemand[h-1] || demGR) : demGR;
         const rampMw = demGR - prevDem;
         let rampAdder = 0;
-        if (h >= 5 && h <= 8 && rampMw > 200) {
-            rampAdder = Math.min(16.0, (rampMw - 200) * 0.035);
+        if (h >= 5 && h <= 8 && rampMw > 150) {
+            rampAdder = Math.min(24.0, (rampMw - 150) * 0.040);
         }
 
         const deShock = getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, 'GR');
@@ -15838,8 +15839,7 @@ function runCoupledMeritOrderOptimizer() {
         const isFloorSurplus = isSolarMidday && (isAcuteSEEOutageGR ? (resGR <= -totExportCap || (resGR < -250 && isExportCongested)) : (
             (resGR <= -totExportCap) ||
             (bgBaseline <= 45.0 && (resGR <= 500 || isExportCongested)) ||
-            (effReqAfterTrade <= 0) ||
-            (effReqAfterTrade < mustRunBaseTotal && isExportCongested)
+            (resGR < -1200 && isExportCongested)
         ));
 
         const decoupleExport = isSolarMidday && (isFloorSurplus || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
