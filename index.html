@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 12:37</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 13:02</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-15 12:37
+                Last DB Audit: 2026-10-15 13:02
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12208,7 +12208,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-15 12:37";
+                const currentBuildTime = "2026-10-15 13:02";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -12391,7 +12391,7 @@ const DAILY_NEIGH = {
     RO: ['HU', 'BG', 'RS', 'GR', 'SK'],
     HU: ['AT', 'SK', 'RO', 'CZ', 'DE_LU', 'SI']
 };
-const DAILY_LEVEL_PHYS_W = { GR: 0.80, BG: 0.35, RO: 0.35, HU: 0.75 };
+const DAILY_LEVEL_PHYS_W = { GR: 0.60, BG: 0.35, RO: 0.35, HU: 0.75 };
 const DAILY_LEVEL_RIDGE = {
     GR: { cols: ["p_imm","res","res_reg","res_prior_own","res_reg_prior","ttf","eua","msin","mcos","wk"],
           coef: [-27.900, 0.557, 0.015, 0.003, -0.010, -0.003, 0.440, 0.568, -2.826, 2.058, -6.877] },
@@ -13598,7 +13598,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     window._engineBaseDailyCache[zone + '|' + targetDate] = baseDaily;
 
     // 5) 1-day error feedback (AR1)
-    if (!window._engineAr1Skip && !isAcuteOutage) {
+    if (!window._engineAr1Skip) {
         const a1 = AR1_ALPHA[zone];
         const hk = AR1_HINGE[zone];
         if (a1 || hk) {
@@ -13803,8 +13803,8 @@ function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, flee
     const deficit = reqGen - cum;
     const peakerSrmc = (fleet && fleet.length > 0) ? fleet[fleet.length - 1].srmc : 265.0;
     const baseRef = Math.max(regionalPriceAnchor || _bref('HU'), peakerSrmc);
-    const scarcitySlope = isSaturday ? 0.10 : 0.075;
-    const scarcityBase = isSaturday ? 31.0 : 15.0;
+    const scarcitySlope = isSaturday ? 0.07 : 0.040;
+    const scarcityBase = isSaturday ? 15.0 : 5.0;
     const scarcityPrice = Math.min(480.0, Math.max(peakerSrmc, baseRef + scarcityBase + deficit * scarcitySlope));
     return {
         price: scarcityPrice,
@@ -15828,13 +15828,13 @@ function runCoupledMeritOrderOptimizer() {
             (resGR <= -totExportCap) ||
             (bgBaseline <= 45.0 && (resGR <= 500 || isExportCongested)) ||
             (effReqAfterTrade <= 0) ||
-            (resGR < mustRunBaseTotal && bestNetImport <= 0)
+            (effReqAfterTrade < mustRunBaseTotal && isExportCongested)
         ));
 
-        const decoupleExport = isSolarMidday && (isFloorSurplus || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0));
+        const decoupleExport = isSolarMidday && (isFloorSurplus || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
-            if (isFloorSurplus || (h >= 10 && h <= 15 && resGR < 750)) {
+            if (isFloorSurplus || (h >= 10 && h <= 15 && resGR < 500 && bgBaseline <= 60.0)) {
                 bestP = 0.01;
                 bestUnit = 'RES Surplus (Curtailment Floor) (Decoupled Export)';
                 bestMarginalType = 'res_surplus';
