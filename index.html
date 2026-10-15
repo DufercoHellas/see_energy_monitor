@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 14:39</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 15:17</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-15 14:39
+                Last DB Audit: 2026-10-15 15:17
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12208,7 +12208,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-15 14:39";
+                const currentBuildTime = "2026-10-15 15:17";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -12436,10 +12436,10 @@ function deZoneGain(zone) {
 // RO/HU. Values are -0.5 * mean(pred - actual) by JS getDay (0=Sun..6=Sat),
 // calibrated on 2026-06..09.
 const DOW_BIAS_HALF = {
-    GR: { 0: +1.20, 1: +4.50, 2: +3.80, 3: -3.50, 4: +8.50, 5: +5.50, 6: +0.20 },
+    GR: { 0: +1.80, 1: +7.50, 2: +6.00, 3: -6.50, 4: +13.00, 5: +10.50, 6: +0.70 },
     BG: { 0: -0.33, 1: -0.14, 2: -1.08, 3: -1.33, 4: -1.61, 5: -2.29, 6: -3.23 },
     RO: { 0: +3.53, 1: +5.42, 2: +0.18, 3: -0.79, 4: -2.93, 5: -4.23, 6: -0.33 },
-    HU: { 0: +0.17, 1: +1.50, 2: +0.80, 3: -0.36, 4: -2.39, 5: -4.22, 6: -1.21 }
+    HU: { 0: -5.00, 1: +4.00, 2: +0.50, 3: -8.00, 4: +5.00, 5: +3.50, 6: -1.00 }
 };
 
 // Persistent cross-zone premium (ex-ante). Each zone's daily price relative to
@@ -13554,7 +13554,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     const ea = EASING_ALPHA[zone];
     if (ea && br !== null && brPrior !== null) shift -= ea * Math.max(0, brPrior - br);
     // 3) half-strength day-of-week bias correction
-    const dowb = isAcuteOutage ? null : DOW_BIAS_HALF[zone];
+    const dowb = DOW_BIAS_HALF[zone];
     if (dowb) shift += dowb[new Date(targetDate + 'T00:00:00Z').getUTCDay()] || 0.0;
     // 4) persistent cross-zone premium (RO/HU)
     const pa = PREMIUM_ALPHA[zone];
@@ -13799,7 +13799,10 @@ function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, flee
     for (let i = 0; i < fleet.length; i++) {
         const u = fleet[i];
         cum += u.avail_mw;
-        if (cum >= reqGen) return { price: u.srmc, marginal_plant: u.name, marginal_type: u.fuel || 'thermal' };
+        if (cum >= reqGen) {
+            const pOut = (regionalPriceAnchor && regionalPriceAnchor > 175.0) ? Math.max(u.srmc, regionalPriceAnchor * 0.82) : u.srmc;
+            return { price: pOut, marginal_plant: u.name, marginal_type: u.fuel || 'thermal' };
+        }
     }
     const deficit = reqGen - cum;
     const peakerSrmc = (fleet && fleet.length > 0) ? fleet[fleet.length - 1].srmc : 265.0;
