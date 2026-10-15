@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 09:19</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 12:37</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-15 09:19
+                Last DB Audit: 2026-10-15 12:37
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12208,7 +12208,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-15 09:19";
+                const currentBuildTime = "2026-10-15 12:37";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13968,8 +13968,8 @@ function solveHUForecast(targetDate) {
             const impC = huCap(dayFcaps, impKey, h, isWeekend);
             if (expC === null || impC === null) return;
             const sp = anchor - borderPrior[nb];
-            const ex = Math.sign(sp) * Math.max(0, Math.abs(sp) - 15.0);
-            const f = Math.max(-expC, Math.min(impC, ex * 20.0));
+            const ex = Math.sign(sp) * Math.max(0, Math.abs(sp) - 2.0);
+            const f = Math.max(-expC, Math.min(impC, ex * 120.0));
             flows[nb] = f;
             netFlow += f;
         });
@@ -15861,10 +15861,12 @@ function runCoupledMeritOrderOptimizer() {
 
         // Evening Peak Hydro Scarcity & Peaker Curvature (H18–H21 CET / H19–H22 EET)
         if (h >= 17 && h <= 21) {
-            if (resGR > 6100) {
-                const scarcityAdder = Math.min(55.0, (resGR - 6100) * 0.035);
+            const targetM = parseInt(targetDate.slice(5, 7), 10);
+            const peakThr = (targetM >= 6 && targetM <= 8) ? 6000.0 : 4700.0;
+            if (resGR > peakThr) {
+                const scarcityAdder = Math.min(65.0, (resGR - peakThr) * 0.045);
                 bestP = Math.max(bestP, bgBaseline + scarcityAdder);
-            } else if (resGR < 3800 && bgBaseline < 160.0) {
+            } else if (resGR < 3500 && bgBaseline < 160.0) {
                 bestP = Math.min(bestP, Math.max(140.0, bgBaseline * 0.88));
             }
         }
