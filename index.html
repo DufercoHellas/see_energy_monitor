@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 13:02</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-15 13:49</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-15 13:02
+                Last DB Audit: 2026-10-15 13:49
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12208,7 +12208,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-15 13:02";
+                const currentBuildTime = "2026-10-15 13:49";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13977,7 +13977,17 @@ function solveHUForecast(targetDate) {
         const reqGen = resHU - netFlow;
         const cleared = clearZonalSupplyHU(reqGen, demHU, anchor, h + 1, fleetHU, targetDOW === 6);
 
-        let modelP = (1.0 - HU_MERIT_W) * anchor + HU_MERIT_W * cleared.price;
+        let clP = cleared.price;
+        // Night baseload floor: Hungarian night demand is served by CHP/imports and does not clear at pure lignite floor
+        if (h >= 1 && h <= 5 && clP < 145.0) {
+            clP = Math.max(clP, Math.min(anchor, 140.0 + (resHU / 4000.0) * 15.0));
+        }
+        // Midday solar discount: when solar is active in HU, market clears below thermal stack
+        if (h >= 10 && h <= 15 && solarShare > 0.15) {
+            clP = Math.min(clP, Math.max(160.0, anchor * 0.85));
+        }
+
+        let modelP = (1.0 - HU_MERIT_W) * anchor + HU_MERIT_W * clP;
 
         const actP = (huActualPrices[h] !== undefined && huActualPrices[h] !== null && !isNaN(huActualPrices[h])) ? huActualPrices[h] : null;
 
@@ -14008,7 +14018,8 @@ function solveHUForecast(targetDate) {
     // Analogue KNN ensemble (shape skill), blended onto the physical model.
     if (knn24 && knn24.length === 24) {
         for (let h = 0; h < 24; h++) {
-            const blended = (1.0 - HU_KNN_W) * hourlyResults[h].model_price_hu + HU_KNN_W * knn24[h];
+            const wKnn = (h >= 18 && h <= 21) ? 0.55 : HU_KNN_W;
+            const blended = (1.0 - wKnn) * hourlyResults[h].model_price_hu + wKnn * knn24[h];
             hourlyResults[h].model_price_hu = Math.round(Math.max(-20.0, Math.min(500.0, blended)) * 100) / 100;
             const act = hourlyResults[h].actual_price_hu;
             hourlyResults[h].price_delta_hu = act !== null ? (hourlyResults[h].model_price_hu - act) : null;
@@ -15891,10 +15902,10 @@ function runCoupledMeritOrderOptimizer() {
             const solarWeight = Math.min(1.0, (trueSolarShare - 0.15) / 0.20);
             // In deep solar surplus (trueSolarShare > 0.35 and residual < 700 MW), market clears at zero/Pmin floor
             let pminCeiling;
-            if (trueSolarShare > 0.35 && resGR < 700) {
+            if (trueSolarShare > 0.35 && resGR < 700 && bgBaseline <= 75.0) {
                 pminCeiling = Math.max(0.01, (Math.max(0, resGR - 300) / 400) * 15.0);
             } else {
-                pminCeiling = Math.max(15.0, 20.0 + (Math.max(0, resGR) / 1500) * 45.0);
+                pminCeiling = Math.max(25.0, Math.min(bgBaseline * 0.85, 30.0 + (Math.max(0, resGR) / 1500) * 65.0));
             }
             const acuteSolarLift = isAcuteSEEOutageGR && !isExportCongested && resGR >= 1000;
             bestP = (acuteSolarLift && bestNetImport < 0) ? bestP : Math.min(bestP, (1.0 - solarWeight * 0.90) * bestP + (solarWeight * 0.90) * pminCeiling);
@@ -15931,7 +15942,8 @@ function runCoupledMeritOrderOptimizer() {
             const prevP = hourlyResults[h - 1] ? hourlyResults[h - 1].model_price_gr : 100;
             const nextP = hourlyResults[h + 1] ? hourlyResults[h + 1].model_price_gr : 100;
             const curP = hourlyResults[h].model_price_gr;
-            if (prevP <= 20.0 && nextP <= 20.0 && curP < 150.0) {
+            const resH = hourlyResults[h].gr_residual;
+            if (prevP <= 20.0 && nextP <= 20.0 && curP < 150.0 && resH < 400.0) {
                 hourlyResults[h].model_price_gr = 0.01;
                 hourlyResults[h].marginal_plant_gr = 'RES Surplus (Curtailment Floor) (Window Continuity)';
                 hourlyResults[h].marginal_type_gr = 'res_surplus';
@@ -15942,7 +15954,9 @@ function runCoupledMeritOrderOptimizer() {
             const next2P = hourlyResults[h + 2] ? hourlyResults[h + 2].model_price_gr : 100;
             const curP = hourlyResults[h].model_price_gr;
             const curP1 = hourlyResults[h + 1].model_price_gr;
-            if (prevP <= 20.0 && next2P <= 20.0 && curP < 150.0 && curP1 < 150.0) {
+            const resH = hourlyResults[h].gr_residual;
+            const resH1 = hourlyResults[h + 1].gr_residual;
+            if (prevP <= 20.0 && next2P <= 20.0 && curP < 150.0 && curP1 < 150.0 && resH < 400.0 && resH1 < 400.0) {
                 hourlyResults[h].model_price_gr = 0.01;
                 hourlyResults[h].marginal_plant_gr = 'RES Surplus (Curtailment Floor) (Window Continuity)';
                 hourlyResults[h].marginal_type_gr = 'res_surplus';
@@ -15951,9 +15965,9 @@ function runCoupledMeritOrderOptimizer() {
                 hourlyResults[h + 1].marginal_type_gr = 'res_surplus';
             }
         }
-        // Early solar surplus entry lock (if core noon hours H11-H12 are at floor and H10 is depressed):
+        // Early solar surplus entry lock (only if residual is actually in surplus):
         if (hourlyResults[10] && hourlyResults[11] && hourlyResults[9]) {
-            if (hourlyResults[10].model_price_gr <= 20.0 && hourlyResults[11].model_price_gr <= 20.0 && hourlyResults[9].model_price_gr < 80.0) {
+            if (hourlyResults[10].model_price_gr <= 20.0 && hourlyResults[11].model_price_gr <= 20.0 && hourlyResults[9].model_price_gr < 80.0 && hourlyResults[9].gr_residual < 200.0) {
                 hourlyResults[9].model_price_gr = 0.01;
                 hourlyResults[9].marginal_plant_gr = 'RES Surplus (Curtailment Floor) (Window Continuity)';
                 hourlyResults[9].marginal_type_gr = 'res_surplus';
