@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 12:32</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:09</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 12:32
+                Last DB Audit: 2026-10-16 13:09
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -3472,6 +3472,58 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                     </tr>
                 </thead>
                 <tbody id="econ_opt_tbody">
+                    <!-- Populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── 24-HOUR SEE TRANSMISSION CORRIDOR & MARKET COUPLING MATRIX ── -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 20px;">🌐</span>
+                    <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                        24-Hour SEE Corridor Market Coupling Matrix (HU ↔ RO ↔ BG ↔ GR)
+                    </h3>
+                </div>
+                <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">
+                    Multi-country SDAC market splitting consensus across the regional transmission spine. Tracks real-time price equalization, connected market clusters, and transmission bottlenecks.
+                </div>
+            </div>
+
+            <!-- Summary KPI Badges -->
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.25); border-radius: 8px; padding: 6px 12px; font-size: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Fully Coupled:</span>
+                    <strong id="corridor_kpi_coupled" style="color: #10b981; margin-left: 4px;">-- / 24 hrs</strong>
+                </div>
+                <div style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 8px; padding: 6px 12px; font-size: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Midday Solar Decoupled:</span>
+                    <strong id="corridor_kpi_solar_decoupled" style="color: #f59e0b; margin-left: 4px;">-- hrs</strong>
+                </div>
+                <div style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25); border-radius: 8px; padding: 6px 12px; font-size: 12px;">
+                    <span style="color: var(--text-secondary); font-weight: 600;">Max Regional Spread:</span>
+                    <strong id="corridor_kpi_max_spread" style="color: #6366f1; margin-left: 4px;">-- €/MWh</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container" style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: inherit;">
+                <thead>
+                    <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: center; width: 65px;">Hour</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #f59e0b; width: 105px;">🇭🇺 HU (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #3b82f6; width: 105px;">🇷🇴 RO (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #10b981; width: 105px;">🇧🇬 BG (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #06b6d4; width: 105px;">🇬🇷 GR (€)</th>
+                        <th style="padding: 10px 12px; font-weight: 700; width: 280px;">Market Coupling Status &amp; Active Cluster</th>
+                        <th style="padding: 10px 12px; font-weight: 700;">Congested Corridor Interconnections</th>
+                    </tr>
+                </thead>
+                <tbody id="corridor_matrix_tbody">
                     <!-- Populated dynamically -->
                 </tbody>
             </table>
@@ -12222,7 +12274,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 12:32";
+                const currentBuildTime = "2026-10-16 13:09";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19579,6 +19631,138 @@ function renderOptimizerTable() {
     });
 
     tbody.innerHTML = html;
+
+    if (typeof renderCorridorMatrix === 'function') {
+        const dEl = document.getElementById("forecast_date") || document.getElementById("econ_date");
+        renderCorridorMatrix(dEl ? dEl.value : null);
+    }
+}
+
+function renderCorridorMatrix(targetDate) {
+    const tbody = document.getElementById("corridor_matrix_tbody");
+    if (!tbody) return;
+
+    if (!targetDate) {
+        const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
+        targetDate = dateInput ? dateInput.value : getTomorrowDateStr();
+    }
+    if (!targetDate) return;
+
+    // Ensure all 4 country solutions are resolved
+    const huRes = (typeof solveHUForecast === 'function') ? solveHUForecast(targetDate) : null;
+    const roRes = (typeof solveROForecast === 'function') ? solveROForecast(targetDate) : null;
+    const bgRes = (typeof solveBGForecast === 'function') ? solveBGForecast(targetDate) : null;
+    const grRes = (typeof solveGRForecast === 'function') ? solveGRForecast(targetDate) : null;
+
+    if (!huRes || !roRes || !bgRes || !grRes || !huRes.hourly || !roRes.hourly || !bgRes.hourly || !grRes.hourly) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);">Corridor data unavailable for ${targetDate}</td></tr>`;
+        return;
+    }
+
+    let fullCoupledCount = 0;
+    let solarDecoupledCount = 0;
+    let maxSpread = 0;
+    let html = '';
+
+    for (let h = 0; h < 24; h++) {
+        const huP = huRes.hourly[h] ? huRes.hourly[h].model_price_hu : 0;
+        const roP = roRes.hourly[h] ? roRes.hourly[h].model_price_ro : 0;
+        const bgP = bgRes.hourly[h] ? bgRes.hourly[h].model_price_bg : 0;
+        const grP = grRes.hourly[h] ? grRes.hourly[h].model_price_gr : 0;
+
+        const prices = [huP, roP, bgP, grP];
+        const hMax = Math.max(...prices);
+        const hMin = Math.min(...prices);
+        const spreadH = hMax - hMin;
+        if (spreadH > maxSpread) maxSpread = spreadH;
+
+        const hu_ro_spread = Math.abs(huP - roP);
+        const ro_bg_spread = Math.abs(roP - bgP);
+        const bg_gr_spread = Math.abs(bgP - grP);
+
+        // Coupling tolerance: within 0.50 €/MWh considered coupled
+        const c1 = hu_ro_spread <= 0.50;
+        const c2 = ro_bg_spread <= 0.50;
+        const c3 = bg_gr_spread <= 0.50;
+
+        let clusterBadge = '';
+        if (c1 && c2 && c3) {
+            fullCoupledCount++;
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.3);">
+                <span style="font-size:9px;">●</span> FULL COUPLING [HU=RO=BG=GR]
+            </span>`;
+        } else if (c1 && c2 && !c3) {
+            if (h >= 9 && h <= 15) solarDecoupledCount++;
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(245,158,11,0.15); color:#d97706; border:1px solid rgba(245,158,11,0.3);">
+                <span style="font-size:9px;">●</span> [HU=RO=BG] | [GR] (GR Decoupled)
+            </span>`;
+        } else if (!c1 && c2 && c3) {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(99,102,241,0.15); color:#6366f1; border:1px solid rgba(99,102,241,0.3);">
+                <span style="font-size:9px;">●</span> [HU] | [RO=BG=GR]
+            </span>`;
+        } else if (c1 && !c2 && c3) {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:rgba(14,165,233,0.15); color:#0284c7; border:1px solid rgba(14,165,233,0.3);">
+                <span style="font-size:9px;">●</span> [HU=RO] | [BG=GR] (Danube Split)
+            </span>`;
+        } else if (c1) {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:rgba(168,85,247,0.12); color:#9333ea; border:1px solid rgba(168,85,247,0.25);">
+                <span style="font-size:9px;">●</span> [HU=RO] | [BG] | [GR]
+            </span>`;
+        } else if (c2) {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:rgba(20,184,166,0.12); color:#0d9488; border:1px solid rgba(20,184,166,0.25);">
+                <span style="font-size:9px;">●</span> [HU] | [RO=BG] | [GR]
+            </span>`;
+        } else if (c3) {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:rgba(6,182,212,0.12); color:#0891b2; border:1px solid rgba(6,182,212,0.25);">
+                <span style="font-size:9px;">●</span> [HU] | [RO] | [BG=GR]
+            </span>`;
+        } else {
+            clusterBadge = `<span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--bg-card-subtle); color:var(--text-muted); border:1px solid var(--border-color);">
+                <span style="font-size:9px;">●</span> DECOUPLED [HU] [RO] [BG] [GR]
+            </span>`;
+        }
+
+        // Interconnection bottlenecks
+        const congested = [];
+        if (!c1) {
+            const premZone = huP > roP ? 'HU' : 'RO';
+            congested.push(`<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; background:rgba(239,68,68,0.1); color:#dc2626; border:1px solid rgba(239,68,68,0.2); font-weight:600;">HU-RO (${premZone} +${hu_ro_spread.toFixed(1)}€)</span>`);
+        }
+        if (!c2) {
+            const premZone = roP > bgP ? 'RO' : 'BG';
+            congested.push(`<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; background:rgba(239,68,68,0.1); color:#dc2626; border:1px solid rgba(239,68,68,0.2); font-weight:600;">RO-BG (${premZone} +${ro_bg_spread.toFixed(1)}€)</span>`);
+        }
+        if (!c3) {
+            const premZone = bgP > grP ? 'BG' : 'GR';
+            congested.push(`<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; background:rgba(239,68,68,0.1); color:#dc2626; border:1px solid rgba(239,68,68,0.2); font-weight:600;">BG-GR (${premZone} +${bg_gr_spread.toFixed(1)}€)</span>`);
+        }
+
+        const congestedHtml = congested.length > 0 
+            ? `<div style="display:flex; flex-wrap:wrap; gap:6px;">${congested.join('')}</div>`
+            : `<span style="color:#10b981; font-weight:600; font-size:11.5px;">✓ Clear Corridor Flow (0.0 € spread)</span>`;
+
+        html += `
+        <tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;" onclick="document.getElementById('econ_opt_hour').value='${h + 1}'; onOptHourChange();" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 7px 8px; text-align: center; font-weight: 700; color: var(--text-primary);">H${String(h + 1).padStart(2, '0')}</td>
+            <td style="padding: 7px 8px; text-align: right; font-weight: 700; color: #f59e0b; font-family: monospace; font-size: 12.5px;">${huP.toFixed(2)}</td>
+            <td style="padding: 7px 8px; text-align: right; font-weight: 700; color: #3b82f6; font-family: monospace; font-size: 12.5px;">${roP.toFixed(2)}</td>
+            <td style="padding: 7px 8px; text-align: right; font-weight: 700; color: #10b981; font-family: monospace; font-size: 12.5px;">${bgP.toFixed(2)}</td>
+            <td style="padding: 7px 8px; text-align: right; font-weight: 700; color: #06b6d4; font-family: monospace; font-size: 12.5px;">${grP.toFixed(2)}</td>
+            <td style="padding: 7px 12px;">${clusterBadge}</td>
+            <td style="padding: 7px 12px;">${congestedHtml}</td>
+        </tr>`;
+    }
+
+    tbody.innerHTML = html;
+
+    const kpiCoupled = document.getElementById("corridor_kpi_coupled");
+    if (kpiCoupled) kpiCoupled.textContent = `${fullCoupledCount} / 24 hrs`;
+
+    const kpiSolar = document.getElementById("corridor_kpi_solar_decoupled");
+    if (kpiSolar) kpiSolar.textContent = `${solarDecoupledCount} hrs`;
+
+    const kpiSpread = document.getElementById("corridor_kpi_max_spread");
+    if (kpiSpread) kpiSpread.textContent = `${maxSpread.toFixed(1)} €/MWh`;
 }
 
 
