@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:19</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:35</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 13:19
+                Last DB Audit: 2026-10-16 13:35
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -3390,14 +3390,15 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <thead>
                     <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
                         <th style="padding: 10px 8px; font-weight: 700; text-align: center; width: 65px;">Hour</th>
-                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #2563eb; width: 105px;">Model (€)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 110px;">Spot (Spread)</th>
-                        <th style="padding: 10px 10px; font-weight: 800; color: var(--text-primary); min-width: 250px;">Economic Driver &amp; Regime (The "Why")</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 100px;">Net Flow (MW)</th>
-                        <th id="econ_opt_th_cables" style="padding: 10px 8px; font-weight: 700; text-align: center; min-width: 180px;">Interconnectors (MW)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 105px;">Residual (MW)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 80px;">RES %</th>
-                        <th style="padding: 10px 10px; font-weight: 700; min-width: 180px;">Marginal Plant / Setting Unit</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 95px;">DEMAND (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 95px;">Residuals (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 75px;">RES %</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 105px;">NET FLOW (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; width: 110px; color: #4338ca;">Final DEMAND (MW)</th>
+                        <th id="econ_opt_th_cables" style="padding: 10px 8px; font-weight: 700; text-align: center; min-width: 190px;">BG / IT / MK / AL (MW)</th>
+                        <th style="padding: 10px 10px; font-weight: 700; min-width: 220px;">Marginal Plant</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #2563eb; width: 105px;">Model Price (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 115px;">Spot Price (€)</th>
                     </tr>
                 </thead>
                 <tbody id="econ_opt_tbody">
@@ -12203,7 +12204,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 13:19";
+                const currentBuildTime = "2026-10-16 13:35";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19283,12 +19284,155 @@ function getHourlyDriverRationale(zone, d, modelPrice, demand, residual, solarSh
     };
 }
 
+function resolveActualMarginalPlant(zone, hIndex, d, targetDate) {
+    let mp = optP(d, 'marginal_plant') || '';
+
+    // 1. Greece (GR)
+    if (zone === 'GR') {
+        if (mp === 'SDAC Coupled' || mp.includes('Coupled')) {
+            let bgSolved = null;
+            try {
+                if (window._solveBGCache && window._solveBGCache[targetDate]) {
+                    bgSolved = window._solveBGCache[targetDate];
+                } else if (typeof solveBGForecast === 'function') {
+                    bgSolved = solveBGForecast(targetDate);
+                }
+            } catch (e) {}
+
+            if (bgSolved && bgSolved.hourly && bgSolved.hourly[hIndex]) {
+                const bgMp = bgSolved.hourly[hIndex].marginal_plant_bg || '';
+                if (bgMp) {
+                    if (bgMp.includes('RES Surplus') || bgMp.includes('Curtailment') || bgMp.includes('Solar')) {
+                        return '☀️ RES Surplus Floor (0.01 €) 🇧🇬';
+                    }
+                    if (bgMp.includes('Maritsa') || bgMp.includes('AES') || bgMp.includes('Bobov') || bgMp.includes('Lignite')) {
+                        return `⛏️ ${bgMp} 🇧🇬`;
+                    }
+                    if (bgMp.includes('Kozloduy') || bgMp.includes('Nuclear')) {
+                        return `⚛️ ${bgMp} 🇧🇬`;
+                    }
+                    if (bgMp.includes('Belmeken') || bgMp.includes('Chaira') || bgMp.includes('Hydro') || bgMp.includes('Cascade')) {
+                        return `💧 ${bgMp} 🇧🇬`;
+                    }
+                    if (bgMp.includes('Scarcity') || bgMp.includes('Emergency') || bgMp.includes('Reserve')) {
+                        return `🚨 ${bgMp} 🇧🇬`;
+                    }
+                    return `${bgMp} 🇧🇬`;
+                }
+            }
+            return '⚡ SDAC Balkan Pool 🇧🇬';
+        }
+
+        if (mp.includes('RES Surplus') || mp.includes('Curtailment Floor') || ((optP(d, 'model_price') || 0) <= 0.05 && hIndex >= 9 && hIndex <= 15)) {
+            return '☀️ RES Surplus Floor (0.01 €)';
+        }
+
+        if (mp.includes('Export Dispatched')) {
+            const cleanName = mp.replace(' (Export Dispatched)', '').trim();
+            return `📤 ${cleanName} 🇬🇷 (Exporting)`;
+        }
+        if (mp.includes('Decoupled Import')) {
+            const cleanName = mp.replace(' (Decoupled Import)', '').trim();
+            return `📥 ${cleanName} 🇬🇷 (Decoupled)`;
+        }
+
+        if (mp.toLowerCase().includes('scarcity') || mp.toLowerCase().includes('deficit') || mp.toLowerCase().includes('peaker') || ((optP(d, 'model_price') || 0) >= 320)) {
+            return `🚨 ${mp.replace(' 🇬🇷', '')} 🇬🇷`;
+        }
+
+        if (mp.includes('Agios Dimitrios') || mp.includes('Ptolemaida') || mp.includes('Megalopoli') || mp.includes('Meliti')) {
+            return `⛏️ ${mp.replace(' 🇬🇷', '')} 🇬🇷`;
+        }
+        if (mp.includes('CCGT') || mp.includes('Lavrio') || mp.includes('Komotini') || mp.includes('Protergia') || mp.includes('Aliveri') || mp.includes('Corinth') || mp.includes('Heron') || mp.includes('Thisvi')) {
+            return `🔥 ${mp.replace(' 🇬🇷', '')} 🇬🇷`;
+        }
+        if (mp.includes('Hydro') || mp.includes('Kremasta') || mp.includes('Kastraki') || mp.includes('Sfikia') || mp.includes('Plastiras')) {
+            return `💧 ${mp.replace(' 🇬🇷', '')} 🇬🇷`;
+        }
+
+        return mp ? `${mp} 🇬🇷` : '⚙️ Greek Thermal Fleet 🇬🇷';
+    }
+
+    // 2. Bulgaria (BG)
+    if (zone === 'BG') {
+        if (d.flow_ro > 100) {
+            let roSolved = null;
+            try {
+                if (window._solveROCache && window._solveROCache[targetDate]) {
+                    roSolved = window._solveROCache[targetDate];
+                } else if (typeof solveROForecast === 'function') {
+                    roSolved = solveROForecast(targetDate);
+                }
+            } catch (e) {}
+            if (roSolved && roSolved.hourly && roSolved.hourly[hIndex]) {
+                const roP = roSolved.hourly[hIndex].model_price_ro;
+                const bgP = d.model_price_bg;
+                if (Math.abs(roP - bgP) <= 0.50) {
+                    const roMp = roSolved.hourly[hIndex].marginal_plant_ro;
+                    if (roMp && !roMp.includes('Coupled')) {
+                        return `${roMp} 🇷🇴`;
+                    }
+                }
+            }
+        }
+        if (mp.includes('RES Surplus') || mp.includes('Export Floor')) return '☀️ Solar / Nuclear Export Floor 🇧🇬';
+        if (mp.includes('Maritsa') || mp.includes('AES') || mp.includes('Bobov')) return `⛏️ ${mp} 🇧🇬`;
+        if (mp.includes('Kozloduy')) return `⚛️ ${mp} 🇧🇬`;
+        if (mp.includes('Belmeken') || mp.includes('Chaira') || mp.includes('Cascade')) return `💧 ${mp} 🇧🇬`;
+        if (mp.includes('Emergency') || mp.includes('Reserve') || mp.includes('Scarcity')) return `🚨 ${mp} 🇧🇬`;
+        return mp ? `${mp} 🇧🇬` : 'Bulgarian Thermal Fleet 🇧🇬';
+    }
+
+    // 3. Romania (RO)
+    if (zone === 'RO') {
+        if (d.flow_hu > 100) {
+            let huSolved = null;
+            try {
+                if (window._solveHUCache && window._solveHUCache[targetDate]) {
+                    huSolved = window._solveHUCache[targetDate];
+                } else if (typeof solveHUForecast === 'function') {
+                    huSolved = solveHUForecast(targetDate);
+                }
+            } catch (e) {}
+            if (huSolved && huSolved.hourly && huSolved.hourly[hIndex]) {
+                const huP = huSolved.hourly[hIndex].model_price_hu;
+                const roP = d.model_price_ro;
+                if (Math.abs(huP - roP) <= 0.50) {
+                    const huMp = huSolved.hourly[hIndex].marginal_plant_hu;
+                    if (huMp && !huMp.includes('Coupled')) {
+                        return `${huMp} 🇭🇺`;
+                    }
+                }
+            }
+        }
+        if (mp.includes('Cernavoda')) return `⚛️ ${mp} 🇷🇴`;
+        if (mp.includes('Turceni') || mp.includes('Rovinari') || mp.includes('Lignite')) return `⛏️ ${mp} 🇷🇴`;
+        if (mp.includes('Brazi') || mp.includes('Iernut') || mp.includes('CCGT')) return `🔥 ${mp} 🇷🇴`;
+        if (mp.includes('Hydro') || mp.includes('Iron Gates')) return `💧 ${mp} 🇷🇴`;
+        return mp ? `${mp} 🇷🇴` : 'Romanian Fleet 🇷🇴';
+    }
+
+    // 4. Hungary (HU)
+    if (zone === 'HU') {
+        if (mp.includes('Paks')) return `⚛️ ${mp} 🇭🇺`;
+        if (mp.includes('Matra')) return `⛏️ ${mp} 🇭🇺`;
+        if (mp.includes('Dunamenti') || mp.includes('Gonyu') || mp.includes('CCGT')) return `🔥 ${mp} 🇭🇺`;
+        return mp ? `${mp} 🇭🇺` : 'Hungarian Fleet 🇭🇺';
+    }
+
+    // 5. Germany / Austria / Italy / Others
+    const flag = zone === 'DE_LU' ? '🇩🇪' : zone === 'AT' ? '🇦🇹' : zone === 'IT' ? '🇮🇹' : zone === 'FR' ? '🇫🇷' : zone === 'CH' ? '🇨🇭' : '';
+    return `${mp || 'Thermal Merit Order'} ${flag}`.trim();
+}
+
 function renderOptimizerTable() {
     const tbody = document.getElementById("econ_opt_tbody");
     if (!tbody || !lastSolvedOptimization) return;
 
     const data = lastSolvedOptimization.hourly;
     const zone = lastSolvedOptimization.country || 'GR';
+    const dateInput = document.getElementById("forecast_date") || document.getElementById("econ_date");
+    const targetDate = lastSolvedOptimization.date || (dateInput ? dateInput.value : getTomorrowDateStr());
     let html = '';
 
     const hasActual = data.some(d => {
@@ -19296,16 +19440,24 @@ function renderOptimizerTable() {
         return p !== null && !isNaN(p) && p !== 0;
     });
 
+    const fmtF = (v) => {
+        if (v === undefined || v === null || isNaN(v)) return '0';
+        const r = Math.round(v);
+        return (r > 0 ? '+' : '') + r;
+    };
+
     data.forEach(d => {
-        const netColor = d.net_import_total > 0 ? '#10b981' : d.net_import_total < 0 ? '#f97316' : 'var(--text-muted)';
-        const netSign = d.net_import_total >= 0 ? '+' : '';
+        const netFlow = d.net_import_total || 0;
+        const netColor = netFlow > 0 ? '#10b981' : netFlow < 0 ? '#f97316' : 'var(--text-muted)';
+        const netSign = netFlow > 0 ? '+' : '';
         const delta = optP(d, 'price_delta');
         const actPrice = optP(d, 'actual_price');
         const modelPrice = optP(d, 'model_price') || 0;
         const demand = optD(d, 'demand') || 0;
         const residual = optD(d, 'residual') || 0;
-        const marginalPlant = optP(d, 'marginal_plant') || '—';
-        const solarShare = d.solar_share || 0;
+        const finalDemand = optD(d, 'required_gen') !== undefined ? optD(d, 'required_gen') : (residual - netFlow);
+        const resPct = (demand > 0) ? Math.max(0, Math.min(100, Math.round(((demand - residual) / demand) * 100))) : Math.round((d.solar_share || 0) * 100);
+        const marginalPlantResolved = resolveActualMarginalPlant(zone, d.hour - 1, d, targetDate);
 
         const deltaBadge = (hasActual && delta !== null)
             ? `<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; font-weight:700; background:${Math.abs(delta) <= 15 ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)'}; color:${Math.abs(delta) <= 15 ? '#10b981' : '#f59e0b'};">
@@ -19317,25 +19469,24 @@ function renderOptimizerTable() {
             ? `<div style="font-weight:700; font-family:monospace; color:var(--text-primary); font-size:12px;">${actPrice.toFixed(2)} € ${deltaBadge}</div>`
             : '<span style="color:var(--text-muted); font-style:italic; font-size:11px;">Pending</span>';
 
-        const flowsBreakdown = (optSuffix() === 'ro')
-            ? `HU: ${Math.round(d.flow_hu)} | BG: ${Math.round(d.flow_bg)} | RS: ${Math.round(d.flow_rs)} | UA: ${Math.round(d.flow_ua)}`
-            : (optSuffix() === 'bg'
-                ? `RO: ${Math.round(d.flow_ro)} | GR: ${Math.round(d.flow_gr)} | RS: ${Math.round(d.flow_rs)} | MK: ${Math.round(d.flow_mk)}`
-                : (optSuffix() === 'hu'
-                    ? `AT: ${Math.round(d.flow_at)} | SK: ${Math.round(d.flow_sk)} | RO: ${Math.round(d.flow_ro)} | HR: ${Math.round(d.flow_hr)}`
-                    : (optSuffix() === 'de'
-                        ? `FR: ${Math.round(d.flow_fr)} | NL: ${Math.round(d.flow_nl)} | AT: ${Math.round(d.flow_at)} | CZ: ${Math.round(d.flow_cz)}`
-                        : (optSuffix() === 'at'
-                            ? `DE: ${Math.round(d.flow_de)} | HU: ${Math.round(d.flow_hu)} | IT: ${Math.round(d.flow_it)} | CH: ${Math.round(d.flow_ch)}`
-                            : (optSuffix() === 'ch'
-                                ? `DE: ${Math.round(d.flow_de)} | FR: ${Math.round(d.flow_fr)} | IT: ${Math.round(d.flow_it)} | AT: ${Math.round(d.flow_at)}`
-                                : (optSuffix() === 'it'
-                                    ? `CH: ${Math.round(d.flow_ch)} | AT: ${Math.round(d.flow_at)} | FR: ${Math.round(d.flow_fr)} | GR: ${Math.round(d.flow_gr)}`
-                                    : (optSuffix() === 'fr'
-                                        ? `DE: ${Math.round(d.flow_de)} | CH: ${Math.round(d.flow_ch)} | IT: ${Math.round(d.flow_it)} | BE: ${Math.round(d.flow_be)}`
-                                        : `BG: ${Math.round(d.flow_bg)} | IT: ${Math.round(d.flow_it)} | MK: ${Math.round(d.flow_mk)} | AL: ${Math.round(d.flow_al)}`)))))));
-
-        const rationale = getHourlyDriverRationale(zone, d, modelPrice, demand, residual, solarShare, d.net_import_total);
+        const sfx = optSuffix();
+        const flowsBreakdown = (sfx === 'ro')
+            ? `HU: ${fmtF(d.flow_hu)} | BG: ${fmtF(d.flow_bg)} | RS: ${fmtF(d.flow_rs)} | UA: ${fmtF(d.flow_ua)}`
+            : (sfx === 'bg'
+                ? `RO: ${fmtF(d.flow_ro)} | GR: ${fmtF(d.flow_gr)} | RS: ${fmtF(d.flow_rs)} | MK: ${fmtF(d.flow_mk)}`
+                : (sfx === 'hu'
+                    ? `AT: ${fmtF(d.flow_at)} | SK: ${fmtF(d.flow_sk)} | RO: ${fmtF(d.flow_ro)} | HR: ${fmtF(d.flow_hr)}`
+                    : (sfx === 'de'
+                        ? `FR: ${fmtF(d.flow_fr)} | NL: ${fmtF(d.flow_nl)} | AT: ${fmtF(d.flow_at)} | CZ: ${fmtF(d.flow_cz)}`
+                        : (sfx === 'at'
+                            ? `DE: ${fmtF(d.flow_de)} | HU: ${fmtF(d.flow_hu)} | IT: ${fmtF(d.flow_it)} | CH: ${fmtF(d.flow_ch)}`
+                            : (sfx === 'ch'
+                                ? `DE: ${fmtF(d.flow_de)} | FR: ${fmtF(d.flow_fr)} | IT: ${fmtF(d.flow_it)} | AT: ${fmtF(d.flow_at)}`
+                                : (sfx === 'it'
+                                    ? `CH: ${fmtF(d.flow_ch)} | AT: ${fmtF(d.flow_at)} | FR: ${fmtF(d.flow_fr)} | GR: ${fmtF(d.flow_gr)}`
+                                    : (sfx === 'fr'
+                                        ? `DE: ${fmtF(d.flow_de)} | CH: ${fmtF(d.flow_ch)} | IT: ${fmtF(d.flow_it)} | BE: ${fmtF(d.flow_be)}`
+                                        : `BG: ${fmtF(d.flow_bg)} | IT: ${fmtF(d.flow_it)} | MK: ${fmtF(d.flow_mk)} | AL: ${fmtF(d.flow_al)}`)))))));
 
         html += `
         <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
@@ -19343,34 +19494,32 @@ function renderOptimizerTable() {
                 H${String(d.hour).padStart(2, '0')}<br>
                 <span style="font-size:10px; color:var(--text-muted); font-weight:500;">${String(d.hour-1).padStart(2, '0')}:00</span>
             </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 600; font-family: monospace; color: var(--text-primary); font-size: 12px;">
+                ${Math.round(demand).toLocaleString()}
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 600; font-family: monospace; color: var(--text-primary); font-size: 12px;">
+                ${Math.round(residual).toLocaleString()}
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${resPct >= 50 ? '#059669' : '#0284c7'}; font-size: 12px; font-family: monospace;">
+                ${resPct}%
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${netColor}; font-family: monospace; font-size: 12px;">
+                ${netSign}${Math.round(netFlow).toLocaleString()} MW
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 800; font-family: monospace; color: #4338ca; font-size: 12px;">
+                ${Math.round(finalDemand).toLocaleString()}
+            </td>
+            <td style="padding: 9px 8px; text-align: center; font-size: 11px; color: var(--text-secondary); font-family: monospace;">
+                ${flowsBreakdown}
+            </td>
+            <td style="padding: 9px 10px; font-weight: 600; color: var(--text-primary); font-size: 11.5px;">
+                ${marginalPlantResolved}
+            </td>
             <td style="padding: 9px 8px; text-align: right; font-weight: 800; color: #2563eb; font-size: 13.5px; font-family: monospace;">
                 ${modelPrice.toFixed(2)} €
             </td>
             <td style="padding: 9px 8px; text-align: right;">
                 ${actPriceText}
-            </td>
-            <td style="padding: 9px 10px;">
-                <span style="display:inline-block; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; background:${rationale.bg}; color:${rationale.color}; border:1px solid ${rationale.border}; margin-bottom:3px;">
-                    ${rationale.badge}
-                </span>
-                <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.25;">
-                    ${rationale.text}
-                </div>
-            </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${netColor}; font-family: monospace; font-size: 12px;">
-                ${netSign}${d.net_import_total.toFixed(0)} MW
-            </td>
-            <td style="padding: 9px 8px; text-align: center; font-size: 11px; color: var(--text-secondary); font-family: monospace;">
-                ${flowsBreakdown}
-            </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 600; color: var(--text-primary); font-family: monospace; font-size: 12px;">
-                ${residual.toFixed(0)}
-            </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: #0284c7; font-size: 12px;">
-                ${(solarShare * 100).toFixed(0)}%
-            </td>
-            <td style="padding: 9px 10px; font-weight: 600; color: var(--text-primary); font-size: 11.5px;">
-                ${marginalPlant}
             </td>
         </tr>
         `;
