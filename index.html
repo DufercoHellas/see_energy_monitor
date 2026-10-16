@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 11:00</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 12:11</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 11:00
+                Last DB Audit: 2026-10-16 12:11
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12222,7 +12222,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 11:00";
+                const currentBuildTime = "2026-10-16 12:11";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13739,6 +13739,151 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
 }
 
 
+// === engine/market_coupling.js ===
+// ── Engine Module: Market Splitting & Corridor Consensus ─────────────────────
+// Implements SDAC EUPHEMIA-style dynamic market splitting across the SEE transmission chain:
+// HU <-> RO <-> BG <-> GR
+//
+// When border transmission corridors are uncongested, borders merge into
+// single price clusters (Connected Components) with 1 shared clearing price (0.00 EUR spread).
+// When transmission corridors congest (e.g. midday Greek solar exports, Danube flow-gates),
+// the chain breaks, isolating the decoupled zones into separate price clusters.
+
+window._corridorMarketSplitCache = window._corridorMarketSplitCache || {};
+
+function resolveCorridorMarketSplitting(targetDate) {
+    if (!targetDate) return false;
+    window._corridorMarketSplitCache = window._corridorMarketSplitCache || {};
+    if (window._corridorMarketSplitCache[targetDate]) {
+        return true;
+    }
+    // Set lock to prevent recursion while individual zonal solves run
+    window._corridorMarketSplitCache[targetDate] = true;
+
+    // 1. Ensure all 4 raw zonal solutions are computed
+    const grOpt = (typeof solveGRForecast === 'function') ? solveGRForecast(targetDate, true) : null;
+    const bgOpt = (typeof solveBGForecast === 'function') ? solveBGForecast(targetDate, true) : null;
+    const roOpt = (typeof solveROForecast === 'function') ? solveROForecast(targetDate, true) : null;
+    const huOpt = (typeof solveHUForecast === 'function') ? solveHUForecast(targetDate, true) : null;
+
+    if (!grOpt || !bgOpt || !roOpt || !huOpt || !grOpt.hourly || !bgOpt.hourly || !roOpt.hourly || !huOpt.hourly) {
+        return false;
+    }
+
+    const zones = ['HU', 'RO', 'BG', 'GR'];
+    const optMap = { HU: huOpt, RO: roOpt, BG: bgOpt, GR: grOpt };
+    const priceKey = { HU: 'model_price_hu', RO: 'model_price_ro', BG: 'model_price_bg', GR: 'model_price_gr' };
+    const actKey = { HU: 'actual_price_hu', RO: 'actual_price_ro', BG: 'actual_price_bg', GR: 'actual_price_gr' };
+    const deltaKey = { HU: 'price_delta_hu', RO: 'price_delta_ro', BG: 'price_delta_bg', GR: 'price_delta_gr' };
+
+    // Helper: Graph Connected Components for an undirected graph
+    function getConnectedComponents(nodes, edges) {
+        const adj = {};
+        nodes.forEach(n => { adj[n] = []; });
+        edges.forEach(([u, v]) => {
+            if (adj[u]) adj[u].push(v);
+            if (adj[v]) adj[v].push(u);
+        });
+        const visited = new Set();
+        const components = [];
+        nodes.forEach(node => {
+            if (!visited.has(node)) {
+                const comp = [];
+                const queue = [node];
+                visited.add(node);
+                while (queue.length > 0) {
+                    const curr = queue.shift();
+                    comp.push(curr);
+                    adj[curr].forEach(neighbor => {
+                        if (!visited.has(neighbor)) {
+                            visited.add(neighbor);
+                            queue.push(neighbor);
+                        }
+                    });
+                }
+                components.push(comp);
+            }
+        });
+        return components;
+    }
+
+    // 2. Evaluate each hour h in 0..23
+    for (let h = 0; h < 24; h++) {
+        const pHU = huOpt.hourly[h] ? huOpt.hourly[h].model_price_hu : null;
+        const pRO = roOpt.hourly[h] ? roOpt.hourly[h].model_price_ro : null;
+        const pBG = bgOpt.hourly[h] ? bgOpt.hourly[h].model_price_bg : null;
+        const pGR = grOpt.hourly[h] ? grOpt.hourly[h].model_price_gr : null;
+
+        if (pHU === null || pRO === null || pBG === null || pGR === null) continue;
+
+        const isSolarWindow = (h >= 8 && h <= 15); // H09-H16 CET
+
+        // Evaluate the 3 links in the corridor chain: HU <-> RO <-> BG <-> GR
+        const edges = [];
+
+        // Link 1: HU <-> RO (couples tightly on non-extreme hours)
+        const dHU_RO = Math.abs(pHU - pRO);
+        if (dHU_RO <= 6.0) {
+            edges.push(['HU', 'RO']);
+        }
+
+        // Link 2: RO <-> BG (Danube corridor: 2,000+ MW capacity)
+        const dRO_BG = Math.abs(pRO - pBG);
+        if (dRO_BG <= 8.0) {
+            edges.push(['RO', 'BG']);
+        }
+
+        // Link 3: BG <-> GR
+        // Outside solar window, BG & GR couple ~85% of time (tolerance up to 12 EUR)
+        // In solar window (H9-H16), Greek solar exports frequently congest the cable, so link breaks if spread > 5 EUR
+        const dBG_GR = Math.abs(pBG - pGR);
+        const grBgTol = isSolarWindow ? 5.0 : 12.0;
+        if (dBG_GR <= grBgTol) {
+            edges.push(['BG', 'GR']);
+        }
+
+        // 3. Resolve Connected Components (Price Clusters)
+        const clusters = getConnectedComponents(zones, edges);
+
+        // 4. Equalize prices within each cluster
+        clusters.forEach(comp => {
+            const isCoupled = comp.length > 1;
+            const clusterLabel = comp.length === 4
+                ? 'Regional Cluster [HU-RO-BG-GR]'
+                : comp.length > 1
+                    ? 'Cluster [' + comp.join('-') + ']'
+                    : 'Decoupled';
+
+            let sharedPrice;
+            if (isCoupled) {
+                let sumP = 0;
+                comp.forEach(z => { sumP += optMap[z].hourly[h][priceKey[z]]; });
+                sharedPrice = Math.round((sumP / comp.length) * 100) / 100;
+            }
+
+            comp.forEach(z => {
+                const hourObj = optMap[z].hourly[h];
+                if (isCoupled) {
+                    hourObj[priceKey[z]] = sharedPrice;
+                    const act = hourObj[actKey[z]];
+                    if (act !== null && act !== undefined && !isNaN(act)) {
+                        hourObj[deltaKey[z]] = Math.round((sharedPrice - act) * 100) / 100;
+                    }
+                    if (z === 'GR' && hourObj.regional_anchor != null) {
+                        hourObj.pred_spread = Math.round((sharedPrice - hourObj.regional_anchor) * 100) / 100;
+                    }
+                }
+                hourObj.is_coupled = isCoupled;
+                hourObj.cluster_label = clusterLabel;
+                hourObj.cluster_members = comp;
+            });
+        });
+    }
+
+    return true;
+}
+
+
 // === engine/solvers/solver_hu.js ===
 // ── Engine Solver: Hungary (HU) ────────────────────────────────────────────
 // ── HUNGARY (HU) COUPLED MERIT ORDER DISPATCH OPTIMIZER ────────────────────
@@ -13831,9 +13976,14 @@ function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, flee
     };
 }
 
-function solveHUForecast(targetDate) {
+function solveHUForecast(targetDate, skipSplitting) {
     window._solveHUCache = window._solveHUCache || {};
-    if (window._solveHUCache[targetDate]) return window._solveHUCache[targetDate];
+    if (window._solveHUCache[targetDate]) {
+        if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+            resolveCorridorMarketSplitting(targetDate);
+        }
+        return window._solveHUCache[targetDate];
+    }
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
     if (!hist || !hist.HU) return null;
@@ -14059,6 +14209,9 @@ function solveHUForecast(targetDate) {
         fleetGR: []
     };
     window._solveHUCache[targetDate] = huOptResult;
+    if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+        resolveCorridorMarketSplitting(targetDate);
+    }
     return huOptResult;
 }
 
@@ -14096,24 +14249,10 @@ function runCoupledMeritOrderOptimizerHU(targetDate) {
 
 // === engine/solvers/solver_ro.js ===
 // ── Engine Solver: Romania (RO) ────────────────────────────────────────────
-function solveROForecast(targetDate) {
-    window._solveROCache = window._solveROCache || {};
-    if (window._solveROCache[targetDate]) return window._solveROCache[targetDate];
-    const prev = window._engineComputeOnly;
-    window._engineComputeOnly = true;
-    runCoupledMeritOrderOptimizerRO(targetDate);
-    const res = window.lastSolvedOptimization;
-    window._engineComputeOnly = prev;
-    if (res) window._solveROCache[targetDate] = res;
-    return res;
-}
-
-function runCoupledMeritOrderOptimizerRO(targetDate) {
-    applyOptimizerLabels('RO');
-
+function _computeROForecast(targetDate) {
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
-    if (!hist || !hist.RO) return;
+    if (!hist || !hist.RO) return null;
 
     // 2. Fetch commodity prices
     let ttfPrice = 0.0;
@@ -14142,14 +14281,7 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
     const bgEntry = hist.BG && hist.BG[targetDate];
 
     const roResiduals = _getEngineResiduals(roEntry, targetDate, targetDate);
-    if (!roEntry || !roResiduals) {
-        const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (!window._engineComputeOnly && profileContainer) {
-            if (window.Plotly) Plotly.purge(profileContainer);
-            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Romania on this date.</div>';
-        }
-        return;
-    }
+    if (!roEntry || !roResiduals) return null;
 
     const roDemand = _getEngineField(roEntry, 'demand', targetDate, targetDate) || roEntry.demand || [];
     const roActualPrices = roEntry.prices || [];
@@ -14545,22 +14677,47 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
         }
     }
 
-    lastSolvedOptimization = window.lastSolvedOptimization = {
+    return {
         date: targetDate,
         country: 'RO',
         ntcHU: 1500,
         fleetRO: activeFleetRO,
         hourly: hourlyResults
     };
+}
 
-    // Render 24h Profile Chart
-    if (window._engineComputeOnly) return lastSolvedOptimization;
+function solveROForecast(targetDate, skipSplitting) {
+    window._solveROCache = window._solveROCache || {};
+    if (window._solveROCache[targetDate]) {
+        if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+            resolveCorridorMarketSplitting(targetDate);
+        }
+        return window._solveROCache[targetDate];
+    }
+    const res = _computeROForecast(targetDate);
+    if (res) window._solveROCache[targetDate] = res;
+    if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+        resolveCorridorMarketSplitting(targetDate);
+    }
+    return res;
+}
+
+function runCoupledMeritOrderOptimizerRO(targetDate) {
+    applyOptimizerLabels('RO');
+    const solved = solveROForecast(targetDate);
+    const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
+    if (!solved) {
+        if (!window._engineComputeOnly && profileContainer) {
+            if (window.Plotly) Plotly.purge(profileContainer);
+            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Romania on this date.</div>';
+        }
+        return null;
+    }
+    lastSolvedOptimization = window.lastSolvedOptimization = solved;
+    if (window._engineComputeOnly) return solved;
+
     render24hOptimizerProfileChart();
-
-    // Render Selected Hour Merit Curve & Cards
     renderSelectedHourDetails();
-
-    // Render 24h Breakdown Table
     renderOptimizerTable();
 
     setTimeout(() => {
@@ -14571,6 +14728,7 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
             if (p2) Plotly.Plots.resize(p2);
         }
     }, 50);
+    return solved;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -14578,12 +14736,10 @@ function runCoupledMeritOrderOptimizerRO(targetDate) {
 
 // === engine/solvers/solver_bg.js ===
 // ── Engine Solver: Bulgaria (BG) ───────────────────────────────────────────
-function runCoupledMeritOrderOptimizerBG(targetDate) {
-    applyOptimizerLabels('BG');
-
+function _computeBGForecast(targetDate) {
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
-    if (!hist || !hist.BG) return;
+    if (!hist || !hist.BG) return null;
 
     // 2. Fetch commodity prices
     let ttfPrice = 0.0;
@@ -14613,14 +14769,7 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
     const huEntry = hist.HU && hist.HU[targetDate];
 
     const bgResiduals = _getEngineResiduals(bgEntry, targetDate, targetDate);
-    if (!bgEntry || !bgResiduals) {
-        const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (!window._engineComputeOnly && profileContainer) {
-            if (window.Plotly) Plotly.purge(profileContainer);
-            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Bulgaria on this date.</div>';
-        }
-        return;
-    }
+    if (!bgEntry || !bgResiduals) return null;
 
     const bgDemand = _getEngineField(bgEntry, 'demand', targetDate, targetDate) || bgEntry.demand || [];
     const bgActualPrices = bgEntry.prices || [];
@@ -15079,15 +15228,45 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
 
     applyDailyLevelEnsemble(hourlyResults, 'BG', targetDate, ttfPrice, euaPrice);
 
-    lastSolvedOptimization = window.lastSolvedOptimization = {
+    return {
         country: 'BG',
         targetDate: targetDate,
         hourly: hourlyResults,
         fleetBG: activeFleetBG,
         fleetGR: []
     };
+}
 
-    if (window._engineComputeOnly) return;
+function solveBGForecast(targetDate, skipSplitting) {
+    window._solveBGCache = window._solveBGCache || {};
+    if (window._solveBGCache[targetDate]) {
+        if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+            resolveCorridorMarketSplitting(targetDate);
+        }
+        return window._solveBGCache[targetDate];
+    }
+    const res = _computeBGForecast(targetDate);
+    if (res) window._solveBGCache[targetDate] = res;
+    if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+        resolveCorridorMarketSplitting(targetDate);
+    }
+    return res;
+}
+
+function runCoupledMeritOrderOptimizerBG(targetDate) {
+    applyOptimizerLabels('BG');
+    const solved = solveBGForecast(targetDate);
+    const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
+    if (!solved) {
+        if (!window._engineComputeOnly && profileContainer) {
+            if (window.Plotly) Plotly.purge(profileContainer);
+            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Bulgaria on this date.</div>';
+        }
+        return null;
+    }
+    lastSolvedOptimization = window.lastSolvedOptimization = solved;
+    if (window._engineComputeOnly) return solved;
+
     render24hOptimizerProfileChart();
     renderSelectedHourDetails();
     renderOptimizerTable();
@@ -15100,6 +15279,7 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
             if (p2) Plotly.Plots.resize(p2);
         }
     }, 50);
+    return solved;
 }
 
 
@@ -15107,7 +15287,6 @@ function runCoupledMeritOrderOptimizerBG(targetDate) {
 // === engine/solvers/solver_gr.js ===
 // ── Engine Solvers: Coupled Merit Order Clearing ─────────────────────────────
 // Dispatches GR, BG, RO, HU zonal fleets and simulates multi-border SDAC flows.
-
 
 function runCoupledMeritOrderOptimizer() {
     if (!window._engineComputeOnly) populateOptHourSelector();
@@ -15147,14 +15326,21 @@ function runCoupledMeritOrderOptimizer() {
         return runCoupledMeritOrderOptimizerFR(targetDate);
     }
 
-    applyOptimizerLabels('GR');
+    return runCoupledMeritOrderOptimizerGR(targetDate);
+}
 
-    const ntcInput = document.getElementById("econ_opt_ntc");
+function _computeGRForecast(targetDate) {
+    if (!targetDate) {
+        const di = (typeof document !== 'undefined' && document.getElementById) ? (document.getElementById("forecast_date") || document.getElementById("econ_date")) : null;
+        targetDate = di ? di.value : getTomorrowDateStr();
+    }
+
+    const ntcInput = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById("econ_opt_ntc") : null;
     const ntcLimitBG = ntcInput ? parseFloat(ntcInput.value) || 1400 : 1400;
 
     const hist = window.historicalData;
     if (typeof computeDynamicCalibration === 'function') computeDynamicCalibration(targetDate);
-    if (!hist || !hist.GR) return;
+    if (!hist || !hist.GR) return null;
 
     // Fetch commodity prices
     let ttfPrice = 0.0;
@@ -15185,14 +15371,7 @@ function runCoupledMeritOrderOptimizer() {
     const roEntry = hist.RO && hist.RO[targetDate];
 
     const grResiduals = _getEngineResiduals(grEntry, targetDate, targetDate);
-    if (!grEntry || !grResiduals) {
-        const profileContainer = document.getElementById("plot_econ_opt_24h_profile");
-        if (!window._engineComputeOnly && profileContainer) {
-            if (window.Plotly) Plotly.purge(profileContainer);
-            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Greece on this date.</div>';
-        }
-        return;
-    }
+    if (!grEntry || !grResiduals) return null;
 
     const grDemand = _getEngineField(grEntry, 'demand', targetDate, targetDate) || grEntry.demand || [];
     const grSolar = _getEngineField(grEntry, 'solar', targetDate, targetDate) || grEntry.solar || [];
@@ -16000,7 +16179,7 @@ function runCoupledMeritOrderOptimizer() {
         }
     });
 
-    lastSolvedOptimization = window.lastSolvedOptimization = {
+    return {
         date: targetDate,
         country: 'GR',
         ntcBG: ntcLimitBG,
@@ -16008,18 +16187,46 @@ function runCoupledMeritOrderOptimizer() {
         hourlyFleetsGR: hourlyFleetsGR,
         hourly: hourlyResults
     };
+}
 
-    // Render 24h Profile Chart
-    if (window._engineComputeOnly) return;
+function solveGRForecast(targetDate, skipSplitting) {
+    window._solveGRCache = window._solveGRCache || {};
+    if (window._solveGRCache[targetDate]) {
+        if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+            resolveCorridorMarketSplitting(targetDate);
+        }
+        return window._solveGRCache[targetDate];
+    }
+    const res = _computeGRForecast(targetDate);
+    if (res) window._solveGRCache[targetDate] = res;
+    if (!skipSplitting && typeof resolveCorridorMarketSplitting === 'function') {
+        resolveCorridorMarketSplitting(targetDate);
+    }
+    return res;
+}
+
+function runCoupledMeritOrderOptimizerGR(targetDate) {
+    if (!targetDate) {
+        const di = (typeof document !== 'undefined' && document.getElementById) ? (document.getElementById("forecast_date") || document.getElementById("econ_date")) : null;
+        targetDate = di ? di.value : getTomorrowDateStr();
+    }
+    applyOptimizerLabels('GR');
+    const solved = solveGRForecast(targetDate);
+    const profileContainer = (typeof document !== 'undefined' && document.getElementById) ? document.getElementById("plot_econ_opt_24h_profile") : null;
+    if (!solved) {
+        if (!window._engineComputeOnly && profileContainer) {
+            if (window.Plotly) Plotly.purge(profileContainer);
+            profileContainer.innerHTML = '<div style="text-align:center; padding:50px; color:var(--text-muted);">No hourly forecast residual data found for Greece on this date.</div>';
+        }
+        return null;
+    }
+    lastSolvedOptimization = window.lastSolvedOptimization = solved;
+    if (window._engineComputeOnly) return solved;
+
     render24hOptimizerProfileChart();
-
-    // Render Selected Hour Merit Curve & Cards
     renderSelectedHourDetails();
-
-    // Render 24h Breakdown Table
     renderOptimizerTable();
 
-    // Ensure Plotly plots resize to actual container dimensions after DOM paint
     setTimeout(() => {
         const p1 = document.getElementById("plot_econ_opt_24h_profile");
         const p2 = document.getElementById("plot_econ_opt_merit_curve");
@@ -16028,6 +16235,7 @@ function runCoupledMeritOrderOptimizer() {
             if (p2) Plotly.Plots.resize(p2);
         }
     }, 50);
+    return solved;
 }
 
 
@@ -18930,14 +19138,18 @@ function renderSelectedHourDetails() {
 
     const badgeEl = document.getElementById("econ_opt_hour_badge");
     if (badgeEl) {
-        if (hourData.is_coupled) {
+        if (hourData.cluster_label && hourData.cluster_label !== 'Decoupled') {
+            badgeEl.style.background = "rgba(16, 185, 129, 0.15)";
+            badgeEl.style.color = "#10b981";
+            badgeEl.innerText = `🟢 ${hourData.cluster_label} (0.00 € spread)`;
+        } else if (hourData.is_coupled) {
             badgeEl.style.background = "rgba(16, 185, 129, 0.15)";
             badgeEl.style.color = "#10b981";
             badgeEl.innerText = optIsRegional() ? "🟢 Regional Coupled" : "🟢 Multi-Border Coupled";
         } else {
             badgeEl.style.background = "rgba(59, 130, 246, 0.15)";
             badgeEl.style.color = "#3b82f6";
-            badgeEl.innerText = "🔵 Balanced Flow";
+            badgeEl.innerText = "🔵 Decoupled (Independent Dispatch)";
         }
     }
 
@@ -19345,6 +19557,10 @@ function renderOptimizerTable() {
                                         ? `${Math.round(d.flow_de)} / ${Math.round(d.flow_ch)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_be)}`
                                         : `${Math.round(d.flow_bg)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_mk)} / ${Math.round(d.flow_al)}`)))))));
 
+        const clusterPill = (d.cluster_label && d.cluster_label !== 'Decoupled')
+            ? `<span title="${d.cluster_label}" style="display:inline-block; font-size:10px; padding:1px 5px; border-radius:3px; background:rgba(16,185,129,0.12); color:#10b981; font-weight:700; margin-left:4px;">${d.cluster_label.replace('Regional Cluster ', '').replace('Cluster ', '')}</span>`
+            : '';
+
         html += `
         <tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;" onclick="document.getElementById('econ_opt_hour').value='${d.hour}'; onOptHourChange();" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
             <td style="padding: 8px 8px; text-align: center; font-weight: 700; color: var(--text-primary);">H${String(d.hour).padStart(2, '0')}</td>
@@ -19354,7 +19570,7 @@ function renderOptimizerTable() {
             <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: ${netColor};">${netSign}${d.net_import_total.toFixed(0)}</td>
             <td style="padding: 8px 8px; text-align: center; font-size: 11px; color: var(--text-secondary);">${flowsBreakdown}</td>
             <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: #2563eb;">${reqGen.toFixed(0)}</td>
-            <td style="padding: 8px 8px; font-weight: 600; color: var(--text-primary); font-size: 11px;">${marginalPlant}</td>
+            <td style="padding: 8px 8px; font-weight: 600; color: var(--text-primary); font-size: 11px;">${marginalPlant}${clusterPill}</td>
             <td style="padding: 8px 8px; text-align: right; font-weight: 800; color: #2563eb; font-size: 13px;">${modelPrice.toFixed(2)} €</td>
             <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: var(--text-primary);">${actPriceText}</td>
             <td style="padding: 8px 8px; text-align: right;">${deltaText}</td>
