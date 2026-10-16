@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:48</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:57</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 13:48
+                Last DB Audit: 2026-10-16 13:57
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -3386,19 +3386,20 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
         </div>
 
         <div class="table-container" style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: inherit;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 13px; font-family: inherit;">
                 <thead>
                     <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
                         <th style="padding: 10px 8px; font-weight: 700; text-align: center; width: 65px;">Hour</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 95px;">DEMAND (MW)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 95px;">Residuals (MW)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 75px;">RES %</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 105px;">NET FLOW (MW)</th>
-                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; width: 110px; color: #4338ca;">Final DEMAND (MW)</th>
-                        <th id="econ_opt_th_cables" style="padding: 10px 8px; font-weight: 700; text-align: center; min-width: 190px;">BG / IT / MK / AL (MW)</th>
-                        <th style="padding: 10px 10px; font-weight: 700; min-width: 220px;">Marginal Plant</th>
-                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #2563eb; width: 105px;">Model Price (€)</th>
-                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 115px;">Spot Price (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 90px;">DEMAND (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 90px;">Residuals (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 70px;">RES %</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 100px;">NET FLOW (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; width: 105px; color: #4338ca;">Final DEMAND (MW)</th>
+                        <th id="econ_opt_th_cables" style="padding: 10px 8px; font-weight: 700; text-align: center; width: 170px; min-width: 170px;">BG / IT / MK / AL (MW)</th>
+                        <th style="padding: 10px 10px; font-weight: 700; min-width: 230px;">Corridor Coupling Topology</th>
+                        <th style="padding: 10px 10px; font-weight: 700; min-width: 210px;">Marginal Plant</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #2563eb; width: 100px;">Model Price (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 110px;">Spot Price (€)</th>
                     </tr>
                 </thead>
                 <tbody id="econ_opt_tbody">
@@ -12204,7 +12205,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 13:48";
+                const currentBuildTime = "2026-10-16 13:57";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19544,6 +19545,139 @@ function makeCorridorLinkBadge(borderLabel, p1, p2, zone1, zone2) {
     </div>`;
 }
 
+function getCorridorTopologyBadge(targetDate, hIndex) {
+    let huRes = null, roRes = null, bgRes = null, grRes = null;
+    try {
+        huRes = (window._solveHUCache && window._solveHUCache[targetDate]) || ((typeof solveHUForecast === 'function') ? solveHUForecast(targetDate) : null);
+        roRes = (window._solveROCache && window._solveROCache[targetDate]) || ((typeof solveROForecast === 'function') ? solveROForecast(targetDate) : null);
+        bgRes = (window._solveBGCache && window._solveBGCache[targetDate]) || ((typeof solveBGForecast === 'function') ? solveBGForecast(targetDate) : null);
+        grRes = (window._solveGRCache && window._solveGRCache[targetDate]) || ((typeof solveGRForecast === 'function') ? solveGRForecast(targetDate) : null);
+    } catch (e) {}
+
+    if (!huRes || !roRes || !bgRes || !grRes || !huRes.hourly || !roRes.hourly || !bgRes.hourly || !grRes.hourly) {
+        return '<span style="color:var(--text-muted); font-size:11px;">Corridor Pending</span>';
+    }
+
+    const huP = huRes.hourly[hIndex] ? huRes.hourly[hIndex].model_price_hu : 0;
+    const roP = roRes.hourly[hIndex] ? roRes.hourly[hIndex].model_price_ro : 0;
+    const bgP = bgRes.hourly[hIndex] ? bgRes.hourly[hIndex].model_price_bg : 0;
+    const grP = grRes.hourly[hIndex] ? grRes.hourly[hIndex].model_price_gr : 0;
+
+    const hu_ro_spread = Math.abs(huP - roP);
+    const ro_bg_spread = Math.abs(roP - bgP);
+    const bg_gr_spread = Math.abs(bgP - grP);
+
+    const c1 = hu_ro_spread <= 0.50;
+    const c2 = ro_bg_spread <= 0.50;
+    const c3 = bg_gr_spread <= 0.50;
+
+    if (c1 && c2 && c3) {
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 2px 8px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35); font-weight: 800; font-size: 11px;">
+                <span style="font-size: 8px;">●</span> HU ═ RO ═ BG ═ GR
+            </div>
+            <div style="font-size: 10.5px; color: #10b981; font-weight: 600;">✓ Full SDAC Consensus (1 Price Pool)</div>
+        </div>`;
+    }
+
+    if (c1 && c2 && !c3) {
+        const grDiff = grP - bgP;
+        const diffText = grDiff < 0 ? `GR -${Math.abs(grDiff).toFixed(1)}€` : `GR +${grDiff.toFixed(1)}€`;
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">HU ═ RO ═ BG</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="BG-GR Congested">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">Balkan Pool Consensus · GR Decoupled (${diffText})</div>
+        </div>`;
+    }
+
+    if (!c1 && c2 && c3) {
+        const huDiff = huP - roP;
+        const diffText = huDiff > 0 ? `HU +${huDiff.toFixed(1)}€` : `HU -${Math.abs(huDiff).toFixed(1)}€`;
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="HU-RO Congested">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">RO ═ BG ═ GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">South Balkan Pool · HU Decoupled (${diffText})</div>
+        </div>`;
+    }
+
+    if (c1 && !c2 && c3) {
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(14,165,233,0.15); color: #0284c7; border: 1px solid rgba(14,165,233,0.3); font-weight: 800; font-size: 11px;">HU ═ RO</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="RO-BG Danube Congested">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); font-weight: 800; font-size: 11px;">BG ═ GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">Danube Congestion Split (RO-BG Δ ${ro_bg_spread.toFixed(1)}€)</div>
+        </div>`;
+    }
+
+    if (!c1 && c2 && !c3) {
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">RO ═ BG</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">Central Corridor (RO=BG) · Dual Border Decoupling</div>
+        </div>`;
+    }
+
+    if (c1 && !c2 && !c3) {
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(14,165,233,0.15); color: #0284c7; border: 1px solid rgba(14,165,233,0.3); font-weight: 800; font-size: 11px;">HU ═ RO</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(20,184,166,0.15); color: #0d9488; border: 1px solid rgba(20,184,166,0.3); font-weight: 800; font-size: 11px;">BG</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">North Coupled (HU=RO) · South Corridor Decoupled</div>
+        </div>`;
+    }
+
+    if (!c1 && !c2 && c3) {
+        return `
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="display: inline-flex; align-items: center; gap: 5px;">
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); font-weight: 800; font-size: 11px;">RO</span>
+                <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
+                <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">BG ═ GR</span>
+            </div>
+            <div style="font-size: 10.5px; color: var(--text-secondary);">South Coupled (BG=GR) · North Corridor Decoupled</div>
+        </div>`;
+    }
+
+    return `
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+        <div style="display: inline-flex; align-items: center; gap: 4px;">
+            <span style="display: inline-flex; align-items: center; padding: 2px 5px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">HU</span>
+            <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
+            <span style="display: inline-flex; align-items: center; padding: 2px 5px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">RO</span>
+            <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
+            <span style="display: inline-flex; align-items: center; padding: 2px 5px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">BG</span>
+            <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
+            <span style="display: inline-flex; align-items: center; padding: 2px 5px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">GR</span>
+        </div>
+        <div style="font-size: 10.5px; color: var(--text-muted);">Full Corridor Decoupling · 4 Isolated Pricing Zones</div>
+    </div>`;
+}
+
 function renderOptimizerTable() {
     const tbody = document.getElementById("econ_opt_tbody");
     if (!tbody || !lastSolvedOptimization) return;
@@ -19571,6 +19705,7 @@ function renderOptimizerTable() {
         const finalDemand = optD(d, 'required_gen') !== undefined ? optD(d, 'required_gen') : (residual - netFlow);
         const resPct = (demand > 0) ? Math.max(0, Math.min(100, Math.round(((demand - residual) / demand) * 100))) : Math.round((d.solar_share || 0) * 100);
         const marginalPlantResolved = resolveActualMarginalPlant(zone, d.hour - 1, d, targetDate);
+        const corridorTopologyHtml = getCorridorTopologyBadge(targetDate, d.hour - 1);
 
         const deltaBadge = (hasActual && delta !== null)
             ? `<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; font-weight:700; background:${Math.abs(delta) <= 15 ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)'}; color:${Math.abs(delta) <= 15 ? '#10b981' : '#f59e0b'};">
@@ -19579,43 +19714,46 @@ function renderOptimizerTable() {
             : '';
 
         const actPriceText = (hasActual && actPrice !== null)
-            ? `<div style="font-weight:700; font-family:monospace; color:var(--text-primary); font-size:12px;">${actPrice.toFixed(2)} € ${deltaBadge}</div>`
-            : '<span style="color:var(--text-muted); font-style:italic; font-size:11px;">Pending</span>';
+            ? `<div style="font-weight:700; font-family:monospace; color:var(--text-primary); font-size:13px;">${actPrice.toFixed(2)} € ${deltaBadge}</div>`
+            : '<span style="color:var(--text-muted); font-style:italic; font-size:11.5px;">Pending</span>';
 
         const sfx = optSuffix();
         const flowsGridHtml = renderInterconnectorGrid(sfx, d);
 
         html += `
         <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-            <td style="padding: 9px 8px; text-align: center; font-weight: 700; color: var(--text-primary); font-size: 11.5px;">
+            <td style="padding: 8px 6px; text-align: center; font-weight: 700; color: var(--text-primary); font-size: 12.5px;">
                 H${String(d.hour).padStart(2, '0')}<br>
-                <span style="font-size:10px; color:var(--text-muted); font-weight:500;">${String(d.hour-1).padStart(2, '0')}:00</span>
+                <span style="font-size:11px; color:var(--text-muted); font-weight:500;">${String(d.hour-1).padStart(2, '0')}:00</span>
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 600; font-family: monospace; color: var(--text-primary); font-size: 12px;">
+            <td style="padding: 8px 6px; text-align: right; font-weight: 700; font-family: monospace; color: var(--text-primary); font-size: 13px;">
                 ${Math.round(demand).toLocaleString()}
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 600; font-family: monospace; color: var(--text-primary); font-size: 12px;">
+            <td style="padding: 8px 6px; text-align: right; font-weight: 700; font-family: monospace; color: var(--text-primary); font-size: 13px;">
                 ${Math.round(residual).toLocaleString()}
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${resPct >= 50 ? '#059669' : '#0284c7'}; font-size: 12px; font-family: monospace;">
+            <td style="padding: 8px 6px; text-align: right; font-weight: 800; color: ${resPct >= 50 ? '#059669' : '#0284c7'}; font-size: 13px; font-family: monospace;">
                 ${resPct}%
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${netColor}; font-family: monospace; font-size: 12px;">
-                ${netSign}${Math.round(netFlow).toLocaleString()} MW
+            <td style="padding: 8px 6px; text-align: right; font-weight: 800; color: ${netColor}; font-family: monospace; font-size: 13px;">
+                ${netSign}${Math.round(netFlow).toLocaleString()}
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 800; font-family: monospace; color: #4338ca; font-size: 12px;">
+            <td style="padding: 8px 6px; text-align: right; font-weight: 800; font-family: monospace; color: #4338ca; font-size: 13px;">
                 ${Math.round(finalDemand).toLocaleString()}
             </td>
-            <td style="padding: 6px 6px; text-align: center;">
+            <td style="padding: 6px 4px; text-align: center;">
                 ${flowsGridHtml}
             </td>
-            <td style="padding: 9px 10px; font-weight: 600; color: var(--text-primary); font-size: 11.5px;">
+            <td style="padding: 6px 10px;">
+                ${corridorTopologyHtml}
+            </td>
+            <td style="padding: 8px 10px; font-weight: 600; color: var(--text-primary); font-size: 12.5px;">
                 ${marginalPlantResolved}
             </td>
-            <td style="padding: 9px 8px; text-align: right; font-weight: 800; color: #2563eb; font-size: 13.5px; font-family: monospace;">
+            <td style="padding: 8px 6px; text-align: right; font-weight: 800; color: #2563eb; font-size: 14px; font-family: monospace;">
                 ${modelPrice.toFixed(2)} €
             </td>
-            <td style="padding: 9px 8px; text-align: right;">
+            <td style="padding: 8px 6px; text-align: right;">
                 ${actPriceText}
             </td>
         </tr>
@@ -19674,107 +19812,14 @@ function renderCorridorMatrix(targetDate) {
         const ro_bg_spread = Math.abs(roP - bgP);
         const bg_gr_spread = Math.abs(bgP - grP);
 
-        // Coupling tolerance: within 0.50 €/MWh considered coupled
         const c1 = hu_ro_spread <= 0.50;
         const c2 = ro_bg_spread <= 0.50;
         const c3 = bg_gr_spread <= 0.50;
 
-        let clusterHtml = '';
-        if (c1 && c2 && c3) {
-            fullCoupledCount++;
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px; width: fit-content; padding: 2px 9px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35); font-weight: 800; font-size: 11px;">
-                    <span style="font-size: 8px;">●</span> HU ═ RO ═ BG ═ GR
-                </div>
-                <div style="font-size: 10.5px; color: #10b981; font-weight: 600;">✓ Full SDAC Regional Consensus (1 Price Pool)</div>
-            </div>`;
-        } else if (c1 && c2 && !c3) {
-            if (h >= 9 && h <= 15) solarDecoupledCount++;
-            const grDiff = grP - bgP;
-            const diffText = grDiff < 0 ? `GR -${Math.abs(grDiff).toFixed(1)}€` : `GR +${grDiff.toFixed(1)}€`;
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">HU ═ RO ═ BG</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="BG-GR Congested">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">Balkan Pool Consensus · GR Decoupled (${diffText})</div>
-            </div>`;
-        } else if (!c1 && c2 && c3) {
-            const huDiff = huP - roP;
-            const diffText = huDiff > 0 ? `HU +${huDiff.toFixed(1)}€` : `HU -${Math.abs(huDiff).toFixed(1)}€`;
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="HU-RO Congested">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">RO ═ BG ═ GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">South Balkan Pool · HU Decoupled (${diffText})</div>
-            </div>`;
-        } else if (c1 && !c2 && c3) {
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(14,165,233,0.15); color: #0284c7; border: 1px solid rgba(14,165,233,0.3); font-weight: 800; font-size: 11px;">HU ═ RO</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;" title="RO-BG Danube Congested">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(99,102,241,0.15); color: #6366f1; border: 1px solid rgba(99,102,241,0.3); font-weight: 800; font-size: 11px;">BG ═ GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">Danube River Congestion Split (RO-BG Δ ${ro_bg_spread.toFixed(1)}€)</div>
-            </div>`;
-        } else if (!c1 && c2 && !c3) {
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">RO ═ BG</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">Central Corridor (RO=BG) · Dual Border Decoupling</div>
-            </div>`;
-        } else if (c1 && !c2 && !c3) {
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(14,165,233,0.15); color: #0284c7; border: 1px solid rgba(14,165,233,0.3); font-weight: 800; font-size: 11px;">HU ═ RO</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(20,184,166,0.15); color: #0d9488; border: 1px solid rgba(20,184,166,0.3); font-weight: 800; font-size: 11px;">BG</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(6,182,212,0.15); color: #0891b2; border: 1px solid rgba(6,182,212,0.3); font-weight: 800; font-size: 11px;">GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">North Coupled (HU=RO) · South Corridor Decoupled</div>
-            </div>`;
-        } else if (!c1 && !c2 && c3) {
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 5px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(245,158,11,0.15); color: #d97706; border: 1px solid rgba(245,158,11,0.3); font-weight: 800; font-size: 11px;">HU</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); font-weight: 800; font-size: 11px;">RO</span>
-                    <span style="color: #ef4444; font-size: 11px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 7px; border-radius: 5px; background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); font-weight: 800; font-size: 11px;">BG ═ GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-secondary);">South Coupled (BG=GR) · North Corridor Decoupled</div>
-            </div>`;
-        } else {
-            clusterHtml = `
-            <div style="display: flex; flex-direction: column; gap: 2px;">
-                <div style="display: inline-flex; align-items: center; gap: 4px;">
-                    <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">HU</span>
-                    <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">RO</span>
-                    <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">BG</span>
-                    <span style="color: #ef4444; font-size: 10px; font-weight: 900;">⚡</span>
-                    <span style="display: inline-flex; align-items: center; padding: 2px 6px; border-radius: 4px; background: var(--bg-card-subtle); color: var(--text-muted); border: 1px solid var(--border-color); font-weight: 800; font-size: 10px;">GR</span>
-                </div>
-                <div style="font-size: 10.5px; color: var(--text-muted);">Full Corridor Decoupling · 4 Isolated Pricing Zones</div>
-            </div>`;
-        }
+        if (c1 && c2 && c3) fullCoupledCount++;
+        else if (c1 && c2 && !c3 && h >= 9 && h <= 15) solarDecoupledCount++;
+
+        const clusterHtml = getCorridorTopologyBadge(targetDate, h);
 
         const linksHtml = `
         <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
@@ -19806,7 +19851,6 @@ function renderCorridorMatrix(targetDate) {
     const kpiSpread = document.getElementById("corridor_kpi_max_spread");
     if (kpiSpread) kpiSpread.textContent = `${maxSpread.toFixed(1)} €/MWh`;
 }
-
 
 
 // === tabs/cables_matrix.js ===
