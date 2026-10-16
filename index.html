@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:09</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 13:19</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 13:09
+                Last DB Audit: 2026-10-16 13:19
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -3306,169 +3306,98 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
             </div>
         </div>
     </div>
-<!-- ── COUPLED MERIT ORDER DISPATCH OPTIMIZER (METHOD 1) ── -->
-    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 30px;">
-        <!-- Optimizer Header & Mode Selectors -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 14px;">
+    <!-- ── EXECUTIVE DAILY KPI CARDS ── -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 20px;">
+        <!-- Card 1: 24h Baseload Forecast vs Spot -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 16px; border-left: 4px solid #2563eb; box-shadow: var(--shadow-sm);">
+            <div id="econ_opt_pred_baseload_title" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">
+                Greece Baseload (24h)
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+                <div id="econ_opt_pred_baseload" style="font-size: 24px; font-weight: 800; color: #2563eb;">-- €/MWh</div>
+                <div id="econ_opt_actual_baseload" style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Spot: --</div>
+            </div>
+            <div id="econ_opt_pred_baseload_sub" style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+                Coupled Consensus Clearing
+            </div>
+        </div>
+
+        <!-- Card 2: Midday Solar Collapse / RES Window -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 16px; border-left: 4px solid #06b6d4; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">
+                ☀️ Solar Window (H10–H15)
+            </div>
+            <div id="econ_opt_solar_kpi_val" style="font-size: 24px; font-weight: 800; color: #0891b2; margin-top: 4px;">-- €/MWh</div>
+            <div id="econ_opt_solar_kpi_sub" style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+                Midday Average / Floor Status
+            </div>
+        </div>
+
+        <!-- Card 3: Evening Scarcity Peak -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 16px; border-left: 4px solid #f59e0b; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">
+                🔥 Evening Peak (H19–H21)
+            </div>
+            <div id="econ_opt_peak_kpi_val" style="font-size: 24px; font-weight: 800; color: #d97706; margin-top: 4px;">-- €/MWh</div>
+            <div id="econ_opt_peak_kpi_sub" style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+                Tight Thermal Margin Window
+            </div>
+        </div>
+
+        <!-- Card 4: SEE Regional Corridor Coupling -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 16px; border-left: 4px solid #10b981; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">
+                🌐 SEE Corridor Consensus
+            </div>
+            <div id="econ_opt_coupling_kpi_val" style="font-size: 24px; font-weight: 800; color: #10b981; margin-top: 4px;">-- / 24 hrs</div>
+            <div id="econ_opt_coupling_kpi_sub" style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">
+                Full Coupling [HU=RO=BG=GR]
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 24-HOUR DAY-AHEAD PRICE PROFILE CHART ── -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📈</span> 24-Hour Day-Ahead Price Profile: Multi-Border Optimizer vs Cleared Spot
+            </div>
+            <div id="econ_opt_summary_metrics" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                <!-- MAE badge -->
+            </div>
+        </div>
+        <div id="plot_econ_opt_24h_profile" style="width: 100%; height: 320px;"></div>
+    </div>
+
+    <!-- ── 24-HOUR MULTI-BORDER DISPATCH & ECONOMIC DRIVER BREAKDOWN ── -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 18px 20px; box-shadow: var(--shadow-sm); margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
             <div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 20px;">🌍</span>
-                    <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0;">
-                        24-Hour Coupled Multi-Border Merit Order Dispatch Optimizer
+                    <span style="font-size: 18px;">📋</span>
+                    <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                        24-Hour Multi-Border Dispatch &amp; Economic Driver Ledger
                     </h3>
                 </div>
-            </div>
-
-            <!-- Hour Selector -->
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card-subtle-2); padding: 4px 10px; border-radius: 8px; border: 1px solid var(--border-color);">
-                    <label for="econ_opt_hour" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Hour to Inspect:</label>
-                    <select id="econ_opt_hour" onchange="onOptHourChange()" style="background: var(--input-bg); border: 1px solid var(--input-border); color: var(--text-primary); padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer;">
-                        <!-- Populated H01 - H24 -->
-                    </select>
+                <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 3px;">
+                    Hour-by-hour commercial dispatch breakdown explaining the fundamental driver, marginal unit, commercial flows, and coupling status behind every clearing price.
                 </div>
             </div>
         </div>
 
-        <!-- Day Average Baseload Forecast & Performance Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #0284c7;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Regional SEE Anchor</div>
-                <div id="econ_opt_regional_anchor" style="font-size: 22px; font-weight: 800; color: #0284c7; margin-top: 4px;">-- €/MWh</div>
-                <div style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Coupled Balkan Baseline</div>
-            </div>
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #10b981;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Predicted GR-BG Spread</div>
-                <div id="econ_opt_pred_spread" style="font-size: 22px; font-weight: 800; color: #10b981; margin-top: 4px;">-- €/MWh</div>
-                <div id="econ_opt_pred_spread_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Cable Congestion Arbitrage</div>
-            </div>
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #2563eb;">
-                <div id="econ_opt_pred_baseload_title" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Greece Forecast (24h)</div>
-                <div id="econ_opt_pred_baseload" style="font-size: 22px; font-weight: 800; color: #2563eb; margin-top: 4px;">-- €/MWh</div>
-                <div id="econ_opt_pred_baseload_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">Anchor + Spread Clearing</div>
-            </div>
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; border-left: 4px solid #f59e0b;">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); font-weight: 700;">Actual Cleared Spot</div>
-                <div id="econ_opt_actual_baseload" style="font-size: 22px; font-weight: 800; color: #f59e0b; margin-top: 4px;">-- €/MWh</div>
-                <div id="econ_opt_actual_baseload_sub" style="font-size: 10.5px; color: var(--text-muted); margin-top: 2px;">HEnEx SDAC Clearing</div>
-            </div>
-        </div>
-
-        <!-- 24-Hour Price Profile Chart: Model Solved vs Day-Ahead Actual -->
-        <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
-                    📈 24-Hour Day-Ahead Price Profile: Multi-Border Optimizer vs Cleared Spot
-                </div>
-                <div id="econ_opt_summary_metrics" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
-                    <!-- e.g. Mean Absolute Error: 9.4 €/MWh -->
-                </div>
-            </div>
-            <div id="plot_econ_opt_24h_profile" style="width: 100%; height: 330px;"></div>
-        </div>
-
-        <!-- Single Hour Inspection: Merit Order Supply Curve with Solved Clearing Point & Net Commercial Flow -->
-        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 20px;" class="opt-hourly-split">
-            <!-- Left: Merit Order Curve for Selected Hour -->
-            <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <div style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
-                        ⚡ <span id="econ_opt_merit_title_country">Greece</span> Merit Order Supply Curve &amp; Dispatch Point (<span id="econ_opt_hour_label">Hour 18</span>)
-                    </div>
-                    <div id="econ_opt_hour_badge" style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">
-                        <!-- e.g. Coupled with Bulgaria -->
-                    </div>
-                </div>
-                <div id="plot_econ_opt_merit_curve" style="width: 100%; height: 350px;"></div>
-            </div>
-
-            <!-- Right: Hourly Clearing Breakdown Cards -->
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <!-- Card 1: Cleared Price vs Market Price -->
-                <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px;">
-                        🎯 Cleared Marginal Price
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 12px;">
-                        <div id="econ_opt_card_price" style="font-size: 26px; font-weight: 900; color: #2563eb;">
-                            —
-                        </div>
-                        <div id="econ_opt_card_actual_price" style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">
-                            Actual Cleared: —
-                        </div>
-                    </div>
-                    <div id="econ_opt_card_marginal_unit" style="font-size: 12px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">
-                        Marginal Unit: —
-                    </div>
-                </div>
-
-                <!-- Card 2: Interconnector Commercial Flows Breakdown -->
-                <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">
-                        🔌 Cross-Border Flows (+ Import / - Export)
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px;">
-                        <div id="econ_opt_card_flow" style="font-size: 22px; font-weight: 800; color: #10b981;">
-                            —
-                        </div>
-                        <div id="econ_opt_card_flow_status" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
-                            Total Net Flow
-                        </div>
-                    </div>
-                    <div id="econ_opt_cable_breakdown" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 11px; border-top: 1px solid var(--border-color); padding-top: 6px;">
-                        <div>🇧🇬 BG: <strong id="econ_flow_bg">—</strong></div>
-                        <div>🇮🇹 IT: <strong id="econ_flow_it">—</strong></div>
-                        <div>🇲🇰 MK: <strong id="econ_flow_mk">—</strong></div>
-                        <div>🇦🇱 AL: <strong id="econ_flow_al">—</strong></div>
-                    </div>
-                </div>
-
-                <!-- Card 3: Domestic Fleet Dispatch Summary -->
-                <div style="background: var(--bg-card-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">
-                        🏭 <span id="econ_opt_fleet_country">Greek</span> Generation &amp; Demand Balance
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: var(--text-secondary);">Total Demand / RES Share:</span>
-                            <strong id="econ_opt_val_dem" style="color: var(--text-primary);">—</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: var(--text-secondary);">Domestic Residual Demand:</span>
-                            <strong id="econ_opt_val_res" style="color: var(--text-primary);">—</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: var(--text-secondary);">Net Border Imports:</span>
-                            <strong id="econ_opt_val_imp" style="color: #10b981;">—</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border-color); padding-top: 4px;">
-                            <span id="econ_opt_req_gen_label" style="color: var(--text-primary); font-weight: 700;">Required Greek Generation:</span>
-                            <strong id="econ_opt_val_gen" style="color: #2563eb;">—</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 24-Hour Detailed Dispatch Results Table -->
         <div class="table-container" style="overflow-x: auto;">
-            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-                📋 24-Hour Multi-Border Dispatch Breakdown
-            </div>
             <table style="width: 100%; border-collapse: collapse; font-size: 12px; font-family: inherit;">
                 <thead>
                     <tr style="background: var(--table-header-bg); color: var(--table-header-color); border-bottom: 2px solid var(--border-color); text-align: left;">
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: center;">Hour</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right;">Demand (MW)</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right;">Residual (MW)</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right;">RES %</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right; color: #10b981;">Net Imports</th>
-                        <th id="econ_opt_th_cables" style="padding: 8px 8px; font-weight: 700; text-align: center;">BG / IT / MK / AL (MW)</th>
-                        <th id="econ_opt_th_req_gen" style="padding: 8px 8px; font-weight: 700; text-align: right; color: #2563eb;">Required Gen</th>
-                        <th style="padding: 8px 8px; font-weight: 700;">Marginal Setting Plant</th>
-                        <th style="padding: 8px 8px; font-weight: 800; text-align: right; color: #2563eb;">Model Price</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right;">Actual Spot</th>
-                        <th style="padding: 8px 8px; font-weight: 700; text-align: right;">Spread</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: center; width: 65px;">Hour</th>
+                        <th style="padding: 10px 8px; font-weight: 800; text-align: right; color: #2563eb; width: 105px;">Model (€)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 110px;">Spot (Spread)</th>
+                        <th style="padding: 10px 10px; font-weight: 800; color: var(--text-primary); min-width: 250px;">Economic Driver &amp; Regime (The "Why")</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 100px;">Net Flow (MW)</th>
+                        <th id="econ_opt_th_cables" style="padding: 10px 8px; font-weight: 700; text-align: center; min-width: 180px;">Interconnectors (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 105px;">Residual (MW)</th>
+                        <th style="padding: 10px 8px; font-weight: 700; text-align: right; width: 80px;">RES %</th>
+                        <th style="padding: 10px 10px; font-weight: 700; min-width: 180px;">Marginal Plant / Setting Unit</th>
                     </tr>
                 </thead>
                 <tbody id="econ_opt_tbody">
@@ -12274,7 +12203,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 13:09";
+                const currentBuildTime = "2026-10-16 13:19";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19177,387 +19106,181 @@ function render24hOptimizerProfileChart() {
 }
 
 function renderSelectedHourDetails() {
-    if (!lastSolvedOptimization) return;
-
-    const isBG = (lastSolvedOptimization && lastSolvedOptimization.country === 'BG');
-    const isRO = (lastSolvedOptimization && lastSolvedOptimization.country === 'RO');
-    const select = document.getElementById("econ_opt_hour");
-    const h = select ? parseInt(select.value) || 18 : 18;
-    const hourData = lastSolvedOptimization.hourly.find(d => d.hour === h) || lastSolvedOptimization.hourly[17];
-
-    const labelEl = document.getElementById("econ_opt_hour_label");
-    if (labelEl) labelEl.innerText = `Hour ${String(h).padStart(2, '0')}`;
-
-    const badgeEl = document.getElementById("econ_opt_hour_badge");
-    if (badgeEl) {
-        if (hourData.cluster_label && hourData.cluster_label !== 'Decoupled') {
-            badgeEl.style.background = "rgba(16, 185, 129, 0.15)";
-            badgeEl.style.color = "#10b981";
-            badgeEl.innerText = `🟢 ${hourData.cluster_label} (0.00 € spread)`;
-        } else if (hourData.is_coupled) {
-            badgeEl.style.background = "rgba(16, 185, 129, 0.15)";
-            badgeEl.style.color = "#10b981";
-            badgeEl.innerText = optIsRegional() ? "🟢 Regional Coupled" : "🟢 Multi-Border Coupled";
-        } else {
-            badgeEl.style.background = "rgba(59, 130, 246, 0.15)";
-            badgeEl.style.color = "#3b82f6";
-            badgeEl.innerText = "🔵 Decoupled (Independent Dispatch)";
-        }
-    }
-
-    // Card 1: Cleared Price
-    const modelP = optP(hourData, 'model_price');
-    const actP = optP(hourData, 'actual_price');
-    const marginalPlant = optP(hourData, 'marginal_plant');
-
-    const cardPrice = document.getElementById("econ_opt_card_price");
-    if (cardPrice) cardPrice.innerText = `${modelP.toFixed(2)} €/MWh`;
-
-    const hasActual = lastSolvedOptimization.hourly.some(d => {
-        const p = optP(d, 'actual_price');
-        return p !== null && !isNaN(p) && p !== 0;
-    });
-
-    const cardActPrice = document.getElementById("econ_opt_card_actual_price");
-    if (cardActPrice) {
-        cardActPrice.innerText = (hasActual && actP !== null) 
-            ? `Actual Cleared: ${actP.toFixed(2)} €/MWh` 
-            : 'Actual Cleared: Pending';
-    }
-
-    const cardMarginal = document.getElementById("econ_opt_card_marginal_unit");
-    if (cardMarginal) cardMarginal.innerText = `Marginal Setter: ${marginalPlant}`;
-
-    // Card 2: Flows Breakdown
-    const cardFlow = document.getElementById("econ_opt_card_flow");
-    if (cardFlow) {
-        const sign = hourData.net_import_total >= 0 ? '+' : '';
-        cardFlow.innerText = `${sign}${hourData.net_import_total.toFixed(0)} MW`;
-        cardFlow.style.color = hourData.net_import_total >= 0 ? '#10b981' : '#f97316';
-    }
-
-    const breakdownContainer = document.getElementById("econ_opt_cable_breakdown");
-    if (breakdownContainer) {
-        if (isRO) {
-            breakdownContainer.innerHTML = `
-                <div>🇭🇺 HU: <strong>${hourData.flow_hu >= 0 ? '+' : ''}${hourData.flow_hu.toFixed(0)} MW</strong></div>
-                <div>🇧🇬 BG: <strong>${hourData.flow_bg >= 0 ? '+' : ''}${hourData.flow_bg.toFixed(0)} MW</strong></div>
-                <div>🇷🇸 RS: <strong>${hourData.flow_rs >= 0 ? '+' : ''}${hourData.flow_rs.toFixed(0)} MW</strong></div>
-                <div>🇺🇦 UA: <strong>${hourData.flow_ua >= 0 ? '+' : ''}${hourData.flow_ua.toFixed(0)} MW</strong></div>
-            `;
-        } else if (isBG) {
-            breakdownContainer.innerHTML = `
-                <div>🇷🇴 RO: <strong>${hourData.flow_ro >= 0 ? '+' : ''}${hourData.flow_ro.toFixed(0)} MW</strong></div>
-                <div>🇬🇷 GR: <strong>${hourData.flow_gr >= 0 ? '+' : ''}${hourData.flow_gr.toFixed(0)} MW</strong></div>
-                <div>🇷🇸 RS: <strong>${hourData.flow_rs >= 0 ? '+' : ''}${hourData.flow_rs.toFixed(0)} MW</strong></div>
-                <div>🇲🇰 MK: <strong>${hourData.flow_mk >= 0 ? '+' : ''}${hourData.flow_mk.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'hu') {
-            breakdownContainer.innerHTML = `
-                <div>🇦🇹 AT: <strong>${hourData.flow_at >= 0 ? '+' : ''}${hourData.flow_at.toFixed(0)} MW</strong></div>
-                <div>🇸🇰 SK: <strong>${hourData.flow_sk >= 0 ? '+' : ''}${hourData.flow_sk.toFixed(0)} MW</strong></div>
-                <div>🇷🇴 RO: <strong>${hourData.flow_ro >= 0 ? '+' : ''}${hourData.flow_ro.toFixed(0)} MW</strong></div>
-                <div>🇭🇷 HR: <strong>${hourData.flow_hr >= 0 ? '+' : ''}${hourData.flow_hr.toFixed(0)} MW</strong></div>
-                <div>🇸🇮 SI: <strong>${hourData.flow_si >= 0 ? '+' : ''}${hourData.flow_si.toFixed(0)} MW</strong></div>
-                <div>🇷🇸 RS: <strong>${hourData.flow_rs >= 0 ? '+' : ''}${hourData.flow_rs.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'de') {
-            breakdownContainer.innerHTML = `
-                <div>🇫🇷 FR: <strong>${hourData.flow_fr >= 0 ? '+' : ''}${hourData.flow_fr.toFixed(0)} MW</strong></div>
-                <div>🇳🇱 NL: <strong>${hourData.flow_nl >= 0 ? '+' : ''}${hourData.flow_nl.toFixed(0)} MW</strong></div>
-                <div>🇧🇪 BE: <strong>${hourData.flow_be >= 0 ? '+' : ''}${hourData.flow_be.toFixed(0)} MW</strong></div>
-                <div>🇦🇹 AT: <strong>${hourData.flow_at >= 0 ? '+' : ''}${hourData.flow_at.toFixed(0)} MW</strong></div>
-                <div>🇨🇿 CZ: <strong>${hourData.flow_cz >= 0 ? '+' : ''}${hourData.flow_cz.toFixed(0)} MW</strong></div>
-                <div>🇵🇱 PL: <strong>${hourData.flow_pl >= 0 ? '+' : ''}${hourData.flow_pl.toFixed(0)} MW</strong></div>
-                <div>🇨🇭 CH: <strong>${hourData.flow_ch >= 0 ? '+' : ''}${hourData.flow_ch.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'at') {
-            breakdownContainer.innerHTML = `
-                <div>🇩🇪 DE: <strong>${hourData.flow_de >= 0 ? '+' : ''}${hourData.flow_de.toFixed(0)} MW</strong></div>
-                <div>🇭🇺 HU: <strong>${hourData.flow_hu >= 0 ? '+' : ''}${hourData.flow_hu.toFixed(0)} MW</strong></div>
-                <div>🇮🇹 IT: <strong>${hourData.flow_it >= 0 ? '+' : ''}${hourData.flow_it.toFixed(0)} MW</strong></div>
-                <div>🇨🇭 CH: <strong>${hourData.flow_ch >= 0 ? '+' : ''}${hourData.flow_ch.toFixed(0)} MW</strong></div>
-                <div>🇨🇿 CZ: <strong>${hourData.flow_cz >= 0 ? '+' : ''}${hourData.flow_cz.toFixed(0)} MW</strong></div>
-                <div>🇸🇮 SI: <strong>${hourData.flow_si >= 0 ? '+' : ''}${hourData.flow_si.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'ch') {
-            breakdownContainer.innerHTML = `
-                <div>🇩🇪 DE: <strong>${hourData.flow_de >= 0 ? '+' : ''}${hourData.flow_de.toFixed(0)} MW</strong></div>
-                <div>🇫🇷 FR: <strong>${hourData.flow_fr >= 0 ? '+' : ''}${hourData.flow_fr.toFixed(0)} MW</strong></div>
-                <div>🇮🇹 IT: <strong>${hourData.flow_it >= 0 ? '+' : ''}${hourData.flow_it.toFixed(0)} MW</strong></div>
-                <div>🇦🇹 AT: <strong>${hourData.flow_at >= 0 ? '+' : ''}${hourData.flow_at.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'it') {
-            breakdownContainer.innerHTML = `
-                <div>🇨🇭 CH: <strong>${hourData.flow_ch >= 0 ? '+' : ''}${hourData.flow_ch.toFixed(0)} MW</strong></div>
-                <div>🇦🇹 AT: <strong>${hourData.flow_at >= 0 ? '+' : ''}${hourData.flow_at.toFixed(0)} MW</strong></div>
-                <div>🇫🇷 FR: <strong>${hourData.flow_fr >= 0 ? '+' : ''}${hourData.flow_fr.toFixed(0)} MW</strong></div>
-                <div>🇬🇷 GR: <strong>${hourData.flow_gr >= 0 ? '+' : ''}${hourData.flow_gr.toFixed(0)} MW</strong></div>
-            `;
-        } else if (optSuffix() === 'fr') {
-            breakdownContainer.innerHTML = `
-                <div>🇩🇪 DE: <strong>${hourData.flow_de >= 0 ? '+' : ''}${hourData.flow_de.toFixed(0)} MW</strong></div>
-                <div>🇨🇭 CH: <strong>${hourData.flow_ch >= 0 ? '+' : ''}${hourData.flow_ch.toFixed(0)} MW</strong></div>
-                <div>🇮🇹 IT: <strong>${hourData.flow_it >= 0 ? '+' : ''}${hourData.flow_it.toFixed(0)} MW</strong></div>
-                <div>🇧🇪 BE: <strong>${hourData.flow_be >= 0 ? '+' : ''}${hourData.flow_be.toFixed(0)} MW</strong></div>
-            `;
-        } else {
-            breakdownContainer.innerHTML = `
-                <div>🇧🇬 BG: <strong id="econ_flow_bg">${hourData.flow_bg >= 0 ? '+' : ''}${hourData.flow_bg.toFixed(0)} MW</strong></div>
-                <div>🇮🇹 IT: <strong id="econ_flow_it">${hourData.flow_it >= 0 ? '+' : ''}${hourData.flow_it.toFixed(0)} MW</strong></div>
-                <div>🇲🇰 MK: <strong id="econ_flow_mk">${hourData.flow_mk >= 0 ? '+' : ''}${hourData.flow_mk.toFixed(0)} MW</strong></div>
-                <div>🇦🇱 AL: <strong id="econ_flow_al">${hourData.flow_al >= 0 ? '+' : ''}${hourData.flow_al.toFixed(0)} MW</strong></div>
-            `;
-        }
-    }
-
-    // Card 3: Demand & Balance
-    const dem = optD(hourData, 'demand');
-    const res = optD(hourData, 'residual');
-    const reqGen = optD(hourData, 'required_gen');
-
-    const valDem = document.getElementById("econ_opt_val_dem");
-    if (valDem) valDem.innerText = `${dem.toFixed(0)} MW (${(hourData.solar_share * 100).toFixed(0)}% RES)`;
-
-    const valRes = document.getElementById("econ_opt_val_res");
-    if (valRes) valRes.innerText = `${res.toFixed(0)} MW`;
-
-    const valImp = document.getElementById("econ_opt_val_imp");
-    if (valImp) {
-        const sign = hourData.net_import_total >= 0 ? '+' : '';
-        valImp.innerText = `${sign}${hourData.net_import_total.toFixed(0)} MW`;
-    }
-
-    const valGen = document.getElementById("econ_opt_val_gen");
-    if (valGen) valGen.innerText = `${reqGen.toFixed(0)} MW`;
-
-    // Render Supply Curve for this hour
-    renderHourlySupplyCurve(hourData);
+    // Safe no-op stub: single-hour merit curve has been superseded by the full 24h explainable dispatch ledger.
 }
 
-function renderHourlySupplyCurve(hourData) {
-    const container = document.getElementById("plot_econ_opt_merit_curve");
-    if (!container || !window.Plotly || !lastSolvedOptimization) return;
+function renderExecutiveKPICards(solved) {
+    if (!solved || !solved.hourly) return;
+    const data = solved.hourly;
 
-    // Purge any stale non-Plotly DOM to allow clean Plotly rendering
-    const isCleanPlotly = container._fullLayout && container.querySelector && container.querySelector('.plot-container');
-    if (!isCleanPlotly) {
-        Plotly.purge(container);
-        container.innerHTML = '';
-    }
+    // 1. Baseload forecast & actual spot
+    const modelPrices = data.map(d => optP(d, 'model_price')).filter(p => p !== null && !isNaN(p));
+    const actualPrices = data.map(d => optP(d, 'actual_price')).filter(p => p !== null && !isNaN(p) && p !== 0);
+    const hasActual = actualPrices.length >= 12;
 
-    const fleet = optFleet();
-    if (!fleet || fleet.length === 0) return;
-    const requiredGen = Math.max(0, optD(hourData, 'required_gen'));
+    const predMean = modelPrices.length ? modelPrices.reduce((a, b) => a + b, 0) / modelPrices.length : 0;
+    const actMean = actualPrices.length ? actualPrices.reduce((a, b) => a + b, 0) / actualPrices.length : null;
 
-    let cumMw = 0;
-    const curveX = [0];
-    const curveY = [(fleet[0] && fleet[0].srmc) || 0];
-    const hoverTexts = ['Start: 0 MW'];
+    const predEl = document.getElementById("econ_opt_pred_baseload");
+    if (predEl) predEl.innerText = `${predMean.toFixed(2)} €/MWh`;
 
-    // Corner / step markers for effortless plant identification and hovering
-    const markerX = [];
-    const markerY = [];
-    const markerText = [];
-    const markerColors = [];
-
-    fleet.forEach(u => {
-        const cost = u.srmc;
-        const startMw = cumMw;
-        curveX.push(cumMw);
-        curveY.push(cost);
-        hoverTexts.push(`<b>${u.name}</b><br>Capacity: <b>${u.avail_mw.toFixed(0)} MW</b><br>Cost: <b>${cost.toFixed(2)} €/MWh</b>`);
-
-        cumMw += u.avail_mw;
-        const endMw = cumMw;
-        curveX.push(cumMw);
-        curveY.push(cost);
-        hoverTexts.push(`<b>${u.name}</b><br>Cumulative: <b>${cumMw.toFixed(0)} MW</b><br>Cost: <b>${cost.toFixed(2)} €/MWh</b>`);
-
-        // Add distinct step markers at corners and midpoint so hover triggers easily
-        const fuelType = (u.fuel || 'thermal').toLowerCase();
-        const icon = (u.tier === 'must_run_hydro' || u.tier === 'hydro_peaker' || fuelType === 'hydro') ? '💧'
-            : (u.tier === 'must_run_chp' ? '🏭'
-            : (u.tier === 'pmin' ? '⚡'
-            : (fuelType === 'nuclear' ? '⚛️' : (fuelType === 'lignite' ? '⛏️' : '🔥'))));
-        const tierBadge = u.tier_label ? ` [${u.tier_label}]` : '';
-        const plantLabel = `${icon} <b>${u.name}</b>${tierBadge}<br>Segment: <b>${startMw.toFixed(0)} – ${endMw.toFixed(0)} MW</b> (Band: ${u.avail_mw.toFixed(0)} MW)<br>Marginal Cost: <b>${cost.toFixed(2)} €/MWh</b>`;
-        
-        const mColor = (u.tier === 'pmin' || (u.tier && u.tier.startsWith('must_run'))) ? '#0284c7'
-            : (u.tier === 'hydro_peaker' ? '#6366f1' : '#10b981');
-
-        markerX.push(startMw, (startMw + endMw) / 2, endMw);
-        markerY.push(cost, cost, cost);
-        markerText.push(plantLabel, plantLabel, plantLabel);
-        markerColors.push(mColor, mColor, mColor);
-    });
-
-    if (optIsRegional()) {
-        // Beyond the physical fleet, add the Emergency Scarcity / Grid Redispatch band.
-        const totalFleet = cumMw;
-        const lastCost = fleet.length > 0 ? fleet[fleet.length - 1].srmc : 220.0;
-        const scarcityCap = 1000;
-        const scarcityEnd = totalFleet + scarcityCap;
-        const scarcityStartP = Math.max(_bl('HU'), Math.round(lastCost + 10.0));
-        const scarcityEndP = _bh('HU');
-        const scarcityName = 'Emergency Grid Redispatch / Scarcity Reserve';
-
-        curveX.push(totalFleet);
-        curveY.push(scarcityStartP);
-        hoverTexts.push(`<b>${scarcityName}</b><br>Start Value: <b>€${scarcityStartP.toFixed(2)}/MWh</b>`);
-
-        curveX.push(scarcityEnd);
-        curveY.push(scarcityEndP);
-        hoverTexts.push(`<b>${scarcityName}</b><br>Cumulative: <b>${scarcityEnd.toFixed(0)} MW</b><br>Cap: <b>€${scarcityEndP.toFixed(2)}/MWh</b>`);
-
-        const scarcityLabel = `⚠️ <b>${scarcityName}</b><br>Available Band: <b>${scarcityCap.toLocaleString()} MW</b><br>Cost: <b>€${scarcityStartP.toFixed(2)} – €${scarcityEndP.toFixed(2)}/MWh</b>`;
-        markerX.push(totalFleet, (totalFleet + scarcityEnd) / 2, scarcityEnd);
-        markerY.push(scarcityStartP, (scarcityStartP + scarcityEndP) / 2, scarcityEndP);
-        markerText.push(scarcityLabel, scarcityLabel, scarcityLabel);
-        markerColors.push('#f59e0b', '#f59e0b', '#f59e0b');
-    } else if (optSuffix() !== '') {
-        // Add peaker segment for non-regional foreign zones if not already present
-        const totalThermal = cumMw;
-        const hydroCap = 1500;
-        const hydroEnd = totalThermal + hydroCap;
-        const hydroStartP = 180.0;
-        const hydroEndP = 300.0;
-        const hydroName = 'Hydro & Fast-Start Peaking Reserves';
-
-        curveX.push(totalThermal);
-        curveY.push(hydroStartP);
-        hoverTexts.push(`<b>${hydroName}</b><br>Start Water Value: <b>€${hydroStartP.toFixed(2)}/MWh</b>`);
-
-        curveX.push(hydroEnd);
-        curveY.push(hydroEndP);
-        hoverTexts.push(`<b>${hydroName}</b><br>Cumulative: <b>${hydroEnd.toFixed(0)} MW</b><br>Water Value: <b>€${hydroEndP.toFixed(2)}/MWh</b>`);
-
-        const hydroLabel = `💧 <b>${hydroName}</b><br>Available Capacity: <b>${hydroCap.toLocaleString()} MW</b><br>Water Value: <b>€${hydroStartP.toFixed(2)} – €${hydroEndP.toFixed(2)}/MWh</b>`;
-        markerX.push(totalThermal, (totalThermal + hydroEnd) / 2, hydroEnd);
-        markerY.push(hydroStartP, (hydroStartP + hydroEndP) / 2, hydroEndP);
-        markerText.push(hydroLabel, hydroLabel, hydroLabel);
-        markerColors.push('#6366f1', '#6366f1', '#6366f1');
-    }
-
-    const curveName = (optSuffix() === 'ro') ? 'Romanian Merit Order Curve'
-        : (optSuffix() === 'bg') ? 'Bulgarian Merit Order Curve'
-        : (optSuffix() === 'hu') ? 'Hungarian Merit Order Curve'
-        : (optSuffix() === 'de') ? 'German Merit Order Curve'
-        : 'Greek Merit Order Curve';
-    const traceLine = {
-        x: curveX,
-        y: curveY,
-        type: 'scatter',
-        mode: 'lines',
-        name: curveName,
-        line: { color: '#059669', width: 2.5, shape: 'hv' },
-        fill: 'tozeroy',
-        fillcolor: isDarkMode() ? 'rgba(5, 150, 105, 0.12)' : 'rgba(5, 150, 105, 0.08)',
-        hoverinfo: 'none'
-    };
-
-    // Visible corner & step markers with high hit-target for cursor
-    const traceMarkers = {
-        x: markerX,
-        y: markerY,
-        type: 'scatter',
-        mode: 'markers',
-        name: 'Generating Plants',
-        marker: {
-            size: 7,
-            color: markerColors,
-            symbol: 'circle',
-            line: { color: isDarkMode() ? '#064e3b' : '#ffffff', width: 1.5 }
-        },
-        hovertext: markerText,
-        hoverinfo: 'text'
-    };
-
-    const modelPrice = optP(hourData, 'model_price');
-    const actualPrice = optP(hourData, 'actual_price');
-
-    const shapes = [
-        // Required generation vertical line going directly ALL THE WAY UP across the plot
-        {
-            type: 'line',
-            x0: requiredGen,
-            x1: requiredGen,
-            y0: 0,
-            y1: 1,
-            yref: 'paper',
-            line: { color: '#2563eb', width: 2.5, dash: 'dash' }
-        },
-        // Cleared price horizontal line up to the clearing point
-        {
-            type: 'line',
-            x0: 0,
-            x1: requiredGen,
-            y0: modelPrice,
-            y1: modelPrice,
-            line: { color: '#2563eb', width: 2, dash: 'dash' }
+    const actEl = document.getElementById("econ_opt_actual_baseload");
+    if (actEl) {
+        if (hasActual && actMean !== null) {
+            const delta = predMean - actMean;
+            const deltaSign = delta >= 0 ? '+' : '';
+            actEl.innerHTML = `Spot: <strong>${actMean.toFixed(2)} €</strong> <span style="font-size:11.5px; color:${Math.abs(delta) <= 10 ? '#10b981' : '#f59e0b'}; font-weight:700;">(${deltaSign}${delta.toFixed(1)}€)</span>`;
+        } else {
+            actEl.innerText = 'Spot: Pending';
         }
-    ];
-
-    const annotations = [
-        {
-            x: requiredGen,
-            y: modelPrice,
-            text: `🎯 Clearing Point: ${modelPrice.toFixed(2)} €/MWh<br>Req Gen: ${requiredGen.toFixed(0)} MW`,
-            showarrow: true,
-            arrowhead: 2,
-            arrowsize: 1,
-            arrowwidth: 1.5,
-            arrowcolor: '#2563eb',
-            ax: -55,
-            ay: -45,
-            font: { color: '#ffffff', size: 11, weight: 700 },
-            bgcolor: '#2563eb',
-            borderpad: 4
-        }
-    ];
-
-    if (actualPrice !== null && actualPrice > 0) {
-        shapes.push({
-            type: 'line',
-            xref: 'paper',
-            x0: 0,
-            x1: 1,
-            y0: actualPrice,
-            y1: actualPrice,
-            line: { color: '#f59e0b', width: 1.5, dash: 'dot' }
-        });
-        annotations.push({
-            xref: 'paper',
-            x: 1,
-            y: actualPrice,
-            text: `Actual Spot: ${actualPrice.toFixed(2)} €`,
-            showarrow: false,
-            xanchor: 'right',
-            font: { color: '#f59e0b', size: 10, weight: 700 },
-            bgcolor: 'rgba(245, 158, 11, 0.15)',
-            borderpad: 3
-        });
     }
 
-    const layout = getPlotlyThemeLayout({
-        xaxis: {
-            title: 'Cumulative Dispatched Generation (MW)',
-            showgrid: true
-        },
-        yaxis: {
-            title: 'Marginal Running Cost (€/MWh)',
-            showgrid: true
-        },
-        shapes: shapes,
-        annotations: annotations,
-        hovermode: 'closest',
-        hoverdistance: 35,
-        margin: { l: 50, r: 35, t: 25, b: 45 },
-        showlegend: false
-    });
+    // 2. Solar Midday Window (H10–H15, hours 10 to 15)
+    const solarWindow = data.filter(d => d.hour >= 10 && d.hour <= 15);
+    const solarPrices = solarWindow.map(d => optP(d, 'model_price'));
+    const solarAvg = solarPrices.length ? solarPrices.reduce((a, b) => a + b, 0) / solarPrices.length : 0;
+    const minSolarP = solarPrices.length ? Math.min(...solarPrices) : 0;
+    const hasSolarFloor = minSolarP <= 5.0;
 
-    const plotFn = (container._fullLayout && container.querySelector && container.querySelector('.plot-container')) ? Plotly.react : Plotly.newPlot;
-    plotFn(container, [traceLine, traceMarkers], layout, { responsive: true, displayModeBar: false });
+    const solarValEl = document.getElementById("econ_opt_solar_kpi_val");
+    if (solarValEl) {
+        solarValEl.innerText = `${solarAvg.toFixed(2)} €/MWh`;
+        solarValEl.style.color = hasSolarFloor ? '#0891b2' : '#0284c7';
+    }
+    const solarSubEl = document.getElementById("econ_opt_solar_kpi_sub");
+    if (solarSubEl) {
+        solarSubEl.innerText = hasSolarFloor 
+            ? `Midday Curtailment Floor Active (Min: ${minSolarP.toFixed(2)} €)`
+            : `Regional Price Support Active (Min: ${minSolarP.toFixed(2)} €)`;
+    }
+
+    // 3. Evening Peak Window (H19–H21, hours 19 to 21)
+    const peakWindow = data.filter(d => d.hour >= 18 && d.hour <= 21);
+    let peakHour = 20;
+    let maxPeakP = -999;
+    peakWindow.forEach(d => {
+        const p = optP(d, 'model_price');
+        if (p > maxPeakP) { maxPeakP = p; peakHour = d.hour; }
+    });
+    const peakValEl = document.getElementById("econ_opt_peak_kpi_val");
+    if (peakValEl) {
+        peakValEl.innerText = maxPeakP > -999 ? `${maxPeakP.toFixed(2)} €/MWh` : '-- €/MWh';
+    }
+    const peakSubEl = document.getElementById("econ_opt_peak_kpi_sub");
+    if (peakSubEl) {
+        const prem = maxPeakP > -999 ? (maxPeakP - predMean) : 0;
+        peakSubEl.innerText = `Peak at H${String(peakHour).padStart(2, '0')} (+${prem.toFixed(1)} € vs baseload)`;
+    }
+
+    // 4. Regional Corridor Coupling
+    let coupledHours = 0;
+    data.forEach(d => {
+        if (d.cluster_label && d.cluster_label !== 'Decoupled' && !d.cluster_label.includes('Isolated')) {
+            coupledHours++;
+        } else if (d.is_coupled) {
+            coupledHours++;
+        }
+    });
+    const coupValEl = document.getElementById("econ_opt_coupling_kpi_val");
+    if (coupValEl) coupValEl.innerText = `${coupledHours} / 24 hrs`;
+    const coupSubEl = document.getElementById("econ_opt_coupling_kpi_sub");
+    if (coupSubEl) {
+        coupSubEl.innerText = coupledHours >= 16 
+            ? 'High Corridor Consensus (Tight SDAC Spreads)' 
+            : 'Frequent Congestion Decoupling';
+    }
+}
+
+function getHourlyDriverRationale(zone, d, modelPrice, demand, residual, solarShare, netImp) {
+    const cluster = d.cluster_label || '';
+    const marginal = optP(d, 'marginal_plant') || '';
+
+    // 1. Solar flood / Curtailment floor
+    if (modelPrice <= 5.0 && (solarShare >= 0.50 || (d.hour >= 10 && d.hour <= 15 && residual <= 500))) {
+        return {
+            badge: '☀️ Solar Surplus Floor',
+            color: '#0891b2',
+            bg: 'rgba(6,182,212,0.12)',
+            border: 'rgba(6,182,212,0.25)',
+            text: `RES covers ${(solarShare * 100).toFixed(0)}% of demand; export interconnectors congested; clears at curtailment floor.`
+        };
+    }
+
+    // 2. Full SDAC Regional Coupling
+    if (cluster && (cluster.includes('FULL COUPLING') || cluster.includes('Cluster [HU=RO=BG=GR]'))) {
+        return {
+            badge: '⚡ SDAC Balkan Pool',
+            color: '#10b981',
+            bg: 'rgba(16,185,129,0.12)',
+            border: 'rgba(16,185,129,0.25)',
+            text: `Zero corridor congestion with HU/RO/BG/GR; cleared at shared SDAC regional market price.`
+        };
+    }
+
+    // 3. Sub-cluster coupling (e.g. GR=BG, RO=BG)
+    if (cluster && cluster.includes('Cluster') && !cluster.includes('Decoupled')) {
+        const partners = cluster.replace('Regional Cluster ', '').replace('Cluster ', '');
+        return {
+            badge: `⚡ Coupled [${partners}]`,
+            color: '#059669',
+            bg: 'rgba(16,185,129,0.10)',
+            border: 'rgba(16,185,129,0.20)',
+            text: `Corridor consensus active with ${partners} (spread ≤ 0.5 €).`
+        };
+    }
+
+    // 4. Scarcity / Peaking Reserve
+    if (marginal.toLowerCase().includes('scarcity') || modelPrice >= 320.0) {
+        return {
+            badge: '🚨 Scarcity Peaker',
+            color: '#dc2626',
+            bg: 'rgba(239,68,68,0.12)',
+            border: 'rgba(239,68,68,0.25)',
+            text: `Extreme residual tightness (${Math.round(residual)} MW); emergency peaking capacity required.`
+        };
+    }
+
+    // 5. Thermal Gas Margin
+    if (marginal.toLowerCase().includes('ccgt') || marginal.toLowerCase().includes('gas') || (residual > 3800 && (d.hour >= 18 && d.hour <= 22))) {
+        return {
+            badge: '🔥 Thermal Gas Margin',
+            color: '#d97706',
+            bg: 'rgba(245,158,11,0.12)',
+            border: 'rgba(245,158,11,0.25)',
+            text: `Evening peak residual forces CCGT gas fleet onto margin with TTF fuel pass-through.`
+        };
+    }
+
+    // 6. Lignite / Coal Baseload Margin
+    if (marginal.toLowerCase().includes('lignite') || marginal.toLowerCase().includes('coal')) {
+        return {
+            badge: '⛏️ Lignite Margin',
+            color: '#78716c',
+            bg: 'rgba(120,113,108,0.12)',
+            border: 'rgba(120,113,108,0.25)',
+            text: `Lignite/coal baseload unit marginal; price anchored by fuel cost + EUA carbon.`
+        };
+    }
+
+    // 7. Cable import congestion / Decoupled
+    if (netImp > 1000 && !d.is_coupled) {
+        return {
+            badge: '🛑 Import Saturation',
+            color: '#9333ea',
+            bg: 'rgba(147,51,234,0.12)',
+            border: 'rgba(147,51,234,0.25)',
+            text: `Interconnector imports maxed out; higher-cost domestic generation dispatched to cover deficit.`
+        };
+    }
+
+    // 8. General domestic thermal dispatch
+    return {
+        badge: '⚙️ Domestic Dispatch',
+        color: '#4f46e5',
+        bg: 'rgba(79,70,229,0.12)',
+        border: 'rgba(79,70,229,0.25)',
+        text: `${marginal || 'Domestic fleet'} clears remaining thermal residual.`
+    };
 }
 
 function renderOptimizerTable() {
@@ -19565,6 +19288,7 @@ function renderOptimizerTable() {
     if (!tbody || !lastSolvedOptimization) return;
 
     const data = lastSolvedOptimization.hourly;
+    const zone = lastSolvedOptimization.country || 'GR';
     let html = '';
 
     const hasActual = data.some(d => {
@@ -19577,60 +19301,84 @@ function renderOptimizerTable() {
         const netSign = d.net_import_total >= 0 ? '+' : '';
         const delta = optP(d, 'price_delta');
         const actPrice = optP(d, 'actual_price');
-        const modelPrice = optP(d, 'model_price');
-        const demand = optD(d, 'demand');
-        const residual = optD(d, 'residual');
-        const reqGen = optD(d, 'required_gen');
-        const marginalPlant = optP(d, 'marginal_plant');
+        const modelPrice = optP(d, 'model_price') || 0;
+        const demand = optD(d, 'demand') || 0;
+        const residual = optD(d, 'residual') || 0;
+        const marginalPlant = optP(d, 'marginal_plant') || '—';
+        const solarShare = d.solar_share || 0;
 
-        const deltaText = (hasActual && delta !== null) 
-            ? `<span style="color:${Math.abs(delta) <= 20 ? '#10b981' : '#f59e0b'}; font-weight:700;">${delta >= 0 ? '+' : ''}${delta.toFixed(2)} €</span>`
-            : '<span style="color:var(--text-muted);">—</span>';
-
-        const actPriceText = (hasActual && actPrice !== null) 
-            ? `${actPrice.toFixed(2)} €` 
-            : '<span style="color:var(--text-muted); font-style:italic;">Pending</span>';
-
-        const flowsBreakdown = (optSuffix() === 'ro')
-            ? `${Math.round(d.flow_hu)} / ${Math.round(d.flow_bg)} / ${Math.round(d.flow_rs)} / ${Math.round(d.flow_ua)}`
-            : (optSuffix() === 'bg'
-                ? `${Math.round(d.flow_ro)} / ${Math.round(d.flow_gr)} / ${Math.round(d.flow_rs)} / ${Math.round(d.flow_mk)}`
-                : (optSuffix() === 'hu'
-                    ? `${Math.round(d.flow_at)} / ${Math.round(d.flow_sk)} / ${Math.round(d.flow_ro)} / ${Math.round(d.flow_hr)} / ${Math.round(d.flow_si)} / ${Math.round(d.flow_rs)}`
-                    : (optSuffix() === 'de'
-                        ? `${Math.round(d.flow_fr)} / ${Math.round(d.flow_nl)} / ${Math.round(d.flow_be)} / ${Math.round(d.flow_at)} / ${Math.round(d.flow_cz)} / ${Math.round(d.flow_pl)} / ${Math.round(d.flow_ch)}`
-                        : (optSuffix() === 'at'
-                            ? `${Math.round(d.flow_de)} / ${Math.round(d.flow_hu)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_ch)} / ${Math.round(d.flow_cz)} / ${Math.round(d.flow_si)}`
-                            : (optSuffix() === 'ch'
-                                ? `${Math.round(d.flow_de)} / ${Math.round(d.flow_fr)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_at)}`
-                                : (optSuffix() === 'it'
-                                    ? `${Math.round(d.flow_ch)} / ${Math.round(d.flow_at)} / ${Math.round(d.flow_fr)} / ${Math.round(d.flow_gr)}`
-                                    : (optSuffix() === 'fr'
-                                        ? `${Math.round(d.flow_de)} / ${Math.round(d.flow_ch)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_be)}`
-                                        : `${Math.round(d.flow_bg)} / ${Math.round(d.flow_it)} / ${Math.round(d.flow_mk)} / ${Math.round(d.flow_al)}`)))))));
-
-        const clusterPill = (d.cluster_label && d.cluster_label !== 'Decoupled')
-            ? `<span title="${d.cluster_label}" style="display:inline-block; font-size:10px; padding:1px 5px; border-radius:3px; background:rgba(16,185,129,0.12); color:#10b981; font-weight:700; margin-left:4px;">${d.cluster_label.replace('Regional Cluster ', '').replace('Cluster ', '')}</span>`
+        const deltaBadge = (hasActual && delta !== null)
+            ? `<span style="display:inline-block; font-size:11px; padding:1px 6px; border-radius:4px; font-weight:700; background:${Math.abs(delta) <= 15 ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)'}; color:${Math.abs(delta) <= 15 ? '#10b981' : '#f59e0b'};">
+                ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}€
+               </span>`
             : '';
 
+        const actPriceText = (hasActual && actPrice !== null)
+            ? `<div style="font-weight:700; font-family:monospace; color:var(--text-primary); font-size:12px;">${actPrice.toFixed(2)} € ${deltaBadge}</div>`
+            : '<span style="color:var(--text-muted); font-style:italic; font-size:11px;">Pending</span>';
+
+        const flowsBreakdown = (optSuffix() === 'ro')
+            ? `HU: ${Math.round(d.flow_hu)} | BG: ${Math.round(d.flow_bg)} | RS: ${Math.round(d.flow_rs)} | UA: ${Math.round(d.flow_ua)}`
+            : (optSuffix() === 'bg'
+                ? `RO: ${Math.round(d.flow_ro)} | GR: ${Math.round(d.flow_gr)} | RS: ${Math.round(d.flow_rs)} | MK: ${Math.round(d.flow_mk)}`
+                : (optSuffix() === 'hu'
+                    ? `AT: ${Math.round(d.flow_at)} | SK: ${Math.round(d.flow_sk)} | RO: ${Math.round(d.flow_ro)} | HR: ${Math.round(d.flow_hr)}`
+                    : (optSuffix() === 'de'
+                        ? `FR: ${Math.round(d.flow_fr)} | NL: ${Math.round(d.flow_nl)} | AT: ${Math.round(d.flow_at)} | CZ: ${Math.round(d.flow_cz)}`
+                        : (optSuffix() === 'at'
+                            ? `DE: ${Math.round(d.flow_de)} | HU: ${Math.round(d.flow_hu)} | IT: ${Math.round(d.flow_it)} | CH: ${Math.round(d.flow_ch)}`
+                            : (optSuffix() === 'ch'
+                                ? `DE: ${Math.round(d.flow_de)} | FR: ${Math.round(d.flow_fr)} | IT: ${Math.round(d.flow_it)} | AT: ${Math.round(d.flow_at)}`
+                                : (optSuffix() === 'it'
+                                    ? `CH: ${Math.round(d.flow_ch)} | AT: ${Math.round(d.flow_at)} | FR: ${Math.round(d.flow_fr)} | GR: ${Math.round(d.flow_gr)}`
+                                    : (optSuffix() === 'fr'
+                                        ? `DE: ${Math.round(d.flow_de)} | CH: ${Math.round(d.flow_ch)} | IT: ${Math.round(d.flow_it)} | BE: ${Math.round(d.flow_be)}`
+                                        : `BG: ${Math.round(d.flow_bg)} | IT: ${Math.round(d.flow_it)} | MK: ${Math.round(d.flow_mk)} | AL: ${Math.round(d.flow_al)}`)))))));
+
+        const rationale = getHourlyDriverRationale(zone, d, modelPrice, demand, residual, solarShare, d.net_import_total);
+
         html += `
-        <tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;" onclick="document.getElementById('econ_opt_hour').value='${d.hour}'; onOptHourChange();" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-            <td style="padding: 8px 8px; text-align: center; font-weight: 700; color: var(--text-primary);">H${String(d.hour).padStart(2, '0')}</td>
-            <td style="padding: 8px 8px; text-align: right; color: var(--text-secondary);">${demand.toFixed(0)}</td>
-            <td style="padding: 8px 8px; text-align: right; color: var(--text-secondary);">${residual.toFixed(0)}</td>
-            <td style="padding: 8px 8px; text-align: right; font-weight: 600; color: #0284c7;">${(d.solar_share * 100).toFixed(0)}%</td>
-            <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: ${netColor};">${netSign}${d.net_import_total.toFixed(0)}</td>
-            <td style="padding: 8px 8px; text-align: center; font-size: 11px; color: var(--text-secondary);">${flowsBreakdown}</td>
-            <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: #2563eb;">${reqGen.toFixed(0)}</td>
-            <td style="padding: 8px 8px; font-weight: 600; color: var(--text-primary); font-size: 11px;">${marginalPlant}${clusterPill}</td>
-            <td style="padding: 8px 8px; text-align: right; font-weight: 800; color: #2563eb; font-size: 13px;">${modelPrice.toFixed(2)} €</td>
-            <td style="padding: 8px 8px; text-align: right; font-weight: 700; color: var(--text-primary);">${actPriceText}</td>
-            <td style="padding: 8px 8px; text-align: right;">${deltaText}</td>
+        <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 9px 8px; text-align: center; font-weight: 700; color: var(--text-primary); font-size: 11.5px;">
+                H${String(d.hour).padStart(2, '0')}<br>
+                <span style="font-size:10px; color:var(--text-muted); font-weight:500;">${String(d.hour-1).padStart(2, '0')}:00</span>
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 800; color: #2563eb; font-size: 13.5px; font-family: monospace;">
+                ${modelPrice.toFixed(2)} €
+            </td>
+            <td style="padding: 9px 8px; text-align: right;">
+                ${actPriceText}
+            </td>
+            <td style="padding: 9px 10px;">
+                <span style="display:inline-block; font-size:11px; font-weight:700; padding:2px 7px; border-radius:4px; background:${rationale.bg}; color:${rationale.color}; border:1px solid ${rationale.border}; margin-bottom:3px;">
+                    ${rationale.badge}
+                </span>
+                <div style="font-size:11.5px; color:var(--text-secondary); line-height:1.25;">
+                    ${rationale.text}
+                </div>
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: ${netColor}; font-family: monospace; font-size: 12px;">
+                ${netSign}${d.net_import_total.toFixed(0)} MW
+            </td>
+            <td style="padding: 9px 8px; text-align: center; font-size: 11px; color: var(--text-secondary); font-family: monospace;">
+                ${flowsBreakdown}
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 600; color: var(--text-primary); font-family: monospace; font-size: 12px;">
+                ${residual.toFixed(0)}
+            </td>
+            <td style="padding: 9px 8px; text-align: right; font-weight: 700; color: #0284c7; font-size: 12px;">
+                ${(solarShare * 100).toFixed(0)}%
+            </td>
+            <td style="padding: 9px 10px; font-weight: 600; color: var(--text-primary); font-size: 11.5px;">
+                ${marginalPlant}
+            </td>
         </tr>
         `;
     });
 
     tbody.innerHTML = html;
+
+    renderExecutiveKPICards(lastSolvedOptimization);
 
     if (typeof renderCorridorMatrix === 'function') {
         const dEl = document.getElementById("forecast_date") || document.getElementById("econ_date");
