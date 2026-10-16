@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 12:11</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 12:32</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 12:11
+                Last DB Audit: 2026-10-16 12:32
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12222,7 +12222,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 12:11";
+                const currentBuildTime = "2026-10-16 12:32";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13816,7 +13816,7 @@ function resolveCorridorMarketSplitting(targetDate) {
 
         if (pHU === null || pRO === null || pBG === null || pGR === null) continue;
 
-        const isSolarWindow = (h >= 8 && h <= 15); // H09-H16 CET
+        const isSolarWindow = (h >= 9 && h <= 14); // H10-H15 CET
 
         // Evaluate the 3 links in the corridor chain: HU <-> RO <-> BG <-> GR
         const edges = [];
@@ -15215,7 +15215,7 @@ function _computeBGForecast(targetDate) {
     // driven by differing solar), which the BG optimizer already models.
     const grKnn24 = knnForecastPrice(hist, targetDate, ttfPrice, euaPrice);
     if (!isAcuteSEEOutage) for (let h = 0; h < 24; h++) {
-        if (h >= 8 && h <= 15) continue; // H9-H16: pure Bulgarian model
+        if (h >= 9 && h <= 14) continue; // H10-H15: pure Bulgarian model
         const grMlP = mlForecastPrice(hist, targetDate, h, ttfPrice, euaPrice);
         if (grMlP == null || grMlP <= 0) continue;
         const grKnnP = (grKnn24 && grKnn24[h] != null && grKnn24[h] > 0) ? grKnn24[h] : grMlP;
@@ -15917,8 +15917,8 @@ function _computeGRForecast(targetDate) {
             if (isNoonHour) {
                 if (resGR <= -hAtcExportBG) {
                     bgBaseline = Math.min(bgBaseline, 0.01);
-                } else if (resGR <= (mustRunBaseTotal * 0.8)) {
-                    // When residual is below mandatory hydro + CHP must-run base, the price collapses
+                } else if (resGR <= (mustRunBaseTotal * 0.8) && bgBaseline <= 60.0) {
+                    // When residual is below mandatory hydro + CHP must-run base and regional sink is depressed, the price collapses
                     const normRes = Math.max(0, resGR) / (mustRunBaseTotal * 0.8);
                     bgBaseline = Math.min(bgBaseline, Math.max(0.01, normRes * 15.0));
                 }
