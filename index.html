@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 15:10</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-16 16:52</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-16 15:10
+                Last DB Audit: 2026-10-16 16:52
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12205,7 +12205,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-16 15:10";
+                const currentBuildTime = "2026-10-16 16:52";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13806,24 +13806,25 @@ function resolveCorridorMarketSplitting(targetDate) {
         // Evaluate the 3 links in the corridor chain: HU <-> RO <-> BG <-> GR
         const edges = [];
 
-        // Link 1: HU <-> RO (couples tightly on non-extreme hours)
+        // Physical SDAC Corridor Congestion Logic:
+        // Link 1: HU <-> RO (ATC ~1,400 MW). Couples when spread <= 18 EUR
         const dHU_RO = Math.abs(pHU - pRO);
-        if (dHU_RO <= 6.0) {
+        if (dHU_RO <= 18.0) {
             edges.push(['HU', 'RO']);
         }
 
-        // Link 2: RO <-> BG (Danube corridor: 2,000+ MW capacity)
+        // Link 2: RO <-> BG (Danube 2,000+ MW). Almost never congests unless extreme nuclear deficit
         const dRO_BG = Math.abs(pRO - pBG);
-        if (dRO_BG <= 8.0) {
+        if (dRO_BG <= 25.0) {
             edges.push(['RO', 'BG']);
         }
 
-        // Link 3: BG <-> GR
-        // Outside solar window, BG & GR couple ~85% of time (tolerance up to 12 EUR)
-        // In solar window (H9-H16), Greek solar exports frequently congest the cable, so link breaks if spread > 5 EUR
+        // Link 3: BG <-> GR. 
+        // In solar window (H10-H15), if Greece is in solar collapse (pGR near 0), cable congests northbound!
+        // Outside solar window, BG and GR couple freely up to 22 EUR spread.
+        const isGrSolarSurplus = (isSolarWindow && pGR < 50.0 && pBG > 100.0);
         const dBG_GR = Math.abs(pBG - pGR);
-        const grBgTol = isSolarWindow ? 5.0 : 12.0;
-        if (dBG_GR <= grBgTol) {
+        if (!isGrSolarSurplus && dBG_GR <= 22.0) {
             edges.push(['BG', 'GR']);
         }
 
@@ -14055,7 +14056,7 @@ function solveHUForecast(targetDate, skipSplitting) {
     const bgOutage = (kozlSpec && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(kozlSpec, 'BG', targetDate).unavail_mw : 0;
     const huOutage = (paksSpec && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(paksSpec, 'HU', targetDate).unavail_mw : 0;
     const seeNucOutage = (roOutage || 0) + (bgOutage || 0);
-    const isAcuteSEEOutage = (seeNucOutage >= 1800 && huOutage >= 400);
+    const isAcuteSEEOutage = (seeNucOutage >= 1600 && huOutage >= 400);
     const seeScarcityLift = isAcuteSEEOutage ? Math.min(18.0, (seeNucOutage - 1800) * 0.018 + 5.0) : 0.0;
 
     function nbPrice(c, ref, h) {
@@ -14092,6 +14093,7 @@ function solveHUForecast(targetDate, skipSplitting) {
         const dRes = resHU - prevResHU;
         let pFeat = p;
         if (targetDOW === 0 && p > 180.0) pFeat = p * 0.70;
+        if (targetDOW === 1 && p > 240.0) pFeat = 240.0 + (p - 240.0) * 0.25;
         const feats = { p: pFeat, ps: ps, ca: ca, ro: ro, rs: rs, bg: bg, d_res: dRes, d_eua: dEua, ttf: ttfPrice };
         let anchor = _dynLin('HU', h, [feats.p, feats.ps, feats.ca, feats.ro, feats.rs, feats.bg, feats.d_res, feats.d_eua, feats.ttf]);
         if (anchor === null) { const co = HU_RIDGE_COEF[h]; anchor = co[0]; for (let i = 0; i < HU_RIDGE_COLS.length; i++) anchor += co[i + 1] * feats[HU_RIDGE_COLS[i]]; }
@@ -14120,13 +14122,19 @@ function solveHUForecast(targetDate, skipSplitting) {
             const expC = huCap(dayFcaps, expKey, h, isWeekend);
             const impC = huCap(dayFcaps, impKey, h, isWeekend);
             if (expC === null || impC === null) return;
-            const sp = anchor - borderPrior[nb];
-            const ex = Math.sign(sp) * Math.max(0, Math.abs(sp) - 2.0);
-            const f = Math.max(-expC, Math.min(impC, ex * 120.0));
+            let sp = anchor - borderPrior[nb];
+            let ex = Math.sign(sp) * Math.max(0, Math.abs(sp) - 2.0);
+            let f = Math.max(-expC, Math.min(impC, ex * 120.0));
+            if (f < 0 && anchor >= borderPrior[nb]) f = 0;
             flows[nb] = f;
             netFlow += f;
         });
 
+        const maxFleetHU = fleetHU.reduce((a, b) => a + b.avail_mw, 0);
+        if (netFlow < 0) {
+            const maxExportMargin = Math.max(0, maxFleetHU - resHU - 200);
+            if (-netFlow > maxExportMargin) netFlow = -maxExportMargin;
+        }
         const reqGen = resHU - netFlow;
         const cleared = clearZonalSupplyHU(reqGen, demHU, anchor, h + 1, fleetHU, targetDOW === 6);
 
@@ -14173,9 +14181,8 @@ function solveHUForecast(targetDate, skipSplitting) {
     // Analogue KNN ensemble (shape skill), blended onto the physical model.
     if (knn24 && knn24.length === 24) {
         for (let h = 0; h < 24; h++) {
-            const wKnn = (h >= 18 && h <= 21) ? 0.55 : HU_KNN_W;
-            const blended = (1.0 - wKnn) * hourlyResults[h].model_price_hu + wKnn * knn24[h];
-            hourlyResults[h].model_price_hu = Math.round(Math.max(-20.0, Math.min(500.0, blended)) * 100) / 100;
+            // KNN bypassed: physical merit model price preserved
+            hourlyResults[h].model_price_hu = Math.round(Math.max(-20.0, Math.min(500.0, hourlyResults[h].model_price_hu)) * 100) / 100;
             const act = hourlyResults[h].actual_price_hu;
             hourlyResults[h].price_delta_hu = act !== null ? (hourlyResults[h].model_price_hu - act) : null;
         }
@@ -14408,7 +14415,7 @@ function _computeROForecast(targetDate) {
     const bgOutageRO = (kozlSpecRO && typeof getPlantOutageInfo === "function") ? getPlantOutageInfo(kozlSpecRO, "BG", targetDate).unavail_mw : 0;
     const huOutageRO = (paksSpecRO && typeof getPlantOutageInfo === "function") ? getPlantOutageInfo(paksSpecRO, "HU", targetDate).unavail_mw : 0;
     const seeNucOutageRO = (roOutageRO || 0) + (bgOutageRO || 0);
-    const isAcuteSEEOutageRO = (seeNucOutageRO >= 1800 && huOutageRO >= 400);
+    const isAcuteSEEOutageRO = (seeNucOutageRO >= 1600 && huOutageRO >= 400);
     const seeScarcityLiftRO = isAcuteSEEOutageRO ? (isWeekend ? (targetDOW === 6 ? 25.0 : 5.0) : 5.0) : 0.0;
 
     const priorImm = priorDates.length > 0 ? priorDates[priorDates.length - 1] : null;
@@ -14481,21 +14488,26 @@ function _computeROForecast(targetDate) {
 
         // Regional price references
         const pImm = (priorImm && histRO[priorImm] && histRO[priorImm].prices) ? (histRO[priorImm].prices[h] !== undefined ? histRO[priorImm].prices[h] : _fb('RO')) : _fb('RO');
-        const pSame = (priorSameDow && histRO[priorSameDow] && histRO[priorSameDow].prices) ? (histRO[priorSameDow].prices[h] !== undefined ? histRO[priorSameDow].prices[h] : _fb('RO')) : pImm;
+        let pSame = (priorSameDow && histRO[priorSameDow] && histRO[priorSameDow].prices) ? (histRO[priorSameDow].prices[h] !== undefined ? histRO[priorSameDow].prices[h] : _fb('RO')) : pImm;
+        if (targetDOW === 1 && pSame > 240.0) pSame = 240.0 + (pSame - 240.0) * 0.25;
         const prevRoP = wImm * pImm + (1.0 - wImm) * pSame;
 
-        let prevResRO = resRO;
-        if (histRO[refDate]) {
-            const pDem = (histRO[refDate].demand && histRO[refDate].demand[h]) ? histRO[refDate].demand[h] : demRO;
-            const pSol = (histRO[refDate].solar && histRO[refDate].solar[h] && h >= 5 && h <= 18) ? histRO[refDate].solar[h] : 0;
-            const pWind = (histRO[refDate].wind && histRO[refDate].wind[h]) ? histRO[refDate].wind[h] : 0;
-            const pHydro = (histRO[refDate].hydro && histRO[refDate].hydro[h]) ? histRO[refDate].hydro[h] : 0;
-            prevResRO = pDem - pSol - pWind - pHydro;
+        function _calcResRO(dt) {
+            if (!histRO[dt]) return resRO;
+            const pDem = (histRO[dt].demand && histRO[dt].demand[h]) ? histRO[dt].demand[h] : demRO;
+            const pSol = (histRO[dt].solar && histRO[dt].solar[h] && h >= 5 && h <= 18) ? histRO[dt].solar[h] : 0;
+            const pWind = (histRO[dt].wind && histRO[dt].wind[h]) ? histRO[dt].wind[h] : 0;
+            const pHydro = (histRO[dt].hydro && histRO[dt].hydro[h]) ? histRO[dt].hydro[h] : 0;
+            return pDem - pSol - pWind - pHydro;
         }
+        const resImm = _calcResRO(priorImm);
+        const resSame = _calcResRO(priorSameDow);
+        const prevResRO = wImm * resImm + (1.0 - wImm) * resSame;
         const dResRO = resRO - prevResRO;
 
         const deShock = getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, 'RO');
-        const statAnchor = Math.max(0.0, prevRoP + euaDelta + (dResRO * 0.012) + ttfLevelAdj + deShock + seeScarcityLiftRO);
+        const roSlope = (dResRO > 300) ? 0.008 : (dResRO < -300 ? 0.008 : 0.006);
+        const statAnchor = Math.max(0.0, prevRoP + euaDelta + (dResRO * roSlope) + ttfLevelAdj + deShock + seeScarcityLiftRO);
         let regionalAnchor = statAnchor;
 
         // Ex-ante cross-border signals
@@ -14542,6 +14554,11 @@ function _computeROForecast(targetDate) {
             flowRS = Math.min(hAtcImportRS, Math.max(-hAtcExportRS, (pEstimate - pBorder) * 10.0));
             flowUA = Math.min(hAtcImportUA, Math.max(-hAtcExportUA, (pEstimate - pBorder) * 10.0));
             netImport = flowHU + flowBG + flowRS + flowUA;
+            const maxFleetRO = activeFleetRO.reduce((a, b) => a + b.avail_mw, 0);
+            if (netImport < 0) {
+                const maxExportRO = Math.max(0, maxFleetRO - resRO - 200);
+                if (-netImport > maxExportRO) netImport = -maxExportRO;
+            }
             reqGen = resRO - netImport;
             // Cap midday export so that exports do not force expensive domestic CCGTs to turn on during solar surplus
             if (h >= 9 && h <= 15 && isSolarCollapse) {
@@ -14632,8 +14649,8 @@ function _computeROForecast(targetDate) {
         const modelMean = hourlyResults.reduce((a, x) => a + x.model_price_ro, 0) / 24.0;
         const knnMean = knn24RO.reduce((a, b) => a + b, 0) / 24.0;
         for (let h = 0; h < 24; h++) {
-            const knnLevel = knn24RO[h] + modelMean - knnMean;
-            let blended = 0.30 * hourlyResults[h].model_price_ro + 0.70 * knnLevel;
+            // KNN bypassed: physical merit model price preserved
+            let blended = hourlyResults[h].model_price_ro;
             // Guardrail: if model solved near 0 in solar collapse, do not let KNN elevate it
             if (hourlyResults[h].model_price_ro < 5.0 && h >= 9 && h <= 15) {
                 blended = Math.min(blended, Math.max(-0.50, hourlyResults[h].model_price_ro * 1.5));
@@ -14900,7 +14917,7 @@ function _computeBGForecast(targetDate) {
     const bgOutage = (kozlSpec && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(kozlSpec, 'BG', targetDate).unavail_mw : 0;
     const huOutage = (paksSpec && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(paksSpec, 'HU', targetDate).unavail_mw : 0;
     const seeNucOutage = (roOutage || 0) + (bgOutage || 0);
-    const isAcuteSEEOutage = (seeNucOutage >= 1800 && huOutage >= 400);
+    const isAcuteSEEOutage = (seeNucOutage >= 1600 && huOutage >= 400);
     const seeScarcityLiftBG = isAcuteSEEOutage ? (isWeekend ? (targetDOW === 6 ? 35.0 : 6.0) : 6.0) : 0.0;
 
     const refDate = priorImm || priorSameDow;
@@ -14998,16 +15015,20 @@ function _computeBGForecast(targetDate) {
 
         // Regional price references
         const pImm = (priorImm && histBG[priorImm] && histBG[priorImm].prices) ? (histBG[priorImm].prices[h] !== undefined ? histBG[priorImm].prices[h] : _fb('BG')) : _fb('BG');
-        const pSame = (priorSameDow && histBG[priorSameDow] && histBG[priorSameDow].prices) ? (histBG[priorSameDow].prices[h] !== undefined ? histBG[priorSameDow].prices[h] : _fb('BG')) : pImm;
+        let pSame = (priorSameDow && histBG[priorSameDow] && histBG[priorSameDow].prices) ? (histBG[priorSameDow].prices[h] !== undefined ? histBG[priorSameDow].prices[h] : _fb('BG')) : pImm;
+        if (targetDOW === 1 && pSame > 240.0) pSame = 240.0 + (pSame - 240.0) * 0.25;
         const prevBgP = wImm * pImm + (1.0 - wImm) * pSame;
 
-        let prevResBG = resBG;
-        if (histBG[refDate]) {
-            const pDem = (histBG[refDate].demand && histBG[refDate].demand[h]) ? histBG[refDate].demand[h] : demBG;
-            const pSol = (histBG[refDate].solar && histBG[refDate].solar[h] && h >= 5 && h <= 18) ? histBG[refDate].solar[h] : 0;
-            const pWind = (histBG[refDate].wind && histBG[refDate].wind[h]) ? histBG[refDate].wind[h] : 0;
-            prevResBG = pDem - pSol - pWind;
+        function _calcResBG(dt) {
+            if (!histBG[dt]) return resBG;
+            const pDem = (histBG[dt].demand && histBG[dt].demand[h]) ? histBG[dt].demand[h] : demBG;
+            const pSol = (histBG[dt].solar && histBG[dt].solar[h] && h >= 5 && h <= 18) ? histBG[dt].solar[h] : 0;
+            const pWind = (histBG[dt].wind && histBG[dt].wind[h]) ? histBG[dt].wind[h] : 0;
+            return pDem - pSol - pWind;
         }
+        const resImmBG = _calcResBG(priorImm);
+        const resSameBG = _calcResBG(priorSameDow);
+        const prevResBG = wImm * resImmBG + (1.0 - wImm) * resSameBG;
         const dResBG = resBG - prevResBG;
 
         // Calibrated Ridge Regression Hour Anchor
@@ -15182,8 +15203,8 @@ function _computeBGForecast(targetDate) {
         const modelMean = hourlyResults.reduce((a, x) => a + x.model_price_bg, 0) / 24.0;
         const knnMean = knn24BG.reduce((a, b) => a + b, 0) / 24.0;
         for (let h = 0; h < 24; h++) {
-            const knnLevel = knn24BG[h] + modelMean - knnMean;
-            const blended = isAcuteSEEOutage ? hourlyResults[h].model_price_bg : (0.30 * hourlyResults[h].model_price_bg + 0.70 * knnLevel);
+            // KNN bypassed: physical model price preserved
+            const blended = hourlyResults[h].model_price_bg;
             hourlyResults[h].model_price_bg = blended;
             const act = hourlyResults[h].actual_price_bg;
             hourlyResults[h].price_delta_bg = act !== null ? (blended - act) : null;
@@ -15723,7 +15744,7 @@ function _computeGRForecast(targetDate) {
     const bgOutageGR = (kozlSpecGR && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(kozlSpecGR, 'BG', targetDate).unavail_mw : 0;
     const huOutageGR = (paksSpecGR && typeof getPlantOutageInfo === 'function') ? getPlantOutageInfo(paksSpecGR, 'HU', targetDate).unavail_mw : 0;
     const seeNucOutageGR = (roOutageGR || 0) + (bgOutageGR || 0);
-    const isAcuteSEEOutageGR = (seeNucOutageGR >= 1800 && huOutageGR >= 400);
+    const isAcuteSEEOutageGR = (seeNucOutageGR >= 1600 && huOutageGR >= 400);
     const targetDOW_GR = new Date(targetDate + 'T00:00:00Z').getUTCDay();
     const isWkndGR = (targetDOW_GR === 0 || targetDOW_GR === 6);
     const seeScarcityLiftGR = isAcuteSEEOutageGR ? (isWkndGR ? (targetDOW_GR === 6 ? Math.min(58.0, (seeNucOutageGR - 1800) * 0.048 + 34.5) : 8.0) : Math.min(6.0, (seeNucOutageGR - 1800) * 0.005 + 2.0)) : 0.0;
@@ -15903,7 +15924,8 @@ function _computeGRForecast(targetDate) {
 
             // Physical Midday Solar Collapse (when residual drops below must-run minimum or cannot clear above mandatory base):
             if (isNoonHour) {
-                if (resGR <= -hAtcExportBG) {
+                const totExpMid = hAtcExportBG + hAtcExportIT + hAtcExportMK + hAtcExportAL;
+                if (resGR <= -totExpMid || (isWeekend && resGR <= -hAtcExportBG)) {
                     bgBaseline = Math.min(bgBaseline, 0.01);
                 } else if (resGR <= (mustRunBaseTotal * 0.8) && bgBaseline <= 60.0) {
                     // When residual is below mandatory hydro + CHP must-run base and regional sink is depressed, the price collapses
@@ -16026,10 +16048,10 @@ function _computeGRForecast(targetDate) {
             (resGR < -1200 && isExportCongested)
         ));
 
-        const decoupleExport = isSolarMidday && (isFloorSurplus || resGR < -300 || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
+        const decoupleExport = isSolarMidday && (isFloorSurplus || (isWeekend && resGR < -300) || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
-            if (isFloorSurplus || resGR < -300 || (h >= 10 && h <= 15 && resGR < 500 && bgBaseline <= 60.0)) {
+            if (isFloorSurplus || (isWeekend && resGR < -300) || (h >= 10 && h <= 15 && resGR < 500 && bgBaseline <= 60.0)) {
                 bestP = 0.01;
                 bestUnit = 'RES Surplus (Curtailment Floor) (Decoupled Export)';
                 bestMarginalType = 'res_surplus';
@@ -16071,15 +16093,8 @@ function _computeGRForecast(targetDate) {
         // ML ensemble: ridge (level) + KNN analogue (shape) + fundamental
         const isFloorRegime = (decoupleExport || bestMarginalType === 'res_surplus' || (isSolarMidday && bestP <= 0.05) || ((bestMarginalType === 'min_load' || bestMarginalType === 'must_run_base') && bestP <= 5.0));
         if (!isFloorRegime) {
-            const mlP = mlForecastPrice(hist, targetDate, h, ttfPrice, euaPrice);
-            const knnP = knn24 ? knn24[h] : null;
-            const hasMl = mlP != null && mlP > 0;
-            const hasKnn = knnP != null && knnP > 0;
-            const isWknd = (targetDOW === 0 || targetDOW === 6);
-            const acuteMute = isAcuteSEEOutageGR && !isWknd;
-            if (hasMl && hasKnn) bestP = acuteMute ? (0.85 * bestP + 0.15 * knnP) : (0.40 * mlP + 0.20 * bestP + 0.40 * knnP);
-            else if (hasMl) bestP = acuteMute ? bestP : (0.70 * mlP + 0.30 * bestP);
-            else if (hasKnn) bestP = acuteMute ? (0.85 * bestP + 0.15 * knnP) : (0.60 * knnP + 0.40 * bestP);
+            // ML/KNN bypassed: physical merit order stack (bestP) given full authority
+            bestP = bestP;
         }
 
         // Shoulder thermal stack floor guard (H09 & H17 CET): when residual is high (>2000 MW),
@@ -16114,6 +16129,7 @@ function _computeGRForecast(targetDate) {
             pred_spread: bestP - bgBaseline,
             model_price_gr: bestP,
             marginal_plant_gr: bestUnit,
+            domestic_marginal_plant_gr: (clearedTrade && clearedTrade.marginal_plant) ? clearedTrade.marginal_plant : 'Greek Thermal Stack',
             marginal_type_gr: bestMarginalType,
             actual_price_gr: actPgr,
             price_delta_gr: actPgr !== null ? (bestP - actPgr) : null,
@@ -19299,7 +19315,8 @@ function resolveActualMarginalPlant(zone, hIndex, d, targetDate) {
 
     // 1. Greece (GR)
     if (zone === 'GR') {
-        if (mp === 'SDAC Coupled' || mp.includes('Coupled')) {
+        const isCoupledWithBG = d.cluster_members ? d.cluster_members.includes('BG') : d.is_coupled;
+        if (isCoupledWithBG && (mp === 'SDAC Coupled' || mp.includes('Coupled'))) {
             let bgSolved = null;
             try {
                 if (window._solveBGCache && window._solveBGCache[targetDate]) {
@@ -19313,24 +19330,29 @@ function resolveActualMarginalPlant(zone, hIndex, d, targetDate) {
                 const bgMp = bgSolved.hourly[hIndex].marginal_plant_bg || '';
                 if (bgMp) {
                     if (bgMp.includes('RES Surplus') || bgMp.includes('Curtailment') || bgMp.includes('Solar')) {
-                        return '☀️ RES Surplus Floor (0.01 €) 🇧🇬';
+                        return '☀️ RES Surplus Floor (0.01 €) 🇧🇬 (Coupled)';
                     }
                     if (bgMp.includes('Maritsa') || bgMp.includes('AES') || bgMp.includes('Bobov') || bgMp.includes('Lignite')) {
-                        return `⛏️ ${bgMp} 🇧🇬`;
+                        return `⛏️ ${bgMp} 🇧🇬 (Coupled)`;
                     }
                     if (bgMp.includes('Kozloduy') || bgMp.includes('Nuclear')) {
-                        return `⚛️ ${bgMp} 🇧🇬`;
+                        return `⚛️ ${bgMp} 🇧🇬 (Coupled)`;
                     }
                     if (bgMp.includes('Belmeken') || bgMp.includes('Chaira') || bgMp.includes('Hydro') || bgMp.includes('Cascade')) {
-                        return `💧 ${bgMp} 🇧🇬`;
+                        return `💧 ${bgMp} 🇧🇬 (Coupled)`;
                     }
                     if (bgMp.includes('Scarcity') || bgMp.includes('Emergency') || bgMp.includes('Reserve')) {
-                        return `🚨 ${bgMp} 🇧🇬`;
+                        return `🚨 ${bgMp} 🇧🇬 (Coupled)`;
                     }
-                    return `${bgMp} 🇧🇬`;
+                    return `${bgMp} 🇧🇬 (Coupled)`;
                 }
             }
-            return '⚡ SDAC Balkan Pool 🇧🇬';
+            return '⚡ SDAC Balkan Pool 🇧🇬 (Coupled)';
+        }
+
+        // If GR is NOT coupled with BG, it MUST use Greece's domestic marginal plant:
+        if (mp === 'SDAC Coupled' || !mp) {
+            mp = d.domestic_marginal_plant_gr || 'Greek Thermal Stack';
         }
 
         if (mp.includes('RES Surplus') || mp.includes('Curtailment Floor') || ((optP(d, 'model_price') || 0) <= 0.05 && hIndex >= 9 && hIndex <= 15)) {
