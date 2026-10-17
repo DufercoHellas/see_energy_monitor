@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-17 20:57</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-17 21:18</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-17 20:57
+                Last DB Audit: 2026-10-17 21:18
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12553,7 +12553,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-17 20:57";
+                const currentBuildTime = "2026-10-17 21:18";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13867,7 +13867,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     const bgOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
     const isSunday = new Date(targetDate + 'T00:00:00Z').getUTCDay() === 0;
-    const isAcuteOutage = (['HU', 'BG', 'GR', 'RO'].includes(zone) && (roOutage + bgOutage) >= 2100 && huOutage >= 400 && !isSunday);
+    const isAcuteOutage = (['HU', 'BG', 'GR', 'RO'].includes(zone) && (roOutage + bgOutage) >= 2100 && huOutage >= 400);
 
     // 1) daily-level ML ensemble (physics + ridge)
     let shift = 0.0;
@@ -14064,7 +14064,16 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
     const THRESHOLD = DE_SHOCK.threshold;
     const KAPPA = DE_SHOCK.kappa; // EUR/MWh per MW of extreme deficit
     if (dResDE > THRESHOLD) {
-        return (dResDE - THRESHOLD) * KAPPA * deZoneGain(zone);
+        let rawShock = (dResDE - THRESHOLD) * KAPPA * deZoneGain(zone);
+        if (zone !== 'DE_LU' && zone !== 'DE' && deRef && hist[zone] && hist[zone][deRefDate] && hist[zone][deRefDate].prices) {
+            const zP = hist[zone][deRefDate].prices[h];
+            const deP = deRef.prices ? deRef.prices[h] : null;
+            if (zP != null && deP != null && zP > deP) {
+                const existingSpread = zP - deP;
+                rawShock = Math.max(0, rawShock - existingSpread * 0.70);
+            }
+        }
+        return rawShock;
     }
     return 0;
 }
@@ -14153,9 +14162,10 @@ function resolveCorridorMarketSplitting(targetDate) {
         const edges = [];
 
         // Physical SDAC Corridor Congestion Logic:
-        // Link 1: HU <-> RO (ATC ~1,400 MW). Couples when spread <= 18 EUR
+        // Link 1: HU <-> RO (ATC ~1,400 MW). Couples freely outside solar window or up to 20 EUR spread
         const dHU_RO = Math.abs(pHU - pRO);
-        if (dHU_RO <= 18.0) {
+        const maxHuRoSpread = (!isSolarWindow) ? 35.0 : 20.0;
+        if (dHU_RO <= maxHuRoSpread) {
             edges.push(['HU', 'RO']);
         }
 
@@ -14167,10 +14177,12 @@ function resolveCorridorMarketSplitting(targetDate) {
 
         // Link 3: BG <-> GR. 
         // In solar window (H10-H15), if Greece is in solar collapse (pGR near 0), cable congests northbound!
-        // Outside solar window, BG and GR couple freely up to 22 EUR spread.
+        // Outside solar window, BG and GR couple freely up to 50 EUR spread when interconnectors are uncongested.
         const isGrSolarSurplus = (isSolarWindow && pGR < 50.0 && pBG > 100.0);
         const dBG_GR = Math.abs(pBG - pGR);
-        if (!isGrSolarSurplus && dBG_GR <= 22.0) {
+        const isEveningOrNight = !isSolarWindow;
+        const maxCouplingSpread = isEveningOrNight ? 50.0 : 25.0;
+        if (!isGrSolarSurplus && dBG_GR <= maxCouplingSpread) {
             edges.push(['BG', 'GR']);
         }
 
@@ -14443,7 +14455,7 @@ function solveHUForecast(targetDate, skipSplitting) {
         const bg = bgRaw !== null ? bgRaw : p;
         const dRes = resHU - prevResHU;
         let pFeat = p;
-        if (targetDOW === 0 && p > 180.0) pFeat = p * 0.70;
+        // Sunday discount removed for physical merit fidelity
         if (targetDOW === 1 && p > 240.0) pFeat = 240.0 + (p - 240.0) * 0.25;
         const feats = { p: pFeat, ps: ps, ca: ca, ro: ro, rs: rs, bg: bg, d_res: dRes, d_eua: dEua, ttf: ttfPrice };
         let anchor = _dynLin('HU', h, [feats.p, feats.ps, feats.ca, feats.ro, feats.rs, feats.bg, feats.d_res, feats.d_eua, feats.ttf]);
@@ -16267,9 +16279,9 @@ function _computeGRForecast(targetDate) {
             // Physical Midday Solar Collapse (when residual drops below must-run minimum or cannot clear above mandatory base):
             if (isNoonHour) {
                 const totExpMid = hAtcExportBG + hAtcExportIT + hAtcExportMK + hAtcExportAL;
-                if (resGR <= -totExpMid || (isWeekend && resGR <= -hAtcExportBG)) {
+                if ((h >= 10 && h <= 14 && (resGR <= -totExpMid || (isWeekend && resGR <= -hAtcExportBG))) || (h === 15 && resGR <= -totExpMid)) {
                     bgBaseline = Math.min(bgBaseline, 0.01);
-                } else if (resGR <= (mustRunBaseTotal * 0.8) && bgBaseline <= 60.0) {
+                } else if ((h >= 10 && h <= 14 ? resGR <= (mustRunBaseTotal * 0.8) : resGR <= 200.0) && bgBaseline <= 60.0) {
                     // When residual is below mandatory hydro + CHP must-run base and regional sink is depressed, the price collapses
                     const normRes = Math.max(0, resGR) / (mustRunBaseTotal * 0.8);
                     bgBaseline = Math.min(bgBaseline, Math.max(0.01, normRes * 15.0));
@@ -16390,10 +16402,10 @@ function _computeGRForecast(targetDate) {
             (resGR < -1200 && isExportCongested)
         ));
 
-        const decoupleExport = isSolarMidday && (isFloorSurplus || (isWeekend && resGR < -300) || (isExportCongested && resGR < 500) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
+        const decoupleExport = isSolarMidday && (isFloorSurplus || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 60.0) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
-            if (isFloorSurplus || (isWeekend && resGR < -300) || (h >= 10 && h <= 15 && resGR < 500 && bgBaseline <= 60.0)) {
+            if (isFloorSurplus || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 60.0)) {
                 bestP = 0.01;
                 bestUnit = 'RES Surplus (Curtailment Floor) (Decoupled Export)';
                 bestMarginalType = 'res_surplus';
@@ -16437,6 +16449,11 @@ function _computeGRForecast(targetDate) {
         if (!isFloorRegime) {
             // ML/KNN bypassed: physical merit order stack (bestP) given full authority
             bestP = bestP;
+        }
+
+        if (h === 15 && resGR > 200 && bestP < 40.0) {
+            bestP = Math.max(bestP, Math.min(65.0, ccgtSrmc * grCalib.pminSolar));
+            bestMarginalType = 'min_load';
         }
 
         // Shoulder thermal stack floor guard (H09 & H17 CET): when residual is high (>2000 MW),
