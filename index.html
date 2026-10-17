@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-17 20:11</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-17 20:57</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-17 20:11
+                Last DB Audit: 2026-10-17 20:57
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12481,6 +12481,11 @@ async function initDashboardData() {
 
                     // Fresh data invalidates the optimizer's cached ex-ante daily levels
                     window._engineBaseDailyCache = {};
+                    window._solveGRCache = {};
+                    window._solveBGCache = {};
+                    window._solveROCache = {};
+                    window._solveHUCache = {};
+                    window._corridorMarketSplitCache = {};
                     window._outageInfoCache = { key: null, map: {} };
 
                     // Pre-load EU Map GeoJSON in the background for instant rendering
@@ -12548,7 +12553,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-17 20:11";
+                const currentBuildTime = "2026-10-17 20:57";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14570,7 +14575,7 @@ function runCoupledMeritOrderOptimizerHU(targetDate) {
 
     lastSolvedOptimization = window.lastSolvedOptimization = solved;
 
-    if (window._engineComputeOnly) return;
+    if (window._engineComputeOnly) return solved;
     render24hOptimizerProfileChart();
     renderSelectedHourDetails();
     renderOptimizerTable();
@@ -18672,6 +18677,11 @@ function initPlantEconomics() {
             // empty plant lists (prior-day AR1 bases, gas SRMC reference, calibration).
             // Invalidate them so results don't depend on which tab the page loaded on.
             window._engineBaseDailyCache = {};
+            window._solveGRCache = {};
+            window._solveBGCache = {};
+            window._solveROCache = {};
+            window._solveHUCache = {};
+            window._corridorMarketSplitCache = {};
             window._refParamsCache = {};
             window._calibCache = null;
             window._grCalibCache = {};
@@ -19637,11 +19647,11 @@ function renderExecutiveKPICards(solved) {
 
     // 1. Baseload forecast & actual spot
     const modelPrices = data.map(d => optP(d, 'model_price')).filter(p => p !== null && !isNaN(p));
-    const actualPrices = data.map(d => optP(d, 'actual_price')).filter(p => p !== null && !isNaN(p) && p !== 0);
-    const hasActual = actualPrices.length >= 12;
+    const actualPrices = data.map(d => optP(d, 'actual_price')).filter(p => p !== null && !isNaN(p));
+    const hasActual = actualPrices.length >= 12 && !actualPrices.every(p => p === 0 || p === null || isNaN(p));
 
     const predMean = modelPrices.length ? modelPrices.reduce((a, b) => a + b, 0) / modelPrices.length : 0;
-    const actMean = actualPrices.length ? actualPrices.reduce((a, b) => a + b, 0) / actualPrices.length : null;
+    const actMean = (hasActual && actualPrices.length) ? actualPrices.reduce((a, b) => a + b, 0) / actualPrices.length : null;
 
     const predEl = document.getElementById("econ_opt_pred_baseload");
     if (predEl) predEl.innerText = `${predMean.toFixed(2)} €/MWh`;
