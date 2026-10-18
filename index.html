@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-18 20:04</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-18 23:41</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-18 20:04
+                Last DB Audit: 2026-10-18 23:41
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12755,7 +12755,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-18 20:04";
+                const currentBuildTime = "2026-10-18 23:41";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14287,11 +14287,28 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
 // HU <-> RO <-> BG <-> GR
 //
 // When border transmission corridors are uncongested, borders merge into
-// single price clusters (Connected Components) with 1 shared clearing price (0.00 EUR spread).
-// When transmission corridors congest (e.g. midday Greek solar exports, Danube flow-gates),
-// the chain breaks, isolating the decoupled zones into separate price clusters.
+// single price clusters with 1 shared clearing price (0.00 EUR spread).
+// When transmission corridors congest (e.g. midday Greek solar exports, Danube flow-gates, cable outages),
+// the chain breaks, isolating the decoupled zones into separate price clusters with physical congestion rents.
 
 window._corridorMarketSplitCache = window._corridorMarketSplitCache || {};
+
+function getBorderCapacityForHour(corridor, targetDate, hour, defaultCap) {
+    if (typeof window !== 'undefined' && window.cableOutagesData && Array.isArray(window.cableOutagesData)) {
+        const pos = hour + 1;
+        const match = window.cableOutagesData.find(x => x.corridor_code === corridor && x.trade_date === targetDate && x.position === pos);
+        if (match && match.remaining_capacity !== undefined && match.remaining_capacity !== null) {
+            return Math.max(0, parseFloat(match.remaining_capacity));
+        }
+    }
+    if (typeof window !== 'undefined' && window.forecastCapacitiesData && window.forecastCapacitiesData[targetDate]) {
+        const fc = window.forecastCapacitiesData[targetDate][corridor];
+        if (fc && fc[hour] !== undefined && fc[hour] !== null) {
+            return Math.max(0, parseFloat(fc[hour]));
+        }
+    }
+    return defaultCap;
+}
 
 function resolveCorridorMarketSplitting(targetDate) {
     if (!targetDate) return false;
@@ -14299,10 +14316,8 @@ function resolveCorridorMarketSplitting(targetDate) {
     if (window._corridorMarketSplitCache[targetDate]) {
         return true;
     }
-    // Set lock to prevent recursion while individual zonal solves run
     window._corridorMarketSplitCache[targetDate] = true;
 
-    // 1. Ensure all 4 raw zonal solutions are computed
     const grOpt = (typeof solveGRForecast === 'function') ? solveGRForecast(targetDate, true) : null;
     const bgOpt = (typeof solveBGForecast === 'function') ? solveBGForecast(targetDate, true) : null;
     const roOpt = (typeof solveROForecast === 'function') ? solveROForecast(targetDate, true) : null;
@@ -14318,7 +14333,14 @@ function resolveCorridorMarketSplitting(targetDate) {
     const actKey = { HU: 'actual_price_hu', RO: 'actual_price_ro', BG: 'actual_price_bg', GR: 'actual_price_gr' };
     const deltaKey = { HU: 'price_delta_hu', RO: 'price_delta_ro', BG: 'price_delta_bg', GR: 'price_delta_gr' };
 
-    // Helper: Graph Connected Components for an undirected graph
+    // Effective zonal price-to-flow sensitivities (EUR/MW) derived from merit order supply elasticties
+    const SLOPES = {
+        HU: 0.014,
+        RO: 0.013,
+        BG: 0.011,
+        GR: 0.015
+    };
+
     function getConnectedComponents(nodes, edges) {
         const adj = {};
         nodes.forEach(n => { adj[n] = []; });
@@ -14349,79 +14371,123 @@ function resolveCorridorMarketSplitting(targetDate) {
         return components;
     }
 
-    // 2. Evaluate each hour h in 0..23
     for (let h = 0; h < 24; h++) {
-        const pHU = huOpt.hourly[h] ? huOpt.hourly[h].model_price_hu : null;
-        const pRO = roOpt.hourly[h] ? roOpt.hourly[h].model_price_ro : null;
-        const pBG = bgOpt.hourly[h] ? bgOpt.hourly[h].model_price_bg : null;
-        const pGR = grOpt.hourly[h] ? grOpt.hourly[h].model_price_gr : null;
+        let pHU = huOpt.hourly[h] ? huOpt.hourly[h].model_price_hu : null;
+        let pRO = roOpt.hourly[h] ? roOpt.hourly[h].model_price_ro : null;
+        let pBG = bgOpt.hourly[h] ? bgOpt.hourly[h].model_price_bg : null;
+        let pGR = grOpt.hourly[h] ? grOpt.hourly[h].model_price_gr : null;
 
         if (pHU === null || pRO === null || pBG === null || pGR === null) continue;
 
-        const isSolarWindow = (h >= 9 && h <= 14); // H10-H15 CET
+        const isSolarWindow = (h >= 9 && h <= 15);
+        const isEveningPeak = (h >= 17 && h <= 21);
 
-        // Evaluate the 3 links in the corridor chain: HU <-> RO <-> BG <-> GR
+        // Real Commercial Transfer Capacities (MW):
+        // 1) HU <-> RO (empirical commercial NTC: ~550 MW HU->RO, ~720 MW RO->HU)
+        const atc_hu_to_ro = getBorderCapacityForHour('HU-RO', targetDate, h, 550.0);
+        const atc_ro_to_hu = getBorderCapacityForHour('RO-HU', targetDate, h, 720.0);
+
+        // 2) RO <-> BG (Danube: derated to 1,200 MW in evening peak tightness, 1,850 MW other hours)
+        const roBgBase = isEveningPeak ? 1200.0 : 1850.0;
+        const atc_ro_to_bg = getBorderCapacityForHour('RO-BG', targetDate, h, roBgBase);
+        const atc_bg_to_ro = getBorderCapacityForHour('BG-RO', targetDate, h, roBgBase);
+
+        // 3) BG <-> GR
+        // BG->GR: ~700 MW average commercial availability.
+        // GR->BG: ~530 MW average, dropping to 450 MW at noon solar peak
+        const defaultExpGR = isSolarWindow ? 450.0 : 650.0;
+        const atc_bg_to_gr = getBorderCapacityForHour('BG-GR', targetDate, h, 700.0);
+        const atc_gr_to_bg = getBorderCapacityForHour('GR-BG', targetDate, h, defaultExpGR);
+
+        let f_hu_ro = 0.0, f_ro_bg = 0.0, f_bg_gr = 0.0;
+
+        for (let it = 0; it < 5; it++) {
+            // Link 1: HU <-> RO
+            let cur_pHU = pHU + SLOPES.HU * f_hu_ro;
+            let cur_pRO = pRO - SLOPES.RO * f_hu_ro + SLOPES.RO * f_ro_bg;
+            let delta_f1 = (cur_pRO - cur_pHU) / (SLOPES.HU + SLOPES.RO);
+            f_hu_ro = Math.max(-atc_ro_to_hu, Math.min(atc_hu_to_ro, f_hu_ro + delta_f1));
+
+            // Link 2: RO <-> BG
+            cur_pRO = pRO - SLOPES.RO * f_hu_ro + SLOPES.RO * f_ro_bg;
+            let cur_pBG = pBG - SLOPES.BG * f_ro_bg + SLOPES.BG * f_bg_gr;
+            let delta_f2 = (cur_pBG - cur_pRO) / (SLOPES.RO + SLOPES.BG);
+            f_ro_bg = Math.max(-atc_bg_to_ro, Math.min(atc_ro_to_bg, f_ro_bg + delta_f2));
+
+            // Link 3: BG <-> GR
+            cur_pBG = pBG - SLOPES.BG * f_ro_bg + SLOPES.BG * f_bg_gr;
+            let cur_pGR = pGR - SLOPES.GR * f_bg_gr;
+            let delta_f3 = (cur_pGR - cur_pBG) / (SLOPES.BG + SLOPES.GR);
+            f_bg_gr = Math.max(-atc_gr_to_bg, Math.min(atc_bg_to_gr, f_bg_gr + delta_f3));
+        }
+
+        let cl_pHU = pHU + SLOPES.HU * f_hu_ro;
+        let cl_pRO = pRO - SLOPES.RO * f_hu_ro + SLOPES.RO * f_ro_bg;
+        let cl_pBG = pBG - SLOPES.BG * f_ro_bg + SLOPES.BG * f_bg_gr;
+        let cl_pGR = pGR - SLOPES.GR * f_bg_gr;
+
+        const cong_hu_ro = (f_hu_ro >= atc_hu_to_ro - 1.0) || (f_hu_ro <= -atc_ro_to_hu + 1.0);
+        const cong_ro_bg = (f_ro_bg >= atc_ro_to_bg - 1.0) || (f_ro_bg <= -atc_bg_to_ro + 1.0);
+        const cong_bg_gr = (f_bg_gr >= atc_bg_to_gr - 1.0) || (f_bg_gr <= -atc_gr_to_bg + 1.0);
+
         const edges = [];
-
-        // Physical SDAC Corridor Congestion Logic:
-        // Link 1: HU <-> RO (ATC ~1,400 MW). Couples freely outside solar window or up to 20 EUR spread
-        const dHU_RO = Math.abs(pHU - pRO);
-        const maxHuRoSpread = (!isSolarWindow) ? 35.0 : 20.0;
-        if (dHU_RO <= maxHuRoSpread) {
+        if (!cong_hu_ro && Math.abs(cl_pHU - cl_pRO) <= 1.5) {
             edges.push(['HU', 'RO']);
         }
-
-        // Link 2: RO <-> BG (Danube 2,000+ MW). Almost never congests unless extreme nuclear deficit
-        const dRO_BG = Math.abs(pRO - pBG);
-        if (dRO_BG <= 25.0) {
+        if (!cong_ro_bg && Math.abs(cl_pRO - cl_pBG) <= 1.5) {
             edges.push(['RO', 'BG']);
         }
-
-        // Link 3: BG <-> GR. 
-        // In solar window (H10-H15), if Greece is in solar collapse (pGR near 0), cable congests northbound!
-        // Outside solar window, BG and GR couple freely up to 50 EUR spread when interconnectors are uncongested.
-        const isGrSolarSurplus = (isSolarWindow && pGR < 50.0 && pBG > 100.0);
-        const dBG_GR = Math.abs(pBG - pGR);
-        const isEveningOrNight = !isSolarWindow;
-        const maxCouplingSpread = isEveningOrNight ? 50.0 : 25.0;
-        if (!isGrSolarSurplus && dBG_GR <= maxCouplingSpread) {
+        if (!cong_bg_gr && Math.abs(cl_pBG - cl_pGR) <= 1.5) {
             edges.push(['BG', 'GR']);
         }
 
-        // 3. Resolve Connected Components (Price Clusters)
         const clusters = getConnectedComponents(zones, edges);
+        const clearedMap = { HU: cl_pHU, RO: cl_pRO, BG: cl_pBG, GR: cl_pGR };
 
-        // 4. Equalize prices within each cluster
+        const linkInfo = {
+            'HU-RO': { flow: Math.round(f_hu_ro), atc: Math.round(f_hu_ro >= 0 ? atc_hu_to_ro : atc_ro_to_hu), congested: cong_hu_ro, spread: Math.round((cl_pRO - cl_pHU) * 10) / 10 },
+            'RO-BG': { flow: Math.round(f_ro_bg), atc: Math.round(f_ro_bg >= 0 ? atc_ro_to_bg : atc_bg_to_ro), congested: cong_ro_bg, spread: Math.round((cl_pBG - cl_pRO) * 10) / 10 },
+            'BG-GR': { flow: Math.round(f_bg_gr), atc: Math.round(f_bg_gr >= 0 ? atc_bg_to_gr : atc_gr_to_bg), congested: cong_bg_gr, spread: Math.round((cl_pGR - cl_pBG) * 10) / 10 }
+        };
+
         clusters.forEach(comp => {
             const isCoupled = comp.length > 1;
             const clusterLabel = comp.length === 4
-                ? 'Regional Cluster [HU-RO-BG-GR]'
+                ? 'Regional Consensus [HU-RO-BG-GR]'
                 : comp.length > 1
-                    ? 'Cluster [' + comp.join('-') + ']'
+                    ? 'Coupled [' + comp.join('-') + ']'
                     : 'Decoupled';
 
-            let sharedPrice;
+            let sharedPrice = null;
             if (isCoupled) {
-                let sumP = 0;
-                comp.forEach(z => { sumP += optMap[z].hourly[h][priceKey[z]]; });
-                sharedPrice = Math.round((sumP / comp.length) * 100) / 100;
+                let sumWeight = 0;
+                let sumWeightedP = 0;
+                comp.forEach(z => {
+                    const w = 1.0 / SLOPES[z];
+                    sumWeight += w;
+                    sumWeightedP += clearedMap[z] * w;
+                });
+                sharedPrice = Math.round((sumWeightedP / sumWeight) * 100) / 100;
             }
 
             comp.forEach(z => {
                 const hourObj = optMap[z].hourly[h];
-                if (isCoupled) {
-                    hourObj[priceKey[z]] = sharedPrice;
-                    const act = hourObj[actKey[z]];
-                    if (act !== null && act !== undefined && !isNaN(act)) {
-                        hourObj[deltaKey[z]] = Math.round((sharedPrice - act) * 100) / 100;
-                    }
-                    if (z === 'GR' && hourObj.regional_anchor != null) {
-                        hourObj.pred_spread = Math.round((sharedPrice - hourObj.regional_anchor) * 100) / 100;
-                    }
+                const finalP = isCoupled ? sharedPrice : Math.round(clearedMap[z] * 100) / 100;
+                hourObj[priceKey[z]] = finalP;
+
+                const act = hourObj[actKey[z]];
+                if (act !== null && act !== undefined && !isNaN(act)) {
+                    hourObj[deltaKey[z]] = Math.round((finalP - act) * 100) / 100;
+                }
+                if (z === 'GR' && hourObj.regional_anchor != null) {
+                    hourObj.pred_spread = Math.round((finalP - hourObj.regional_anchor) * 100) / 100;
                 }
                 hourObj.is_coupled = isCoupled;
                 hourObj.cluster_label = clusterLabel;
                 hourObj.cluster_members = comp;
+                hourObj.corridor_flow = (z === 'GR') ? -f_bg_gr : (z === 'BG') ? f_ro_bg : (z === 'RO') ? f_hu_ro : 0;
+                hourObj.corridor_congested = (z === 'GR') ? cong_bg_gr : (z === 'BG') ? (cong_bg_gr || cong_ro_bg) : (z === 'RO') ? (cong_ro_bg || cong_hu_ro) : cong_hu_ro;
+                hourObj.corridor_links = linkInfo;
             });
         });
     }
@@ -16395,7 +16461,7 @@ function _computeGRForecast(targetDate) {
 
         if (refDate && histGR[refDate] && histGR[refDate].prices) {
             let effPImm = pImm;
-            if (targetDOW === 1 && (h >= 9 && h <= 15) && pImm < 15.0) {
+            if (targetDOW === 1 && (h >= 9 && h <= 15) && pImm < 50.0) {
                 effPImm = Math.max(115.0, ccgtSrmc * 0.95);
             }
             const prevGrP = wImm * effPImm + (1.0 - wImm) * pSame + mondayBonus;
@@ -16604,7 +16670,7 @@ function _computeGRForecast(targetDate) {
             (resGR < -1200 && isExportCongested)
         ));
 
-        const decoupleExport = isSolarMidday && (isFloorSurplus || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 60.0) || (resGR < 900 && bestNetImport < 0 && bgBaseline <= 60.0));
+        const decoupleExport = isSolarMidday && (isFloorSurplus || (isExportCongested && (resGR < 300 || isWeekend)));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
             if (isFloorSurplus || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 60.0)) {
@@ -20522,15 +20588,18 @@ function renderInterconnectorGrid(sfx, d) {
     </div>`;
 }
 
-function makeCorridorLinkBadge(borderLabel, p1, p2, zone1, zone2) {
+function makeCorridorLinkBadge(borderLabel, p1, p2, zone1, zone2, linkMeta) {
     const spread = Math.abs(p1 - p2);
     const isCoupled = spread <= 0.50;
+    const flowText = (linkMeta && linkMeta.flow !== undefined)
+        ? ` · ${Math.abs(linkMeta.flow)}MW`
+        : '';
 
     if (isCoupled) {
         return `
-        <div style="display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2.5px 7px; border-radius: 5px; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.28); font-size: 11px; min-width: 108px;">
+        <div style="display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2.5px 7px; border-radius: 5px; background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.28); font-size: 11px; min-width: 108px;" title="Coupled via SDAC. Available transmission within ATC limits.">
             <span style="font-weight: 800; letter-spacing: 0.2px;">${borderLabel}</span>
-            <span style="font-weight: 700; font-size: 10.5px;">✓ 0.0€</span>
+            <span style="font-weight: 700; font-size: 10.5px;">✓ 0.0€${flowText}</span>
         </div>`;
     }
 
@@ -20539,9 +20608,10 @@ function makeCorridorLinkBadge(borderLabel, p1, p2, zone1, zone2) {
     const bg = isHeavy ? 'rgba(239, 68, 68, 0.14)' : 'rgba(245, 158, 11, 0.14)';
     const borderColor = isHeavy ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.30)';
     const textColor = isHeavy ? '#ef4444' : '#d97706';
+    const atcLimitText = (linkMeta && linkMeta.atc) ? ` (ATC ${linkMeta.atc}MW)` : '';
 
     return `
-    <div style="display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2.5px 7px; border-radius: 5px; background: ${bg}; color: ${textColor}; border: 1px solid ${borderColor}; font-size: 11px; min-width: 108px;">
+    <div style="display: inline-flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2.5px 7px; border-radius: 5px; background: ${bg}; color: ${textColor}; border: 1px solid ${borderColor}; font-size: 11px; min-width: 108px;" title="Decoupled due to transmission congestion${atcLimitText}">
         <span style="font-weight: 800; letter-spacing: 0.2px;">${borderLabel}</span>
         <span style="font-weight: 800; font-size: 10.5px; font-family: monospace;">⚡ ${premZone} +${spread.toFixed(1)}€</span>
     </div>`;
@@ -20823,11 +20893,13 @@ function renderCorridorMatrix(targetDate) {
 
         const clusterHtml = getCorridorTopologyBadge(targetDate, h);
 
+        const linksMeta = (huRes.hourly[h] && huRes.hourly[h].corridor_links) || (grRes.hourly[h] && grRes.hourly[h].corridor_links) || {};
+
         const linksHtml = `
         <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-            ${makeCorridorLinkBadge('HU↔RO', huP, roP, 'HU', 'RO')}
-            ${makeCorridorLinkBadge('RO↔BG', roP, bgP, 'RO', 'BG')}
-            ${makeCorridorLinkBadge('BG↔GR', bgP, grP, 'BG', 'GR')}
+            ${makeCorridorLinkBadge('HU↔RO', huP, roP, 'HU', 'RO', linksMeta['HU-RO'])}
+            ${makeCorridorLinkBadge('RO↔BG', roP, bgP, 'RO', 'BG', linksMeta['RO-BG'])}
+            ${makeCorridorLinkBadge('BG↔GR', bgP, grP, 'BG', 'GR', linksMeta['BG-GR'])}
         </div>`;
 
         html += `
