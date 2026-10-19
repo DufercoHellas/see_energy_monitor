@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-19 09:56</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-19 10:03</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-19 09:56
+                Last DB Audit: 2026-10-19 10:03
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12784,7 +12784,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-19 09:56";
+                const currentBuildTime = "2026-10-19 10:03";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14412,18 +14412,18 @@ function resolveCorridorMarketSplitting(targetDate) {
 
         const isSolarWindow = (h >= 9 && h <= 15);
 
-        // 1) HU <-> RO: Core FBMC commercial envelope (nominal ~1400 MW HU->RO, ~1500 MW RO->HU, commercial active ~700-1000 MW)
-        const atc_hu_to_ro = getBorderCapacityForHour('HU-RO', targetDate, h, 1000.0);
-        const atc_ro_to_hu = getBorderCapacityForHour('RO-HU', targetDate, h, 1200.0);
+        // 1) HU <-> RO: Core FBMC commercial envelope (commercial limit ~540-550 MW HU->RO, ~720 MW RO->HU)
+        const atc_hu_to_ro = getBorderCapacityForHour('HU-RO', targetDate, h, 550.0);
+        const atc_ro_to_hu = getBorderCapacityForHour('RO-HU', targetDate, h, 720.0);
 
-        // 2) RO <-> BG: Danube interconnector from forecastCapacitiesData (nominal 2,190 MW RO->BG, 2,500 MW BG->RO)
-        const atc_ro_to_bg = getBorderCapacityForHour('RO-BG', targetDate, h, 2190.0);
-        const atc_bg_to_ro = getBorderCapacityForHour('BG-RO', targetDate, h, 2500.0);
+        // 2) RO <-> BG: Danube interconnector (commercial active limit ~1,100 MW RO->BG, ~1,200 MW BG->RO)
+        const atc_ro_to_bg = getBorderCapacityForHour('RO-BG', targetDate, h, 1100.0);
+        const atc_bg_to_ro = getBorderCapacityForHour('BG-RO', targetDate, h, 1200.0);
 
         // 3) BG <-> GR: Exact forecast capacity from forecastCapacitiesData (ADMIE / ESO)
-        // Nominal fallback: BG->GR 1,400 MW, GR->BG 1,170 MW (derated to 850 MW in noon solar hours if missing)
-        const defaultExpGR = isSolarWindow ? 850.0 : 1170.0;
-        const atc_bg_to_gr = getBorderCapacityForHour('BG-GR', targetDate, h, 1400.0);
+        // Commercial limits: BG->GR ~700 MW import limit into GR, GR->BG ~450-530 MW export limit
+        const defaultExpGR = isSolarWindow ? 450.0 : 530.0;
+        const atc_bg_to_gr = getBorderCapacityForHour('BG-GR', targetDate, h, 700.0);
         const atc_gr_to_bg = getBorderCapacityForHour('GR-BG', targetDate, h, defaultExpGR);
 
         let f_hu_ro = 0.0, f_ro_bg = 0.0, f_bg_gr = 0.0;
@@ -14499,7 +14499,7 @@ function resolveCorridorMarketSplitting(targetDate) {
 
             comp.forEach(z => {
                 const hourObj = optMap[z].hourly[h];
-                const finalP = isCoupled ? sharedPrice : Math.round(clearedMap[z] * 100) / 100;
+                const finalP = Math.round(clearedMap[z] * 100) / 100;
                 hourObj[priceKey[z]] = finalP;
 
                 const act = hourObj[actKey[z]];
