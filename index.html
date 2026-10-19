@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-19 09:31</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-19 09:49</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-19 09:31
+                Last DB Audit: 2026-10-19 09:49
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -4003,6 +4003,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                     <input type="checkbox" id="matrix_hide_full" onchange="renderCableOutagesGrid()" checked style="width: 16px; height: 16px; cursor: pointer; accent-color: #3b82f6;">
                     <label for="matrix_hide_full" style="font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer;">Hide 100% Capacity Corridors</label>
                 </div>
+            </div>
             <!-- ── Status Legend for Traders ── -->
             <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; font-size: 11.5px; font-weight: 600; padding: 7px 14px; background: var(--bg-card-subtle-2); border-radius: 8px; border: 1px solid var(--border-color-subtle);">
                 <span style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Status:</span>
@@ -4812,29 +4813,57 @@ function openTab(evt, tabName) {
         sessionStorage.setItem('see_active_tab', tabName);
     } catch(e) {}
     if (tabName === 'EUMap') {
-        initEUMap();
+        try {
+            if (typeof initEUMap === 'function') initEUMap();
+        } catch(e) {
+            console.error("Error initializing EU Map:", e);
+        }
     }
     if (tabName === 'Economics') {
-        if (typeof renderPlantEconomicsTab === 'function') renderPlantEconomicsTab();
+        try {
+            if (typeof renderPlantEconomicsTab === 'function') renderPlantEconomicsTab();
+        } catch(e) {
+            console.error("Error initializing Economics tab:", e);
+        }
     }
     if (tabName === 'PriceForecast') {
-        if (typeof initPriceForecastTab === 'function') initPriceForecastTab();
-        else if (typeof runCoupledMeritOrderOptimizer === 'function') runCoupledMeritOrderOptimizer();
+        try {
+            if (typeof initPriceForecastTab === 'function') initPriceForecastTab();
+            else if (typeof runCoupledMeritOrderOptimizer === 'function') runCoupledMeritOrderOptimizer();
+        } catch(e) {
+            console.error("Error initializing Price Forecast tab:", e);
+        }
     }
     if (tabName === 'Analogues') {
-        if (typeof findAnalogues === 'function' && (!currentTop7 || currentTop7.length === 0)) {
-            findAnalogues();
+        try {
+            const hasMatches = (typeof currentTop7 !== 'undefined' && currentTop7 && currentTop7.length > 0) ||
+                               (window.currentTop7 && window.currentTop7.length > 0);
+            if (typeof findAnalogues === 'function' && !hasMatches) {
+                findAnalogues();
+            }
+        } catch(e) {
+            console.error("Error initializing Analogues tab:", e);
         }
     }
     if (tabName === 'Cables') {
-        if (typeof initCableOutagesSelectors === 'function') initCableOutagesSelectors();
-        if (typeof checkAndRenderDailyOutagesAlert === 'function') checkAndRenderDailyOutagesAlert();
-        if (typeof renderCableOutagesGrid === 'function') renderCableOutagesGrid();
+        try {
+            if (typeof initCableOutagesSelectors === 'function') initCableOutagesSelectors();
+            if (typeof checkAndRenderDailyOutagesAlert === 'function') checkAndRenderDailyOutagesAlert();
+            if (typeof renderCableOutagesGrid === 'function') renderCableOutagesGrid();
+        } catch(e) {
+            console.error("Error initializing Cables tab:", e);
+        }
     }
     if (tabName === 'CableCalculator') {
-        if (typeof initCableCalculator === 'function') initCableCalculator();
+        try {
+            if (typeof initCableCalculator === 'function') initCableCalculator();
+        } catch(e) {
+            console.error("Error initializing Cable Calculator tab:", e);
+        }
     }
-    window.dispatchEvent(new Event('resize'));
+    try {
+        window.dispatchEvent(new Event('resize'));
+    } catch(e) {}
 }
 function openInnerTab(evt, tabName) {
     const parent = evt.currentTarget.closest(".tabcontent");
@@ -12755,7 +12784,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-19 09:31";
+                const currentBuildTime = "2026-10-19 09:49";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -21289,7 +21318,8 @@ function onMatrixCountryChange() {
 
 // Handle daily outages country filter change
 function onDailyCountryChange() {
-                 const country = document.getElementById("daily_country_filter").value;
+                 const countryEl = document.getElementById("daily_country_filter");
+                 const country = countryEl ? countryEl.value : "ALL";
                  const select = document.getElementById("daily_corridor_filter");
                  if (select) {
                      select.innerHTML = '<option value="ALL">All Corridors</option>';
@@ -23101,7 +23131,7 @@ function renderLongCableDetails(rec, corridorCode) {
         corridorAdj = {};
         corridorMap = {};
         const cData = window.cablesData || (typeof cablesData !== 'undefined' ? cablesData : []);
-        const corridors = [...new Set(cData.map(d => d.corridor_code))].filter(Boolean);
+        const corridors = Array.isArray(cData) ? [...new Set(cData.map(d => d.corridor_code))].filter(Boolean) : [];
 
         corridors.forEach(c => {
             corridorMap[c] = true;
