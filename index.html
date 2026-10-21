@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-21 10:00</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-21 10:04</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-21 10:00
+                Last DB Audit: 2026-10-21 10:04
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12812,7 +12812,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-21 10:00";
+                const currentBuildTime = "2026-10-21 10:04";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14741,9 +14741,15 @@ function solveHUForecast(targetDate, skipSplitting) {
     const roOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.RO || []).filter(p => p.id && p.id.includes('CERNAVODA')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'RO', targetDate).unavail_mw : 0), 0);
     const bgOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
-    const seeNucOutage = (roOutage || 0) + (bgOutage || 0);
-    const isAcuteSEEOutage = (seeNucOutage >= 1600 && huOutage >= 400);
-    const seeScarcityLift = isAcuteSEEOutage ? Math.min(18.0, (seeNucOutage - 1800) * 0.018 + 5.0) : 0.0;
+    const totNucOutage = (roOutage || 0) + (bgOutage || 0) + (huOutage || 0);
+    const isAcuteSEEOutage = (totNucOutage >= 1800 || (roOutage >= 1200 && huOutage >= 350));
+    let seeScarcityLift = isAcuteSEEOutage ? Math.min(25.0, (totNucOutage - 1600) * 0.022 + 6.0) : 0.0;
+    if (seeScarcityLift > 0 && priorDates.length > 0) {
+        const pRefMean = _zoneDailyPrice('HU', priorImm);
+        if (pRefMean !== null && pRefMean > 210.0) {
+            seeScarcityLift *= Math.max(0.0, 1.0 - (pRefMean - 210.0) / 40.0);
+        }
+    }
 
     function nbPrice(c, ref, h) {
         const cd = hist[c] && hist[c][ref];
@@ -14835,7 +14841,7 @@ function solveHUForecast(targetDate, skipSplitting) {
             clP = Math.min(clP, Math.max(minMid, anchor * (anchor > 175.0 ? 0.98 : 0.85)));
         }
 
-        let wMerit = (cleared.marginal_type === "scarcity" && reqGen > 6500) ? 0.70 : HU_MERIT_W;
+        let wMerit = (cleared.marginal_type === "scarcity" && reqGen > 5200) ? 0.65 : HU_MERIT_W;
         let modelP = (1.0 - wMerit) * anchor + wMerit * clP;
 
         const actP = (huActualPrices[h] !== undefined && huActualPrices[h] !== null && !isNaN(huActualPrices[h])) ? huActualPrices[h] : null;
