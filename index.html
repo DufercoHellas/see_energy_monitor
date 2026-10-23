@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-23 09:14</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-23 09:56</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-23 09:14
+                Last DB Audit: 2026-10-23 09:56
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12840,7 +12840,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-23 09:14";
+                const currentBuildTime = "2026-10-23 09:56";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14218,6 +14218,12 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
                 const DE_THR = DE_SHOCK.dailyThr;
                 if (dResDE > DE_THR && !['HU', 'RO', 'BG', 'GR'].includes(zone)) {
                     shift += (dResDE - DE_THR) * (DE_K[zone] !== undefined ? DE_K[zone] : 0.0008);
+
+                } else if (dResDE < -DE_THR) {
+                    const downK = (DE_K[zone] !== undefined ? DE_K[zone] : 0.0008) * 0.60;
+                    shift += Math.max(-25.0, (dResDE + DE_THR) * downK);
+
+
                 }
             }
         }
@@ -14361,6 +14367,9 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
             }
         }
         return rawShock;
+    } else if (dResDE < -10000.0) {
+        const downShock = (dResDE + 10000.0) * KAPPA * 0.65 * deZoneGain(zone);
+        return Math.max(-30.0, downShock);
     }
     return 0;
 }
@@ -14669,8 +14678,8 @@ function clearZonalSupplyHU(reqGen, totalDemand, regionalPriceAnchor, hour, flee
     const deficit = reqGen - cum;
     const peakerSrmc = (fleet && fleet.length > 0) ? fleet[fleet.length - 1].srmc : 265.0;
     const baseRef = peakerSrmc;
-    const scarcitySlope = isSaturday ? 0.07 : 0.040;
-    const scarcityBase = isSaturday ? 15.0 : 5.0;
+    const scarcitySlope = 0.040;
+    const scarcityBase = 5.0;
     const scarcityPrice = Math.min(480.0, Math.max(peakerSrmc, baseRef + scarcityBase + deficit * scarcitySlope));
     return {
         price: scarcityPrice,
@@ -15133,7 +15142,7 @@ function _computeROForecast(targetDate) {
     const huOutageRO = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes("PAKS")).reduce((acc, p) => acc + (typeof getPlantOutageInfo === "function" ? getPlantOutageInfo(p, "HU", targetDate).unavail_mw : 0), 0);
     const seeNucOutageRO = (roOutageRO || 0) + (bgOutageRO || 0);
     const isAcuteSEEOutageRO = (seeNucOutageRO >= 1600 && huOutageRO >= 400);
-    const seeScarcityLiftRO = isAcuteSEEOutageRO ? (isWeekend ? (targetDOW === 6 ? 25.0 : 5.0) : 5.0) : 0.0;
+    const seeScarcityLiftRO = isAcuteSEEOutageRO ? (isWeekend ? 3.0 : 5.0) : 0.0;
 
     const priorImm = priorDates.length > 0 ? priorDates[priorDates.length - 1] : null;
     let priorSameDow = null;
@@ -15632,7 +15641,7 @@ function _computeBGForecast(targetDate) {
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
     const seeNucOutage = (roOutage || 0) + (bgOutage || 0);
     const isAcuteSEEOutage = (seeNucOutage >= 1600 && huOutage >= 400);
-    const seeScarcityLiftBG = isAcuteSEEOutage ? (isWeekend ? (targetDOW === 6 ? 35.0 : 6.0) : 6.0) : 0.0;
+    const seeScarcityLiftBG = isAcuteSEEOutage ? (isWeekend ? 3.0 : 6.0) : 0.0;
 
     const refDate = priorImm || priorSameDow;
     const prevEUA = (refDate && histBG[refDate] && histBG[refDate].eua_price) || euaPrice;
