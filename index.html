@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-26 09:22</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-26 10:14</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-26 09:22
+                Last DB Audit: 2026-10-26 10:14
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12882,7 +12882,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-26 09:22";
+                const currentBuildTime = "2026-10-26 10:14";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14196,7 +14196,8 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     const bgOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
     const isSunday = new Date(targetDate + 'T00:00:00Z').getUTCDay() === 0;
-    const isAcuteOutage = (['HU', 'BG', 'GR', 'RO'].includes(zone) && (roOutage + bgOutage) >= 2100 && huOutage >= 400);
+    const huThermalOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
+    const isAcuteOutage = (['HU', 'BG', 'GR', 'RO'].includes(zone) && (((roOutage + bgOutage) >= 1600 && huOutage >= 350) || (zone === 'HU' && huThermalOutage >= 1200)));
 
     // 1) daily-level ML ensemble (physics + ridge)
     let shift = 0.0;
@@ -14261,7 +14262,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
                 if (dResDE > DE_THR && !['HU', 'RO', 'BG', 'GR'].includes(zone)) {
                     shift += (dResDE - DE_THR) * (DE_K[zone] !== undefined ? DE_K[zone] : 0.0008);
 
-                } else if (dResDE < -DE_THR) {
+                } else if (dResDE < -DE_THR && !isAcuteOutage) {
                     const downK = (DE_K[zone] !== undefined ? DE_K[zone] : 0.0008) * 0.60;
                     shift += Math.max(-25.0, (dResDE + DE_THR) * downK);
 
@@ -14410,6 +14411,12 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
         }
         return rawShock;
     } else if (dResDE < -10000.0) {
+        const roOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.RO || []).filter(p => p.id && p.id.includes('CERNAVODA')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'RO', targetDate).unavail_mw : 0), 0);
+        const bgOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
+        const huThermalOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
+        if (['HU', 'RO', 'BG', 'GR'].includes(zone) && ((roOutageDE + bgOutageDE >= 1600) || (zone === 'HU' && huThermalOutageDE >= 1200))) {
+            return 0.0;
+        }
         const downShock = (dResDE + 10000.0) * KAPPA * 0.65 * deZoneGain(zone);
         return Math.max(-30.0, downShock);
     }
@@ -16841,7 +16848,7 @@ function _computeGRForecast(targetDate) {
             const targetM = parseInt(targetDate.slice(5, 7), 10);
             const isWeekend = (targetDOW === 0 || targetDOW === 6);
             const peakThr = isWeekend ? 5800.0 : ((targetM >= 6 && targetM <= 8) ? 6000.0 : 4500.0);
-            if (resGR > peakThr && bestFlowBG >= -150) {
+            if (resGR > peakThr) {
                 const scarcityAdder = Math.min(65.0, (resGR - peakThr) * 0.045);
                 bestP = Math.max(bestP, bgBaseline + scarcityAdder);
             } else if (resGR < 3500 && bgBaseline < 160.0) {
@@ -16875,7 +16882,7 @@ function _computeGRForecast(targetDate) {
             } else {
                 pminCeiling = Math.max(45.0, Math.min(bgBaseline * 0.90, ccgtSrmc * 0.95));
             }
-            const acuteSolarLift = isAcuteSEEOutageGR && resGR >= 0;
+            const acuteSolarLift = (isAcuteSEEOutageGR && resGR >= 0) || (resGR > 1200);
             bestP = acuteSolarLift ? Math.min(bgBaseline, Math.max(bestP, pminCeiling)) : Math.min(bestP, (1.0 - solarWeight * 0.85) * bestP + (solarWeight * 0.85) * pminCeiling);
         }
 
