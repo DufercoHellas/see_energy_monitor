@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-10-26 10:14</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-10-26 11:13</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-10-26 10:14
+                Last DB Audit: 2026-10-26 11:13
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12882,7 +12882,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-10-26 10:14";
+                const currentBuildTime = "2026-10-26 11:13";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14229,7 +14229,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     const ea = EASING_ALPHA[zone];
     if (ea && br !== null && brPrior !== null) shift -= ea * Math.max(0, brPrior - br);
     // 3) half-strength day-of-week bias correction
-    const dowb = DOW_BIAS_HALF[zone];
+    const dowb = isAcuteOutage ? null : DOW_BIAS_HALF[zone];
     if (dowb) shift += dowb[new Date(targetDate + 'T00:00:00Z').getUTCDay()] || 0.0;
     // 4) persistent cross-zone premium (RO/HU)
     const pa = PREMIUM_ALPHA[zone];
@@ -14828,8 +14828,9 @@ function solveHUForecast(targetDate, skipSplitting) {
     const bgOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
     const totNucOutage = (roOutage || 0) + (bgOutage || 0) + (huOutage || 0);
-    const isAcuteSEEOutage = (totNucOutage >= 1800 || (roOutage >= 1200 && huOutage >= 350));
-    let seeScarcityLift = isAcuteSEEOutage ? Math.min(25.0, (totNucOutage - 1600) * 0.022 + 6.0) : 0.0;
+    const huThermalOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
+    const isAcuteSEEOutage = (totNucOutage >= 1800 || (roOutage >= 1200 && huOutage >= 350) || (huThermalOutage >= 1200));
+    let seeScarcityLift = isAcuteSEEOutage ? Math.min(25.0, (Math.max(totNucOutage, huThermalOutage) - 1200) * 0.022 + 6.0) : 0.0;
     if (seeScarcityLift > 0 && priorDates.length > 0) {
         const pRefMean = _zoneDailyPrice('HU', priorImm);
         if (pRefMean !== null && pRefMean > 210.0) {
@@ -14877,6 +14878,8 @@ function solveHUForecast(targetDate, skipSplitting) {
         if (anchor === null) { const co = HU_RIDGE_COEF[h]; anchor = co[0]; for (let i = 0; i < HU_RIDGE_COLS.length; i++) anchor += co[i + 1] * feats[HU_RIDGE_COLS[i]]; }
         const deShock = getGermanResidualShock(hist, targetDate, priorImm, targetDOW, h, 'HU');
         anchor = Math.max(0, anchor + deShock);
+        const maxNeighbour = Math.max(atP, skP, ro, rs, bg);
+        if (maxNeighbour > 0) anchor = Math.min(anchor, maxNeighbour + 45.0);
 
         // Explicit commercial flows on every HU border. Capacity = hourly
         // FORECAST_NTC when published (D-1, ex-ante), else the calibrated
@@ -14917,6 +14920,13 @@ function solveHUForecast(targetDate, skipSplitting) {
         const cleared = clearZonalSupplyHU(reqGen, demHU, anchor, h + 1, fleetHU, targetDOW === 6);
 
         let clP = cleared.price;
+        if (isAcuteSEEOutage && clP < Math.min(anchor, Math.max(roBorder, rsBorder))) {
+            clP = Math.max(clP, Math.min(anchor, Math.max(roBorder, rsBorder)));
+        }
+        const maxBorderP = Math.max(borderPrior.AT, borderPrior.SK, borderPrior.RO, borderPrior.RS);
+        if (cleared.marginal_type === "scarcity" && maxBorderP > 0) {
+            clP = Math.min(clP, maxBorderP + 45.0);
+        }
         // Night baseload floor: Hungarian night demand is served by CHP/imports and does not clear at pure lignite floor
         if (h >= 1 && h <= 5 && clP < 145.0) {
             clP = Math.max(clP, Math.min(anchor, 140.0 + (resHU / 4000.0) * 15.0));
