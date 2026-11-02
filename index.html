@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 16:48</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 18:33</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-02 16:48
+                Last DB Audit: 2026-11-02 18:33
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12942,6 +12942,11 @@ async function initDashboardData() {
                     window._solveBGCache = {};
                     window._solveROCache = {};
                     window._solveHUCache = {};
+                    window._solveDECache = {};
+                    window._solveATCache = {};
+                    window._solveCHCache = {};
+                    window._solveITCache = {};
+                    window._solveFRCache = {};
                     window._corridorMarketSplitCache = {};
                     window._outageInfoCache = { key: null, map: {} };
 
@@ -13010,7 +13015,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-02 16:48";
+                const currentBuildTime = "2026-11-02 18:33";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14504,8 +14509,103 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
         const a = h[dkey];
         h[pkey] = (a !== null && a !== undefined) ? (h[key] - a) : null;
     });
+// 7) Pre-gate early clearing auction integration (RS, MK, ME, CH)
+    applyEarlyClearingCoupling(hourly, zone, targetDate);
+
     return hourly;
 }
+
+// ── Pre-Gate Early Clearing Auction Integration (RS, MK, ME, CH) ──────────────
+// Before SDAC market coupling closes at 12:00 CET, non-SDAC / EFTA markets clear:
+//   - North Macedonia (MEMO - MK): ~10:30 CET
+//   - Montenegro (MEPX - ME):      ~10:30 CET
+//   - Serbia (SEEPEX - RS):        ~10:45 CET
+//   - Switzerland (EPEX CH - CH):  ~11:00 CET
+// When these actual spot prices are uploaded into historicalData on targetDate,
+// they provide an ex-ante market anchor that significantly cuts forecast error.
+function applyEarlyClearingCoupling(hourly, zone, targetDate) {
+    if (!hourly || !hourly.length) return hourly;
+    const hist = window.historicalData;
+    if (!hist) return hourly;
+
+    const EARLY_CONFIG = {
+        GR: { basket: ['MK', 'ME'], weight: 0.30, spreadDecay: 1.0 },
+        BG: { basket: ['RS', 'MK'], weight: 0.50, spreadDecay: 0.5 },
+        RO: { basket: ['RS'],       weight: 0.50, spreadDecay: 0.5 },
+        HU: { basket: ['RS'],       weight: 0.50, spreadDecay: 0.5 },
+        AT: { basket: ['CH'],       weight: 0.50, spreadDecay: 0.5 },
+        IT: { basket: ['CH', 'ME'], weight: 0.40, spreadDecay: 1.0 }
+    };
+
+    const cfg = EARLY_CONFIG[zone];
+    if (!cfg) return hourly;
+
+    const validPrices = (c, d) => {
+        const e = hist[c] && hist[c][d];
+        return e && e.prices && e.prices.some(x => x !== null && Math.abs(x) > 0.5);
+    };
+
+    // Check which early markets have published prices for targetDate
+    const availableEarly = cfg.basket.filter(c => validPrices(c, targetDate));
+    if (!availableEarly.length) return hourly;
+
+    // Prior priced day for own zone
+    const priorDate = _priorPricedDate(zone, targetDate);
+    if (!priorDate || !validPrices(zone, priorDate)) return hourly;
+
+    const ownPriorMean = _dailyMean(hist[zone][priorDate].prices);
+    if (ownPriorMean === null) return hourly;
+
+    // Calculate early reference price profile for targetDate
+    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : 'gr';
+    const key = 'model_price_' + sfx, dkey = 'actual_price_' + sfx, pkey = 'price_delta_' + sfx;
+
+    const earlyHourly = new Array(24).fill(0);
+    let earlyCount = 0;
+
+    for (const ec of availableEarly) {
+        if (!validPrices(ec, priorDate)) continue;
+        const ecPriorMean = _dailyMean(hist[ec][priorDate].prices);
+        if (ecPriorMean === null) continue;
+
+        const histSpread = (ownPriorMean - ecPriorMean) * cfg.spreadDecay;
+        const ecTargetPrices = hist[ec][targetDate].prices;
+
+        for (let h = 0; h < 24; h++) {
+            const ep = ecTargetPrices[h];
+            if (ep !== null && ep !== undefined && !isNaN(ep)) {
+                earlyHourly[h] += ep + histSpread;
+            }
+        }
+        earlyCount++;
+    }
+
+    if (!earlyCount) return hourly;
+
+    for (let h = 0; h < 24; h++) earlyHourly[h] /= earlyCount;
+
+    // Pro-rate blend weight if only part of the basket is uploaded
+    const effectiveWeight = cfg.weight * (availableEarly.length / cfg.basket.length);
+
+    // Apply blend to hourly predictions
+    for (let h = 0; h < 24; h++) {
+        const currentP = hourly[h][key];
+        if (currentP === null || currentP === undefined || isNaN(currentP)) continue;
+
+        // Guard: do not override curtailed solar floors (0.01 €) with positive early prices
+        if (currentP <= 0.05 && hourly[h]['marginal_type_' + sfx] === 'res_surplus') continue;
+
+        const blended = (1.0 - effectiveWeight) * currentP + effectiveWeight * earlyHourly[h];
+        const finalP = Math.round(Math.max(-20.0, Math.min(500.0, blended)) * 100) / 100;
+
+        hourly[h][key] = finalP;
+        const act = hourly[h][dkey];
+        hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (finalP - act) : null;
+    }
+
+    return hourly;
+}
+
 
 
 // ── Macro German Residual Shock (European Scarcity / Dunkelflaute Signal) ──
@@ -18538,6 +18638,10 @@ function solveITForecast(targetDate) {
         hourlyResults[h].price_delta_it = act !== null ? (finalP - act) : null;
     }
 
+    if (typeof applyDailyLevelEnsemble === 'function') {
+        applyDailyLevelEnsemble(hourlyResults, 'IT', targetDate, ttfPrice, euaPrice);
+    }
+
     const itOptResult = {
         date: targetDate,
         country: 'IT',
@@ -19666,6 +19770,11 @@ function initPlantEconomics() {
             window._solveBGCache = {};
             window._solveROCache = {};
             window._solveHUCache = {};
+            window._solveDECache = {};
+            window._solveATCache = {};
+            window._solveCHCache = {};
+            window._solveITCache = {};
+            window._solveFRCache = {};
             window._corridorMarketSplitCache = {};
             window._refParamsCache = {};
             window._calibCache = null;
