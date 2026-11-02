@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 16:20</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 16:47</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-02 16:20
+                Last DB Audit: 2026-11-02 16:47
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -5487,12 +5487,11 @@ const explicitBorders = [
     { from: 'RS', to: 'MK', cable: 'RS-MK' }, { from: 'MK', to: 'RS', cable: 'MK-RS' },
     { from: 'MK', to: 'BG', cable: 'MK-BG' }, { from: 'BG', to: 'MK', cable: 'BG-MK' },
     { from: 'IT', to: 'ME', cable: 'IT-ME' }, { from: 'ME', to: 'IT', cable: 'ME-IT' },
-    { from: 'AL', to: 'GR', cable: 'AL-GR' }, { from: 'GR', to: 'AL', cable: 'GR-AL' },
+    { from: 'GR', to: 'AL', cable: 'GR-AL' },
     { from: 'AL', to: 'ME', cable: 'AL-ME' }, { from: 'ME', to: 'AL', cable: 'ME-AL' },
     { from: 'GR', to: 'MK', cable: 'GR-MK' }, { from: 'MK', to: 'GR', cable: 'MK-GR' },
     { from: 'ME', to: 'XK', cable: 'ME-XK' }, { from: 'XK', to: 'ME', cable: 'XK-ME' },
-    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' },
-    { from: 'AL', to: 'XK', cable: 'AL-XK' }, { from: 'XK', to: 'AL', cable: 'XK-AL' }
+    { from: 'XK', to: 'MK', cable: 'XK-MK' }, { from: 'MK', to: 'XK', cable: 'MK-XK' }
 ];
 
 const implicitBorders = [];
@@ -5540,6 +5539,8 @@ pathCountriesList.forEach(start => {
 function isValidPathCBAM(path) {
     const start = path[0].to;
     const end = path[path.length - 1].to;
+    // Commercial rule: selling to AL is permitted only via ME-AL corridor, not GR-AL (GR-AL is transit-only towards ME)
+    if (end === 'AL' && path[path.length - 1].cable === 'GR-AL') return false;
     if (start === 'AL' || end === 'AL') return true;
     const startIsEU = countryEU[start] || false;
     const endIsEU = countryEU[end] || false;
@@ -12469,21 +12470,77 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-10-26": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 361.18,
+        "hours": 9
+      },
+      "5": {
+        "net": 186.95,
+        "hours": 6
+      },
+      "elite": {
+        "net": 303.18,
+        "hours": 12
+      }
+    },
+    "2026-10-27": {
+      "3": {
+        "net": 638.28,
+        "hours": 9
+      },
+      "5": {
+        "net": 110.8,
+        "hours": 3
+      },
+      "elite": {
+        "net": -135.71,
+        "hours": 6
+      }
+    },
+    "2026-10-28": {
+      "3": {
+        "net": 63.87,
+        "hours": 6
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 38.48,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       }
     },
-    "2026-10-27": {
+    "2026-10-29": {
       "3": {
-        "net": -150.78,
+        "net": -157.14,
+        "hours": 8
+      },
+      "5": {
+        "net": -42.89,
+        "hours": 9
+      },
+      "elite": {
+        "net": 206.68,
+        "hours": 12
+      }
+    },
+    "2026-10-30": {
+      "3": {
+        "net": -159.46,
+        "hours": 19
+      },
+      "5": {
+        "net": -25.16,
+        "hours": 3
+      },
+      "elite": {
+        "net": -9.2,
+        "hours": 16
+      }
+    },
+    "2026-10-31": {
+      "3": {
+        "net": 53.38,
         "hours": 3
       },
       "5": {
@@ -12491,27 +12548,13 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 136.3,
-        "hours": 4
+        "net": 335.38,
+        "hours": 7
       }
     },
-    "2026-10-28": {
+    "2026-11-01": {
       "3": {
-        "net": 75.77,
-        "hours": 6
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 13.85,
-        "hours": 4
-      }
-    },
-    "2026-10-29": {
-      "3": {
-        "net": 26.61,
+        "net": -205.87,
         "hours": 10
       },
       "5": {
@@ -12519,64 +12562,36 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 1.4,
-        "hours": 5
-      }
-    },
-    "2026-10-30": {
-      "3": {
-        "net": 174.04,
-        "hours": 17
-      },
-      "5": {
-        "net": -52.69,
-        "hours": 4
-      },
-      "elite": {
-        "net": -40.78,
+        "net": 128.3,
         "hours": 3
-      }
-    },
-    "2026-10-31": {
-      "3": {
-        "net": -65.83,
-        "hours": 12
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 94.83,
-        "hours": 8
-      }
-    },
-    "2026-11-01": {
-      "3": {
-        "net": -79.22,
-        "hours": 9
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 0,
-        "hours": 0
       }
     },
     "2026-11-02": {
       "3": {
-        "net": -23.53,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -110.25,
-        "hours": 9
+        "net": 0,
+        "hours": 0
+      }
+    },
+    "2026-11-03": {
+      "3": {
+        "net": 0,
+        "hours": 0
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 0,
+        "hours": 0
       }
     }
   }
@@ -12995,7 +13010,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-02 16:20";
+                const currentBuildTime = "2026-11-02 16:47";
                 let isNotified = false;
 
                 setInterval(async function() {
