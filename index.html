@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 15:20</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 16:20</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-02 15:20
+                Last DB Audit: 2026-11-02 16:20
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12854,7 +12854,7 @@ async function initDashboardData() {
                 try {
                     const cacheBust = Date.now();
                     let loaded = 0;
-                    const total = 9;
+                    const total = 10;
                     // Progress tick — updates the loading status label
                     const tick = (label) => {
                         loaded++;
@@ -12893,7 +12893,7 @@ async function initDashboardData() {
                     const t = cacheBust;
 
                     // Fire all requests simultaneously
-                    const [hist, out, cab, cabL, cabO, fcap, stratStats, genMix, grkEmp] = await Promise.all([
+                    const [hist, out, cab, cabL, cabO, fcap, stratStats, genMix, grkEmp, pSpecs] = await Promise.all([
                         fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d || {};  }),
                         fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d || [];  }),
                         fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d || [];  }),
@@ -12902,7 +12902,8 @@ async function initDashboardData() {
                         fetchJSON(`data/forecast_capacities.json.gz?t=${t}`).then(d => { tick('forecast capacities'); return d || {}; }),
                         fetchJSON(`data/strategy_rolling_stats.json.gz?t=${t}`).then(d => { tick('strategy stats'); return d || null; }),
                         fetchJSON(`data/generation_mix.json.gz?t=${t}`).then(d => { tick('generation mix'); return d || {}; }),
-                        fetchJSON(`data/greek_fleet_empirical.json.gz?t=${t}`).then(d => { tick('fleet empirical'); return d || null; })
+                        fetchJSON(`data/greek_fleet_empirical.json.gz?t=${t}`).then(d => { tick('fleet empirical'); return d || null; }),
+                        fetchJSON(`data/plant_specs_reference.json?t=${t}`).then(d => { tick('plant fleet'); return d || null; })
                     ]);
 
                     if (hist && hist.residual_bias) {
@@ -12918,6 +12919,7 @@ async function initDashboardData() {
                     window.strategyRollingStats   = stratStats || window.strategyRollingStats || null;
                     window.generationMixData      = generationMixData = genMix || {};
                     window.greekFleetEmpirical    = grkEmp || null;
+                    if (pSpecs && pSpecs.plants) { window.plantSpecsData = plantSpecsData = pSpecs; window._plantSpecsLoaded = true; }
 
                     // Fresh data invalidates the optimizer's cached ex-ante daily levels
                     window._engineBaseDailyCache = {};
@@ -12993,7 +12995,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-02 15:20";
+                const currentBuildTime = "2026-11-02 16:20";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13512,7 +13514,8 @@ function _computePlantOutageInfo(plantSpec, country, targetDate) {
         if (c !== country && c !== country.replace('_LU', '')) return false;
         const rName = o.production_resource_name || '';
         const psrName = o.production_resource_psr_name || '';
-        const matchesPid = (o.plant_id && o.plant_id === pid) || (rName === pid || psrName === pid);
+        const uName = o.unit_name || '';
+        const matchesPid = (o.plant_id && o.plant_id === pid) || (rName === pid || psrName === pid || uName === pid);
         const matchesPsr = psrId && (rName === psrId || psrName === psrId);
         const matchesAlt = altId && (rName === altId || psrName === altId) && (!psrId || !psrName || psrName === psrId);
         if (!matchesPid && !matchesPsr && !matchesAlt) return false;
@@ -14381,7 +14384,8 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
                 const dResDE = deCur - deRef;
                 const DE_K = DE_SHOCK.dailyK;
                 const DE_THR = DE_SHOCK.dailyThr;
-                if (dResDE > DE_THR && !['HU', 'RO', 'BG', 'GR'].includes(zone)) {
+                const _zPriorP = _zoneDailyPrice(zone, deRefDate); const _dBr = (br !== null && brPrior !== null) ? (br - brPrior) : 0;
+                if (dResDE > DE_THR && (zone !== 'GR' && (!['HU', 'RO', 'BG'].includes(zone) || ((_zPriorP === null || _zPriorP < 270) && _dBr >= 100)))) {
                     shift += (dResDE - DE_THR) * (DE_K[zone] !== undefined ? DE_K[zone] : 0.0008);
 
                 } else if (dResDE < -DE_THR && !isAcuteOutage) {
@@ -16777,6 +16781,7 @@ function _computeGRForecast(targetDate) {
         let bgBaseline = _fb('GR') + deShock;
         const pImm = (priorImm && histGR[priorImm] && histGR[priorImm].prices) ? (histGR[priorImm].prices[h] !== undefined ? histGR[priorImm].prices[h] : _fb('GR')) : _fb('GR');
         const pSame = (priorSameDow && histGR[priorSameDow] && histGR[priorSameDow].prices) ? (histGR[priorSameDow].prices[h] !== undefined ? histGR[priorSameDow].prices[h] : _fb('GR')) : pImm;
+        let _bgMidSurge = false;
 
         if (refDate && histGR[refDate] && histGR[refDate].prices) {
             let effPImm = pImm;
@@ -16790,6 +16795,7 @@ function _computeGRForecast(targetDate) {
             const refResGR = (histGR[refDate] && _getEngineResiduals(histGR[refDate], refDate, targetDate));
             const prevResGR = (refResGR && refResGR[h] !== undefined) ? refResGR[h] : resGR;
             const dResBG = resBG - prevResBG;
+            _bgMidSurge = (resBG >= 1800 && dResBG > 400 && resGR > -300);
             const dResGR = resGR - prevResGR;
 
             // Hourly tuned elasticity: higher sensitivity during morning ramp, solar, and evening peaker hours
@@ -16860,7 +16866,7 @@ function _computeGRForecast(targetDate) {
             // When BG has thermal headroom (resBG >= 350 MW), prior-day BG prices represent
             // the regional clearing floor that GR is coupled to via the BG export corridor.
             // Only applied when Greece is not in severe solar surplus (resGR > 500).
-            if (isNoonHour && resBG >= 0 && resGR > 500) {
+            if (isNoonHour && resBG >= 0 && (resGR > 500 || _bgMidSurge)) {
                 let prevBgP = (histBG[refDate] && histBG[refDate].prices && histBG[refDate].prices[h] !== undefined) ? histBG[refDate].prices[h] : bgBaseline;
                 // In late solar hours (h14-h15, i.e. h=13,14), if Greece still has strong solar/wind (>1000 MW solar or dResGR < -600 MW),
                 // cap prevBgP at the core midday solar average (h10-h12) so Bulgaria's early afternoon spike doesn't bleed into Greece's congested export window
@@ -16936,7 +16942,7 @@ function _computeGRForecast(targetDate) {
 
         if (resGR < 0) {
             // ── SURPLUS REGIME: STRICT ZERO IMPORTS; EXPORT ALLOCATION SINK ──
-            const totalSurplus = -resGR;
+            const totalSurplus = (bgBaseline > 80.0) ? ( -resGR + mustRunBaseTotal + 1200.0 ) : ( -resGR + mustRunBaseTotal );
 
             // 1. Bulgaria takes primary SDAC coupling priority up to full available export ATC
             bestFlowBG = -Math.min(hAtcExportBG, totalSurplus);
@@ -17004,10 +17010,12 @@ function _computeGRForecast(targetDate) {
             (resGR < -1200 && isExportCongested)
         ));
 
-        const decoupleExport = isSolarMidday && (isFloorSurplus || (isExportCongested && (resGR < 300 || isWeekend)));
+        const _grWindH = (grEntry.wind && grEntry.wind[h]) || 0;
+        const _isWindSolarFlood = isSolarMidday && (h >= 10 && h <= 15) && (_grWindH >= 2800 && (grResiduals[h] || 0) < 300);
+        const decoupleExport = isSolarMidday && (isFloorSurplus || _isWindSolarFlood || (isExportCongested && ((resGR < 300 && !_bgMidSurge) || isWeekend)));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
-            if (isFloorSurplus || (effReqAfterTrade <= 0) || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 45.0)) {
+            if (isFloorSurplus || _isWindSolarFlood || (effReqAfterTrade <= 0) || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 45.0)) {
                 bestP = 0.01;
                 bestUnit = 'RES Surplus (Curtailment Floor) (Decoupled Export)';
                 bestMarginalType = 'res_surplus';
@@ -17069,7 +17077,7 @@ function _computeGRForecast(targetDate) {
             } else {
                 pminCeiling = Math.max(45.0, Math.min(bgBaseline * 0.90, ccgtSrmc * 0.95));
             }
-            const acuteSolarLift = (isAcuteSEEOutageGR && resGR >= 0) || (resGR > 1200);
+            const acuteSolarLift = (isAcuteSEEOutageGR && (resGR >= 0 || _bgMidSurge)) || (resGR > 1200);
             bestP = acuteSolarLift ? Math.min(bgBaseline, Math.max(bestP, pminCeiling)) : Math.min(bestP, (1.0 - solarWeight * 0.85) * bestP + (solarWeight * 0.85) * pminCeiling);
         }
 
