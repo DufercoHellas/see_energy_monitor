@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 09:10</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 09:57</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-02 09:10
+                Last DB Audit: 2026-11-02 09:57
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -5425,7 +5425,20 @@ function selectCorridorTab(cid, selectedIdx, count) {
 // No solar-state filter, no month window, no lookback limit.
 // Stored in backtest/models/expanded.json
 
-var PRODUCTION_WEIGHTS = { res: 25, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 8, it_res: 8 };
+var PRODUCTION_WEIGHTS_SUMMER = { res: 25, eua: 21, de_res: 9, bg_res: 9, ttf: 4, gr_prior: 7, de_prior: 9, bg_prior: 8, it_res: 8 };
+var PRODUCTION_WEIGHTS_WINTER = { res: 20, eua: 10, de_res: 8, bg_res: 8, ttf: 20, gr_prior: 10, de_prior: 9, bg_prior: 8, it_res: 7 };
+
+function getProductionWeights(targetDateStr) {
+    if (!targetDateStr) return PRODUCTION_WEIGHTS_SUMMER;
+    const m = parseInt(targetDateStr.slice(5, 7), 10);
+    // Winter & shoulder heating season (October through March)
+    if (m >= 10 || m <= 3) {
+        return PRODUCTION_WEIGHTS_WINTER;
+    }
+    return PRODUCTION_WEIGHTS_SUMMER;
+}
+
+var PRODUCTION_WEIGHTS = PRODUCTION_WEIGHTS_SUMMER;
 
 // ── Original per-category weights (used by Standard model) ──────────────
 var OPTIMIZED_WEIGHTS = {
@@ -12428,142 +12441,142 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-10-24": {
       "3": {
-        "net": -292.82,
-        "hours": 8
+        "net": -798.96,
+        "hours": 14
       },
       "5": {
-        "net": -329.07,
-        "hours": 10
+        "net": -413.91,
+        "hours": 4
       },
       "elite": {
-        "net": 6.81,
-        "hours": 15
+        "net": -420.4,
+        "hours": 7
       }
     },
     "2026-10-25": {
       "3": {
-        "net": -217.35,
+        "net": 94.55,
         "hours": 3
       },
       "5": {
-        "net": -217.35,
+        "net": -7.24,
         "hours": 3
       },
       "elite": {
-        "net": -197.48,
-        "hours": 7
+        "net": 948.05,
+        "hours": 9
       }
     },
     "2026-10-26": {
       "3": {
-        "net": -669.81,
-        "hours": 27
+        "net": 0,
+        "hours": 0
       },
       "5": {
-        "net": -360.4,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -1069.53,
-        "hours": 22
+        "net": 38.48,
+        "hours": 6
       }
     },
     "2026-10-27": {
       "3": {
-        "net": -88.01,
-        "hours": 16
-      },
-      "5": {
-        "net": -41.65,
+        "net": -150.78,
         "hours": 3
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 147.9,
-        "hours": 16
+        "net": 136.3,
+        "hours": 4
       }
     },
     "2026-10-28": {
       "3": {
-        "net": -45.27,
-        "hours": 3
+        "net": 75.77,
+        "hours": 6
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 116.09,
-        "hours": 8
+        "net": 13.85,
+        "hours": 4
       }
     },
     "2026-10-29": {
       "3": {
-        "net": 82.27,
-        "hours": 12
+        "net": 26.61,
+        "hours": 10
       },
       "5": {
-        "net": 15.12,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 399.03,
-        "hours": 18
+        "net": 1.4,
+        "hours": 5
       }
     },
     "2026-10-30": {
       "3": {
-        "net": -23.58,
-        "hours": 16
+        "net": 174.04,
+        "hours": 17
       },
       "5": {
-        "net": -179.43,
-        "hours": 15
+        "net": -52.69,
+        "hours": 4
       },
       "elite": {
-        "net": 219.38,
-        "hours": 20
+        "net": -40.78,
+        "hours": 3
       }
     },
     "2026-10-31": {
       "3": {
-        "net": 74.34,
-        "hours": 3
+        "net": -65.83,
+        "hours": 12
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -3.78,
-        "hours": 3
+        "net": 94.83,
+        "hours": 8
       }
     },
     "2026-11-01": {
       "3": {
+        "net": -79.22,
+        "hours": 9
+      },
+      "5": {
         "net": 0,
         "hours": 0
       },
-      "5": {
-        "net": -207.52,
-        "hours": 6
-      },
       "elite": {
-        "net": -207.52,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-11-02": {
       "3": {
-        "net": -206.28,
-        "hours": 14
+        "net": -23.53,
+        "hours": 3
       },
       "5": {
-        "net": -88.1,
-        "hours": 5
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -19.14,
-        "hours": 7
+        "net": -110.25,
+        "hours": 9
       }
     }
   }
@@ -12980,7 +12993,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-02 09:10";
+                const currentBuildTime = "2026-11-02 09:57";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -25405,6 +25418,7 @@ function renderEUMapCountryMix(dataKey, date) {
 // ── Tab: Historical Analogues Matching UI ─────────────────────────────
 // ── Tab: Historical Analogues & Arbitrage UI ────────────────────────────────
 // Search engine, similarity scoring, target details card, multi-strategy P&L.
+var isManualWeights = false;
 
 function onAnalogueDateChange() {
     applyOptimizedWeights();
@@ -25451,7 +25465,7 @@ function applyOptimizedWeights(force = false) {
                 }
                 
                 const dayType = get3DayType(targetDate, isHoliday);
-                var opt = PRODUCTION_WEIGHTS;
+                var opt = (typeof getProductionWeights === 'function') ? getProductionWeights(targetDateStr) : PRODUCTION_WEIGHTS;
                 if (opt) {
                     document.getElementById("w_res").value = opt.res || 0;
                     document.getElementById("w_eua").value = opt.eua || 0;
@@ -25465,7 +25479,7 @@ function applyOptimizedWeights(force = false) {
                     
                     const label = document.getElementById("weights_auto_label");
                     if (label) {
-                        label.innerHTML = "🎯 Production weights loaded";
+                        label.innerHTML = (opt && opt.ttf >= 15) ? "🎯 Winter / Fuel-calibrated weights loaded" : "🎯 Production weights loaded";
                         label.style.color = "#10b981";
                     }
                 }
@@ -26201,16 +26215,17 @@ function findAnalogues() {
                 const dePriorNormFactor = get95thPercentile(allMatches.map(m => m.distDePrior));
                 const bgPriorNormFactor = get95thPercentile(allMatches.map(m => m.distBgPrior));
                 const itResNormFactor = get95thPercentile(allMatches.map(m => m.distItRes));
-                // Get weights once (with robust production fallbacks if elements are loading/missing)
-                var w_res = (document.getElementById("w_res") && !isNaN(parseFloat(document.getElementById("w_res").value))) ? parseFloat(document.getElementById("w_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.res) || 25);
-                var w_eua = (document.getElementById("w_eua") && !isNaN(parseFloat(document.getElementById("w_eua").value))) ? parseFloat(document.getElementById("w_eua").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.eua) || 21);
-                var w_de_res = (document.getElementById("w_de_res") && !isNaN(parseFloat(document.getElementById("w_de_res").value))) ? parseFloat(document.getElementById("w_de_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.de_res) || 9);
-                var w_bg_res = (document.getElementById("w_bg_res") && !isNaN(parseFloat(document.getElementById("w_bg_res").value))) ? parseFloat(document.getElementById("w_bg_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.bg_res) || 9);
-                var w_ttf = (document.getElementById("w_ttf") && !isNaN(parseFloat(document.getElementById("w_ttf").value))) ? parseFloat(document.getElementById("w_ttf").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.ttf) || 4);
-                var w_gr_prior = (document.getElementById("w_gr_prior") && !isNaN(parseFloat(document.getElementById("w_gr_prior").value))) ? parseFloat(document.getElementById("w_gr_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.gr_prior) || 7);
-                var w_de_prior = (document.getElementById("w_de_prior") && !isNaN(parseFloat(document.getElementById("w_de_prior").value))) ? parseFloat(document.getElementById("w_de_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.de_prior) || 9);
-                var w_bg_prior = (document.getElementById("w_bg_prior") && !isNaN(parseFloat(document.getElementById("w_bg_prior").value))) ? parseFloat(document.getElementById("w_bg_prior").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.bg_prior) || 8);
-                var w_it_res = (document.getElementById("w_it_res") && !isNaN(parseFloat(document.getElementById("w_it_res").value))) ? parseFloat(document.getElementById("w_it_res").value) : ((typeof PRODUCTION_WEIGHTS !== 'undefined' && PRODUCTION_WEIGHTS.it_res) || 8);
+                // Get weights once (with robust regime-aware production fallbacks)
+                var activeProd = (typeof getProductionWeights === 'function') ? getProductionWeights(targetDate) : ((typeof PRODUCTION_WEIGHTS !== 'undefined') ? PRODUCTION_WEIGHTS : null);
+                var w_res = (!isManualWeights && activeProd) ? activeProd.res : ((document.getElementById("w_res") && !isNaN(parseFloat(document.getElementById("w_res").value))) ? parseFloat(document.getElementById("w_res").value) : ((activeProd && activeProd.res) || 25));
+                var w_eua = (!isManualWeights && activeProd) ? activeProd.eua : ((document.getElementById("w_eua") && !isNaN(parseFloat(document.getElementById("w_eua").value))) ? parseFloat(document.getElementById("w_eua").value) : ((activeProd && activeProd.eua) || 21));
+                var w_de_res = (!isManualWeights && activeProd) ? activeProd.de_res : ((document.getElementById("w_de_res") && !isNaN(parseFloat(document.getElementById("w_de_res").value))) ? parseFloat(document.getElementById("w_de_res").value) : ((activeProd && activeProd.de_res) || 9));
+                var w_bg_res = (!isManualWeights && activeProd) ? activeProd.bg_res : ((document.getElementById("w_bg_res") && !isNaN(parseFloat(document.getElementById("w_bg_res").value))) ? parseFloat(document.getElementById("w_bg_res").value) : ((activeProd && activeProd.bg_res) || 9));
+                var w_ttf = (!isManualWeights && activeProd) ? activeProd.ttf : ((document.getElementById("w_ttf") && !isNaN(parseFloat(document.getElementById("w_ttf").value))) ? parseFloat(document.getElementById("w_ttf").value) : ((activeProd && activeProd.ttf) || 4));
+                var w_gr_prior = (!isManualWeights && activeProd) ? activeProd.gr_prior : ((document.getElementById("w_gr_prior") && !isNaN(parseFloat(document.getElementById("w_gr_prior").value))) ? parseFloat(document.getElementById("w_gr_prior").value) : ((activeProd && activeProd.gr_prior) || 7));
+                var w_de_prior = (!isManualWeights && activeProd) ? activeProd.de_prior : ((document.getElementById("w_de_prior") && !isNaN(parseFloat(document.getElementById("w_de_prior").value))) ? parseFloat(document.getElementById("w_de_prior").value) : ((activeProd && activeProd.de_prior) || 9));
+                var w_bg_prior = (!isManualWeights && activeProd) ? activeProd.bg_prior : ((document.getElementById("w_bg_prior") && !isNaN(parseFloat(document.getElementById("w_bg_prior").value))) ? parseFloat(document.getElementById("w_bg_prior").value) : ((activeProd && activeProd.bg_prior) || 8));
+                var w_it_res = (!isManualWeights && activeProd) ? activeProd.it_res : ((document.getElementById("w_it_res") && !isNaN(parseFloat(document.getElementById("w_it_res").value))) ? parseFloat(document.getElementById("w_it_res").value) : ((activeProd && activeProd.it_res) || 8));
                 w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
                 w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
                 w_it_res /= 100.0;
