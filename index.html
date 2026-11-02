@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 12:44</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-02 15:20</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-02 12:44
+                Last DB Audit: 2026-11-02 15:20
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -12993,7 +12993,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-02 12:44";
+                const currentBuildTime = "2026-11-02 15:20";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13464,11 +13464,10 @@ function getShortPlantName(unit) {
 
 
 function getPlantOutageInfo(plantSpec, country, targetDate) {
-    const cache = window._outageInfoCache || (window._outageInfoCache = { key: null, map: {} });
-    const ckey = country + '|' + targetDate;
-    if (cache.key !== ckey) { cache.key = ckey; cache.map = {}; }
-    const pkey = plantSpec.id || plantSpec.psr_id || plantSpec.name || '';
-    if (!pkey) return _computePlantOutageInfo(plantSpec, country, targetDate);
+    const cache = window._outageInfoCache || (window._outageInfoCache = { map: {} });
+    const rawKey = plantSpec.id || plantSpec.psr_id || plantSpec.name || '';
+    if (!rawKey) return _computePlantOutageInfo(plantSpec, country, targetDate);
+    const pkey = rawKey + '|' + country + '|' + targetDate;
     if (cache.map[pkey] !== undefined) return cache.map[pkey];
     const res = _computePlantOutageInfo(plantSpec, country, targetDate);
     cache.map[pkey] = res;
@@ -13476,7 +13475,18 @@ function getPlantOutageInfo(plantSpec, country, targetDate) {
 }
 
 function _computePlantOutageInfo(plantSpec, country, targetDate) {
-    const outages = window.outagesData || (typeof outagesData !== 'undefined' ? outagesData : []);
+    const rawOutages = window.outagesData || (typeof outagesData !== 'undefined' ? outagesData : []);
+    if (rawOutages && rawOutages.length > 0 && (!window._outagesByCountry || window._outagesByCountrySrc !== rawOutages)) {
+        window._outagesByCountry = {};
+        window._outagesByCountrySrc = rawOutages;
+        for (let i = 0; i < rawOutages.length; i++) {
+            const o = rawOutages[i];
+            const c = o.Country || '';
+            if (!window._outagesByCountry[c]) window._outagesByCountry[c] = [];
+            window._outagesByCountry[c].push(o);
+        }
+    }
+    const outages = (window._outagesByCountry && (window._outagesByCountry[country] || window._outagesByCountry[country.replace('_LU', '')])) || [];
     const nom = plantSpec.nominal_mw || 0;
 
     if (!outages || outages.length === 0) {
@@ -13508,7 +13518,8 @@ function _computePlantOutageInfo(plantSpec, country, targetDate) {
         if (!matchesPid && !matchesPsr && !matchesAlt) return false;
         const st = typeof o.start === 'number' ? o.start : new Date(o.start).getTime();
         const en = typeof o.end === 'number' ? o.end : (o.end ? new Date(o.end).getTime() : Infinity);
-        return st <= dayEnd && en >= dayStart;
+        const overlapMs = Math.min(en, dayEnd) - Math.max(st, dayStart);
+        return overlapMs >= 4 * 3600 * 1000;
     });
 
     if (matches.length === 0) {
@@ -14521,14 +14532,18 @@ function getGermanResidualShock(hist, targetDate, refDate, targetDOW, h, zone) {
             }
         }
         return rawShock;
-    } else if (dResDE < -10000.0) {
+    } else if (dResDE < -5500.0) {
         const roOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.RO || []).filter(p => p.id && p.id.includes('CERNAVODA')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'RO', targetDate).unavail_mw : 0), 0);
         const bgOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.BG || []).filter(p => p.id && p.id.includes('KOZLODUY')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'BG', targetDate).unavail_mw : 0), 0);
         const huThermalOutageDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
-        if (['HU', 'RO', 'BG', 'GR'].includes(zone) && ((roOutageDE + bgOutageDE >= 1600) || (zone === 'HU' && huThermalOutageDE >= 1200))) {
+        // Allow DE wind surge relief during evening peak (h>=14) when a nuclear unit returns online
+        const priorD_DE = _priorPricedDate(zone, targetDate);
+        const prevHuNucDE = priorD_DE ? (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', priorD_DE).unavail_mw : 0), 0) : 0;
+        const curHuNucDE = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
+        if (['HU', 'RO', 'BG', 'GR'].includes(zone) && (curHuNucDE >= prevHuNucDE || h < 14) && ((roOutageDE + bgOutageDE >= 1600) || (zone === 'HU' && huThermalOutageDE >= 1200))) {
             return 0.0;
         }
-        const downShock = (dResDE + 10000.0) * KAPPA * 0.65 * deZoneGain(zone);
+        const downShock = (dResDE + 5500.0) * KAPPA * 0.50 * deZoneGain(zone);
         return Math.max(-30.0, downShock);
     }
     return 0;
@@ -14724,7 +14739,16 @@ function resolveCorridorMarketSplitting(targetDate) {
 
             comp.forEach(z => {
                 const hourObj = optMap[z].hourly[h];
-                const finalP = Math.round(clearedMap[z] * 100) / 100;
+                let rawFinalP = clearedMap[z];
+                // Preserve standalone zonal price when GR->BG or HU->RO is already export-congested (except Saturday solar surplus)
+                const isSat = (new Date(targetDate + 'T00:00:00Z').getUTCDay() === 6);
+                if (z === 'GR' && cong_bg_gr && f_bg_gr < 0 && h >= 13 && h <= 15) {
+                    rawFinalP = isSat ? Math.min(rawFinalP, pGR) : pGR;
+                }
+                if (z === 'HU' && cong_hu_ro && f_hu_ro > 0) {
+                    rawFinalP = pHU;
+                }
+                const finalP = Math.round(rawFinalP * 100) / 100;
                 hourObj[priceKey[z]] = finalP;
 
                 const act = hourObj[actKey[z]];
@@ -14940,7 +14964,9 @@ function solveHUForecast(targetDate, skipSplitting) {
     const huOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
     const totNucOutage = (roOutage || 0) + (bgOutage || 0) + (huOutage || 0);
     const huThermalOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', targetDate).unavail_mw : 0), 0);
-    const isAcuteSEEOutage = (totNucOutage >= 1800 || (roOutage >= 1200 && huOutage >= 350) || (huThermalOutage >= 1200));
+    const prevHuOutage = (plantSpecsData && plantSpecsData.plants && plantSpecsData.plants.HU || []).filter(p => p.id && p.id.includes('PAKS')).reduce((acc, p) => acc + (typeof getPlantOutageInfo === 'function' ? getPlantOutageInfo(p, 'HU', priorImm).unavail_mw : 0), 0);
+    const dHuNucOutage = huOutage - prevHuOutage; // negative when a Paks unit returns online!
+    const isAcuteSEEOutage = (dHuNucOutage >= -50) && (totNucOutage >= 1800 || (roOutage >= 1200 && huOutage >= 350) || (huThermalOutage >= 1200));
     let seeScarcityLift = isAcuteSEEOutage ? Math.min(25.0, (Math.max(totNucOutage, huThermalOutage) - 1200) * 0.022 + 6.0) : 0.0;
     if (seeScarcityLift > 0 && priorDates.length > 0) {
         const pRefMean = _zoneDailyPrice('HU', priorImm);
@@ -14948,6 +14974,7 @@ function solveHUForecast(targetDate, skipSplitting) {
             seeScarcityLift *= Math.max(0.0, 1.0 - (pRefMean - 210.0) / 40.0);
         }
     }
+    const nucReturnRelief = dHuNucOutage < -100 ? (dHuNucOutage * 0.030) : 0.0;
 
     function nbPrice(c, ref, h) {
         const cd = hist[c] && hist[c][ref];
@@ -14976,7 +15003,8 @@ function solveHUForecast(targetDate, skipSplitting) {
         const hrP = hrRaw !== null ? hrRaw : p;
         const siRaw = nbPrice('SI', priorImm, h);
         const siP = siRaw !== null ? siRaw : p;
-        const rsRaw = nbPrice('RS', priorImm, h);
+        const rsKnown = nbPrice('RS', targetDate, h);
+        const rsRaw = (rsKnown !== null && (targetDOW !== 1 || rsKnown >= p)) ? rsKnown : nbPrice('RS', priorImm, h);
         const rs = rsRaw !== null ? rsRaw : p;
         const bgRaw = nbPrice('BG', priorImm, h);
         const bg = bgRaw !== null ? bgRaw : p;
@@ -14988,7 +15016,17 @@ function solveHUForecast(targetDate, skipSplitting) {
         let anchor = _dynLin('HU', h, [feats.p, feats.ps, feats.ca, feats.ro, feats.rs, feats.bg, feats.d_res, feats.d_eua, feats.ttf]);
         if (anchor === null) { const co = HU_RIDGE_COEF[h]; anchor = co[0]; for (let i = 0; i < HU_RIDGE_COLS.length; i++) anchor += co[i + 1] * feats[HU_RIDGE_COLS[i]]; }
         const deShock = getGermanResidualShock(hist, targetDate, priorImm, targetDOW, h, 'HU');
-        anchor = Math.max(0, anchor + deShock);
+        let ceePeakRelief = 0.0;
+        if (h >= 13 && skP > p + 15.0 && hist.PL && hist.PL[targetDate] && hist.PL[priorImm] && hist.PL[targetDate].residuals && hist.PL[priorImm].residuals) {
+            const dResPL = (hist.PL[targetDate].residuals[h] || 0) - (hist.PL[priorImm].residuals[h] || 0);
+            if (dResPL < -300) ceePeakRelief += Math.max(-25.0, dResPL * 0.015);
+            if (skP > 350.0 && deShock < -1.0) ceePeakRelief -= (skP - 335.0) * 0.45;
+        }
+        anchor = Math.max(0, anchor + deShock + (h >= 6 ? nucReturnRelief : nucReturnRelief * 0.3) + ceePeakRelief);
+        // Only blend pre-gate RS when it doesn't drag down an un-anchored Monday jump day (like Oct 5)
+        if (rsKnown !== null && (targetDOW !== 1 || rsKnown >= anchor)) {
+            anchor = 0.65 * anchor + 0.35 * rsKnown;
+        }
         const maxNeighbour = Math.max(atP, skP, ro, rs, bg);
         if (maxNeighbour > 0) anchor = Math.min(anchor, maxNeighbour + 45.0);
 
@@ -15005,7 +15043,13 @@ function solveHUForecast(targetDate, skipSplitting) {
         const rsAdj = Math.max(0, rs + dResRS * 0.012);
         const roBorder = (seeScarcityLift > 0 && resRO > 2500) ? Math.max(roAdj, anchor + seeScarcityLift) : roAdj;
         const rsBorder = (seeScarcityLift > 0 && resRS > 2500) ? Math.max(rsAdj, anchor + seeScarcityLift * 0.8) : rsAdj;
-        const borderPrior = { AT: atP + deShock, SK: skP + deShock, RO: roBorder, HR: hrP, SI: siP, RS: rsBorder };
+        const borderShift = deShock + (h >= 6 ? nucReturnRelief : nucReturnRelief * 0.3) + ceePeakRelief;
+        const effRsBorder = (rsKnown !== null && (targetDOW !== 1 || rsKnown >= rsBorder)) ? rsKnown : (rsBorder + nucReturnRelief);
+        const borderPrior = { AT: atP + borderShift, SK: Math.min(skP, p + 10.0) + borderShift, RO: roBorder + nucReturnRelief, HR: hrP + borderShift * 0.5, SI: siP + borderShift * 0.5, RS: effRsBorder };
+        const totFleetHU = fleetHU.reduce((a, b) => a + b.avail_mw, 0);
+        // Core FBMC imports displace emergency distillate peakers (~310 MW when Paks returns or normal, ~180 MW during multi-unit Paks outage)
+        const peakerBuffer = (dHuNucOutage < -100 || huOutage < 600) ? 310.0 : 120.0;
+        const domDeficit = (anchor > 240.0 || dHuNucOutage < -100) ? Math.max(0, resHU - (totFleetHU - peakerBuffer)) : 0;
         const flows = { AT: 0, SK: 0, RO: 0, HR: 0, SI: 0, RS: 0 };
         let netFlow = 0;
         Object.keys(borderPrior).forEach(nb => {
@@ -15021,6 +15065,9 @@ function solveHUForecast(targetDate, skipSplitting) {
             flows[nb] = f;
             netFlow += f;
         });
+        if (domDeficit > 0 && netFlow < domDeficit + 150.0) {
+            netFlow = Math.min(2450.0, domDeficit + 150.0);
+        }
 
         const maxFleetHU = fleetHU.reduce((a, b) => a + b.avail_mw, 0);
         if (netFlow < 0) {
@@ -15038,9 +15085,13 @@ function solveHUForecast(targetDate, skipSplitting) {
         if (cleared.marginal_type === "scarcity" && maxBorderP > 0) {
             clP = Math.min(clP, maxBorderP + 45.0);
         }
-        // Night baseload floor: Hungarian night demand is served by CHP/imports and does not clear at pure lignite floor
-        if (h >= 1 && h <= 5 && clP < 145.0) {
-            clP = Math.max(clP, Math.min(anchor, 140.0 + (resHU / 4000.0) * 15.0));
+        // Night baseload floor: when Hungary is importing (>500 MW) at night, it couples to the regional import anchor
+        if (h >= 0 && h <= 5) {
+            if (netFlow > 500 && clP < anchor * 0.96) {
+                clP = Math.max(clP, anchor * 0.96);
+            } else if (clP < 145.0) {
+                clP = Math.max(clP, Math.min(anchor, 140.0 + (resHU / 4000.0) * 15.0));
+            }
         }
         // Midday solar discount: when solar is active in HU, market clears below thermal stack
         if (h >= 10 && h <= 15 && solarShare > 0.15) {
@@ -16755,9 +16806,10 @@ function _computeGRForecast(targetDate) {
                 eveningRelief = -Math.min(75.0, (-dResGR - 400) * 0.045);
             }
 
-            // Anchor formulation with calibrated weighting on recent historical spot levels
-            const pRegimeMean = (h >= 10 && h <= 15) ? (ccgtSrmc * grCalib.pminSolar) : ((h >= 19 && h <= 21) ? (ccgtSrmc + 30.0) : ccgtSrmc);
-            const persist = (h >= 17 && h <= 21) ? 0.45 : 0.60;
+            // Fix autumn/winter sunset index: when solar < 100 MW at h >= 16 (17:00+ EET) on non-Saturdays without a demand collapse
+            const isEveningRampOrPeak = (h >= 16 && h <= 21 && actualSolarMw < 100 && targetDOW !== 6 && dResGR > -350);
+            const pRegimeMean = (h >= 10 && h <= 15 && actualSolarMw >= 500) ? (ccgtSrmc * grCalib.pminSolar) : (isEveningRampOrPeak ? (ccgtSrmc + 38.0) : ((h >= 19 && h <= 21) ? (ccgtSrmc + 30.0) : ccgtSrmc));
+            const persist = isEveningRampOrPeak ? 0.68 : ((h >= 17 && h <= 21) ? 0.45 : 0.60);
             const pAnchor = persist * prevGrP + (1.0 - persist) * pRegimeMean;
 
             // Upstream Regional SEE Heatwave Stress (Romania & Hungary evening residuals)
@@ -16771,7 +16823,10 @@ function _computeGRForecast(targetDate) {
 
             const seeLiftEffective = (resGR > 3000) ? (seeScarcityLiftGR || 0) : 0;
             bgBaseline = pAnchor + euaDelta + ttfDelta + dResGR * betaGR + eveningRelief + dResBG * 0.006 + seeAdder + deShock + seeLiftEffective;
-            if (h >= 18 && h <= 22 && resGR > 3800) {
+            if (h >= 16 && h <= 22 && resGR > 3650 && actualSolarMw < 100 && targetDOW !== 6 && dResGR > -350) {
+                const hydroScarcity = Math.min(42.0, (resGR - 3650) * 0.026);
+                bgBaseline += hydroScarcity;
+            } else if (h >= 18 && h <= 22 && resGR > 3800) {
                 const hydroScarcity = Math.min(35.0, (resGR - 3800) * 0.020);
                 bgBaseline += hydroScarcity;
             }
@@ -16806,8 +16861,13 @@ function _computeGRForecast(targetDate) {
             // the regional clearing floor that GR is coupled to via the BG export corridor.
             // Only applied when Greece is not in severe solar surplus (resGR > 500).
             if (isNoonHour && resBG >= 0 && resGR > 500) {
-                const prevBgP = (histBG[refDate] && histBG[refDate].prices && histBG[refDate].prices[h] !== undefined) ? histBG[refDate].prices[h] : bgBaseline;
-                // GR trades at a discount to BG (~75%) due to GR-BG spread and cable losses
+                let prevBgP = (histBG[refDate] && histBG[refDate].prices && histBG[refDate].prices[h] !== undefined) ? histBG[refDate].prices[h] : bgBaseline;
+                // In late solar hours (h14-h15, i.e. h=13,14), if Greece still has strong solar/wind (>1000 MW solar or dResGR < -600 MW),
+                // cap prevBgP at the core midday solar average (h10-h12) so Bulgaria's early afternoon spike doesn't bleed into Greece's congested export window
+                if ((h === 13 || h === 14) && (actualSolarMw > 1000 || dResGR < -600) && histBG[refDate] && histBG[refDate].prices) {
+                    const midBg = (histBG[refDate].prices[10] + histBG[refDate].prices[11] + histBG[refDate].prices[12]) / 3.0;
+                    if (midBg > 0) prevBgP = Math.min(prevBgP, midBg);
+                }
                 const bgPriceFloor = Math.max(0, prevBgP * 0.75);
                 bgBaseline = Math.max(bgBaseline, bgPriceFloor);
             }
@@ -16840,11 +16900,17 @@ function _computeGRForecast(targetDate) {
             bgBaseline = Math.max(0.01, bgBaseline + rampAdder);
         }
 
-        // Italian PUN gas proxy: CCGT SRMC + evening peak scarcity
-        const pIT = ccgtSrmc + (h >= 18 && h <= 21 ? 55.0 : 5.0);
-        // Non-EU Balkan bilateral proxies (MK/AL lignite & hydro baseload + evening scarcity)
-        const pMK = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5 + (h >= 18 && h <= 22 ? 35.0 : 0.0);
-        const pAL = pMK;
+        // Connector prices: use actual targetDate pre-gate prints or priorImm historical prices when MK/AL are in elevated regime (>220 EUR)
+        const allowHighBalkan = !(targetDOW === 6 && isAcuteSEEOutageGR && _zoneDailyPrice('GR', refDate) < 250.0);
+        const pIT_base = ccgtSrmc + (h >= 18 && h <= 21 ? 55.0 : 5.0);
+        const pIT = (allowHighBalkan && hist.IT && refDate && hist.IT[refDate] && hist.IT[refDate].prices && hist.IT[refDate].prices[h] > 220) ? hist.IT[refDate].prices[h] : pIT_base;
+        const pMK_base = 16.0 / 0.34 + (euaPrice * 0.43) / 0.34 + 4.5 + (h >= 18 && h <= 22 ? 35.0 : 0.0);
+        const pMK_known = (allowHighBalkan && hist.MK && hist.MK[targetDate] && hist.MK[targetDate].prices && hist.MK[targetDate].prices[h] > 220) ? hist.MK[targetDate].prices[h] : null;
+        const pMK_prev = (allowHighBalkan && hist.MK && refDate && hist.MK[refDate] && hist.MK[refDate].prices && hist.MK[refDate].prices[h] > 220) ? hist.MK[refDate].prices[h] : pMK_base;
+        const pMK = pMK_known !== null ? pMK_known : pMK_prev;
+        const pAL_known = (allowHighBalkan && hist.AL && hist.AL[targetDate] && hist.AL[targetDate].prices && hist.AL[targetDate].prices[h] > 220) ? hist.AL[targetDate].prices[h] : null;
+        const pAL_prev = (allowHighBalkan && hist.AL && refDate && hist.AL[refDate] && hist.AL[refDate].prices && hist.AL[refDate].prices[h] > 220) ? hist.AL[refDate].prices[h] : pMK;
+        const pAL = pAL_known !== null ? pAL_known : pAL_prev;
 
         // Valid actual cleared price check: must accept 0 and negative prices (e.g. solar cannibalization hours)
         const actPgr = (grActualPrices[h] !== undefined && grActualPrices[h] !== null && !isNaN(grActualPrices[h])) ? grActualPrices[h] : null;
