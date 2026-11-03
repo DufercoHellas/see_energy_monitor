@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-03 14:24</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-03 16:30</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-03 14:24
+                Last DB Audit: 2026-11-03 16:30
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13190,7 +13190,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-03 14:24";
+                const currentBuildTime = "2026-11-03 16:30";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14739,7 +14739,7 @@ function applyCableAuctionCoupling(hourly, zone, targetDate) {
             }
         }
     } else if (zone === 'CH') {
-        const deCh = dayCables['DE-CH'] || [];
+        const deCh = dayCables['DE-CH'] || dayCables['CH-DE'] || [];
         for (let h = 0; h < 24; h++) {
             const cp = deCh[h] || 0;
             const curP = hourly[h][key];
@@ -14753,8 +14753,8 @@ function applyCableAuctionCoupling(hourly, zone, targetDate) {
             }
         }
     } else if (zone === 'IT') {
-        const deCh = dayCables['DE-CH'] || [];
-        const meIt = dayCables['ME-IT'] || [];
+        const deCh = dayCables['DE-CH'] || dayCables['CH-DE'] || [];
+        const meIt = dayCables['ME-IT'] || dayCables['IT-ME'] || [];
         for (let h = 0; h < 24; h++) {
             const cpDeCh = deCh[h] || 0;
             const cpMeIt = meIt[h] || 0;
@@ -14775,10 +14775,11 @@ function applyCableAuctionCoupling(hourly, zone, targetDate) {
     return hourly;
 }
 
-// ── Pre-Gate Early Clearing Auction Integration (RS, MK, ME, CH) ──────────────
+// ── Pre-Gate Early Clearing Auction Integration (RS, MK, ME, AL, XK, CH) ──────
 // Before SDAC market coupling closes at 12:00 CET, non-SDAC / EFTA markets clear:
 //   - North Macedonia (MEMO - MK): ~10:30 CET
 //   - Montenegro (MEPX - ME):      ~10:30 CET
+//   - Albania / Kosovo (ALPEX):    ~10:30 CET
 //   - Serbia (SEEPEX - RS):        ~10:45 CET
 //   - Switzerland (EPEX CH - CH):  ~11:00 CET
 // When these actual spot prices are uploaded into historicalData on targetDate,
@@ -14789,12 +14790,12 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
     if (!hist) return hourly;
 
     const EARLY_CONFIG = {
-        GR: { basket: ['MK', 'ME'], weight: 0.30, spreadDecay: 1.0 },
-        BG: { basket: ['RS', 'MK'], weight: 0.50, spreadDecay: 0.5 },
-        RO: { basket: ['RS'],       weight: 0.50, spreadDecay: 0.5 },
-        HU: { basket: ['RS'],       weight: 0.50, spreadDecay: 0.5 },
-        AT: { basket: ['CH'],       weight: 0.50, spreadDecay: 0.5 },
-        IT: { basket: ['CH', 'ME'], weight: 0.40, spreadDecay: 1.0 }
+        GR: { basket: ['MK', 'ME', 'AL', 'XK'], denom: 2, weight: 0.30, spreadDecay: 1.0 },
+        BG: { basket: ['RS', 'MK', 'AL', 'XK'], denom: 2, weight: 0.50, spreadDecay: 0.5 },
+        RO: { basket: ['RS'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
+        HU: { basket: ['RS'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
+        AT: { basket: ['CH'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
+        IT: { basket: ['CH', 'ME'],             denom: 2, weight: 0.40, spreadDecay: 1.0 }
     };
 
     const cfg = EARLY_CONFIG[zone];
@@ -14845,7 +14846,7 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
     for (let h = 0; h < 24; h++) earlyHourly[h] /= earlyCount;
 
     // Pro-rate blend weight if only part of the basket is uploaded
-    const effectiveWeight = cfg.weight * (availableEarly.length / cfg.basket.length);
+    const effectiveWeight = cfg.weight * Math.min(1.0, availableEarly.length / (cfg.denom || cfg.basket.length));
 
     // Apply blend to hourly predictions
     for (let h = 0; h < 24; h++) {
