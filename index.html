@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-03 09:13</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-03 10:22</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-healthy" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-03 09:13
+                Last DB Audit: 2026-11-03 10:22
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13015,7 +13015,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-03 09:13";
+                const currentBuildTime = "2026-11-03 10:22";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -14511,6 +14511,91 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     });
 // 7) Pre-gate early clearing auction integration (RS, MK, ME, CH)
     applyEarlyClearingCoupling(hourly, zone, targetDate);
+
+    // 8) Pre-gate daily explicit cable auction integration (GR, CH, IT)
+    applyCableAuctionCoupling(hourly, zone, targetDate);
+
+    return hourly;
+}
+
+// ── Pre-Gate Daily Auction Cable Price Coupling (GR, CH, IT) ───────────────
+// Explicit daily auctions (SEECAO & JAO) clear between 09:00 and 09:30 CET,
+// hours before SDAC gate closure at 12:00 CET.
+// Clearing prices directly indicate anticipated export congestion and price divergence.
+function applyCableAuctionCoupling(hourly, zone, targetDate) {
+    if (!hourly || !hourly.length) return hourly;
+    const cabs = window.cablesData;
+    if (!cabs || !cabs.length) return hourly;
+
+    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : 'gr';
+    const key = 'model_price_' + sfx, dkey = 'actual_price_' + sfx, pkey = 'price_delta_' + sfx;
+
+    // Fast-lookup daily map if not cached on window
+    if (!window._cableIndexDaily || window._cableIndexDate !== targetDate) {
+        window._cableIndexDaily = {};
+        window._cableIndexDate = targetDate;
+        for (let i = 0; i < cabs.length; i++) {
+            const c = cabs[i];
+            if (c.trade_date === targetDate) {
+                if (!window._cableIndexDaily[c.corridor_code]) window._cableIndexDaily[c.corridor_code] = new Array(24).fill(0);
+                const pos = (c.position || 1) - 1;
+                if (pos >= 0 && pos < 24) window._cableIndexDaily[c.corridor_code][pos] = c.price || 0;
+            }
+        }
+    }
+
+    const dayCables = window._cableIndexDaily;
+    if (!dayCables || Object.keys(dayCables).length === 0) return hourly;
+
+    if (zone === 'GR') {
+        const grMk = dayCables['GR-MK'] || [];
+        const grAl = dayCables['GR-AL'] || [];
+        for (let h = 0; h < 24; h++) {
+            const cp = Math.max(grMk[h] || 0, grAl[h] || 0);
+            const curP = hourly[h][key];
+            if (curP === null || curP === undefined || isNaN(curP)) continue;
+            // When export cable auction price is high (> 20 EUR), Greek solar/wind decouples below northern pool
+            if (cp > 20.0 && curP > 35.0) {
+                const discount = Math.min(50.0, (cp - 20.0) * 0.25);
+                const finalP = Math.max(25.0, curP - discount);
+                hourly[h][key] = Math.round(finalP * 100) / 100;
+                const act = hourly[h][dkey];
+                hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (hourly[h][key] - act) : null;
+            }
+        }
+    } else if (zone === 'CH') {
+        const deCh = dayCables['DE-CH'] || [];
+        for (let h = 0; h < 24; h++) {
+            const cp = deCh[h] || 0;
+            const curP = hourly[h][key];
+            if (curP === null || curP === undefined || isNaN(curP)) continue;
+            if (cp > 15.0) {
+                const premium = (cp - 15.0) * 0.05;
+                const finalP = curP + premium;
+                hourly[h][key] = Math.round(finalP * 100) / 100;
+                const act = hourly[h][dkey];
+                hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (hourly[h][key] - act) : null;
+            }
+        }
+    } else if (zone === 'IT') {
+        const deCh = dayCables['DE-CH'] || [];
+        const meIt = dayCables['ME-IT'] || [];
+        for (let h = 0; h < 24; h++) {
+            const cpDeCh = deCh[h] || 0;
+            const cpMeIt = meIt[h] || 0;
+            const curP = hourly[h][key];
+            if (curP === null || curP === undefined || isNaN(curP)) continue;
+            let adj = 0;
+            if (cpDeCh > 15.0) adj += (cpDeCh - 15.0) * 0.025;
+            if (cpMeIt > 10.0) adj += (cpMeIt - 10.0) * 0.025;
+            if (adj > 0) {
+                const finalP = curP + adj;
+                hourly[h][key] = Math.round(finalP * 100) / 100;
+                const act = hourly[h][dkey];
+                hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (hourly[h][key] - act) : null;
+            }
+        }
+    }
 
     return hourly;
 }
