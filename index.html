@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 15:24</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 15:29</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-16 15:24
+                Last DB Audit: 2026-11-16 15:29
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13386,7 +13386,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-16 15:24";
+                const currentBuildTime = "2026-11-16 15:29";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19670,9 +19670,13 @@ function renderResiduals(dateList) {
                         const diff = val - baseVal;
                         const pctStr = baseVal !== 0 ? ` (${diff >= 0 ? '+' : ''}${((diff / Math.abs(baseVal)) * 100).toFixed(1)}%)` : '';
                         const col = diff >= 0 ? '#10b981' : '#f43f5e';
-                        diffInfo = `<br><span style="color:${col}; font-weight:bold;">Net Δ (${series.dStr} - ${validSeries[0].dStr}): ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW${pctStr}</span>`;
+                        diffInfo = `<br><span style="color:${col}; font-weight:bold;">Net Δ (${series.dStr} vs ${validSeries[0].dStr}): ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW${pctStr}</span>`;
                     } else {
-                        diffInfo = `<br><span style="color:#94a3b8; font-size:11px;">(Baseline Reference)</span>`;
+                        const nextVal = validSeries[1].resArray[i];
+                        const diff = nextVal - val;
+                        const pctStr = val !== 0 ? ` (${diff >= 0 ? '+' : ''}${((diff / Math.abs(val)) * 100).toFixed(1)}%)` : '';
+                        const col = diff >= 0 ? '#10b981' : '#f43f5e';
+                        diffInfo = `<br><span style="color:${col}; font-size:12px;">Net Δ to ${validSeries[1].dStr}: <b>${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW</b>${pctStr}</span>`;
                     }
                 } else if (validSeries.length > 2 && sIdx > 0) {
                     const baseVal = validSeries[0].resArray[i];
@@ -19698,43 +19702,7 @@ function renderResiduals(dateList) {
             });
         });
 
-        // If exactly 2 dates selected, add dedicated Net Difference Line Trace
-        if (validSeries.length === 2) {
-            const d1 = validSeries[0];
-            const d2 = validSeries[1];
-            const deltaY = [];
-            const deltaHover = [];
-
-            for (let i = 0; i < 24; i++) {
-                const v1 = d1.resArray[i];
-                const v2 = d2.resArray[i];
-                const diff = v2 - v1;
-                deltaY.push(diff);
-                const pctStr = v1 !== 0 ? ` (${diff >= 0 ? '+' : ''}${((diff / Math.abs(v1)) * 100).toFixed(1)}%)` : '';
-                const col = diff >= 0 ? '#10b981' : '#f43f5e';
-                deltaHover.push(
-                    `<b>Hour ${i + 1} Net Difference</b><br>` +
-                    `${d2.dStr}: ${v2.toLocaleString()} MW<br>` +
-                    `${d1.dStr}: ${v1.toLocaleString()} MW<br>` +
-                    `<span style="color:${col}; font-weight:bold;">` +
-                    `Net Δ: ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW${pctStr}</span>`
-                );
-            }
-
-            traces.push({
-                x: Array.from({length: 24}, (_, i) => i + 1),
-                y: deltaY,
-                name: `Net Δ (${d2.dStr} - ${d1.dStr})`,
-                type: 'scatter',
-                mode: 'lines+markers',
-                line: {color: '#f59e0b', width: 2.5, dash: 'dot'},
-                marker: {size: 6, color: '#f59e0b', symbol: 'diamond'},
-                hoverinfo: 'text',
-                hovertext: deltaHover
-            });
-        }
-
-        // Render Summary KPI Card Above Plot
+        // Render Summary KPI Card Above Plot (NO BLURRY LINE OVERLAY ON CHART!)
         summaryCard.style.display = 'block';
         if (validSeries.length === 2) {
             const d1 = validSeries[0];
@@ -19749,31 +19717,57 @@ function renderResiduals(dateList) {
             const badgeBorder = isPos ? 'rgba(16, 185, 129, 0.35)' : 'rgba(244, 63, 94, 0.35)';
             const badgeText = isPos ? '#10b981' : '#f43f5e';
 
-            summaryCard.innerHTML = `
-                <div style="background:var(--card-bg, #1a2234); border:1px solid var(--border-color, #2d3748); border-radius:10px; padding:10px 16px; margin-bottom:14px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); font-family:'Inter', sans-serif;">
-                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase; letter-spacing:0.5px;">Dates:</span>
-                        <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d1.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d1.baseAvg).toLocaleString()} MW)</span></span>
-                        <span style="color:var(--text-secondary, #94a3b8);">➔</span>
-                        <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d2.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d2.baseAvg).toLocaleString()} MW)</span></span>
+            // Build compact 24-hour hourly grid (expandable)
+            let hourlyCells = '';
+            for (let i = 0; i < 24; i++) {
+                const v1 = d1.resArray[i];
+                const v2 = d2.resArray[i];
+                const diff = v2 - v1;
+                const col = diff >= 0 ? '#10b981' : '#f43f5e';
+                const bg = diff >= 0 ? 'rgba(16, 185, 129, 0.08)' : 'rgba(244, 63, 94, 0.08)';
+                hourlyCells += `
+                    <div style="background:${bg}; border:1px solid ${diff >= 0 ? 'rgba(16, 185, 129, 0.2)' : 'rgba(244, 63, 94, 0.2)'}; border-radius:4px; padding:4px 2px; text-align:center; min-width:44px; flex:1;">
+                        <div style="font-size:10px; color:var(--text-secondary, #94a3b8); margin-bottom:2px;">H${i+1}</div>
+                        <div style="font-size:11px; font-weight:700; color:${col};">${diff >= 0 ? '+' : ''}${diff.toLocaleString()}</div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                        <!-- Baseload Net Difference Pill -->
-                        <div style="background:${badgeBg}; border:1px solid ${badgeBorder}; border-radius:6px; padding:4px 10px; display:flex; align-items:center; gap:6px;">
-                            <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase;">Baseload Net:</span>
-                            <span style="font-size:14px; font-weight:800; color:${badgeText};">${isPos ? '+' : ''}${deltaBase.toLocaleString()} MW</span>
-                            <span style="font-size:11px; font-weight:600; color:${badgeText};">(${isPos ? '+' : ''}${pctBase}%)</span>
+                `;
+            }
+
+            summaryCard.innerHTML = `
+                <div style="background:var(--card-bg, #1a2234); border:1px solid var(--border-color, #2d3748); border-radius:10px; padding:10px 16px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.1); font-family:'Inter', sans-serif;">
+                    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase; letter-spacing:0.5px;">Dates:</span>
+                            <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d1.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d1.baseAvg).toLocaleString()} MW)</span></span>
+                            <span style="color:var(--text-secondary, #94a3b8);">➔</span>
+                            <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d2.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d2.baseAvg).toLocaleString()} MW)</span></span>
                         </div>
-                        <!-- Peak Delta Pill -->
-                        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
-                            <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Peak (09-20h):</span>
-                            <span style="font-size:12px; font-weight:700; color:${deltaPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaPeak >= 0 ? '+' : ''}${deltaPeak.toLocaleString()} MW</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                            <!-- Baseload Net Difference Pill -->
+                            <div style="background:${badgeBg}; border:1px solid ${badgeBorder}; border-radius:6px; padding:4px 10px; display:flex; align-items:center; gap:6px;">
+                                <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase;">Baseload Net:</span>
+                                <span style="font-size:14px; font-weight:800; color:${badgeText};">${isPos ? '+' : ''}${deltaBase.toLocaleString()} MW</span>
+                                <span style="font-size:11px; font-weight:600; color:${badgeText};">(${isPos ? '+' : ''}${pctBase}%)</span>
+                            </div>
+                            <!-- Peak Delta Pill -->
+                            <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
+                                <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Peak (09-20h):</span>
+                                <span style="font-size:12px; font-weight:700; color:${deltaPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaPeak >= 0 ? '+' : ''}${deltaPeak.toLocaleString()} MW</span>
+                            </div>
+                            <!-- Off-Peak Delta Pill -->
+                            <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
+                                <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Off-Peak:</span>
+                                <span style="font-size:12px; font-weight:700; color:${deltaOffPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaOffPeak >= 0 ? '+' : ''}${deltaOffPeak.toLocaleString()} MW</span>
+                            </div>
+                            <!-- Toggle Button for 24h Grid -->
+                            <button onclick="const el=document.getElementById('${plotId}_grid'); el.style.display=el.style.display==='none'?'flex':'none'; this.innerText=el.style.display==='none'?'Show 24h Net Δ':'Hide 24h Net Δ';" style="background:transparent; border:1px solid var(--border-color, #475569); color:var(--text-secondary, #cbd5e1); font-size:11px; font-weight:600; border-radius:6px; padding:4px 8px; cursor:pointer;">
+                                Show 24h Net Δ
+                            </button>
                         </div>
-                        <!-- Off-Peak Delta Pill -->
-                        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
-                            <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Off-Peak:</span>
-                            <span style="font-size:12px; font-weight:700; color:${deltaOffPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaOffPeak >= 0 ? '+' : ''}${deltaOffPeak.toLocaleString()} MW</span>
-                        </div>
+                    </div>
+                    <!-- Collapsible 24-Hour Net Grid -->
+                    <div id="${plotId}_grid" style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border-color, #334155); gap:4px; flex-wrap:wrap; justify-content:space-between;">
+                        ${hourlyCells}
                     </div>
                 </div>
             `;
