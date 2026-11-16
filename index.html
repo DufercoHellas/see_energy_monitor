@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 15:29</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 16:44</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-16 15:29
+                Last DB Audit: 2026-11-16 16:44
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -5470,6 +5470,8 @@ var OPTIMIZED_WEIGHTS = {
 };
 
 var currentTop7 = [];
+var currentTop7Short = [];
+var currentTop7ShortTop3 = [];
 var currentTargetData = null;
 var currentTargetDate = "";
 
@@ -5620,6 +5622,31 @@ function getRealizedPriceWithFallback(c, h, date) {
     else if (c === 'DE_LU' && historicalData['DE'])      prices = getPrices('DE');
     else return 0.0;
     return (prices && prices[h] !== null && prices[h] !== undefined && !isNaN(prices[h])) ? prices[h] : 0.0;
+}
+
+/** Return the ex-ante regime-calibrated analogue candidate pool for a given arbitrage strategy. */
+function getActiveTop7ForStrategy(stratKey) {
+    if (stratKey === '5' && typeof currentTop7Short !== 'undefined' && currentTop7Short && currentTop7Short.length >= 5) {
+        return currentTop7Short;
+    }
+    if (stratKey === '3' && typeof currentTop7ShortTop3 !== 'undefined' && currentTop7ShortTop3 && currentTop7ShortTop3.length >= 3) {
+        return currentTop7ShortTop3;
+    }
+    return currentTop7 || [];
+}
+
+/** Apply ex-ante source residual shift damping for Top 3 when target residual load exceeds match load. */
+function applySourceResidualShiftDamping(gross, start, h, targetDate, matchDate, stratKey) {
+    if (stratKey !== '3') return gross;
+    const sT = historicalData[start] && historicalData[start][targetDate];
+    const sM = historicalData[start] && historicalData[start][matchDate];
+    if (!sT || !sM) return gross;
+    const rT = (sT.residuals_morning || sT.residuals || [])[h] || 0;
+    const rM = (sM.residuals_morning || sM.residuals || [])[h] || 0;
+    if (rT - rM > 350) {
+        return gross - (rT - rM - 350) * 0.045;
+    }
+    return gross;
 }
 
 
@@ -8487,30 +8514,30 @@ function getRealizedPriceWithFallback(c, h, date) {
   "daily_history": {
     "2026-01-01": {
       "3": {
-        "net": 456.04,
-        "hours": 9
+        "net": 374.33,
+        "hours": 11
       },
       "5": {
-        "net": 76.18,
-        "hours": 7
+        "net": 109.08,
+        "hours": 5
       },
       "elite": {
-        "net": 195.83,
-        "hours": 12
+        "net": 463.31,
+        "hours": 10
       }
     },
     "2026-01-02": {
       "3": {
-        "net": 73.17,
-        "hours": 16
+        "net": 270.61,
+        "hours": 21
       },
       "5": {
-        "net": 267.02,
-        "hours": 14
+        "net": -22.29,
+        "hours": 3
       },
       "elite": {
-        "net": -24.27,
-        "hours": 21
+        "net": -75.25,
+        "hours": 11
       }
     },
     "2026-01-03": {
@@ -8523,386 +8550,386 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 33.24,
+        "hours": 9
       }
     },
     "2026-01-04": {
       "3": {
-        "net": -43.6,
-        "hours": 4
+        "net": 56.53,
+        "hours": 6
       },
       "5": {
         "net": 41.44,
         "hours": 5
       },
       "elite": {
-        "net": 83.46,
-        "hours": 16
+        "net": 90.31,
+        "hours": 10
       }
     },
     "2026-01-05": {
       "3": {
-        "net": 569.04,
-        "hours": 10
+        "net": 320.22,
+        "hours": 11
       },
       "5": {
-        "net": 82.07,
-        "hours": 5
+        "net": 96.97,
+        "hours": 7
       },
       "elite": {
-        "net": 88.83,
-        "hours": 11
+        "net": 13.09,
+        "hours": 9
       }
     },
     "2026-01-06": {
       "3": {
-        "net": 311.14,
-        "hours": 7
+        "net": 340.55,
+        "hours": 11
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 117.19,
+        "hours": 6
       },
       "elite": {
-        "net": 239.18,
-        "hours": 14
+        "net": 286.79,
+        "hours": 10
       }
     },
     "2026-01-07": {
       "3": {
-        "net": 778.16,
-        "hours": 18
+        "net": -255.96,
+        "hours": 15
       },
       "5": {
-        "net": 220.47,
-        "hours": 7
+        "net": -28.8,
+        "hours": 8
       },
       "elite": {
-        "net": 991.95,
-        "hours": 12
+        "net": 95.56,
+        "hours": 14
       }
     },
     "2026-01-08": {
       "3": {
-        "net": 855.84,
-        "hours": 15
+        "net": 142.01,
+        "hours": 19
       },
       "5": {
-        "net": 732.07,
-        "hours": 9
+        "net": 134.01,
+        "hours": 11
       },
       "elite": {
-        "net": 1949.17,
-        "hours": 20
+        "net": 1015.11,
+        "hours": 14
       }
     },
     "2026-01-09": {
       "3": {
-        "net": 588.02,
-        "hours": 16
+        "net": -12.48,
+        "hours": 4
       },
       "5": {
-        "net": 311.43,
-        "hours": 9
+        "net": 45.06,
+        "hours": 5
       },
       "elite": {
-        "net": 840.91,
-        "hours": 20
+        "net": 450.92,
+        "hours": 17
       }
     },
     "2026-01-10": {
       "3": {
-        "net": 35.48,
-        "hours": 6
+        "net": -300,
+        "hours": 12
       },
       "5": {
-        "net": 105.75,
+        "net": 41.85,
         "hours": 3
       },
       "elite": {
-        "net": 256.21,
-        "hours": 6
+        "net": 114.56,
+        "hours": 3
       }
     },
     "2026-01-11": {
       "3": {
-        "net": -578.59,
+        "net": -995.09,
+        "hours": 23
+      },
+      "5": {
+        "net": -350.57,
+        "hours": 6
+      },
+      "elite": {
+        "net": -494.42,
+        "hours": 15
+      }
+    },
+    "2026-01-12": {
+      "3": {
+        "net": 428.01,
+        "hours": 10
+      },
+      "5": {
+        "net": 187.7,
+        "hours": 11
+      },
+      "elite": {
+        "net": 1171.72,
+        "hours": 20
+      }
+    },
+    "2026-01-13": {
+      "3": {
+        "net": -585.64,
+        "hours": 14
+      },
+      "5": {
+        "net": 214.36,
+        "hours": 9
+      },
+      "elite": {
+        "net": 894.21,
+        "hours": 19
+      }
+    },
+    "2026-01-14": {
+      "3": {
+        "net": -538.7,
+        "hours": 4
+      },
+      "5": {
+        "net": -164.66,
         "hours": 12
+      },
+      "elite": {
+        "net": 71.4,
+        "hours": 10
+      }
+    },
+    "2026-01-15": {
+      "3": {
+        "net": -46.48,
+        "hours": 21
+      },
+      "5": {
+        "net": -118.65,
+        "hours": 6
+      },
+      "elite": {
+        "net": -80.79,
+        "hours": 7
+      }
+    },
+    "2026-01-16": {
+      "3": {
+        "net": 348.97,
+        "hours": 8
+      },
+      "5": {
+        "net": 162.21,
+        "hours": 3
+      },
+      "elite": {
+        "net": 273.1,
+        "hours": 9
+      }
+    },
+    "2026-01-17": {
+      "3": {
+        "net": -291.97,
+        "hours": 7
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -814.9,
-        "hours": 12
-      }
-    },
-    "2026-01-12": {
-      "3": {
-        "net": 1130.97,
-        "hours": 14
-      },
-      "5": {
-        "net": 1103.35,
-        "hours": 11
-      },
-      "elite": {
-        "net": 1545.75,
-        "hours": 23
-      }
-    },
-    "2026-01-13": {
-      "3": {
-        "net": -105.93,
-        "hours": 3
-      },
-      "5": {
-        "net": 200.76,
-        "hours": 19
-      },
-      "elite": {
-        "net": -217.58,
-        "hours": 8
-      }
-    },
-    "2026-01-14": {
-      "3": {
-        "net": 319.48,
-        "hours": 11
-      },
-      "5": {
-        "net": 451.92,
-        "hours": 9
-      },
-      "elite": {
-        "net": 855.38,
-        "hours": 16
-      }
-    },
-    "2026-01-15": {
-      "3": {
-        "net": 108.84,
-        "hours": 11
-      },
-      "5": {
-        "net": -109.81,
-        "hours": 10
-      },
-      "elite": {
-        "net": -1142.09,
-        "hours": 24
-      }
-    },
-    "2026-01-16": {
-      "3": {
-        "net": 106.62,
-        "hours": 6
-      },
-      "5": {
-        "net": 82.8,
-        "hours": 3
-      },
-      "elite": {
-        "net": 227.29,
-        "hours": 3
-      }
-    },
-    "2026-01-17": {
-      "3": {
-        "net": 174.9,
-        "hours": 11
-      },
-      "5": {
-        "net": 105.5,
-        "hours": 3
-      },
-      "elite": {
-        "net": 450.42,
+        "net": 145.74,
         "hours": 6
       }
     },
     "2026-01-18": {
       "3": {
-        "net": 305.29,
-        "hours": 12
+        "net": 157.16,
+        "hours": 7
       },
       "5": {
-        "net": 198.48,
-        "hours": 6
+        "net": 40.94,
+        "hours": 3
       },
       "elite": {
-        "net": 687.25,
-        "hours": 11
+        "net": 118.99,
+        "hours": 5
       }
     },
     "2026-01-19": {
       "3": {
-        "net": 362.56,
-        "hours": 13
+        "net": 65.92,
+        "hours": 7
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 53,
+        "hours": 3
       },
       "elite": {
-        "net": 453.56,
-        "hours": 15
+        "net": -372.89,
+        "hours": 14
       }
     },
     "2026-01-20": {
       "3": {
-        "net": 58.47,
-        "hours": 12
+        "net": -97.15,
+        "hours": 10
       },
       "5": {
-        "net": 292.29,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 368.81,
-        "hours": 9
+        "net": 248.91,
+        "hours": 12
       }
     },
     "2026-01-21": {
       "3": {
-        "net": -117.36,
-        "hours": 15
+        "net": 186.97,
+        "hours": 17
       },
       "5": {
-        "net": -87.02,
-        "hours": 7
+        "net": -16.34,
+        "hours": 10
       },
       "elite": {
-        "net": 226.4,
-        "hours": 4
+        "net": 113.32,
+        "hours": 9
       }
     },
     "2026-01-22": {
       "3": {
-        "net": -236.76,
-        "hours": 7
+        "net": 33.64,
+        "hours": 4
       },
       "5": {
-        "net": 167.58,
-        "hours": 5
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -127.81,
-        "hours": 13
+        "net": 786.79,
+        "hours": 10
       }
     },
     "2026-01-23": {
       "3": {
-        "net": 1227.18,
-        "hours": 16
+        "net": 1191.83,
+        "hours": 9
       },
       "5": {
-        "net": 1157.65,
-        "hours": 12
+        "net": 922.57,
+        "hours": 5
       },
       "elite": {
-        "net": 161.9,
-        "hours": 3
+        "net": 1095.77,
+        "hours": 18
       }
     },
     "2026-01-24": {
       "3": {
-        "net": -2.75,
-        "hours": 12
+        "net": -65.59,
+        "hours": 3
       },
       "5": {
-        "net": -11.57,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -75.57,
-        "hours": 11
+        "net": -275.81,
+        "hours": 20
       }
     },
     "2026-01-25": {
       "3": {
-        "net": 634.86,
-        "hours": 11
+        "net": 356.19,
+        "hours": 9
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 151.53,
+        "hours": 5
       },
       "elite": {
-        "net": 644.1,
-        "hours": 14
+        "net": 199.24,
+        "hours": 9
       }
     },
     "2026-01-26": {
       "3": {
-        "net": 1061.55,
-        "hours": 23
+        "net": -6.44,
+        "hours": 14
       },
       "5": {
-        "net": 828.86,
-        "hours": 16
+        "net": 79.37,
+        "hours": 14
       },
       "elite": {
-        "net": 1039.17,
-        "hours": 18
+        "net": -138.17,
+        "hours": 6
       }
     },
     "2026-01-27": {
       "3": {
-        "net": 1855.27,
-        "hours": 31
+        "net": 1770.57,
+        "hours": 17
       },
       "5": {
-        "net": 1204.75,
-        "hours": 13
+        "net": 1088.69,
+        "hours": 10
       },
       "elite": {
-        "net": 560.75,
-        "hours": 14
+        "net": 348.29,
+        "hours": 10
       }
     },
     "2026-01-28": {
       "3": {
-        "net": 488.34,
-        "hours": 9
+        "net": 1216.44,
+        "hours": 15
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 144.29,
+        "hours": 9
       },
       "elite": {
-        "net": 860.78,
-        "hours": 12
+        "net": 1604.12,
+        "hours": 21
       }
     },
     "2026-01-29": {
       "3": {
-        "net": 994.64,
-        "hours": 27
+        "net": 571.62,
+        "hours": 15
       },
       "5": {
-        "net": 424,
+        "net": 103.92,
         "hours": 7
       },
       "elite": {
-        "net": 811.52,
-        "hours": 15
+        "net": 791.88,
+        "hours": 16
       }
     },
     "2026-01-30": {
       "3": {
-        "net": 434.89,
-        "hours": 7
+        "net": 2018.11,
+        "hours": 25
       },
       "5": {
-        "net": 229.19,
-        "hours": 3
+        "net": 926.57,
+        "hours": 8
       },
       "elite": {
-        "net": 381.68,
-        "hours": 6
+        "net": 934.61,
+        "hours": 12
       }
     },
     "2026-01-31": {
@@ -8915,97 +8942,97 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": -161.29,
+        "net": -4.94,
         "hours": 6
       }
     },
     "2026-02-01": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 602.36,
+        "hours": 11
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 627.58,
+        "hours": 9
       },
       "elite": {
-        "net": 98.74,
-        "hours": 3
+        "net": 629.97,
+        "hours": 12
       }
     },
     "2026-02-02": {
       "3": {
-        "net": 548.8,
-        "hours": 17
+        "net": -29.68,
+        "hours": 7
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 241.97,
+        "hours": 18
       },
       "elite": {
-        "net": 327.44,
-        "hours": 11
+        "net": 1325.03,
+        "hours": 41
       }
     },
     "2026-02-03": {
       "3": {
-        "net": -34.42,
-        "hours": 3
+        "net": 535.66,
+        "hours": 20
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 46.5,
+        "hours": 6
       },
       "elite": {
-        "net": 67.1,
-        "hours": 8
+        "net": 708.22,
+        "hours": 13
       }
     },
     "2026-02-04": {
       "3": {
-        "net": 502.36,
-        "hours": 9
+        "net": 189.35,
+        "hours": 12
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 189.74,
+        "hours": 3
       },
       "elite": {
-        "net": 494.44,
-        "hours": 7
+        "net": 769.18,
+        "hours": 17
       }
     },
     "2026-02-05": {
       "3": {
-        "net": -177.21,
-        "hours": 7
+        "net": 221.15,
+        "hours": 25
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 27.43,
+        "hours": 7
       },
       "elite": {
-        "net": 205.05,
-        "hours": 11
+        "net": 563.65,
+        "hours": 14
       }
     },
     "2026-02-06": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 1034.96,
+        "hours": 21
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 307.03,
+        "hours": 6
       },
       "elite": {
-        "net": 105.07,
-        "hours": 3
+        "net": 914.11,
+        "hours": 17
       }
     },
     "2026-02-07": {
       "3": {
-        "net": 302.57,
+        "net": 182.55,
         "hours": 6
       },
       "5": {
@@ -9013,993 +9040,965 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 448.1,
-        "hours": 9
+        "net": 730.23,
+        "hours": 13
       }
     },
     "2026-02-08": {
       "3": {
-        "net": 172.92,
-        "hours": 6
+        "net": 1253.38,
+        "hours": 25
       },
       "5": {
-        "net": 615.77,
-        "hours": 6
+        "net": 367.05,
+        "hours": 12
       },
       "elite": {
-        "net": 650.24,
-        "hours": 9
+        "net": 1080.36,
+        "hours": 21
       }
     },
     "2026-02-09": {
       "3": {
-        "net": 129.46,
-        "hours": 6
+        "net": 841.14,
+        "hours": 24
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 240.69,
+        "hours": 6
       },
       "elite": {
-        "net": 513.41,
-        "hours": 6
+        "net": 521.89,
+        "hours": 12
       }
     },
     "2026-02-10": {
       "3": {
-        "net": 431.91,
-        "hours": 10
+        "net": 463.72,
+        "hours": 28
       },
       "5": {
-        "net": 14.15,
-        "hours": 3
+        "net": 624.36,
+        "hours": 15
       },
       "elite": {
-        "net": -27.19,
-        "hours": 6
+        "net": 576.71,
+        "hours": 15
       }
     },
     "2026-02-11": {
       "3": {
-        "net": 753.77,
-        "hours": 32
+        "net": 582.7,
+        "hours": 24
       },
       "5": {
-        "net": 452.25,
-        "hours": 9
+        "net": 463.73,
+        "hours": 15
       },
       "elite": {
-        "net": 902.04,
-        "hours": 20
+        "net": 100.81,
+        "hours": 14
       }
     },
     "2026-02-12": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 1078.79,
+        "hours": 24
       },
       "5": {
-        "net": 8.76,
-        "hours": 3
+        "net": 696.55,
+        "hours": 15
       },
       "elite": {
-        "net": 287.15,
-        "hours": 6
+        "net": 682.49,
+        "hours": 13
       }
     },
     "2026-02-13": {
       "3": {
-        "net": 182.74,
-        "hours": 5
+        "net": 706.79,
+        "hours": 26
       },
       "5": {
-        "net": 112.47,
-        "hours": 3
+        "net": 536.8,
+        "hours": 15
       },
       "elite": {
-        "net": 274.54,
-        "hours": 11
+        "net": 1088.29,
+        "hours": 28
       }
     },
     "2026-02-14": {
       "3": {
-        "net": 219.48,
-        "hours": 3
+        "net": -106.71,
+        "hours": 13
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 330.62,
-        "hours": 11
+        "net": 729.76,
+        "hours": 16
       }
     },
     "2026-02-15": {
       "3": {
-        "net": 442.84,
-        "hours": 16
+        "net": 1330.18,
+        "hours": 27
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 1338.21,
+        "hours": 24
       },
       "elite": {
-        "net": 301.67,
-        "hours": 6
+        "net": 806.68,
+        "hours": 18
       }
     },
     "2026-02-16": {
       "3": {
-        "net": 468.43,
-        "hours": 5
+        "net": 1132.51,
+        "hours": 17
       },
       "5": {
-        "net": 380.26,
-        "hours": 4
+        "net": 1548.76,
+        "hours": 22
       },
       "elite": {
-        "net": 936.19,
-        "hours": 10
+        "net": 1297.82,
+        "hours": 16
       }
     },
     "2026-02-17": {
       "3": {
-        "net": 973.98,
-        "hours": 20
+        "net": 1240.51,
+        "hours": 27
       },
       "5": {
-        "net": 318.15,
-        "hours": 8
+        "net": 1107.62,
+        "hours": 15
       },
       "elite": {
-        "net": 1268.61,
-        "hours": 19
+        "net": 1850.06,
+        "hours": 39
       }
     },
     "2026-02-18": {
       "3": {
-        "net": 1726.31,
-        "hours": 33
+        "net": 902.64,
+        "hours": 18
       },
       "5": {
-        "net": 773.12,
-        "hours": 7
+        "net": 1389.49,
+        "hours": 21
       },
       "elite": {
-        "net": 1389.93,
-        "hours": 24
+        "net": 2653.53,
+        "hours": 33
       }
     },
     "2026-02-19": {
       "3": {
-        "net": 607.92,
-        "hours": 8
+        "net": 724.11,
+        "hours": 9
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 1085.17,
+        "hours": 12
       },
       "elite": {
-        "net": 331,
-        "hours": 6
+        "net": 1549.64,
+        "hours": 37
       }
     },
     "2026-02-20": {
       "3": {
-        "net": 1255.85,
-        "hours": 26
+        "net": 1184.08,
+        "hours": 17
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 456.53,
+        "hours": 6
       },
       "elite": {
-        "net": 1278.52,
-        "hours": 24
+        "net": 1481.78,
+        "hours": 34
       }
     },
     "2026-02-21": {
       "3": {
-        "net": 739.05,
-        "hours": 15
+        "net": 194.48,
+        "hours": 7
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 237.71,
+        "hours": 3
       },
       "elite": {
-        "net": 190.57,
-        "hours": 4
+        "net": -128.26,
+        "hours": 16
       }
     },
     "2026-02-22": {
       "3": {
-        "net": 227.92,
-        "hours": 16
+        "net": 1550.23,
+        "hours": 23
       },
       "5": {
-        "net": 152.67,
-        "hours": 7
+        "net": 996.32,
+        "hours": 15
       },
       "elite": {
-        "net": 494.86,
-        "hours": 22
+        "net": 824.44,
+        "hours": 12
       }
     },
     "2026-02-23": {
       "3": {
-        "net": 357.52,
-        "hours": 7
+        "net": 1265.67,
+        "hours": 24
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 812.35,
+        "hours": 15
       },
       "elite": {
-        "net": 866.39,
-        "hours": 14
+        "net": 853.28,
+        "hours": 21
       }
     },
     "2026-02-24": {
       "3": {
-        "net": 298.31,
-        "hours": 13
+        "net": 1351.97,
+        "hours": 22
       },
       "5": {
-        "net": 247.31,
-        "hours": 4
+        "net": 1306.64,
+        "hours": 22
       },
       "elite": {
-        "net": 1917.67,
-        "hours": 23
+        "net": 1848.85,
+        "hours": 32
       }
     },
     "2026-02-25": {
       "3": {
-        "net": 1779.91,
-        "hours": 35
-      },
-      "5": {
-        "net": 1693.63,
+        "net": 1504.86,
         "hours": 25
       },
-      "elite": {
-        "net": 1319.65,
+      "5": {
+        "net": 1180.57,
         "hours": 19
+      },
+      "elite": {
+        "net": 1424.28,
+        "hours": 34
       }
     },
     "2026-02-26": {
       "3": {
-        "net": 576.15,
-        "hours": 26
+        "net": 623.9,
+        "hours": 19
       },
       "5": {
-        "net": 142.14,
-        "hours": 6
+        "net": 756.32,
+        "hours": 21
       },
       "elite": {
-        "net": 693.59,
-        "hours": 19
+        "net": 1090.05,
+        "hours": 25
       }
     },
     "2026-02-27": {
       "3": {
-        "net": 775,
-        "hours": 17
+        "net": 944.8,
+        "hours": 12
       },
       "5": {
-        "net": 272.81,
-        "hours": 3
+        "net": 391.48,
+        "hours": 9
       },
       "elite": {
-        "net": 322.63,
-        "hours": 7
+        "net": 1179.65,
+        "hours": 21
       }
     },
     "2026-02-28": {
       "3": {
-        "net": -62.05,
-        "hours": 4
+        "net": 861.78,
+        "hours": 16
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 600.42,
+        "hours": 8
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 372.17,
+        "hours": 10
       }
     },
     "2026-03-01": {
       "3": {
-        "net": 39.43,
-        "hours": 20
+        "net": 866.84,
+        "hours": 24
       },
       "5": {
-        "net": 24.98,
-        "hours": 3
+        "net": 824.96,
+        "hours": 20
       },
       "elite": {
-        "net": 900.93,
+        "net": 866.1,
         "hours": 24
       }
     },
     "2026-03-02": {
       "3": {
-        "net": 1049.81,
-        "hours": 17
+        "net": 886.27,
+        "hours": 14
       },
       "5": {
-        "net": 364.65,
-        "hours": 3
+        "net": 566.63,
+        "hours": 6
       },
       "elite": {
-        "net": 705.26,
-        "hours": 15
+        "net": 922.55,
+        "hours": 20
       }
     },
     "2026-03-03": {
       "3": {
-        "net": 333.31,
-        "hours": 10
+        "net": 834.86,
+        "hours": 13
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 584.02,
+        "hours": 9
       },
       "elite": {
-        "net": 495.96,
-        "hours": 10
+        "net": 855.13,
+        "hours": 21
       }
     },
     "2026-03-04": {
       "3": {
-        "net": 449.53,
-        "hours": 6
+        "net": 1068.51,
+        "hours": 23
       },
       "5": {
-        "net": 398.84,
-        "hours": 3
+        "net": 598.49,
+        "hours": 8
       },
       "elite": {
-        "net": 671.8,
-        "hours": 10
+        "net": 1144.58,
+        "hours": 23
       }
     },
     "2026-03-05": {
       "3": {
-        "net": 913.86,
-        "hours": 25
+        "net": 1049.04,
+        "hours": 26
       },
       "5": {
-        "net": 239.45,
-        "hours": 3
+        "net": 268.44,
+        "hours": 5
       },
       "elite": {
-        "net": 566.38,
-        "hours": 10
+        "net": 811.08,
+        "hours": 23
       }
     },
     "2026-03-06": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 697.81,
+        "hours": 23
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 357.68,
+        "hours": 20
       },
       "elite": {
-        "net": 569.16,
-        "hours": 14
+        "net": 183.78,
+        "hours": 17
       }
     },
     "2026-03-07": {
       "3": {
-        "net": -66.07,
-        "hours": 3
+        "net": 1091.67,
+        "hours": 20
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 1301.4,
+        "hours": 20
       },
       "elite": {
-        "net": 221,
-        "hours": 4
+        "net": 1140.39,
+        "hours": 19
       }
     },
     "2026-03-08": {
       "3": {
-        "net": 352.3,
-        "hours": 13
+        "net": 1702.35,
+        "hours": 23
       },
       "5": {
-        "net": 348.78,
-        "hours": 8
+        "net": 1286.53,
+        "hours": 17
       },
       "elite": {
-        "net": 177.33,
-        "hours": 10
+        "net": 1512.82,
+        "hours": 20
       }
     },
     "2026-03-09": {
       "3": {
-        "net": 1381.13,
-        "hours": 22
+        "net": 1472.79,
+        "hours": 24
       },
       "5": {
-        "net": 576.9,
-        "hours": 6
+        "net": 632.39,
+        "hours": 12
       },
       "elite": {
-        "net": 443.4,
-        "hours": 7
+        "net": 451.7,
+        "hours": 20
       }
     },
     "2026-03-10": {
       "3": {
-        "net": -25.52,
-        "hours": 15
+        "net": 1825.13,
+        "hours": 28
       },
       "5": {
-        "net": 411.45,
-        "hours": 10
+        "net": 1589.1,
+        "hours": 19
       },
       "elite": {
-        "net": 1033.85,
-        "hours": 15
+        "net": 1202.9,
+        "hours": 25
       }
     },
     "2026-03-11": {
       "3": {
-        "net": 1186.57,
-        "hours": 25
+        "net": 1012.98,
+        "hours": 22
       },
       "5": {
-        "net": 830.53,
-        "hours": 14
+        "net": 1186.59,
+        "hours": 17
       },
       "elite": {
-        "net": 1286.89,
-        "hours": 25
+        "net": 724.18,
+        "hours": 23
       }
     },
     "2026-03-12": {
       "3": {
-        "net": 336,
-        "hours": 3
+        "net": 1101.42,
+        "hours": 18
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 515.49,
+        "hours": 15
       },
       "elite": {
-        "net": 789.07,
-        "hours": 9
+        "net": 459.67,
+        "hours": 10
       }
     },
     "2026-03-13": {
       "3": {
-        "net": 401.44,
-        "hours": 3
+        "net": 1380.58,
+        "hours": 21
       },
       "5": {
-        "net": 393.37,
-        "hours": 3
+        "net": 1284.45,
+        "hours": 19
       },
       "elite": {
-        "net": 469.88,
-        "hours": 4
+        "net": 1320.52,
+        "hours": 23
       }
     },
     "2026-03-14": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 1278.86,
+        "hours": 20
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 1031.39,
+        "hours": 15
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 1408.65,
+        "hours": 28
       }
     },
     "2026-03-15": {
       "3": {
-        "net": 337.58,
-        "hours": 4
+        "net": 1275.22,
+        "hours": 35
       },
       "5": {
-        "net": 296.47,
-        "hours": 3
+        "net": 1120.02,
+        "hours": 24
       },
       "elite": {
-        "net": 236.39,
-        "hours": 8
+        "net": 1215.61,
+        "hours": 23
       }
     },
     "2026-03-16": {
       "3": {
-        "net": 1873.92,
-        "hours": 29
+        "net": 1567.59,
+        "hours": 22
       },
       "5": {
-        "net": 1473.82,
-        "hours": 21
+        "net": 1155.94,
+        "hours": 18
       },
       "elite": {
-        "net": 1764.48,
-        "hours": 31
+        "net": 1482.92,
+        "hours": 28
       }
     },
     "2026-03-17": {
       "3": {
-        "net": -582.64,
-        "hours": 16
+        "net": -533.17,
+        "hours": 22
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -436.36,
+        "hours": 16
       },
       "elite": {
-        "net": -688.89,
-        "hours": 7
+        "net": -425.3,
+        "hours": 15
       }
     },
     "2026-03-18": {
       "3": {
-        "net": 879.17,
-        "hours": 16
+        "net": 656.33,
+        "hours": 15
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 928.31,
+        "hours": 12
       },
       "elite": {
-        "net": 129.67,
-        "hours": 7
+        "net": 1093.28,
+        "hours": 31
       }
     },
     "2026-03-19": {
       "3": {
-        "net": -62.91,
-        "hours": 15
+        "net": 413.17,
+        "hours": 17
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 648.54,
+        "hours": 13
       },
       "elite": {
-        "net": -150.84,
-        "hours": 3
+        "net": 949.03,
+        "hours": 24
       }
     },
     "2026-03-20": {
       "3": {
-        "net": -155.4,
-        "hours": 7
+        "net": 943.34,
+        "hours": 14
       },
       "5": {
-        "net": 25.01,
-        "hours": 3
+        "net": 551.88,
+        "hours": 9
       },
       "elite": {
-        "net": 463.56,
-        "hours": 10
+        "net": 1097.29,
+        "hours": 32
       }
     },
     "2026-03-21": {
       "3": {
-        "net": 127.2,
-        "hours": 11
+        "net": 1172.32,
+        "hours": 21
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 839.32,
+        "hours": 12
       },
       "elite": {
-        "net": 320.64,
-        "hours": 7
+        "net": 1641.63,
+        "hours": 31
       }
     },
     "2026-03-22": {
       "3": {
-        "net": 1137.86,
-        "hours": 17
+        "net": 1637.93,
+        "hours": 20
       },
       "5": {
-        "net": 271.59,
-        "hours": 8
+        "net": 880.61,
+        "hours": 14
       },
       "elite": {
-        "net": 62.49,
-        "hours": 11
+        "net": 1767.73,
+        "hours": 28
       }
     },
     "2026-03-23": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 335.94,
+        "hours": 14
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 441.28,
+        "hours": 17
       },
       "elite": {
-        "net": 752.47,
-        "hours": 16
+        "net": 719.14,
+        "hours": 23
       }
     },
     "2026-03-24": {
       "3": {
-        "net": -188.61,
-        "hours": 4
+        "net": 759.12,
+        "hours": 20
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 489.51,
+        "hours": 12
       },
       "elite": {
-        "net": 106.84,
-        "hours": 8
+        "net": 599.65,
+        "hours": 22
       }
     },
     "2026-03-25": {
       "3": {
-        "net": 854.78,
-        "hours": 10
+        "net": 1148.15,
+        "hours": 26
       },
       "5": {
-        "net": 407.46,
-        "hours": 4
+        "net": 1254.22,
+        "hours": 20
       },
       "elite": {
-        "net": 810.01,
-        "hours": 18
+        "net": 817.69,
+        "hours": 17
       }
     },
     "2026-03-26": {
       "3": {
-        "net": -3.66,
-        "hours": 7
+        "net": 16.63,
+        "hours": 24
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 143.8,
+        "hours": 27
       },
       "elite": {
-        "net": 0,
-        "hours": 4
+        "net": -43.42,
+        "hours": 18
       }
     },
     "2026-03-27": {
       "3": {
-        "net": 591.85,
-        "hours": 15
+        "net": -124.25,
+        "hours": 26
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 429.05,
+        "hours": 11
       },
       "elite": {
-        "net": 788.68,
-        "hours": 14
+        "net": 479.33,
+        "hours": 24
       }
     },
     "2026-03-28": {
       "3": {
-        "net": 285.24,
-        "hours": 8
+        "net": 74.79,
+        "hours": 20
       },
       "5": {
-        "net": 27.52,
-        "hours": 3
+        "net": 92.75,
+        "hours": 20
       },
       "elite": {
-        "net": -321.51,
-        "hours": 7
+        "net": 374,
+        "hours": 30
       }
     },
     "2026-03-30": {
       "3": {
-        "net": 1154.39,
-        "hours": 31
+        "net": 83.99,
+        "hours": 21
       },
       "5": {
-        "net": 82.74,
-        "hours": 3
+        "net": 111.77,
+        "hours": 19
       },
       "elite": {
-        "net": 581.14,
-        "hours": 14
+        "net": 270.23,
+        "hours": 22
       }
     },
     "2026-03-31": {
       "3": {
-        "net": 141.2,
-        "hours": 7
+        "net": 556.7,
+        "hours": 23
       },
       "5": {
-        "net": 94.52,
-        "hours": 4
+        "net": 65.17,
+        "hours": 13
       },
       "elite": {
-        "net": 693.41,
-        "hours": 19
+        "net": 116.19,
+        "hours": 12
       }
     },
     "2026-04-01": {
       "3": {
-        "net": 189.63,
-        "hours": 12
+        "net": 13.98,
+        "hours": 11
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 89.71,
+        "hours": 3
       },
       "elite": {
-        "net": 221.53,
-        "hours": 8
+        "net": 115.43,
+        "hours": 13
       }
     },
     "2026-04-02": {
       "3": {
-        "net": 328.39,
-        "hours": 17
+        "net": 50.99,
+        "hours": 11
       },
       "5": {
-        "net": 66.4,
-        "hours": 3
+        "net": 34.82,
+        "hours": 6
       },
       "elite": {
-        "net": 350.37,
-        "hours": 13
+        "net": 654.21,
+        "hours": 24
       }
     },
     "2026-04-03": {
       "3": {
-        "net": 189.43,
-        "hours": 10
+        "net": -176.46,
+        "hours": 9
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -75.18,
+        "hours": 5
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": -106.27,
+        "hours": 7
       }
     },
     "2026-04-04": {
       "3": {
-        "net": 33.62,
-        "hours": 4
+        "net": 498.96,
+        "hours": 24
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 317.49,
+        "hours": 16
       },
       "elite": {
-        "net": 257.62,
-        "hours": 9
+        "net": 829.88,
+        "hours": 30
       }
     },
     "2026-04-05": {
       "3": {
-        "net": -114.71,
-        "hours": 8
+        "net": 1128.86,
+        "hours": 17
       },
       "5": {
-        "net": -54.69,
-        "hours": 3
+        "net": 1148.57,
+        "hours": 15
       },
       "elite": {
-        "net": 335.15,
-        "hours": 4
+        "net": 1276.57,
+        "hours": 18
       }
     },
     "2026-04-06": {
       "3": {
-        "net": 625.32,
-        "hours": 11
+        "net": -23.45,
+        "hours": 3
       },
       "5": {
-        "net": 618.06,
-        "hours": 11
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 388.85,
-        "hours": 24
+        "net": -232,
+        "hours": 7
       }
     },
     "2026-04-07": {
       "3": {
-        "net": 93.92,
-        "hours": 23
+        "net": -22.52,
+        "hours": 8
       },
       "5": {
-        "net": 122.35,
-        "hours": 26
+        "net": 38.78,
+        "hours": 12
       },
       "elite": {
-        "net": 105.25,
-        "hours": 36
+        "net": -197.22,
+        "hours": 18
       }
     },
     "2026-04-08": {
       "3": {
-        "net": 520.4,
-        "hours": 29
+        "net": 51.21,
+        "hours": 10
       },
       "5": {
-        "net": 520.4,
-        "hours": 29
+        "net": 9.63,
+        "hours": 3
       },
       "elite": {
-        "net": 702.44,
-        "hours": 26
+        "net": -9.25,
+        "hours": 11
       }
     },
     "2026-04-09": {
       "3": {
-        "net": 413.56,
-        "hours": 10
+        "net": 50.74,
+        "hours": 6
       },
       "5": {
-        "net": 365,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 16.06,
-        "hours": 3
+        "net": 101.9,
+        "hours": 11
       }
     },
     "2026-04-10": {
       "3": {
-        "net": -178.15,
+        "net": 53.86,
         "hours": 20
       },
       "5": {
-        "net": 50.22,
-        "hours": 15
+        "net": 387.52,
+        "hours": 16
       },
       "elite": {
-        "net": -29.84,
-        "hours": 14
+        "net": 335.53,
+        "hours": 23
       }
     },
     "2026-04-11": {
       "3": {
-        "net": -21.79,
-        "hours": 3
+        "net": -132.51,
+        "hours": 13
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -8.43,
+        "hours": 8
       },
       "elite": {
-        "net": 71.4,
-        "hours": 3
+        "net": -179.44,
+        "hours": 19
       }
     },
     "2026-04-12": {
       "3": {
-        "net": 292.01,
-        "hours": 17
+        "net": 209.61,
+        "hours": 16
       },
       "5": {
-        "net": 252.58,
-        "hours": 13
+        "net": 252.6,
+        "hours": 8
       },
       "elite": {
-        "net": 219.3,
-        "hours": 14
+        "net": 219.79,
+        "hours": 15
       }
     },
     "2026-04-13": {
       "3": {
-        "net": -5.27,
-        "hours": 8
+        "net": -153.06,
+        "hours": 7
       },
       "5": {
-        "net": -27.44,
-        "hours": 3
+        "net": 44.42,
+        "hours": 5
       },
       "elite": {
-        "net": -6.15,
-        "hours": 10
+        "net": 82.4,
+        "hours": 8
       }
     },
     "2026-04-14": {
       "3": {
-        "net": 13.15,
-        "hours": 9
+        "net": -117.86,
+        "hours": 6
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 85.63,
-        "hours": 4
+        "net": 951.14,
+        "hours": 33
       }
     },
     "2026-04-15": {
       "3": {
-        "net": -64.77,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 191.2,
+        "hours": 9
       }
     },
     "2026-04-16": {
       "3": {
-        "net": 281.52,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 146.26,
-        "hours": 3
+        "net": 134.84,
+        "hours": 8
       }
     },
     "2026-04-17": {
       "3": {
-        "net": 43.35,
-        "hours": 3
+        "net": 171.7,
+        "hours": 14
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 61.14,
+        "hours": 4
       },
       "elite": {
-        "net": 190.04,
-        "hours": 6
+        "net": 242.37,
+        "hours": 11
       }
     },
     "2026-04-18": {
       "3": {
-        "net": 141.36,
-        "hours": 19
-      },
-      "5": {
-        "net": 188.75,
-        "hours": 6
-      },
-      "elite": {
-        "net": 203.88,
-        "hours": 12
-      }
-    },
-    "2026-04-19": {
-      "3": {
-        "net": 436.44,
-        "hours": 13
-      },
-      "5": {
-        "net": 74.08,
-        "hours": 5
-      },
-      "elite": {
-        "net": 2.98,
-        "hours": 5
-      }
-    },
-    "2026-04-20": {
-      "3": {
-        "net": 244.26,
+        "net": 15.61,
         "hours": 7
       },
       "5": {
@@ -10007,8 +10006,36 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": -6.67,
-        "hours": 10
+        "net": 46.98,
+        "hours": 24
+      }
+    },
+    "2026-04-19": {
+      "3": {
+        "net": 546.46,
+        "hours": 7
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 575.6,
+        "hours": 12
+      }
+    },
+    "2026-04-20": {
+      "3": {
+        "net": 0,
+        "hours": 0
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 111.58,
+        "hours": 3
       }
     },
     "2026-04-21": {
@@ -10021,41 +10048,41 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 210.14,
-        "hours": 10
+        "net": 141.9,
+        "hours": 8
       }
     },
     "2026-04-22": {
       "3": {
-        "net": -256.39,
-        "hours": 13
+        "net": 7.22,
+        "hours": 3
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -344.11,
-        "hours": 17
+        "net": 226.87,
+        "hours": 7
       }
     },
     "2026-04-23": {
       "3": {
-        "net": 109.03,
-        "hours": 16
+        "net": 14.73,
+        "hours": 7
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -1.29,
+        "hours": 3
       },
       "elite": {
-        "net": 135.3,
-        "hours": 6
+        "net": 200.83,
+        "hours": 12
       }
     },
     "2026-04-24": {
       "3": {
-        "net": 157.19,
+        "net": 163.28,
         "hours": 3
       },
       "5": {
@@ -10063,92 +10090,92 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 344.07,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-04-25": {
       "3": {
-        "net": 265.89,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "5": {
-        "net": 664.33,
-        "hours": 10
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 456.91,
-        "hours": 21
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-04-26": {
       "3": {
-        "net": 83.63,
-        "hours": 3
+        "net": 641.22,
+        "hours": 10
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 605.08,
+        "hours": 8
       }
     },
     "2026-04-27": {
       "3": {
-        "net": 700.9,
-        "hours": 12
+        "net": 300,
+        "hours": 3
       },
       "5": {
-        "net": 330.69,
-        "hours": 5
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 584.72,
-        "hours": 7
+        "net": 497.17,
+        "hours": 11
       }
     },
     "2026-04-28": {
       "3": {
-        "net": 136.86,
-        "hours": 3
+        "net": 382.29,
+        "hours": 6
       },
       "5": {
-        "net": 136.86,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 656.14,
-        "hours": 16
+        "net": 641.89,
+        "hours": 10
       }
     },
     "2026-04-29": {
       "3": {
-        "net": 341.93,
-        "hours": 7
+        "net": 496.95,
+        "hours": 12
       },
       "5": {
-        "net": 234.7,
-        "hours": 5
+        "net": 365.84,
+        "hours": 7
       },
       "elite": {
-        "net": 306.32,
-        "hours": 11
+        "net": 459.51,
+        "hours": 14
       }
     },
     "2026-04-30": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": -114.04,
+        "hours": 12
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 49.56,
+        "hours": 3
       },
       "elite": {
-        "net": 68.16,
-        "hours": 4
+        "net": 15.98,
+        "hours": 6
       }
     },
     "2026-05-01": {
@@ -10157,12 +10184,12 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -9.88,
+        "hours": 3
       },
       "elite": {
-        "net": -13.03,
-        "hours": 7
+        "net": -55.59,
+        "hours": 10
       }
     },
     "2026-05-02": {
@@ -10171,17 +10198,17 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 3
       },
       "5": {
-        "net": 1.17,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 451.28,
-        "hours": 12
+        "net": 607.16,
+        "hours": 9
       }
     },
     "2026-05-03": {
       "3": {
-        "net": 202.34,
+        "net": 253.92,
         "hours": 10
       },
       "5": {
@@ -10189,69 +10216,69 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 288.27,
-        "hours": 13
+        "net": -12.9,
+        "hours": 6
       }
     },
     "2026-05-04": {
       "3": {
-        "net": 115.93,
-        "hours": 5
+        "net": 160.1,
+        "hours": 7
       },
       "5": {
-        "net": -37.58,
-        "hours": 14
+        "net": 76.5,
+        "hours": 7
       },
       "elite": {
-        "net": 139.34,
-        "hours": 13
+        "net": 212.64,
+        "hours": 9
       }
     },
     "2026-05-05": {
       "3": {
-        "net": -125.67,
-        "hours": 25
+        "net": -6.22,
+        "hours": 15
       },
       "5": {
-        "net": 264.55,
-        "hours": 19
+        "net": -46.83,
+        "hours": 5
       },
       "elite": {
-        "net": 164.46,
-        "hours": 19
+        "net": -46.83,
+        "hours": 5
       }
     },
     "2026-05-06": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 220.17,
+        "hours": 13
       },
       "5": {
-        "net": 350.88,
-        "hours": 6
+        "net": 99.45,
+        "hours": 4
       },
       "elite": {
-        "net": 351.64,
-        "hours": 17
+        "net": -42.32,
+        "hours": 3
       }
     },
     "2026-05-07": {
       "3": {
-        "net": -51.22,
-        "hours": 12
+        "net": 33.94,
+        "hours": 14
       },
       "5": {
-        "net": -134.91,
-        "hours": 6
+        "net": -81.74,
+        "hours": 5
       },
       "elite": {
-        "net": -219.6,
-        "hours": 13
+        "net": -84.48,
+        "hours": 10
       }
     },
     "2026-05-08": {
       "3": {
-        "net": -15.7,
+        "net": -23.56,
         "hours": 3
       },
       "5": {
@@ -10259,405 +10286,363 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 118.48,
-        "hours": 6
+        "net": -44.63,
+        "hours": 11
       }
     },
     "2026-05-09": {
       "3": {
-        "net": 129.57,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "5": {
-        "net": 129.57,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 24.59,
-        "hours": 16
+        "net": -120.42,
+        "hours": 5
       }
     },
     "2026-05-10": {
       "3": {
-        "net": 258.66,
-        "hours": 7
+        "net": 237.62,
+        "hours": 6
       },
       "5": {
-        "net": -71.88,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 186.56,
-        "hours": 14
+        "net": 257.57,
+        "hours": 6
       }
     },
     "2026-05-11": {
       "3": {
-        "net": 149.21,
-        "hours": 6
+        "net": 16.37,
+        "hours": 7
       },
       "5": {
-        "net": -164.33,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 425.43,
-        "hours": 11
+        "net": -188.9,
+        "hours": 16
       }
     },
     "2026-05-12": {
       "3": {
-        "net": -11.83,
-        "hours": 6
-      },
-      "5": {
-        "net": 350.93,
+        "net": 335.74,
         "hours": 9
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 452.42,
-        "hours": 16
+        "net": 187.51,
+        "hours": 5
       }
     },
     "2026-05-13": {
       "3": {
-        "net": 184.47,
-        "hours": 8
+        "net": 2.73,
+        "hours": 19
       },
       "5": {
-        "net": 20.07,
-        "hours": 4
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -28.8,
-        "hours": 7
+        "net": 197.64,
+        "hours": 8
       }
     },
     "2026-05-14": {
       "3": {
-        "net": 121.19,
+        "net": -37.48,
         "hours": 6
       },
       "5": {
-        "net": 65.38,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -129.12,
-        "hours": 9
+        "net": 9.59,
+        "hours": 18
       }
     },
     "2026-05-15": {
       "3": {
-        "net": -15.58,
-        "hours": 6
+        "net": -52.07,
+        "hours": 8
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -88.39,
-        "hours": 10
+        "net": 77.88,
+        "hours": 3
       }
     },
     "2026-05-16": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 112.82,
+        "hours": 3
       },
       "5": {
-        "net": 67.8,
-        "hours": 6
+        "net": 143.57,
+        "hours": 3
       },
       "elite": {
-        "net": 88.59,
-        "hours": 10
+        "net": 641.9,
+        "hours": 19
       }
     },
     "2026-05-17": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 415.7,
+        "hours": 8
       },
       "5": {
-        "net": 11.42,
-        "hours": 4
+        "net": 401.02,
+        "hours": 3
       },
       "elite": {
-        "net": -130.22,
-        "hours": 7
+        "net": 483.77,
+        "hours": 11
       }
     },
     "2026-05-18": {
       "3": {
-        "net": 261.65,
-        "hours": 3
+        "net": 367.39,
+        "hours": 17
       },
       "5": {
-        "net": 261.65,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 241.25,
-        "hours": 6
+        "net": 397.13,
+        "hours": 7
       }
     },
     "2026-05-19": {
       "3": {
-        "net": -16.4,
-        "hours": 3
+        "net": -179.27,
+        "hours": 12
       },
       "5": {
-        "net": 134.27,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -31.11,
+        "net": -285.52,
         "hours": 9
       }
     },
     "2026-05-20": {
       "3": {
-        "net": 173.41,
-        "hours": 6
+        "net": 174.55,
+        "hours": 4
       },
       "5": {
-        "net": 368.41,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 90.33,
-        "hours": 7
+        "net": 458.97,
+        "hours": 10
       }
     },
     "2026-05-21": {
       "3": {
-        "net": 430.91,
-        "hours": 7
-      },
-      "5": {
-        "net": 105.64,
+        "net": 96.56,
         "hours": 3
       },
-      "elite": {
+      "5": {
         "net": 0,
         "hours": 0
+      },
+      "elite": {
+        "net": 128.8,
+        "hours": 3
       }
     },
     "2026-05-22": {
       "3": {
-        "net": 449.3,
-        "hours": 6
+        "net": 140.47,
+        "hours": 19
       },
       "5": {
-        "net": 449.3,
-        "hours": 6
+        "net": 90.83,
+        "hours": 3
       },
       "elite": {
-        "net": 447.47,
-        "hours": 10
+        "net": 180,
+        "hours": 16
       }
     },
     "2026-05-23": {
       "3": {
-        "net": 22.02,
-        "hours": 3
+        "net": 144.73,
+        "hours": 14
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 124.25,
+        "hours": 3
       },
       "elite": {
-        "net": 60.78,
-        "hours": 6
+        "net": 532.19,
+        "hours": 15
       }
     },
     "2026-05-24": {
       "3": {
-        "net": 8.74,
-        "hours": 6
+        "net": -18.03,
+        "hours": 13
       },
       "5": {
-        "net": 221.68,
-        "hours": 7
+        "net": 13.28,
+        "hours": 4
       },
       "elite": {
-        "net": 9.34,
-        "hours": 4
+        "net": -64.09,
+        "hours": 6
       }
     },
     "2026-05-25": {
       "3": {
-        "net": 419.28,
-        "hours": 12
+        "net": 22.85,
+        "hours": 10
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -25.47,
-        "hours": 7
+        "net": 260.21,
+        "hours": 6
       }
     },
     "2026-05-26": {
       "3": {
-        "net": 308.71,
-        "hours": 6
+        "net": 229.5,
+        "hours": 12
       },
       "5": {
-        "net": 196.22,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 184.71,
-        "hours": 6
+        "net": 113.8,
+        "hours": 9
       }
     },
     "2026-05-27": {
       "3": {
-        "net": 573.61,
-        "hours": 12
+        "net": 482.85,
+        "hours": 11
       },
       "5": {
-        "net": 138.68,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 398.82,
-        "hours": 9
+        "net": -281.49,
+        "hours": 10
       }
     },
     "2026-05-28": {
       "3": {
-        "net": 6.86,
-        "hours": 7
+        "net": -60.85,
+        "hours": 9
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 196.74,
-        "hours": 8
+        "net": -212.21,
+        "hours": 19
       }
     },
     "2026-05-29": {
       "3": {
-        "net": 155.11,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "5": {
-        "net": 121.3,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 536.97,
-        "hours": 16
+        "net": 364.74,
+        "hours": 8
       }
     },
     "2026-05-30": {
       "3": {
-        "net": -28.51,
-        "hours": 11
+        "net": -178.69,
+        "hours": 25
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -195.69,
+        "hours": 6
       },
       "elite": {
-        "net": -83.82,
-        "hours": 11
+        "net": -267.78,
+        "hours": 22
       }
     },
     "2026-05-31": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 101.89,
+        "hours": 4
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 101.89,
+        "hours": 4
       },
       "elite": {
-        "net": 118.55,
-        "hours": 4
+        "net": 133.2,
+        "hours": 7
       }
     },
     "2026-06-01": {
       "3": {
-        "net": -82.75,
-        "hours": 6
+        "net": 412.27,
+        "hours": 10
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -392.25,
+        "net": -390.11,
         "hours": 4
       }
     },
     "2026-06-02": {
       "3": {
-        "net": 309.57,
-        "hours": 6
+        "net": -28.14,
+        "hours": 3
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 38.72,
-        "hours": 6
+        "net": 162.17,
+        "hours": 12
       }
     },
     "2026-06-03": {
       "3": {
-        "net": 329.3,
-        "hours": 8
-      },
-      "5": {
-        "net": 362.5,
-        "hours": 9
-      },
-      "elite": {
-        "net": 398.79,
-        "hours": 10
-      }
-    },
-    "2026-06-04": {
-      "3": {
-        "net": -233.97,
-        "hours": 3
-      },
-      "5": {
-        "net": -65.67,
-        "hours": 6
-      },
-      "elite": {
-        "net": -105.41,
-        "hours": 9
-      }
-    },
-    "2026-06-05": {
-      "3": {
-        "net": 117.61,
-        "hours": 6
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 117.52,
-        "hours": 6
-      }
-    },
-    "2026-06-06": {
-      "3": {
-        "net": 589.54,
+        "net": 109.99,
         "hours": 5
       },
       "5": {
@@ -10665,8 +10650,50 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 879.55,
-        "hours": 12
+        "net": 35.5,
+        "hours": 9
+      }
+    },
+    "2026-06-04": {
+      "3": {
+        "net": 0,
+        "hours": 0
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": -163.23,
+        "hours": 10
+      }
+    },
+    "2026-06-05": {
+      "3": {
+        "net": -30.75,
+        "hours": 6
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 0,
+        "hours": 0
+      }
+    },
+    "2026-06-06": {
+      "3": {
+        "net": 243.29,
+        "hours": 6
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 646.93,
+        "hours": 13
       }
     },
     "2026-06-07": {
@@ -10675,255 +10702,255 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "5": {
-        "net": 257.76,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 71.44,
-        "hours": 15
+        "net": 201.64,
+        "hours": 11
       }
     },
     "2026-06-08": {
       "3": {
-        "net": 564.09,
-        "hours": 12
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 542.05,
-        "hours": 10
+        "net": 826.62,
+        "hours": 17
       }
     },
     "2026-06-09": {
       "3": {
-        "net": 649.78,
-        "hours": 20
+        "net": 517.12,
+        "hours": 17
       },
       "5": {
-        "net": 405.16,
-        "hours": 11
+        "net": 308.15,
+        "hours": 9
       },
       "elite": {
-        "net": 716.74,
-        "hours": 17
+        "net": 852.98,
+        "hours": 25
       }
     },
     "2026-06-10": {
       "3": {
-        "net": 214.62,
-        "hours": 5
+        "net": 195.38,
+        "hours": 17
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 447.19,
-        "hours": 14
+        "net": 348.38,
+        "hours": 11
       }
     },
     "2026-06-11": {
       "3": {
-        "net": -244.78,
-        "hours": 7
+        "net": 30.57,
+        "hours": 13
       },
       "5": {
-        "net": 38.47,
-        "hours": 9
+        "net": 257.83,
+        "hours": 6
       },
       "elite": {
-        "net": 151.57,
-        "hours": 19
+        "net": 146.65,
+        "hours": 26
       }
     },
     "2026-06-12": {
       "3": {
-        "net": -167.64,
-        "hours": 6
+        "net": -82.29,
+        "hours": 8
       },
       "5": {
-        "net": -27.12,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -132.22,
-        "hours": 12
+        "net": 126.73,
+        "hours": 4
       }
     },
     "2026-06-13": {
       "3": {
+        "net": 161.25,
+        "hours": 3
+      },
+      "5": {
         "net": 0,
         "hours": 0
       },
-      "5": {
-        "net": 104.82,
-        "hours": 6
-      },
       "elite": {
-        "net": 50.22,
-        "hours": 7
+        "net": 261.42,
+        "hours": 10
       }
     },
     "2026-06-14": {
       "3": {
-        "net": 402.2,
-        "hours": 10
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 167.8,
-        "hours": 5
+        "net": 258.67,
+        "hours": 10
       }
     },
     "2026-06-15": {
       "3": {
-        "net": 76.72,
-        "hours": 4
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 364.62,
-        "hours": 11
+        "net": 296.07,
+        "hours": 12
       }
     },
     "2026-06-16": {
       "3": {
-        "net": 99.23,
-        "hours": 6
+        "net": 41.74,
+        "hours": 19
       },
       "5": {
-        "net": 10.99,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 58.3,
-        "hours": 14
+        "net": 49.18,
+        "hours": 13
       }
     },
     "2026-06-17": {
       "3": {
-        "net": 134.95,
-        "hours": 11
+        "net": 10.46,
+        "hours": 10
       },
       "5": {
-        "net": 150.29,
-        "hours": 8
+        "net": 136.19,
+        "hours": 12
       },
       "elite": {
-        "net": 162.38,
+        "net": 183.83,
         "hours": 14
       }
     },
     "2026-06-18": {
       "3": {
-        "net": 170.07,
+        "net": 335.71,
         "hours": 11
       },
       "5": {
-        "net": 274.54,
-        "hours": 10
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 592.55,
-        "hours": 13
+        "net": 764.98,
+        "hours": 19
       }
     },
     "2026-06-19": {
       "3": {
-        "net": 273.55,
-        "hours": 10
+        "net": 376.19,
+        "hours": 13
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 238.35,
+        "hours": 7
       },
       "elite": {
-        "net": 394.48,
-        "hours": 10
+        "net": 343.76,
+        "hours": 9
       }
     },
     "2026-06-20": {
       "3": {
-        "net": 204.8,
-        "hours": 12
+        "net": 310.92,
+        "hours": 14
       },
       "5": {
-        "net": 60.61,
+        "net": -2.27,
         "hours": 3
       },
       "elite": {
-        "net": 274.92,
-        "hours": 9
+        "net": 58.09,
+        "hours": 25
       }
     },
     "2026-06-21": {
       "3": {
-        "net": -96.85,
-        "hours": 14
-      },
-      "5": {
-        "net": 117.35,
-        "hours": 3
-      },
-      "elite": {
-        "net": -5.37,
-        "hours": 6
-      }
-    },
-    "2026-06-22": {
-      "3": {
-        "net": 110.46,
-        "hours": 11
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 278.67,
-        "hours": 10
+        "net": -74.27,
+        "hours": 5
+      }
+    },
+    "2026-06-22": {
+      "3": {
+        "net": 277.38,
+        "hours": 13
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 196.14,
+        "hours": 8
       }
     },
     "2026-06-23": {
       "3": {
-        "net": 74.39,
-        "hours": 11
+        "net": 98.58,
+        "hours": 8
       },
       "5": {
         "net": 262.28,
         "hours": 5
       },
       "elite": {
-        "net": 265.05,
+        "net": 240.74,
         "hours": 13
       }
     },
     "2026-06-24": {
       "3": {
-        "net": 511.3,
-        "hours": 13
+        "net": 436.6,
+        "hours": 10
       },
       "5": {
         "net": 329.97,
         "hours": 5
       },
       "elite": {
-        "net": 456.5,
-        "hours": 12
+        "net": 599.79,
+        "hours": 15
       }
     },
     "2026-06-25": {
       "3": {
-        "net": -122.62,
+        "net": 73.25,
         "hours": 7
       },
       "5": {
@@ -10931,111 +10958,167 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 5
       },
       "elite": {
-        "net": 46.83,
-        "hours": 7
+        "net": 53.48,
+        "hours": 4
       }
     },
     "2026-06-26": {
       "3": {
-        "net": 120.63,
-        "hours": 9
+        "net": 125.24,
+        "hours": 8
       },
       "5": {
-        "net": 326.45,
-        "hours": 10
+        "net": 337.41,
+        "hours": 11
       },
       "elite": {
-        "net": 209.94,
-        "hours": 15
+        "net": 201.69,
+        "hours": 14
       }
     },
     "2026-06-27": {
       "3": {
+        "net": 118.27,
+        "hours": 6
+      },
+      "5": {
         "net": 0,
         "hours": 0
       },
-      "5": {
-        "net": -56.37,
-        "hours": 3
-      },
       "elite": {
-        "net": 183.65,
-        "hours": 9
+        "net": 279.73,
+        "hours": 14
       }
     },
     "2026-06-28": {
       "3": {
-        "net": 56.94,
-        "hours": 11
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 420.78,
-        "hours": 6
+        "net": 379.23,
+        "hours": 12
       }
     },
     "2026-06-29": {
       "3": {
-        "net": 739.2,
-        "hours": 13
+        "net": 800.73,
+        "hours": 16
       },
       "5": {
-        "net": 302.04,
-        "hours": 11
+        "net": 225.28,
+        "hours": 10
       },
       "elite": {
-        "net": 319.9,
-        "hours": 15
+        "net": 401.97,
+        "hours": 14
       }
     },
     "2026-06-30": {
       "3": {
-        "net": 223.49,
-        "hours": 11
+        "net": 261.18,
+        "hours": 10
       },
       "5": {
         "net": 121.47,
         "hours": 5
       },
       "elite": {
-        "net": 380.03,
-        "hours": 11
+        "net": 601.71,
+        "hours": 16
       }
     },
     "2026-07-01": {
       "3": {
-        "net": 1290.18,
-        "hours": 20
+        "net": 1148.8,
+        "hours": 23
       },
       "5": {
-        "net": 721.51,
-        "hours": 12
+        "net": 609.15,
+        "hours": 14
       },
       "elite": {
-        "net": 1075.81,
-        "hours": 15
+        "net": 839.13,
+        "hours": 20
       }
     },
     "2026-07-02": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 398.17,
+        "hours": 8
+      },
+      "5": {
+        "net": 40.26,
+        "hours": 5
+      },
+      "elite": {
+        "net": 360.99,
+        "hours": 11
+      }
+    },
+    "2026-07-03": {
+      "3": {
+        "net": 487.79,
+        "hours": 14
+      },
+      "5": {
+        "net": 79.8,
+        "hours": 4
+      },
+      "elite": {
+        "net": 361.68,
+        "hours": 9
+      }
+    },
+    "2026-07-04": {
+      "3": {
+        "net": -16.17,
+        "hours": 10
+      },
+      "5": {
+        "net": 13.93,
+        "hours": 4
+      },
+      "elite": {
+        "net": 142.67,
+        "hours": 11
+      }
+    },
+    "2026-07-05": {
+      "3": {
+        "net": 389.73,
+        "hours": 12
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 205.14,
-        "hours": 9
+        "net": 299.33,
+        "hours": 7
       }
     },
-    "2026-07-03": {
+    "2026-07-06": {
       "3": {
-        "net": 333.16,
+        "net": -77.19,
+        "hours": 8
+      },
+      "5": {
+        "net": -22.79,
+        "hours": 5
+      },
+      "elite": {
+        "net": -29.64,
+        "hours": 13
+      }
+    },
+    "2026-07-07": {
+      "3": {
+        "net": -201.6,
         "hours": 3
       },
       "5": {
@@ -11043,13 +11126,41 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 383.21,
-        "hours": 8
+        "net": 393.31,
+        "hours": 13
       }
     },
-    "2026-07-04": {
+    "2026-07-08": {
       "3": {
-        "net": -58.98,
+        "net": -69.96,
+        "hours": 8
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": -120.19,
+        "hours": 15
+      }
+    },
+    "2026-07-09": {
+      "3": {
+        "net": -133.8,
+        "hours": 3
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 54.3,
+        "hours": 15
+      }
+    },
+    "2026-07-10": {
+      "3": {
+        "net": 3.35,
         "hours": 5
       },
       "5": {
@@ -11057,204 +11168,120 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 161.48,
-        "hours": 11
-      }
-    },
-    "2026-07-05": {
-      "3": {
-        "net": -79.75,
-        "hours": 3
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 218.43,
-        "hours": 6
-      }
-    },
-    "2026-07-06": {
-      "3": {
-        "net": -69.96,
+        "net": 144.04,
         "hours": 8
-      },
-      "5": {
-        "net": -69.96,
-        "hours": 8
-      },
-      "elite": {
-        "net": -80.31,
-        "hours": 8
-      }
-    },
-    "2026-07-07": {
-      "3": {
-        "net": -419.8,
-        "hours": 6
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 379.28,
-        "hours": 9
-      }
-    },
-    "2026-07-08": {
-      "3": {
-        "net": 113.04,
-        "hours": 6
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": -194.23,
-        "hours": 11
-      }
-    },
-    "2026-07-09": {
-      "3": {
-        "net": -245.13,
-        "hours": 6
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": -134.28,
-        "hours": 3
-      }
-    },
-    "2026-07-10": {
-      "3": {
-        "net": 0,
-        "hours": 0
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": 140.69,
-        "hours": 3
       }
     },
     "2026-07-11": {
       "3": {
-        "net": 113.96,
-        "hours": 7
+        "net": 679.78,
+        "hours": 30
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 326.01,
+        "hours": 12
       },
       "elite": {
-        "net": 499.74,
-        "hours": 16
+        "net": 96.55,
+        "hours": 3
       }
     },
     "2026-07-12": {
       "3": {
-        "net": 60.01,
-        "hours": 6
+        "net": 101.06,
+        "hours": 7
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 10.04,
+        "hours": 3
       },
       "elite": {
-        "net": -54.11,
-        "hours": 6
+        "net": 81.1,
+        "hours": 9
       }
     },
     "2026-07-13": {
       "3": {
-        "net": 423.51,
-        "hours": 11
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 397.18,
-        "hours": 6
+        "net": 138.26,
+        "hours": 3
       }
     },
     "2026-07-14": {
       "3": {
-        "net": 110.57,
-        "hours": 13
+        "net": 13.44,
+        "hours": 3
       },
       "5": {
-        "net": 172.14,
-        "hours": 6
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 371.31,
-        "hours": 16
+        "net": 184.17,
+        "hours": 7
       }
     },
     "2026-07-15": {
       "3": {
-        "net": 3.1,
-        "hours": 4
+        "net": 10.88,
+        "hours": 20
       },
       "5": {
-        "net": -145.84,
-        "hours": 7
+        "net": -50.69,
+        "hours": 9
       },
       "elite": {
-        "net": 463.22,
+        "net": 266.78,
         "hours": 11
       }
     },
     "2026-07-16": {
       "3": {
-        "net": 375.62,
-        "hours": 7
+        "net": 429.3,
+        "hours": 14
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 63.17,
-        "hours": 4
+        "net": -105.49,
+        "hours": 9
       }
     },
     "2026-07-17": {
       "3": {
-        "net": 217.8,
-        "hours": 7
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 324.51,
-        "hours": 11
+        "net": 325.1,
+        "hours": 13
       }
     },
     "2026-07-18": {
       "3": {
-        "net": 193.7,
-        "hours": 12
+        "net": 445.15,
+        "hours": 11
       },
       "5": {
-        "net": 144.78,
-        "hours": 3
+        "net": 304.85,
+        "hours": 6
       },
       "elite": {
-        "net": 750.84,
-        "hours": 16
+        "net": 509.57,
+        "hours": 10
       }
     },
     "2026-07-19": {
@@ -11267,120 +11294,120 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 39.64,
+        "net": 48.18,
         "hours": 3
       }
     },
     "2026-07-20": {
       "3": {
-        "net": 71.47,
-        "hours": 4
+        "net": 188.68,
+        "hours": 16
       },
       "5": {
-        "net": 71.47,
-        "hours": 4
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 163.88,
-        "hours": 4
+        "net": 294.25,
+        "hours": 11
       }
     },
     "2026-07-21": {
       "3": {
-        "net": 89.26,
-        "hours": 7
+        "net": 49.21,
+        "hours": 3
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -89.39,
-        "hours": 10
+        "net": 66.96,
+        "hours": 5
       }
     },
     "2026-07-22": {
       "3": {
-        "net": 293.69,
-        "hours": 4
+        "net": 711.05,
+        "hours": 8
       },
       "5": {
-        "net": 331.11,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 917.4,
-        "hours": 12
+        "net": 668.28,
+        "hours": 8
       }
     },
     "2026-07-23": {
       "3": {
-        "net": 502.27,
-        "hours": 8
-      },
-      "5": {
-        "net": 207.92,
+        "net": 65.6,
         "hours": 3
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 407.42,
-        "hours": 7
+        "net": 184.66,
+        "hours": 3
       }
     },
     "2026-07-24": {
       "3": {
-        "net": -85.41,
-        "hours": 3
+        "net": 513,
+        "hours": 15
       },
       "5": {
-        "net": 192.03,
-        "hours": 4
+        "net": 192.24,
+        "hours": 10
       },
       "elite": {
-        "net": 446.32,
-        "hours": 6
+        "net": 510.23,
+        "hours": 16
       }
     },
     "2026-07-25": {
       "3": {
-        "net": 988.65,
-        "hours": 25
+        "net": 1107.82,
+        "hours": 18
       },
       "5": {
-        "net": 1002.21,
-        "hours": 14
+        "net": 417.99,
+        "hours": 9
       },
       "elite": {
-        "net": 905.74,
-        "hours": 13
+        "net": 957.05,
+        "hours": 14
       }
     },
     "2026-07-26": {
       "3": {
-        "net": 231.32,
-        "hours": 10
+        "net": 95.63,
+        "hours": 4
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -11.6,
+        "hours": 3
       },
       "elite": {
-        "net": 84.82,
-        "hours": 8
+        "net": 26.65,
+        "hours": 3
       }
     },
     "2026-07-27": {
       "3": {
-        "net": 448.33,
-        "hours": 15
+        "net": 721.52,
+        "hours": 13
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 529.95,
-        "hours": 6
+        "net": 401.16,
+        "hours": 7
       }
     },
     "2026-07-28": {
@@ -11393,13 +11420,13 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": -208.37,
+        "net": 115.88,
         "hours": 7
       }
     },
     "2026-07-29": {
       "3": {
-        "net": 22.77,
+        "net": -238.09,
         "hours": 9
       },
       "5": {
@@ -11407,78 +11434,78 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": -206.26,
-        "hours": 19
+        "net": -83.76,
+        "hours": 6
       }
     },
     "2026-07-30": {
       "3": {
-        "net": -14.98,
-        "hours": 6
-      },
-      "5": {
-        "net": 23.53,
+        "net": -15.08,
         "hours": 3
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 42.43,
-        "hours": 6
+        "net": -11.47,
+        "hours": 3
       }
     },
     "2026-07-31": {
       "3": {
+        "net": -55.8,
+        "hours": 3
+      },
+      "5": {
         "net": 0,
         "hours": 0
       },
-      "5": {
-        "net": -102.43,
-        "hours": 3
-      },
       "elite": {
-        "net": 400.77,
-        "hours": 16
+        "net": 538.53,
+        "hours": 18
       }
     },
     "2026-08-01": {
       "3": {
-        "net": -277.15,
-        "hours": 15
+        "net": 8.25,
+        "hours": 19
       },
       "5": {
-        "net": -290.02,
-        "hours": 14
+        "net": -109.89,
+        "hours": 6
       },
       "elite": {
-        "net": -440.75,
-        "hours": 14
+        "net": -291.71,
+        "hours": 17
       }
     },
     "2026-08-02": {
       "3": {
-        "net": 116.23,
-        "hours": 13
-      },
-      "5": {
-        "net": 61.68,
-        "hours": 3
-      },
-      "elite": {
-        "net": 178.74,
-        "hours": 10
-      }
-    },
-    "2026-08-03": {
-      "3": {
-        "net": 344.59,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -116.33,
-        "hours": 4
+        "net": 254.51,
+        "hours": 12
+      }
+    },
+    "2026-08-03": {
+      "3": {
+        "net": 0,
+        "hours": 0
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-08-04": {
@@ -11491,28 +11518,28 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 45.41,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-08-05": {
       "3": {
-        "net": 300.67,
-        "hours": 8
+        "net": 157.82,
+        "hours": 4
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 244.72,
+        "net": 291.86,
         "hours": 3
       }
     },
     "2026-08-06": {
       "3": {
-        "net": 752.89,
-        "hours": 11
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
@@ -11525,63 +11552,63 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-08-07": {
       "3": {
-        "net": -286.43,
-        "hours": 10
-      },
-      "5": {
-        "net": -38.33,
-        "hours": 4
-      },
-      "elite": {
-        "net": -178.47,
-        "hours": 5
-      }
-    },
-    "2026-08-08": {
-      "3": {
-        "net": 642.35,
-        "hours": 27
-      },
-      "5": {
-        "net": 613.03,
-        "hours": 18
-      },
-      "elite": {
-        "net": 856.23,
-        "hours": 16
-      }
-    },
-    "2026-08-09": {
-      "3": {
-        "net": 161.59,
-        "hours": 12
-      },
-      "5": {
-        "net": 51.86,
-        "hours": 3
-      },
-      "elite": {
-        "net": 53.56,
-        "hours": 15
-      }
-    },
-    "2026-08-10": {
-      "3": {
-        "net": 544.43,
-        "hours": 8
+        "net": 50.42,
+        "hours": 9
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 257.91,
+        "net": 21.78,
+        "hours": 9
+      }
+    },
+    "2026-08-08": {
+      "3": {
+        "net": 0,
+        "hours": 0
+      },
+      "5": {
+        "net": 139.66,
+        "hours": 3
+      },
+      "elite": {
+        "net": 941.41,
+        "hours": 18
+      }
+    },
+    "2026-08-09": {
+      "3": {
+        "net": 80.65,
+        "hours": 7
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": -59.57,
+        "hours": 8
+      }
+    },
+    "2026-08-10": {
+      "3": {
+        "net": -78.18,
+        "hours": 3
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": -18.09,
         "hours": 3
       }
     },
     "2026-08-11": {
       "3": {
-        "net": 144.98,
+        "net": 43.75,
         "hours": 9
       },
       "5": {
@@ -11595,161 +11622,105 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-08-12": {
       "3": {
-        "net": 73.93,
-        "hours": 8
+        "net": 62.3,
+        "hours": 3
       },
       "5": {
         "net": 62.3,
         "hours": 3
       },
       "elite": {
-        "net": 353.7,
-        "hours": 13
+        "net": 7.97,
+        "hours": 8
       }
     },
     "2026-08-13": {
       "3": {
-        "net": 236.75,
-        "hours": 17
+        "net": 180.44,
+        "hours": 9
       },
       "5": {
-        "net": 216.83,
-        "hours": 3
+        "net": 281.88,
+        "hours": 8
       },
       "elite": {
-        "net": 554.06,
-        "hours": 16
+        "net": 423.97,
+        "hours": 17
       }
     },
     "2026-08-14": {
       "3": {
-        "net": 213.98,
-        "hours": 9
+        "net": 298.88,
+        "hours": 11
       },
       "5": {
-        "net": 159.11,
-        "hours": 7
+        "net": 7,
+        "hours": 5
       },
       "elite": {
-        "net": 128.16,
-        "hours": 9
+        "net": 149.12,
+        "hours": 11
       }
     },
     "2026-08-15": {
       "3": {
-        "net": 223.21,
-        "hours": 7
+        "net": 168.31,
+        "hours": 4
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 270.57,
-        "hours": 8
+        "net": 261.7,
+        "hours": 12
       }
     },
     "2026-08-16": {
       "3": {
-        "net": -116.78,
-        "hours": 3
+        "net": 179.55,
+        "hours": 4
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 179.55,
+        "hours": 4
       },
       "elite": {
-        "net": 56.46,
-        "hours": 16
+        "net": 507,
+        "hours": 22
       }
     },
     "2026-08-17": {
       "3": {
-        "net": 191.32,
-        "hours": 8
+        "net": 63.65,
+        "hours": 12
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -67.17,
+        "hours": 11
       },
       "elite": {
-        "net": 193.76,
-        "hours": 12
+        "net": 209.97,
+        "hours": 10
       }
     },
     "2026-08-18": {
       "3": {
-        "net": 275.97,
-        "hours": 8
+        "net": 128.4,
+        "hours": 6
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -8.57,
+        "hours": 3
       },
       "elite": {
-        "net": 251.86,
-        "hours": 11
+        "net": 58.82,
+        "hours": 12
       }
     },
     "2026-08-19": {
       "3": {
-        "net": -158.8,
-        "hours": 9
-      },
-      "5": {
-        "net": 0,
-        "hours": 0
-      },
-      "elite": {
-        "net": -123.61,
-        "hours": 7
-      }
-    },
-    "2026-08-20": {
-      "3": {
-        "net": 351.29,
-        "hours": 12
-      },
-      "5": {
-        "net": 282.79,
-        "hours": 6
-      },
-      "elite": {
-        "net": 480.18,
-        "hours": 13
-      }
-    },
-    "2026-08-21": {
-      "3": {
-        "net": -95.6,
-        "hours": 5
-      },
-      "5": {
-        "net": -57.26,
-        "hours": 4
-      },
-      "elite": {
-        "net": 85.11,
-        "hours": 13
-      }
-    },
-    "2026-08-22": {
-      "3": {
-        "net": 787.15,
-        "hours": 13
-      },
-      "5": {
-        "net": 930.61,
-        "hours": 12
-      },
-      "elite": {
-        "net": 1028.92,
-        "hours": 24
-      }
-    },
-    "2026-08-23": {
-      "3": {
-        "net": 281.06,
+        "net": 380.99,
         "hours": 8
       },
       "5": {
@@ -11757,13 +11728,27 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 322.19,
-        "hours": 10
+        "net": -37.97,
+        "hours": 11
       }
     },
-    "2026-08-24": {
+    "2026-08-20": {
       "3": {
-        "net": -66.76,
+        "net": 330.39,
+        "hours": 11
+      },
+      "5": {
+        "net": 41.91,
+        "hours": 3
+      },
+      "elite": {
+        "net": 41.91,
+        "hours": 3
+      }
+    },
+    "2026-08-21": {
+      "3": {
+        "net": -115.93,
         "hours": 5
       },
       "5": {
@@ -11771,13 +11756,55 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 61.76,
-        "hours": 12
+        "net": 82.79,
+        "hours": 5
+      }
+    },
+    "2026-08-22": {
+      "3": {
+        "net": 214.49,
+        "hours": 3
+      },
+      "5": {
+        "net": 694.59,
+        "hours": 10
+      },
+      "elite": {
+        "net": 447.67,
+        "hours": 16
+      }
+    },
+    "2026-08-23": {
+      "3": {
+        "net": 254.18,
+        "hours": 6
+      },
+      "5": {
+        "net": 324.35,
+        "hours": 7
+      },
+      "elite": {
+        "net": 359.3,
+        "hours": 14
+      }
+    },
+    "2026-08-24": {
+      "3": {
+        "net": 175.7,
+        "hours": 8
+      },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
+      "elite": {
+        "net": -79.91,
+        "hours": 3
       }
     },
     "2026-08-25": {
       "3": {
-        "net": 278.25,
+        "net": 27.15,
         "hours": 4
       },
       "5": {
@@ -11785,139 +11812,139 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 20.71,
-        "hours": 3
+        "net": 183.21,
+        "hours": 11
       }
     },
     "2026-08-26": {
       "3": {
-        "net": 89.02,
-        "hours": 4
+        "net": 520.06,
+        "hours": 18
       },
       "5": {
         "net": 42.59,
         "hours": 3
       },
       "elite": {
-        "net": 291.47,
-        "hours": 8
+        "net": 291.75,
+        "hours": 12
       }
     },
     "2026-08-27": {
       "3": {
-        "net": -1.69,
-        "hours": 7
+        "net": 38.7,
+        "hours": 12
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 127.24,
+        "hours": 7
       },
       "elite": {
-        "net": 15.97,
-        "hours": 7
+        "net": 130.65,
+        "hours": 9
       }
     },
     "2026-08-28": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 163.73,
+        "hours": 6
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 133.87,
+        "hours": 6
       },
       "elite": {
-        "net": 301.89,
-        "hours": 10
+        "net": 178.49,
+        "hours": 8
       }
     },
     "2026-08-29": {
       "3": {
-        "net": 17.67,
-        "hours": 29
+        "net": 94.91,
+        "hours": 14
       },
       "5": {
-        "net": 36.39,
-        "hours": 10
+        "net": 81.62,
+        "hours": 13
       },
       "elite": {
-        "net": 164.74,
-        "hours": 20
+        "net": 617.02,
+        "hours": 19
       }
     },
     "2026-08-30": {
       "3": {
-        "net": 383.23,
-        "hours": 7
+        "net": 225.56,
+        "hours": 6
       },
       "5": {
-        "net": 213.51,
-        "hours": 4
+        "net": 318.93,
+        "hours": 10
       },
       "elite": {
-        "net": 93.96,
-        "hours": 3
+        "net": 487.45,
+        "hours": 14
       }
     },
     "2026-08-31": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": -39.95,
+        "hours": 6
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -57.73,
+        "hours": 3
       },
       "elite": {
-        "net": -102.97,
-        "hours": 3
+        "net": -102.38,
+        "hours": 7
       }
     },
     "2026-09-01": {
       "3": {
-        "net": 86.75,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": -16.41,
+        "hours": 4
       }
     },
     "2026-09-02": {
       "3": {
-        "net": -6.69,
-        "hours": 13
+        "net": -41.71,
+        "hours": 7
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -18.22,
-        "hours": 4
+        "net": 0,
+        "hours": 0
       }
     },
     "2026-09-03": {
       "3": {
-        "net": -214.86,
-        "hours": 18
+        "net": 168.95,
+        "hours": 7
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -81.41,
-        "hours": 16
+        "net": 216.23,
+        "hours": 7
       }
     },
     "2026-09-04": {
       "3": {
-        "net": 22.31,
+        "net": 169.63,
         "hours": 3
       },
       "5": {
@@ -11925,27 +11952,27 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 104.96,
+        "net": 173.98,
         "hours": 6
       }
     },
     "2026-09-05": {
       "3": {
-        "net": 457.96,
-        "hours": 13
+        "net": 427.06,
+        "hours": 14
       },
       "5": {
-        "net": 138.12,
-        "hours": 4
+        "net": 254.45,
+        "hours": 6
       },
       "elite": {
-        "net": 140.4,
-        "hours": 8
+        "net": 320.87,
+        "hours": 14
       }
     },
     "2026-09-06": {
       "3": {
-        "net": -17.72,
+        "net": -121.03,
         "hours": 13
       },
       "5": {
@@ -11953,8 +11980,8 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 77.63,
-        "hours": 14
+        "net": 139.14,
+        "hours": 17
       }
     },
     "2026-09-07": {
@@ -11973,21 +12000,21 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-09-08": {
       "3": {
-        "net": 799.34,
-        "hours": 30
+        "net": 684.2,
+        "hours": 28
       },
       "5": {
-        "net": 298.48,
-        "hours": 13
+        "net": 110.63,
+        "hours": 4
       },
       "elite": {
-        "net": 641.49,
-        "hours": 17
+        "net": 397.46,
+        "hours": 19
       }
     },
     "2026-09-09": {
       "3": {
-        "net": 689.36,
+        "net": 624.15,
         "hours": 13
       },
       "5": {
@@ -11995,750 +12022,750 @@ function getRealizedPriceWithFallback(c, h, date) {
         "hours": 0
       },
       "elite": {
-        "net": 532.94,
-        "hours": 21
+        "net": 781,
+        "hours": 15
       }
     },
     "2026-09-10": {
       "3": {
-        "net": 235.54,
-        "hours": 19
+        "net": 172.81,
+        "hours": 20
       },
       "5": {
-        "net": 330.43,
-        "hours": 10
+        "net": 253.78,
+        "hours": 5
       },
       "elite": {
-        "net": 340.88,
-        "hours": 14
+        "net": 411.48,
+        "hours": 12
       }
     },
     "2026-09-11": {
       "3": {
-        "net": 199.13,
-        "hours": 19
+        "net": 470.1,
+        "hours": 13
       },
       "5": {
-        "net": 196.86,
-        "hours": 6
+        "net": 145.83,
+        "hours": 4
       },
       "elite": {
-        "net": 327.41,
-        "hours": 17
+        "net": 394.34,
+        "hours": 21
       }
     },
     "2026-09-12": {
       "3": {
-        "net": 997.27,
-        "hours": 14
+        "net": 458.36,
+        "hours": 9
       },
       "5": {
-        "net": 492.65,
-        "hours": 8
+        "net": 291.27,
+        "hours": 3
       },
       "elite": {
-        "net": 392.02,
-        "hours": 7
+        "net": 567.71,
+        "hours": 11
       }
     },
     "2026-09-13": {
       "3": {
-        "net": 429.78,
-        "hours": 12
+        "net": 383.74,
+        "hours": 9
       },
       "5": {
-        "net": 103.81,
+        "net": 57.77,
         "hours": 3
       },
       "elite": {
-        "net": 272.76,
-        "hours": 9
+        "net": 423.93,
+        "hours": 12
       }
     },
     "2026-09-14": {
       "3": {
-        "net": 806.91,
+        "net": 534.21,
         "hours": 14
       },
       "5": {
-        "net": 167,
-        "hours": 8
+        "net": -45.66,
+        "hours": 4
       },
       "elite": {
-        "net": 166.76,
-        "hours": 8
+        "net": 84.09,
+        "hours": 10
       }
     },
     "2026-09-15": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 125.97,
+        "hours": 9
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 400.85,
-        "hours": 9
+        "net": 167.94,
+        "hours": 7
       }
     },
     "2026-09-16": {
       "3": {
-        "net": 436.77,
-        "hours": 9
+        "net": 765.53,
+        "hours": 16
       },
       "5": {
-        "net": 386.33,
-        "hours": 3
+        "net": 701.04,
+        "hours": 8
       },
       "elite": {
-        "net": 660.04,
-        "hours": 14
+        "net": 77.57,
+        "hours": 13
       }
     },
     "2026-09-17": {
       "3": {
-        "net": 787.11,
+        "net": 755.01,
         "hours": 16
       },
       "5": {
-        "net": 538.91,
-        "hours": 6
+        "net": 671.68,
+        "hours": 4
       },
       "elite": {
-        "net": 463.09,
-        "hours": 14
+        "net": 263.23,
+        "hours": 13
       }
     },
     "2026-09-18": {
       "3": {
-        "net": 725.35,
-        "hours": 8
+        "net": 819.9,
+        "hours": 16
       },
       "5": {
-        "net": 648.4,
-        "hours": 8
+        "net": 869.28,
+        "hours": 10
       },
       "elite": {
-        "net": 635.08,
-        "hours": 14
+        "net": 536.88,
+        "hours": 12
       }
     },
     "2026-09-19": {
       "3": {
-        "net": 548.82,
-        "hours": 15
-      },
-      "5": {
-        "net": -96.71,
+        "net": 134.45,
         "hours": 9
       },
-      "elite": {
-        "net": -7.81,
+      "5": {
+        "net": 78.29,
         "hours": 10
+      },
+      "elite": {
+        "net": 452.88,
+        "hours": 17
       }
     },
     "2026-09-20": {
       "3": {
-        "net": 641.58,
-        "hours": 8
+        "net": 700.43,
+        "hours": 18
       },
       "5": {
-        "net": 121.9,
-        "hours": 7
+        "net": 40.75,
+        "hours": 8
       },
       "elite": {
-        "net": 203.29,
-        "hours": 10
+        "net": 16.87,
+        "hours": 11
       }
     },
     "2026-09-21": {
       "3": {
-        "net": 316.64,
-        "hours": 13
+        "net": 387.47,
+        "hours": 15
       },
       "5": {
-        "net": 185.8,
-        "hours": 4
+        "net": 417.26,
+        "hours": 13
       },
       "elite": {
-        "net": -68.91,
-        "hours": 11
+        "net": 309.32,
+        "hours": 14
       }
     },
     "2026-09-22": {
       "3": {
-        "net": 909.52,
-        "hours": 14
+        "net": 581.44,
+        "hours": 11
       },
       "5": {
-        "net": 444.78,
-        "hours": 5
+        "net": 584.27,
+        "hours": 7
       },
       "elite": {
-        "net": 951.23,
-        "hours": 15
+        "net": 760.04,
+        "hours": 9
       }
     },
     "2026-09-23": {
       "3": {
-        "net": 496.01,
-        "hours": 8
+        "net": 280.42,
+        "hours": 12
       },
       "5": {
-        "net": 559.47,
-        "hours": 6
+        "net": 339.06,
+        "hours": 9
       },
       "elite": {
-        "net": 721.93,
+        "net": 246.77,
         "hours": 13
       }
     },
     "2026-09-24": {
       "3": {
-        "net": -0.41,
-        "hours": 8
+        "net": -218.12,
+        "hours": 13
       },
       "5": {
-        "net": -57.9,
-        "hours": 3
+        "net": -145.01,
+        "hours": 8
       },
       "elite": {
-        "net": -229.19,
-        "hours": 11
+        "net": -10.74,
+        "hours": 12
       }
     },
     "2026-09-25": {
       "3": {
-        "net": 145.45,
-        "hours": 16
+        "net": -21.98,
+        "hours": 15
       },
       "5": {
-        "net": 87.37,
-        "hours": 12
+        "net": -179.33,
+        "hours": 11
       },
       "elite": {
-        "net": -134.75,
-        "hours": 22
+        "net": -357.44,
+        "hours": 12
       }
     },
     "2026-09-26": {
       "3": {
-        "net": -49.11,
-        "hours": 11
+        "net": 434.56,
+        "hours": 13
       },
       "5": {
-        "net": -5.65,
-        "hours": 3
+        "net": 408.76,
+        "hours": 13
       },
       "elite": {
-        "net": 44.8,
-        "hours": 13
+        "net": 300.07,
+        "hours": 11
       }
     },
     "2026-09-27": {
       "3": {
-        "net": -58.92,
-        "hours": 3
+        "net": 392.02,
+        "hours": 19
       },
       "5": {
-        "net": 70.43,
-        "hours": 3
+        "net": -159.87,
+        "hours": 4
       },
       "elite": {
-        "net": 291.35,
-        "hours": 12
+        "net": 559.71,
+        "hours": 19
       }
     },
     "2026-09-28": {
       "3": {
-        "net": 341.4,
-        "hours": 12
-      },
-      "5": {
-        "net": 228.65,
+        "net": 114.4,
         "hours": 4
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 258.86,
-        "hours": 8
+        "net": 429.87,
+        "hours": 6
       }
     },
     "2026-09-29": {
       "3": {
-        "net": 692.42,
-        "hours": 18
-      },
-      "5": {
-        "net": 273.67,
+        "net": 169.89,
         "hours": 6
       },
+      "5": {
+        "net": 0,
+        "hours": 0
+      },
       "elite": {
-        "net": 515.08,
+        "net": 393.85,
         "hours": 9
       }
     },
     "2026-09-30": {
       "3": {
-        "net": 627.67,
-        "hours": 12
+        "net": 199.24,
+        "hours": 10
       },
       "5": {
-        "net": 238.58,
-        "hours": 11
+        "net": 153.1,
+        "hours": 10
       },
       "elite": {
-        "net": 384.57,
-        "hours": 8
+        "net": 405.37,
+        "hours": 13
       }
     },
     "2026-10-01": {
       "3": {
-        "net": -3.25,
-        "hours": 11
+        "net": -832.54,
+        "hours": 21
       },
       "5": {
-        "net": 364.46,
-        "hours": 12
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -170.92,
-        "hours": 17
+        "net": -812.6,
+        "hours": 14
       }
     },
     "2026-10-02": {
       "3": {
-        "net": 1184.48,
-        "hours": 24
+        "net": 362.63,
+        "hours": 9
       },
       "5": {
-        "net": 1222.44,
-        "hours": 16
+        "net": 374.87,
+        "hours": 10
       },
       "elite": {
-        "net": 1031.53,
-        "hours": 13
+        "net": 1200.52,
+        "hours": 20
       }
     },
     "2026-10-03": {
       "3": {
-        "net": -164.66,
-        "hours": 8
+        "net": 141.64,
+        "hours": 5
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 246.59,
+        "hours": 3
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 653.14,
+        "hours": 8
       }
     },
     "2026-10-04": {
       "3": {
-        "net": 137.17,
-        "hours": 4
+        "net": 991.79,
+        "hours": 13
       },
       "5": {
-        "net": 2.86,
-        "hours": 3
+        "net": 1074.77,
+        "hours": 12
       },
       "elite": {
-        "net": 1259.81,
-        "hours": 16
+        "net": 1563.52,
+        "hours": 31
       }
     },
     "2026-10-05": {
       "3": {
-        "net": 168.99,
+        "net": 738.11,
         "hours": 9
       },
       "5": {
-        "net": 412.18,
-        "hours": 12
+        "net": 594.79,
+        "hours": 7
       },
       "elite": {
-        "net": 433.45,
-        "hours": 15
+        "net": 138.93,
+        "hours": 6
       }
     },
     "2026-10-06": {
       "3": {
-        "net": 1019.71,
-        "hours": 9
+        "net": 1411.57,
+        "hours": 24
       },
       "5": {
-        "net": 821.47,
+        "net": 803.63,
         "hours": 9
       },
       "elite": {
-        "net": 656.94,
-        "hours": 12
+        "net": 22.16,
+        "hours": 3
       }
     },
     "2026-10-07": {
       "3": {
-        "net": 1060.17,
-        "hours": 18
+        "net": 205.33,
+        "hours": 10
       },
       "5": {
-        "net": 461.03,
-        "hours": 12
+        "net": 995.19,
+        "hours": 13
       },
       "elite": {
-        "net": 701.37,
-        "hours": 17
+        "net": 1161.46,
+        "hours": 25
       }
     },
     "2026-10-08": {
       "3": {
-        "net": 1333.4,
-        "hours": 13
+        "net": 562.23,
+        "hours": 12
       },
       "5": {
-        "net": 660.7,
-        "hours": 9
+        "net": 330.71,
+        "hours": 7
       },
       "elite": {
-        "net": 342.56,
-        "hours": 7
+        "net": 1143.48,
+        "hours": 13
       }
     },
     "2026-10-09": {
       "3": {
-        "net": 279.02,
-        "hours": 13
+        "net": 286.68,
+        "hours": 6
       },
       "5": {
-        "net": -36.34,
-        "hours": 5
+        "net": -170.32,
+        "hours": 3
       },
       "elite": {
-        "net": 279.36,
-        "hours": 12
+        "net": 37.22,
+        "hours": 8
       }
     },
     "2026-10-10": {
       "3": {
-        "net": 49.71,
-        "hours": 9
+        "net": 173.51,
+        "hours": 11
       },
       "5": {
-        "net": 156.55,
-        "hours": 10
+        "net": 144.52,
+        "hours": 4
       },
       "elite": {
-        "net": 134.12,
-        "hours": 7
+        "net": 262.16,
+        "hours": 13
       }
     },
     "2026-10-11": {
       "3": {
-        "net": 752.32,
-        "hours": 22
+        "net": 266.09,
+        "hours": 11
       },
       "5": {
-        "net": 843.95,
+        "net": 1037.59,
         "hours": 13
       },
       "elite": {
-        "net": 587.42,
-        "hours": 19
+        "net": 925.65,
+        "hours": 20
       }
     },
     "2026-10-12": {
       "3": {
-        "net": 153.93,
-        "hours": 11
+        "net": -52.74,
+        "hours": 6
       },
       "5": {
-        "net": 137.53,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -421.41,
-        "hours": 19
+        "net": -161.05,
+        "hours": 13
       }
     },
     "2026-10-13": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 168.12,
+        "hours": 13
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 127.3,
+        "hours": 6
       },
       "elite": {
-        "net": 23.47,
-        "hours": 3
+        "net": 19.49,
+        "hours": 10
       }
     },
     "2026-10-14": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": -125.77,
+        "hours": 13
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 734.1,
-        "hours": 7
+        "net": 943.75,
+        "hours": 15
       }
     },
     "2026-10-15": {
       "3": {
-        "net": 34.28,
-        "hours": 8
+        "net": 179.77,
+        "hours": 6
       },
       "5": {
-        "net": -57.22,
-        "hours": 4
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 642.19,
-        "hours": 22
+        "net": 179.77,
+        "hours": 6
       }
     },
     "2026-10-16": {
       "3": {
-        "net": 22.54,
-        "hours": 15
+        "net": 563.37,
+        "hours": 17
       },
       "5": {
-        "net": -107.87,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 266.97,
-        "hours": 22
+        "net": -202.71,
+        "hours": 7
       }
     },
     "2026-10-17": {
       "3": {
-        "net": -64.67,
-        "hours": 6
+        "net": 61.61,
+        "hours": 17
       },
       "5": {
-        "net": -85.47,
-        "hours": 8
+        "net": -113.67,
+        "hours": 3
       },
       "elite": {
-        "net": -99.36,
-        "hours": 13
+        "net": -30.77,
+        "hours": 6
       }
     },
     "2026-10-18": {
       "3": {
-        "net": 622.03,
-        "hours": 19
+        "net": 12.15,
+        "hours": 7
       },
       "5": {
-        "net": 622.02,
-        "hours": 19
+        "net": 333.3,
+        "hours": 6
       },
       "elite": {
-        "net": 161.74,
-        "hours": 8
+        "net": 341.93,
+        "hours": 20
       }
     },
     "2026-10-19": {
       "3": {
-        "net": -89.27,
-        "hours": 3
+        "net": 62.3,
+        "hours": 13
       },
       "5": {
-        "net": -89.27,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 455.15,
-        "hours": 16
+        "net": 788.71,
+        "hours": 15
       }
     },
     "2026-10-20": {
       "3": {
-        "net": 947.49,
-        "hours": 10
+        "net": 845.58,
+        "hours": 14
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 863.94,
-        "hours": 14
+        "net": 328.68,
+        "hours": 19
       }
     },
     "2026-10-21": {
       "3": {
-        "net": 404.61,
-        "hours": 22
+        "net": -414.8,
+        "hours": 21
       },
       "5": {
-        "net": 260.28,
-        "hours": 8
+        "net": -125.82,
+        "hours": 14
       },
       "elite": {
-        "net": 285.85,
-        "hours": 22
+        "net": 109.64,
+        "hours": 23
       }
     },
     "2026-10-22": {
       "3": {
-        "net": 80.4,
-        "hours": 7
+        "net": 57.67,
+        "hours": 3
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 285.91,
-        "hours": 23
+        "net": 173.84,
+        "hours": 6
       }
     },
     "2026-10-23": {
       "3": {
-        "net": 57.8,
-        "hours": 14
+        "net": -54.98,
+        "hours": 27
       },
       "5": {
-        "net": 232.73,
-        "hours": 5
+        "net": 125.14,
+        "hours": 7
       },
       "elite": {
-        "net": 78.14,
-        "hours": 14
+        "net": -87.41,
+        "hours": 22
       }
     },
     "2026-10-24": {
       "3": {
-        "net": -798.96,
-        "hours": 14
+        "net": -335.58,
+        "hours": 6
       },
       "5": {
-        "net": -413.91,
-        "hours": 4
+        "net": -172.03,
+        "hours": 3
       },
       "elite": {
-        "net": -420.4,
-        "hours": 7
+        "net": -639.18,
+        "hours": 8
       }
     },
     "2026-10-25": {
       "3": {
-        "net": 94.55,
-        "hours": 3
+        "net": 126.84,
+        "hours": 6
       },
       "5": {
-        "net": -7.24,
-        "hours": 3
+        "net": 178.91,
+        "hours": 10
       },
       "elite": {
-        "net": 948.05,
-        "hours": 9
+        "net": 15.57,
+        "hours": 3
       }
     },
     "2026-10-26": {
       "3": {
-        "net": 361.18,
-        "hours": 9
+        "net": 159.48,
+        "hours": 3
       },
       "5": {
-        "net": 186.95,
-        "hours": 6
+        "net": 16.98,
+        "hours": 4
       },
       "elite": {
-        "net": 303.18,
-        "hours": 12
+        "net": 136.21,
+        "hours": 10
       }
     },
     "2026-10-27": {
       "3": {
-        "net": 638.28,
-        "hours": 9
+        "net": 677.17,
+        "hours": 12
       },
       "5": {
         "net": 110.8,
         "hours": 3
       },
       "elite": {
-        "net": -135.71,
-        "hours": 6
+        "net": -9.75,
+        "hours": 3
       }
     },
     "2026-10-28": {
       "3": {
-        "net": 63.87,
-        "hours": 6
+        "net": 617.45,
+        "hours": 13
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 423.68,
+        "hours": 4
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 830.1,
+        "hours": 14
       }
     },
     "2026-10-29": {
       "3": {
-        "net": -157.14,
-        "hours": 8
+        "net": -161.59,
+        "hours": 16
       },
       "5": {
-        "net": -42.89,
-        "hours": 9
+        "net": 166.5,
+        "hours": 6
       },
       "elite": {
-        "net": 206.68,
-        "hours": 12
+        "net": 154.83,
+        "hours": 19
       }
     },
     "2026-10-30": {
       "3": {
-        "net": -159.46,
-        "hours": 19
+        "net": -272.05,
+        "hours": 20
       },
       "5": {
-        "net": -25.16,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": -9.2,
-        "hours": 16
+        "net": -60.92,
+        "hours": 7
       }
     },
     "2026-10-31": {
       "3": {
-        "net": 53.38,
-        "hours": 3
+        "net": 168.07,
+        "hours": 8
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 335.38,
-        "hours": 7
+        "net": 336.41,
+        "hours": 3
       }
     },
     "2026-11-01": {
       "3": {
-        "net": -205.87,
+        "net": -240.61,
         "hours": 10
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -164.42,
+        "hours": 8
       },
       "elite": {
-        "net": 128.3,
-        "hours": 3
+        "net": -224.74,
+        "hours": 14
       }
     },
     "2026-11-02": {
@@ -12757,15 +12784,15 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-11-03": {
       "3": {
-        "net": -27.8,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": -75.5,
+        "net": -27.8,
         "hours": 3
       }
     },
@@ -12785,78 +12812,78 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-11-05": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 58.75,
+        "hours": 3
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 58.75,
-        "hours": 3
+        "net": 496.86,
+        "hours": 6
       }
     },
     "2026-11-06": {
       "3": {
-        "net": 88.14,
-        "hours": 3
+        "net": 226.28,
+        "hours": 11
       },
       "5": {
-        "net": 88.14,
-        "hours": 3
+        "net": 0,
+        "hours": 0
       },
       "elite": {
-        "net": 125.35,
-        "hours": 8
+        "net": 1.13,
+        "hours": 3
       }
     },
     "2026-11-07": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": 446.81,
+        "hours": 14
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 280.52,
+        "hours": 7
       },
       "elite": {
-        "net": 81.03,
-        "hours": 3
+        "net": 324.64,
+        "hours": 9
       }
     },
     "2026-11-08": {
       "3": {
-        "net": -38.65,
-        "hours": 9
-      },
-      "5": {
-        "net": -14,
+        "net": 415.22,
         "hours": 3
       },
+      "5": {
+        "net": 681.45,
+        "hours": 7
+      },
       "elite": {
-        "net": -9.83,
-        "hours": 4
+        "net": 1573.32,
+        "hours": 19
       }
     },
     "2026-11-09": {
       "3": {
-        "net": 139.36,
-        "hours": 6
+        "net": 44.25,
+        "hours": 4
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": -41.09,
+        "hours": 3
       },
       "elite": {
-        "net": 2.02,
-        "hours": 7
+        "net": 88.37,
+        "hours": 6
       }
     },
     "2026-11-10": {
       "3": {
-        "net": 272.57,
-        "hours": 3
+        "net": -50.86,
+        "hours": 8
       },
       "5": {
         "net": 0,
@@ -12869,86 +12896,86 @@ function getRealizedPriceWithFallback(c, h, date) {
     },
     "2026-11-11": {
       "3": {
-        "net": 0,
-        "hours": 0
+        "net": -54.2,
+        "hours": 6
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 0,
-        "hours": 0
+        "net": 291.18,
+        "hours": 4
       }
     },
     "2026-11-12": {
       "3": {
-        "net": 110.42,
-        "hours": 14
+        "net": 225.33,
+        "hours": 9
       },
       "5": {
         "net": 76.91,
         "hours": 6
       },
       "elite": {
-        "net": 112.35,
-        "hours": 8
+        "net": 78.19,
+        "hours": 4
       }
     },
     "2026-11-13": {
       "3": {
-        "net": 107.45,
-        "hours": 9
+        "net": 0,
+        "hours": 0
       },
       "5": {
         "net": 0,
         "hours": 0
       },
       "elite": {
-        "net": 110.24,
-        "hours": 6
+        "net": 60.93,
+        "hours": 7
       }
     },
     "2026-11-14": {
       "3": {
-        "net": 2.66,
-        "hours": 6
+        "net": 32.74,
+        "hours": 14
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 75.42,
+        "hours": 5
       },
       "elite": {
-        "net": 386.31,
-        "hours": 10
+        "net": 231.46,
+        "hours": 3
       }
     },
     "2026-11-15": {
       "3": {
-        "net": 135.13,
-        "hours": 6
+        "net": -834.06,
+        "hours": 9
       },
       "5": {
         "net": -335.36,
         "hours": 6
       },
       "elite": {
-        "net": -17.36,
-        "hours": 6
+        "net": -75.3,
+        "hours": 7
       }
     },
     "2026-11-16": {
       "3": {
-        "net": 501.03,
-        "hours": 8
+        "net": 276.25,
+        "hours": 9
       },
       "5": {
-        "net": 0,
-        "hours": 0
+        "net": 486.25,
+        "hours": 8
       },
       "elite": {
-        "net": 274.51,
-        "hours": 4
+        "net": 411.24,
+        "hours": 3
       }
     },
     "2026-11-17": {
@@ -13386,7 +13413,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-16 15:29";
+                const currentBuildTime = "2026-11-16 16:44";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -27328,17 +27355,6 @@ function findAnalogues() {
                     return sorted[idx];
                 }
                 
-                // Get 95th percentile distances across the candidate pool for robust normalization
-                const resNormFactor = get95thPercentile(allMatches.map(m => m.distRes));
-                const resShapeNormFactor = get95thPercentile(allMatches.map(m => m.distResShape));
-                const euaNormFactor = get95thPercentile(allMatches.map(m => m.distEua));
-                const deResNormFactor = get95thPercentile(allMatches.map(m => m.distDeRes));
-                const bgResNormFactor = get95thPercentile(allMatches.map(m => m.distBgRes));
-                const ttfNormFactor = get95thPercentile(allMatches.map(m => m.distTtf));
-                const grPriorNormFactor = get95thPercentile(allMatches.map(m => m.distGrPrior));
-                const dePriorNormFactor = get95thPercentile(allMatches.map(m => m.distDePrior));
-                const bgPriorNormFactor = get95thPercentile(allMatches.map(m => m.distBgPrior));
-                const itResNormFactor = get95thPercentile(allMatches.map(m => m.distItRes));
                 // Get weights once (with robust regime-aware production fallbacks)
                 var activeProd = (typeof getProductionWeights === 'function') ? getProductionWeights(targetDate) : ((typeof PRODUCTION_WEIGHTS !== 'undefined') ? PRODUCTION_WEIGHTS : null);
                 var isManual = (typeof isManualWeights !== 'undefined') ? isManualWeights : false;
@@ -27351,58 +27367,89 @@ function findAnalogues() {
                 var w_de_prior = (!isManual && activeProd) ? activeProd.de_prior : ((document.getElementById("w_de_prior") && !isNaN(parseFloat(document.getElementById("w_de_prior").value))) ? parseFloat(document.getElementById("w_de_prior").value) : ((activeProd && activeProd.de_prior) || 9));
                 var w_bg_prior = (!isManual && activeProd) ? activeProd.bg_prior : ((document.getElementById("w_bg_prior") && !isNaN(parseFloat(document.getElementById("w_bg_prior").value))) ? parseFloat(document.getElementById("w_bg_prior").value) : ((activeProd && activeProd.bg_prior) || 8));
                 var w_it_res = (!isManual && activeProd) ? activeProd.it_res : ((document.getElementById("w_it_res") && !isNaN(parseFloat(document.getElementById("w_it_res").value))) ? parseFloat(document.getElementById("w_it_res").value) : ((activeProd && activeProd.it_res) || 8));
-                w_res /= 100.0; w_eua /= 100.0; w_de_res /= 100.0; w_bg_res /= 100.0;
-                w_ttf /= 100.0; w_gr_prior /= 100.0; w_de_prior /= 100.0; w_bg_prior /= 100.0;
-                w_it_res /= 100.0;
+                const weights = {
+                    res: w_res / 100.0, eua: w_eua / 100.0, de_res: w_de_res / 100.0,
+                    bg_res: w_bg_res / 100.0, ttf: w_ttf / 100.0, gr_prior: w_gr_prior / 100.0,
+                    de_prior: w_de_prior / 100.0, bg_prior: w_bg_prior / 100.0, it_res: w_it_res / 100.0
+                };
 
-                // Normalize all matches using the 95th percentile normalization factors
-                allMatches.forEach(m => {
-                    const resAbsPct = resNormFactor > 0 ? Math.max(0, (1 - m.distRes / resNormFactor) * 100) : 100;
-                    const resShapePct = resShapeNormFactor > 0 ? Math.max(0, (1 - m.distResShape / resShapeNormFactor) * 100) : 100;
-                    m.resPct = 0.5 * resAbsPct + 0.5 * resShapePct;
-                    
-                    m.euaPct = (m.distEua !== Infinity && euaNormFactor > 0) ? Math.max(0, (1 - m.distEua / euaNormFactor) * 100) : null;
-                    
-                    m.deResPct  = (m.distDeRes  !== Infinity && deResNormFactor  > 0) ? Math.max(0, (1 - m.distDeRes  / deResNormFactor)  * 100) : null;
-                    m.bgResPct  = (m.distBgRes  !== Infinity && bgResNormFactor  > 0) ? Math.max(0, (1 - m.distBgRes  / bgResNormFactor)  * 100) : null;
-                    m.ttfPct    = (m.distTtf    !== Infinity && ttfNormFactor    > 0) ? Math.max(0, (1 - m.distTtf    / ttfNormFactor)    * 100) : null;
-                    m.grPriorPct= (m.distGrPrior!== Infinity && grPriorNormFactor> 0) ? Math.max(0, (1 - m.distGrPrior/ grPriorNormFactor)* 100) : null;
-                    m.dePriorPct= (m.distDePrior!== Infinity && dePriorNormFactor> 0) ? Math.max(0, (1 - m.distDePrior/ dePriorNormFactor)* 100) : null;
-                    m.bgPriorPct= (m.distBgPrior!== Infinity && bgPriorNormFactor> 0) ? Math.max(0, (1 - m.distBgPrior/ bgPriorNormFactor)* 100) : null;
-                    m.itResPct  = (m.distItRes  !== Infinity && itResNormFactor  > 0) ? Math.max(0, (1 - m.distItRes  / itResNormFactor) * 100) : null;
+                // Normalize and score a candidate pool strictly within that pool's distribution
+                function scoreCandidatePool(pool, w) {
+                    if (!pool || pool.length === 0) return [];
+                    const resNormFactor     = get95thPercentile(pool.map(m => m.distRes));
+                    const resShapeNormFactor= get95thPercentile(pool.map(m => m.distResShape));
+                    const euaNormFactor     = get95thPercentile(pool.map(m => m.distEua));
+                    const deResNormFactor   = get95thPercentile(pool.map(m => m.distDeRes));
+                    const bgResNormFactor   = get95thPercentile(pool.map(m => m.distBgRes));
+                    const ttfNormFactor     = get95thPercentile(pool.map(m => m.distTtf));
+                    const grPriorNormFactor = get95thPercentile(pool.map(m => m.distGrPrior));
+                    const dePriorNormFactor = get95thPercentile(pool.map(m => m.distDePrior));
+                    const bgPriorNormFactor = get95thPercentile(pool.map(m => m.distBgPrior));
+                    const itResNormFactor   = get95thPercentile(pool.map(m => m.distItRes));
 
-                    // Build weighted score: skip null (missing data) dimensions and re-scale remaining weights
-                    const dims = [
-                        { pct: m.resPct,     w: w_res      },
-                        { pct: m.euaPct,     w: w_eua      },
-                        { pct: m.deResPct,   w: w_de_res   },
-                        { pct: m.bgResPct,   w: w_bg_res   },
-                        { pct: m.ttfPct,     w: w_ttf      },
-                        { pct: m.grPriorPct, w: w_gr_prior },
-                        { pct: m.dePriorPct, w: w_de_prior },
-                        { pct: m.bgPriorPct, w: w_bg_prior },
-                        { pct: m.itResPct,   w: w_it_res   },
-                    ];
-                    const available = dims.filter(d => d.pct !== null);
-                    const totalW = available.reduce((s, d) => s + d.w, 0);
-                    const baseCombined = totalW > 0
-                        ? available.reduce((s, d) => s + (d.w / totalW) * d.pct, 0)
-                        : 0;
+                    const scored = pool.map(raw => {
+                        const m = Object.assign({}, raw);
+                        const resAbsPct   = resNormFactor > 0 ? Math.max(0, (1 - m.distRes / resNormFactor) * 100) : 100;
+                        const resShapePct = resShapeNormFactor > 0 ? Math.max(0, (1 - m.distResShape / resShapeNormFactor) * 100) : 100;
+                        m.resPct     = 0.5 * resAbsPct + 0.5 * resShapePct;
+                        m.euaPct     = (m.distEua     !== Infinity && euaNormFactor     > 0) ? Math.max(0, (1 - m.distEua     / euaNormFactor)     * 100) : null;
+                        m.deResPct   = (m.distDeRes   !== Infinity && deResNormFactor   > 0) ? Math.max(0, (1 - m.distDeRes   / deResNormFactor)   * 100) : null;
+                        m.bgResPct   = (m.distBgRes   !== Infinity && bgResNormFactor   > 0) ? Math.max(0, (1 - m.distBgRes   / bgResNormFactor)   * 100) : null;
+                        m.ttfPct     = (m.distTtf     !== Infinity && ttfNormFactor     > 0) ? Math.max(0, (1 - m.distTtf     / ttfNormFactor)     * 100) : null;
+                        m.grPriorPct = (m.distGrPrior !== Infinity && grPriorNormFactor > 0) ? Math.max(0, (1 - m.distGrPrior / grPriorNormFactor) * 100) : null;
+                        m.dePriorPct = (m.distDePrior !== Infinity && dePriorNormFactor > 0) ? Math.max(0, (1 - m.distDePrior / dePriorNormFactor) * 100) : null;
+                        m.bgPriorPct = (m.distBgPrior !== Infinity && bgPriorNormFactor > 0) ? Math.max(0, (1 - m.distBgPrior / bgPriorNormFactor) * 100) : null;
+                        m.itResPct   = (m.distItRes   !== Infinity && itResNormFactor   > 0) ? Math.max(0, (1 - m.distItRes   / itResNormFactor)   * 100) : null;
 
-                    m.combined = baseCombined;
-                });
-                
-                // Now filter matches by the selected lookback window date
-                let matches = allMatches.filter(m => m.curD >= minDate);
-                
-                if (matches.length === 0) {
-                    alert("No matches found in the selected lookback period.");
-                    return;
+                        const dims = [
+                            { pct: m.resPct,     w: w.res      },
+                            { pct: m.euaPct,     w: w.eua      },
+                            { pct: m.deResPct,   w: w.de_res   },
+                            { pct: m.bgResPct,   w: w.bg_res   },
+                            { pct: m.ttfPct,     w: w.ttf      },
+                            { pct: m.grPriorPct, w: w.gr_prior },
+                            { pct: m.dePriorPct, w: w.de_prior },
+                            { pct: m.bgPriorPct, w: w.bg_prior },
+                            { pct: m.itResPct,   w: w.it_res   },
+                        ];
+                        const available = dims.filter(d => d.pct !== null);
+                        const totalW = available.reduce((s, d) => s + d.w, 0);
+                        m.combined = totalW > 0
+                            ? available.reduce((s, d) => s + (d.w / totalW) * d.pct, 0)
+                            : 0;
+                        return m;
+                    });
+                    scored.sort((a, b) => b.combined - a.combined);
+                    return scored;
                 }
-                
-                // Sort by combined score descending
-                matches.sort((a, b) => b.combined - a.combined);
-                currentTop7 = matches.slice(0, 7);
+
+                if (lookback === "all") {
+                    const DAY_MS = 24 * 60 * 60 * 1000;
+                    const minDate90 = new Date(targetD.getTime() - (0.25 * 365.25 * DAY_MS));
+                    const minDate36 = new Date(targetD.getTime() - (0.10 * 365.25 * DAY_MS));
+
+                    let pool90 = allMatches.filter(m => m.curD >= minDate90);
+                    if (pool90.length < 7) pool90 = allMatches;
+                    currentTop7 = scoreCandidatePool(pool90, weights).slice(0, 7);
+
+                    let pool36 = allMatches.filter(m => m.curD >= minDate36);
+                    if (pool36.length < 5) pool36 = pool90;
+                    window.currentTop7Short = currentTop7Short = scoreCandidatePool(pool36, weights).slice(0, 7);
+
+                    let pool36NoHolSun = allMatches.filter(m => m.curD >= minDate36 && !(targetDateObj.getDay() === 0 && m.curD.getDay() !== 0));
+                    if (pool36NoHolSun.length < 3) pool36NoHolSun = pool36;
+                    window.currentTop7ShortTop3 = currentTop7ShortTop3 = scoreCandidatePool(pool36NoHolSun, weights).slice(0, 7);
+                } else {
+                    const matches = allMatches.filter(m => m.curD >= minDate);
+                    if (matches.length === 0) {
+                        alert("No matches found in the selected lookback period.");
+                        return;
+                    }
+                    const topMatches = scoreCandidatePool(matches, weights).slice(0, 7);
+                    currentTop7 = topMatches;
+                    window.currentTop7Short = currentTop7Short = topMatches;
+                    window.currentTop7ShortTop3 = currentTop7ShortTop3 = topMatches;
+                }
 
                 function pctColour(pct) {
                     if (pct >= 80) return '#16a34a';
@@ -27850,23 +27897,25 @@ function getWeightedRealizedPrice(c, h, dates, weights) {
 function evaluateArbitrageStrategy(stratKey, targetDate) {
     if (!currentTop7 || currentTop7.length === 0) return null;
 
+    const activeTop7 = (typeof getActiveTop7ForStrategy === 'function') ? getActiveTop7ForStrategy(stratKey) : currentTop7;
     const isElite = (stratKey === "elite");
     const topNSel = isElite ? 7 : parseInt(stratKey, 10);
-    const count = Math.min(topNSel, currentTop7.length);
+    const count = Math.min(topNSel, activeTop7.length);
     const threshold = (document.getElementById("arbitrage_min_spread") ? parseFloat(document.getElementById("arbitrage_min_spread").value) : 5.0) || 5.0;
 
-    // Cables map - strictly anti-lookahead: no future cable costs
-    const cablesMap = {};
-    cablesData.forEach(item => {
-        if (targetDate && item.trade_date > targetDate) return;
-        const key = `${item.trade_date}_${item.corridor_code}_${item.position}`;
-        cablesMap[key] = item.price;
-    });
-
+    // Cached cable index with strict anti-lookahead check on lookup
+    if (!window._evalCablesMapCache || window._evalCablesMapCache.src !== cablesData || window._evalCablesMapCache.len !== cablesData.length) {
+        const map = {};
+        for (let i = 0; i < cablesData.length; i++) {
+            const item = cablesData[i];
+            map[`${item.trade_date}_${item.corridor_code}_${item.position}`] = item.price;
+        }
+        window._evalCablesMapCache = { src: cablesData, len: cablesData.length, map };
+    }
 
     function getCablePriceLocal(cable, h, date) {
-        if (!cable) return 0.0;
-        return cablesMap[`${date}_${cable}_${h+1}`] || 0.0;
+        if (!cable || (targetDate && date > targetDate)) return 0.0;
+        return window._evalCablesMapCache.map[`${date}_${cable}_${h+1}`] || 0.0;
     }
 
     // Pre-index outages
@@ -27890,8 +27939,8 @@ function evaluateArbitrageStrategy(stratKey, targetDate) {
         if (key in pairMatchesCache) return pairMatchesCache[key];
 
         const validMatches = [];
-        for (let i = 0; i < currentTop7.length; i++) {
-            const m = currentTop7[i];
+        for (let i = 0; i < activeTop7.length; i++) {
+            const m = activeTop7[i];
             const avgStart = getDayAveragePriceWithFallback(start, m.date);
             const avgEnd = getDayAveragePriceWithFallback(end, m.date);
             if (avgStart <= 0.01 || avgEnd <= 0.01) continue;
@@ -27956,7 +28005,9 @@ function evaluateArbitrageStrategy(stratKey, targetDate) {
 
                 const pSrc = getRealizedPriceWithFallback(start, h, md);
                 const pDst = getRealizedPriceWithFallback(end,   h, md);
-                const gross = pDst - pSrc;
+                const gross = (typeof applySourceResidualShiftDamping === 'function')
+                    ? applySourceResidualShiftDamping(pDst - pSrc, start, h, targetDate, md, stratKey)
+                    : (pDst - pSrc);
 
                 let cable = 0.0;
                 for (let idx = 1; idx < path.length; idx++) {
@@ -28768,13 +28819,14 @@ function renderArbitragePanel() {
                     descEl.innerHTML = descriptions[stratMode] || descriptions["elite"];
                 }
 
+                const activeTop7 = (typeof getActiveTop7ForStrategy === 'function') ? getActiveTop7ForStrategy(stratMode) : currentTop7;
                 const topNSel = isElite ? 7 : parseInt(stratMode, 10);
-                const count = Math.min(topNSel, currentTop7.length);
+                const count = Math.min(topNSel, activeTop7.length);
                 const matchDates = [];
                 const rawSims = [];
                 for (let i = 0; i < count; i++) {
-                    matchDates.push(currentTop7[i].date);
-                    rawSims.push(currentTop7[i].combined);
+                    matchDates.push(activeTop7[i].date);
+                    rawSims.push(activeTop7[i].combined);
                 }
                 let matchWeights = [];
                 if (isElite) {
@@ -28782,8 +28834,8 @@ function renderArbitragePanel() {
                     const sumW = eliteWeights.reduce((a, b) => a + b, 0);
                     matchWeights = eliteWeights.map(w => sumW > 0 ? w / sumW : 1 / count);
                 } else {
-                    // Inverse-distance weighting: 1/distance, normalised
-                    const invSims = rawSims.map(s => 1.0 / Math.max(s, 1e-6));
+                    // Inverse-distance weighting: 1/(100 - similarity), normalised
+                    const invSims = rawSims.map(s => 1.0 / Math.max(100.0 - s, 1e-4));
                     const sumInv = invSims.reduce((a, b) => a + b, 0);
                     matchWeights = invSims.map(v => sumInv > 0 ? v / sumInv : 1 / count);
                 }
@@ -28836,8 +28888,8 @@ function renderArbitragePanel() {
                     if (key in pairMatchesCache) return pairMatchesCache[key];
 
                     const validMatches = [];
-                    for (let i = 0; i < currentTop7.length; i++) {
-                        const m = currentTop7[i];
+                    for (let i = 0; i < activeTop7.length; i++) {
+                        const m = activeTop7[i];
                         const avgStart = getDayAveragePriceWithFallback(start, m.date);
                         const avgEnd = getDayAveragePriceWithFallback(end, m.date);
                         if (avgStart <= 0.01 || avgEnd <= 0.01) continue;
@@ -28909,7 +28961,9 @@ function renderArbitragePanel() {
 
                             const pSrc = getRealizedPriceWithFallback(start, h, md);
                             const pDst = getRealizedPriceWithFallback(end,   h, md);
-                            const gross = pDst - pSrc;
+                            const gross = (typeof applySourceResidualShiftDamping === 'function')
+                                ? applySourceResidualShiftDamping(pDst - pSrc, start, h, targetDate, md, stratMode)
+                                : (pDst - pSrc);
 
                             // Cable cost for this match on each leg
                             let cable = 0.0;
@@ -29152,7 +29206,7 @@ function renderArbitragePanel() {
                             cor.hours.forEach(res => {
                                 uniqueProfitableHours.add(res.hour);
                                 if (!bestByHour[res.hour] || res.netMargin > bestByHour[res.hour].netMargin) {
-                                    bestByHour[res.hour] = { ...res, corridorKey: cor.routeKey, routeName: cor.routeName };
+                                    bestByHour[res.hour] = { ...res, corridorKey: cor.routeKey, routeName: cor.routeName, path: cor.path };
                                 }
                             });
                         });
@@ -29165,7 +29219,8 @@ function renderArbitragePanel() {
                             hour: h.hour,
                             src: group.start,
                             dst: group.end,
-                            transitCost: h.transitCost
+                            transitCost: h.transitCost,
+                            path: h.path
                         }));
                         const maxMargin = Math.max(...allHours.map(h => h.netMargin));
                         const avgMargin = allHours.reduce((s, h) => s + h.netMargin, 0) / allHours.length;
@@ -29486,8 +29541,8 @@ function renderArbitragePanel() {
 
                     // Find valid matches
                     const validMatches = [];
-                    for (let i = 0; i < currentTop7.length; i++) {
-                        const m = currentTop7[i];
+                    for (let i = 0; i < activeTop7.length; i++) {
+                        const m = activeTop7[i];
                         const avgStart = getDayAveragePriceWithFallback(start, m.date);
                         const avgEnd = getDayAveragePriceWithFallback(end, m.date);
                         if (avgStart > 0.01 && avgEnd > 0.01) {
@@ -29499,7 +29554,7 @@ function renderArbitragePanel() {
 
                     // Re-calculate weights dynamically for these valid matches
                     const rawSimsLocal = validMatches.map(m => m.combined);
-                    const invSimsLocal = rawSimsLocal.map(s => 1.0 / Math.max(s, 1e-6));
+                    const invSimsLocal = rawSimsLocal.map(s => 1.0 / Math.max(100.0 - s, 1e-4));
                     const sumInvLocal = invSimsLocal.reduce((a, b) => a + b, 0);
                     const matchWeightsLocal = invSimsLocal.map(v => sumInvLocal > 0 ? v / sumInvLocal : 1 / count);
 
@@ -29784,7 +29839,13 @@ function renderArbitragePanel() {
                                 const actualSrc = getRealizedPriceWithFallback(m.src, m.hour, targetDate);
                                 const actualDst = getRealizedPriceWithFallback(m.dst, m.hour, targetDate);
                                 if (srcHasData && dstHasData && typeof actualSrc === 'number' && typeof actualDst === 'number' && !isNaN(actualSrc) && !isNaN(actualDst)) {
-                                    const netR = (actualDst - actualSrc) - (m.transitCost || 0);
+                                    let realCable = 0.0;
+                                    if (m.path) {
+                                        for (let idx = 1; idx < m.path.length; idx++) {
+                                            if (m.path[idx].cable) realCable += getCablePrice(m.path[idx].cable, m.hour, targetDate);
+                                        }
+                                    }
+                                    const netR = (actualDst - actualSrc) - realCable;
                                     sumRealised += netR;
                                     countRealised++;
                                     if (netR > 0) winsRealised++;
