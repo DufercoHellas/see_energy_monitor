@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 15:17</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-16 15:24</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-16 15:17
+                Last DB Audit: 2026-11-16 15:24
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13386,7 +13386,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-16 15:17";
+                const currentBuildTime = "2026-11-16 15:24";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -19581,81 +19581,258 @@ function runCoupledMeritOrderOptimizerFR(targetDate) {
 
 // Collect date inputs and render residuals charts
 function renderResidualsTab() {
-                const dateList = [];
-                for (let i = 1; i <= 5; i++) {
-                    const val = document.getElementById(`res_date_${i}`).value;
-                    if (val) {
-                        dateList.push(val);
-                    }
-                }
-                renderResiduals(dateList);
-            }
-
-// Collect date range and render generation outages
-
+    const dateList = [];
+    for (let i = 1; i <= 5; i++) {
+        const val = document.getElementById(`res_date_${i}`).value;
+        if (val) {
+            dateList.push(val);
+        }
+    }
+    renderResiduals(dateList);
+}
 
 // ── Residuals & Outages Charts ────────────────────────────────────────────
 
 // Render residual forecast charts for countries with active forecast residuals
 function renderResiduals(dateList) {
-                const resCountries = [
-                    'GR', 'BG', 'RO', 'HU', 'RS', 'DE_LU', 'IT', 'IT_CSUD', 'IT_SUD',
-                    'FR', 'ES', 'AT', 'CH', 'PL', 'CZ', 'SK', 'SI', 'HR'
-                ];
-                const runKey = (document.getElementById("residuals_forecast_run") && document.getElementById("residuals_forecast_run").value) || "morning";
+    const resCountries = [
+        'GR', 'BG', 'RO', 'HU', 'RS', 'DE_LU', 'IT', 'IT_CSUD', 'IT_SUD',
+        'FR', 'ES', 'AT', 'CH', 'PL', 'CZ', 'SK', 'SI', 'HR'
+    ];
+    const runKey = (document.getElementById("residuals_forecast_run") && document.getElementById("residuals_forecast_run").value) || "morning";
 
-                resCountries.forEach(c => {
-                    const traces = [];
-                    dateList.forEach(dStr => {
-                        if (historicalData[c] && historicalData[c][dStr]) {
-                            const dayData = historicalData[c][dStr];
-                            let resArray = dayData.residuals;
-                            if (runKey === 'gate' && dayData.residuals_gate && dayData.residuals_gate.some(v => v !== 0)) {
-                                resArray = dayData.residuals_gate;
-                            } else if (runKey === 'latest' && dayData.residuals_latest && dayData.residuals_latest.some(v => v !== 0)) {
-                                resArray = dayData.residuals_latest;
-                            } else if (dayData.residuals_morning && dayData.residuals_morning.some(v => v !== 0)) {
-                                resArray = dayData.residuals_morning;
-                            }
+    resCountries.forEach(c => {
+        const plotId = `plot_res_${c}`;
+        const div = document.getElementById(plotId);
+        if (!div) return;
 
-                            const hoverText = [];
-                            for (let i = 0; i < 24; i++) {
-                                const resVal = resArray[i] !== undefined ? resArray[i] : 0;
-                                hoverText.push(`<b>${dStr} (Hour ${i + 1}) [${runKey.toUpperCase()}]</b><br>Residual: ${resVal.toLocaleString()} MW`);
-                            }
-                            traces.push({
-                                x: Array.from({length: 24}, (_, i) => i + 1),
-                                y: resArray,
-                                name: `${dStr} (${runKey})`,
-                                type: 'bar',
-                                hoverinfo: 'text',
-                                hovertext: hoverText
-                            });
-                        }
-                    });
-                    
-                    const plotId = `plot_res_${c}`;
-                    const div = document.getElementById(plotId);
-                    if (!div) return;
-                    
-                    if (traces.length === 0) {
-                        div.innerHTML = `<div style="padding: 40px; text-align: center; color: #9ca3af; font-family: 'Inter';">No residuals forecast data available for ${countryNames[c] || c} in the selected period.</div>`;
-                        return;
+        // Container for delta summary KPI cards above chart
+        let summaryCard = document.getElementById(`${plotId}_delta_card`);
+        if (!summaryCard) {
+            summaryCard = document.createElement('div');
+            summaryCard.id = `${plotId}_delta_card`;
+            div.parentNode.insertBefore(summaryCard, div);
+        }
+
+        const traces = [];
+        const validSeries = [];
+
+        dateList.forEach(dStr => {
+            if (historicalData[c] && historicalData[c][dStr]) {
+                const dayData = historicalData[c][dStr];
+                let resArray = dayData.residuals;
+                if (runKey === 'gate' && dayData.residuals_gate && dayData.residuals_gate.some(v => v !== 0)) {
+                    resArray = dayData.residuals_gate;
+                } else if (runKey === 'latest' && dayData.residuals_latest && dayData.residuals_latest.some(v => v !== 0)) {
+                    resArray = dayData.residuals_latest;
+                } else if (dayData.residuals_morning && dayData.residuals_morning.some(v => v !== 0)) {
+                    resArray = dayData.residuals_morning;
+                }
+
+                if (resArray && resArray.length) {
+                    const cleanRes = [];
+                    for (let i = 0; i < 24; i++) {
+                        cleanRes.push(resArray[i] !== undefined ? Math.round(resArray[i]) : 0);
                     }
-                    
-                    const layout = getPlotlyThemeLayout({
-                        title: {text: '', font: {size: 16}},
-                        barmode: 'group',
-                        xaxis: {title: 'Hour of Day', tickmode: 'linear', dtick: 1},
-                        yaxis: {title: 'Net Demand (MW)'},
-                        margin: {t: 50, l: 60, r: 20, b: 40},
-                        legend: {orientation: 'h', y: -0.2}
+                    const baseAvg = cleanRes.reduce((a, b) => a + b, 0) / 24;
+                    const peakSlice = cleanRes.slice(8, 20); // H09-H20
+                    const peakAvg = peakSlice.reduce((a, b) => a + b, 0) / peakSlice.length;
+                    const offPeakSlice = cleanRes.slice(0, 8).concat(cleanRes.slice(20, 24)); // H01-H08 & H21-H24
+                    const offPeakAvg = offPeakSlice.reduce((a, b) => a + b, 0) / offPeakSlice.length;
+
+                    validSeries.push({
+                        dStr,
+                        resArray: cleanRes,
+                        baseAvg,
+                        peakAvg,
+                        offPeakAvg
                     });
-                    Plotly.newPlot(plotId, traces, layout, {responsive: true});
-                });
+                }
+            }
+        });
+
+        if (validSeries.length === 0) {
+            summaryCard.style.display = 'none';
+            div.innerHTML = `<div style="padding: 40px; text-align: center; color: #9ca3af; font-family: 'Inter';">No residuals forecast data available for ${countryNames[c] || c} in the selected period.</div>`;
+            return;
+        }
+
+        // Build Hover Text and Traces with Net Delta Comparisons
+        validSeries.forEach((series, sIdx) => {
+            const hoverText = [];
+            for (let i = 0; i < 24; i++) {
+                const val = series.resArray[i];
+                let diffInfo = '';
+
+                if (validSeries.length === 2) {
+                    if (sIdx === 1) {
+                        const baseVal = validSeries[0].resArray[i];
+                        const diff = val - baseVal;
+                        const pctStr = baseVal !== 0 ? ` (${diff >= 0 ? '+' : ''}${((diff / Math.abs(baseVal)) * 100).toFixed(1)}%)` : '';
+                        const col = diff >= 0 ? '#10b981' : '#f43f5e';
+                        diffInfo = `<br><span style="color:${col}; font-weight:bold;">Net Δ (${series.dStr} - ${validSeries[0].dStr}): ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW${pctStr}</span>`;
+                    } else {
+                        diffInfo = `<br><span style="color:#94a3b8; font-size:11px;">(Baseline Reference)</span>`;
+                    }
+                } else if (validSeries.length > 2 && sIdx > 0) {
+                    const baseVal = validSeries[0].resArray[i];
+                    const diff = val - baseVal;
+                    const col = diff >= 0 ? '#10b981' : '#f43f5e';
+                    diffInfo = `<br><span style="color:${col}; font-weight:bold;">Net Δ vs ${validSeries[0].dStr}: ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW</span>`;
+                }
+
+                hoverText.push(
+                    `<b>${series.dStr} (Hour ${i + 1}) [${runKey.toUpperCase()}]</b><br>` +
+                    `Residual: <b>${val.toLocaleString()} MW</b>` +
+                    diffInfo
+                );
             }
 
-// Render generation outages summary cards, charts, and tables
+            traces.push({
+                x: Array.from({length: 24}, (_, i) => i + 1),
+                y: series.resArray,
+                name: `${series.dStr} (${runKey})`,
+                type: 'bar',
+                hoverinfo: 'text',
+                hovertext: hoverText
+            });
+        });
+
+        // If exactly 2 dates selected, add dedicated Net Difference Line Trace
+        if (validSeries.length === 2) {
+            const d1 = validSeries[0];
+            const d2 = validSeries[1];
+            const deltaY = [];
+            const deltaHover = [];
+
+            for (let i = 0; i < 24; i++) {
+                const v1 = d1.resArray[i];
+                const v2 = d2.resArray[i];
+                const diff = v2 - v1;
+                deltaY.push(diff);
+                const pctStr = v1 !== 0 ? ` (${diff >= 0 ? '+' : ''}${((diff / Math.abs(v1)) * 100).toFixed(1)}%)` : '';
+                const col = diff >= 0 ? '#10b981' : '#f43f5e';
+                deltaHover.push(
+                    `<b>Hour ${i + 1} Net Difference</b><br>` +
+                    `${d2.dStr}: ${v2.toLocaleString()} MW<br>` +
+                    `${d1.dStr}: ${v1.toLocaleString()} MW<br>` +
+                    `<span style="color:${col}; font-weight:bold;">` +
+                    `Net Δ: ${diff >= 0 ? '+' : ''}${diff.toLocaleString()} MW${pctStr}</span>`
+                );
+            }
+
+            traces.push({
+                x: Array.from({length: 24}, (_, i) => i + 1),
+                y: deltaY,
+                name: `Net Δ (${d2.dStr} - ${d1.dStr})`,
+                type: 'scatter',
+                mode: 'lines+markers',
+                line: {color: '#f59e0b', width: 2.5, dash: 'dot'},
+                marker: {size: 6, color: '#f59e0b', symbol: 'diamond'},
+                hoverinfo: 'text',
+                hovertext: deltaHover
+            });
+        }
+
+        // Render Summary KPI Card Above Plot
+        summaryCard.style.display = 'block';
+        if (validSeries.length === 2) {
+            const d1 = validSeries[0];
+            const d2 = validSeries[1];
+            const deltaBase = Math.round(d2.baseAvg - d1.baseAvg);
+            const pctBase = d1.baseAvg !== 0 ? ((deltaBase / Math.abs(d1.baseAvg)) * 100).toFixed(1) : '0.0';
+            const deltaPeak = Math.round(d2.peakAvg - d1.peakAvg);
+            const deltaOffPeak = Math.round(d2.offPeakAvg - d1.offPeakAvg);
+
+            const isPos = deltaBase >= 0;
+            const badgeBg = isPos ? 'rgba(16, 185, 129, 0.12)' : 'rgba(244, 63, 94, 0.12)';
+            const badgeBorder = isPos ? 'rgba(16, 185, 129, 0.35)' : 'rgba(244, 63, 94, 0.35)';
+            const badgeText = isPos ? '#10b981' : '#f43f5e';
+
+            summaryCard.innerHTML = `
+                <div style="background:var(--card-bg, #1a2234); border:1px solid var(--border-color, #2d3748); border-radius:10px; padding:10px 16px; margin-bottom:14px; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); font-family:'Inter', sans-serif;">
+                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                        <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase; letter-spacing:0.5px;">Dates:</span>
+                        <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d1.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d1.baseAvg).toLocaleString()} MW)</span></span>
+                        <span style="color:var(--text-secondary, #94a3b8);">➔</span>
+                        <span style="font-size:13px; font-weight:600; color:var(--text-primary, #f1f5f9);">${d2.dStr} <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">(${Math.round(d2.baseAvg).toLocaleString()} MW)</span></span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <!-- Baseload Net Difference Pill -->
+                        <div style="background:${badgeBg}; border:1px solid ${badgeBorder}; border-radius:6px; padding:4px 10px; display:flex; align-items:center; gap:6px;">
+                            <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase;">Baseload Net:</span>
+                            <span style="font-size:14px; font-weight:800; color:${badgeText};">${isPos ? '+' : ''}${deltaBase.toLocaleString()} MW</span>
+                            <span style="font-size:11px; font-weight:600; color:${badgeText};">(${isPos ? '+' : ''}${pctBase}%)</span>
+                        </div>
+                        <!-- Peak Delta Pill -->
+                        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
+                            <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Peak (09-20h):</span>
+                            <span style="font-size:12px; font-weight:700; color:${deltaPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaPeak >= 0 ? '+' : ''}${deltaPeak.toLocaleString()} MW</span>
+                        </div>
+                        <!-- Off-Peak Delta Pill -->
+                        <div style="background:rgba(255,255,255,0.04); border:1px solid var(--border-color, #334155); border-radius:6px; padding:4px 8px; display:flex; align-items:center; gap:5px;">
+                            <span style="font-size:11px; color:var(--text-secondary, #94a3b8);">Off-Peak:</span>
+                            <span style="font-size:12px; font-weight:700; color:${deltaOffPeak >= 0 ? '#10b981' : '#f43f5e'};">${deltaOffPeak >= 0 ? '+' : ''}${deltaOffPeak.toLocaleString()} MW</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (validSeries.length > 2) {
+            const baseSeries = validSeries[0];
+            const baseAvg = Math.round(baseSeries.baseAvg);
+            let cardsHtml = `
+                <div style="background:var(--card-bg, #1a2234); border:1px solid var(--border-color, #2d3748); border-radius:10px; padding:10px 16px; margin-bottom:14px; font-family:'Inter', sans-serif;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:11px; font-weight:700; color:var(--text-secondary, #94a3b8); text-transform:uppercase; letter-spacing:0.5px;">
+                            Multi-Date Net Comparison (Baseline: <strong style="color:var(--text-primary, #f1f5f9);">${baseSeries.dStr}</strong> · Baseload: ${baseAvg.toLocaleString()} MW)
+                        </span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            `;
+
+            for (let i = 1; i < validSeries.length; i++) {
+                const s = validSeries[i];
+                const dAvg = Math.round(s.baseAvg);
+                const diff = dAvg - baseAvg;
+                const isPos = diff >= 0;
+                const pct = baseAvg !== 0 ? ((diff / Math.abs(baseAvg)) * 100).toFixed(1) : '0.0';
+                const col = isPos ? '#10b981' : '#f43f5e';
+                const bg = isPos ? 'rgba(16, 185, 129, 0.1)' : 'rgba(244, 63, 94, 0.1)';
+                const border = isPos ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)';
+
+                cardsHtml += `
+                    <div style="background:${bg}; border:1px solid ${border}; border-radius:6px; padding:4px 10px; display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:12px; font-weight:600; color:var(--text-primary, #f1f5f9);">${s.dStr}:</span>
+                        <span style="font-size:12px; color:var(--text-secondary, #94a3b8);">${dAvg.toLocaleString()} MW</span>
+                        <span style="font-size:12px; font-weight:800; color:${col};">Net Δ: ${isPos ? '+' : ''}${diff.toLocaleString()} MW (${isPos ? '+' : ''}${pct}%)</span>
+                    </div>
+                `;
+            }
+            cardsHtml += `</div></div>`;
+            summaryCard.innerHTML = cardsHtml;
+        } else {
+            // Single date selected
+            const s = validSeries[0];
+            summaryCard.innerHTML = `
+                <div style="background:var(--card-bg, #1a2234); border:1px solid var(--border-color, #2d3748); border-radius:10px; padding:8px 16px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-family:'Inter', sans-serif;">
+                    <div style="font-size:12px; font-weight:600; color:var(--text-primary, #f1f5f9);">
+                        ${s.dStr} Residual Profile: <span style="color:var(--text-secondary, #94a3b8); font-weight:400;">Baseload Avg: <strong>${Math.round(s.baseAvg).toLocaleString()} MW</strong> | Peak (09-20h): <strong>${Math.round(s.peakAvg).toLocaleString()} MW</strong></span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const layout = getPlotlyThemeLayout({
+            title: {text: '', font: {size: 16}},
+            barmode: 'group',
+            xaxis: {title: 'Hour of Day', tickmode: 'linear', dtick: 1},
+            yaxis: {title: 'Net Demand (MW)'},
+            margin: {t: 20, l: 60, r: 20, b: 40},
+            legend: {orientation: 'h', y: -0.2}
+        });
+        Plotly.newPlot(plotId, traces, layout, {responsive: true});
+    });
+}
 
 
 // === tabs/outages.js ===
