@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-18 09:10</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-18 11:03</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-18 09:10
+                Last DB Audit: 2026-11-18 11:03
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13427,7 +13427,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-18 09:10";
+                const currentBuildTime = "2026-11-18 11:03";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -13642,7 +13642,7 @@ const DE_SHOCK = Object.assign({
     kappa: 0.0025,
     threshold: 14000.0,
     zoneGain: { GR: 1.0, BG: 1.0, RO: 1.0, HU: 1.0 },
-    dailyK: { GR: 0.0, BG: 0.0024, RO: 0.0010, HU: 0.0016 },
+    dailyK: { GR: 0.0, BG: 0.0024, RO: 0.0010, HU: 0.0 },
     dailyThr: 14000.0,
     solarPremium: 0.005
 }, (typeof window !== 'undefined' && window.DE_SHOCK_OVERRIDE) || {});
@@ -14343,11 +14343,169 @@ function getDynamicHydro(country, targetDate, fallbackRoR) {
 // ── Engine Machine Learning & KNN Analogue Models ────────────────────────────
 // Ridge regressions and k-Nearest-Neighbor historical shape forecasters.
 
+function _solveOlsDynamic(X, y, lam) {
+    const n = X[0].length;
+    const A = Array.from({ length: n }, () => new Array(n).fill(0));
+    const b = new Array(n).fill(0);
+    for (let i = 0; i < X.length; i++) {
+        const w = X[i]._w || 1.0;
+        for (let a = 0; a < n; a++) {
+            b[a] += w * X[i][a] * y[i];
+            for (let c = 0; c < n; c++) A[a][c] += w * X[i][a] * X[i][c];
+        }
+    }
+    let tr = 0;
+    for (let a = 1; a < n; a++) tr += A[a][a];
+    const l = lam * (tr / Math.max(1, n - 1) || 1);
+    for (let a = 1; a < n; a++) A[a][a] += l;
+    for (let c = 0; c < n; c++) {
+        let piv = c;
+        for (let r = c + 1; r < n; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
+        let t = A[c]; A[c] = A[piv]; A[piv] = t;
+        t = b[c]; b[c] = b[piv]; b[piv] = t;
+        const pv = A[c][c] || 1e-9;
+        for (let r = 0; r < n; r++) {
+            if (r === c) continue;
+            const f = A[r][c] / pv;
+            if (!f) continue;
+            for (let k = c; k < n; k++) A[r][k] -= f * A[c][k];
+            b[r] -= f * b[c];
+        }
+    }
+    return b.map((v, i) => v / (A[i][i] || 1e-9));
+}
+
+function _getDePricedDates(hc) {
+    if (!hc) return [];
+    const keys = Object.keys(hc);
+    if (window._dePricedCache && window._dePricedCache.hc === hc && window._dePricedCache.len === keys.length) {
+        return window._dePricedCache.dates;
+    }
+    const dates = keys.filter(d => {
+        const e = hc[d];
+        return e && e.prices && e.prices.some(p => p !== null && Math.abs(p) > 0.01);
+    }).sort();
+    window._dePricedCache = { hc: hc, len: keys.length, dates: dates };
+    return dates;
+}
+
+/** Fit walk-forward empirical cubic merit curve for DE_LU strictly before targetDate. */
+function getDeDynamicMeritCurve(targetDate, ccgtT) {
+    window._deDynCurveCache = window._deDynCurveCache || {};
+    const ccgtKey = Math.round((ccgtT || 0) * 100);
+    const cached = window._deDynCurveCache[targetDate];
+    if (cached && cached._ccgtKey === ccgtKey) return cached;
+
+    const hc = window.historicalData && window.historicalData.DE_LU;
+    const dates = _getDePricedDates(hc).filter(d => d < targetDate).slice(-90);
+    const X = [], y = [];
+    for (let di = 0; di < dates.length; di++) {
+        const d = dates[di];
+        const e = hc[d];
+        const resArr = _getEngineResiduals(e, d, targetDate);
+        const demArr = _getEngineField(e, 'demand', d, targetDate) || e.demand || [];
+        if (!resArr || resArr.length < 24) continue;
+        const ttf = e.ttf_price || 80.0, eua = e.eua_price || 85.0;
+        const ccgtD = refGasSrmc('DE_LU', ttf, eua) || ((ttf + 0.40) / 0.55 + (eua * 0.202) / 0.55 + 2.5);
+        const fuelDiff = (ccgtT - ccgtD) * 0.65;
+        const dow = new Date(d + 'T00:00:00Z').getUTCDay();
+        const isWknd = (dow === 0 || dow === 6) ? 1 : 0;
+        const recW = Math.exp(-(dates.length - 1 - di) / 40.0);
+        for (let h = 0; h < 24; h++) {
+            const p = e.prices[h];
+            const r = resArr[h];
+            const dem = (demArr[h] && demArr[h] > 0) ? demArr[h] : 55000.0;
+            if (p === null || p === undefined || isNaN(p) || r === null || r === undefined) continue;
+            const rn = (r - 25000.0) / 10000.0;
+            const rho = r / dem;
+            const isPeak = (h >= 7 && h <= 21) ? 1 : 0;
+            const row = [1, rn, rn * rn, rn * rn * rn, rho, isPeak, isWknd];
+            row._w = recW;
+            X.push(row);
+            y.push(p + fuelDiff);
+        }
+    }
+    const coef = X.length >= 200 ? _solveOlsDynamic(X, y, 2e-3) : [140, 35, 3, 1, 40, 15, -10];
+    const dayMeanCache = {};
+    const fn = function (r, dem, h, isWknd) {
+        const d = (dem && dem > 0) ? dem : 55000.0;
+        const rn = (r - 25000.0) / 10000.0;
+        const rho = r / d;
+        const isPeak = (h >= 7 && h <= 21) ? 1 : 0;
+        return coef[0] + coef[1] * rn + coef[2] * rn * rn + coef[3] * rn * rn * rn + coef[4] * rho + coef[5] * isPeak + coef[6] * (isWknd ? 1 : 0);
+    };
+    fn.dayMean = function (dStr) {
+        if (dayMeanCache[dStr] !== undefined) return dayMeanCache[dStr];
+        const e = hc && hc[dStr];
+        if (!e) return null;
+        const rArr = _getEngineResiduals(e, dStr, targetDate);
+        const dArr = _getEngineField(e, 'demand', dStr, targetDate) || e.demand || [];
+        if (!rArr || rArr.length < 24) return null;
+        const dow = new Date(dStr + 'T00:00:00Z').getUTCDay();
+        const wk = (dow === 0 || dow === 6);
+        let s = 0;
+        for (let h = 0; h < 24; h++) s += fn(rArr[h] || 0, dArr[h] || 55000, h, wk);
+        dayMeanCache[dStr] = s / 24.0;
+        return dayMeanCache[dStr];
+    };
+    fn._ccgtKey = ccgtKey;
+    window._deDynCurveCache[targetDate] = fn;
+    return fn;
+}
+
 function dailyLevelRidgePredict(c, targetDate, ttfPrice, euaPrice) {
-    const spec = DAILY_LEVEL_RIDGE[c];
-    if (!spec) return null;
     const hc = window.historicalData && window.historicalData[c];
     if (!hc) return null;
+    if (c === 'DE_LU') {
+        const eT = hc[targetDate];
+        if (!eT) return null;
+        const ttfT = (ttfPrice && ttfPrice > 0) ? ttfPrice : (eT.ttf_price || 80.0);
+        const euaT = (euaPrice && euaPrice > 0) ? euaPrice : (eT.eua_price || 85.0);
+        const ccgtT = refGasSrmc('DE_LU', ttfT, euaT) || ((ttfT + 0.40) / 0.55 + (euaT * 0.202) / 0.55 + 2.5);
+        const fCurve = getDeDynamicMeritCurve(targetDate, ccgtT);
+
+        const dates = _getDePricedDates(hc).filter(d => d < targetDate);
+        const win = dates.slice(-90);
+        const X = [], y = [];
+        for (let i = 1; i < win.length; i++) {
+            const d = win[i];
+            const dow = new Date(d + 'T00:00:00Z').getUTCDay();
+            let pD = win[i - 1];
+            if (dow === 1) {
+                for (let k = i - 1; k >= Math.max(0, i - 7); k--) {
+                    if (new Date(win[k] + 'T00:00:00Z').getUTCDay() === 5) { pD = win[k]; break; }
+                }
+            }
+            const pAct = _zoneDailyPrice('DE_LU', d);
+            const pPrior = _zoneDailyPrice('DE_LU', pD);
+            const fCur = fCurve.dayMean(d);
+            const fPri = fCurve.dayMean(pD);
+            if (pAct === null || pPrior === null || fCur === null || fPri === null) continue;
+            const row = [1, fCur, pPrior - fPri];
+            row._w = Math.exp(-(win.length - 1 - i) / 40.0);
+            X.push(row);
+            y.push(pAct);
+        }
+        const imm = _priorPricedDate('DE_LU', targetDate);
+        if (!imm) return null;
+        let refD = imm;
+        const tDow = new Date(targetDate + 'T00:00:00Z').getUTCDay();
+        if (tDow === 1) {
+            for (let k = dates.length - 1; k >= Math.max(0, dates.length - 7); k--) {
+                if (new Date(dates[k] + 'T00:00:00Z').getUTCDay() === 5) { refD = dates[k]; break; }
+            }
+        }
+        const pPriorT = _zoneDailyPrice('DE_LU', refD);
+        const fCurT = fCurve.dayMean(targetDate);
+        const fPriT = fCurve.dayMean(refD);
+        if (pPriorT === null || fCurT === null || fPriT === null) return null;
+        if (X.length < 25) return fCurT + 0.55 * (pPriorT - fPriT);
+        const co = _solveOlsDynamic(X, y, 5e-3);
+        return co[0] + co[1] * fCurT + co[2] * (pPriorT - fPriT);
+    }
+
+    const spec = DAILY_LEVEL_RIDGE[c];
+    if (!spec) return null;
     const e = hc[targetDate];
     const eResiduals = _getEngineResiduals(e, targetDate, targetDate);
     if (!e || !eResiduals || !e.prices) return null;
@@ -15747,9 +15905,9 @@ function solveHUForecast(targetDate, skipSplitting) {
         const dePriorP = nbPrice('DE_LU', priorImm, h);
         let deSpreadShift = 0.0;
         if (deToday !== null && dePriorP !== null && dePriorP > 0) {
-            deSpreadShift = (deToday - dePriorP) * 0.85;
+            deSpreadShift = (deToday - dePriorP) * 0.45;
         }
-        anchor = Math.max(0, anchor + deSpreadShift + deShock + (h >= 6 ? nucReturnRelief : nucReturnRelief * 0.3) + ceePeakRelief);
+        anchor = Math.max(0, anchor + deSpreadShift + (h >= 6 ? nucReturnRelief : nucReturnRelief * 0.3) + ceePeakRelief);
         // Only blend pre-gate RS when it doesn't drag down an un-anchored Monday jump day (like Oct 5)
         if (rsKnown !== null && (targetDOW !== 1 || rsKnown >= anchor) && (!isAcuteSEEOutage || rsKnown >= anchor || dRes <= 150)) {
             anchor = 0.65 * anchor + 0.35 * rsKnown;
@@ -18048,6 +18206,8 @@ function knnForecastPriceDE(hist, targetDate, ttfPrice, euaPrice) {
     const euaT = euaPrice > 0 ? euaPrice : 0;
     const ccgtT = refGasSrmc('DE_LU', ttfT, euaT) || ((ttfT + 0.40) / 0.55 + (euaT * 0.202) / 0.55 + 2.5);
 
+    const fCurve = getDeDynamicMeritCurve(targetDate, ccgtT);
+    const demTArr = _getEngineField(deT, 'demand', targetDate, targetDate) || deT.demand || [];
     const cands = [];
     for (const ds of Object.keys(hist.DE_LU)) {
         if (ds >= targetDate) continue;
@@ -18073,7 +18233,8 @@ function knnForecastPriceDE(hist, targetDate, ttfPrice, euaPrice) {
         const windC = (windCArr ? windCArr.reduce((a, b) => a + b, 0) / 24 : 0);
         const dw = Math.abs(windT - windC) / 7000.0;
         const ccgtC = refGasSrmc('DE_LU', (c.ttf_price || 0), (c.eua_price || 0)) || (((c.ttf_price || 0) + 0.40) / 0.55 + ((c.eua_price || 0) * 0.202) / 0.55 + 2.5);
-        cands.push({ ds: ds, dist: dl + dshape + dttf + deua + 0.5 * dw, price: c.prices, ccgt: ccgtC });
+        const demCArr = _getEngineField(c, 'demand', ds, targetDate) || c.demand || [];
+        cands.push({ ds: ds, dist: dl + dshape + dttf + deua + 0.5 * dw, price: c.prices, ccgt: ccgtC, res: resC, dem: demCArr });
     }
     if (cands.length === 0) return null;
     cands.sort((a, b) => a.dist - b.dist);
@@ -18087,7 +18248,8 @@ function knnForecastPriceDE(hist, targetDate, ttfPrice, euaPrice) {
         for (let h = 0; h < 24; h++) {
             const rawP = c.price[h] || 0;
             const fScale = Math.max(0.0, Math.min(1.0, (rawP - 15.0) / 35.0));
-            out[h] += w * (rawP + fuelAdj * fScale);
+            const curveShift = fCurve(resT[h] || 0, demTArr[h] || 55000, h, tWe) - fCurve(c.res[h] || 0, c.dem[h] || 55000, h, tWe);
+            out[h] += w * (rawP + fuelAdj * fScale + 0.75 * curveShift);
         }
     }
     return out;
@@ -18158,6 +18320,11 @@ function solveDEForecast(targetDate) {
     const deDemand = _getEngineField(deEntry, 'demand', targetDate, targetDate) || deEntry.demand || [];
     const deActualPrices = deEntry.prices || [];
     const prevResArr = (countryData[priorImm]) ? _getEngineResiduals(countryData[priorImm], priorImm, targetDate) : null;
+    const prevDemArr = (countryData[priorImm]) ? (_getEngineField(countryData[priorImm], 'demand', priorImm, targetDate) || countryData[priorImm].demand || []) : [];
+    const sameDowResArr = (countryData[priorSameDow]) ? _getEngineResiduals(countryData[priorSameDow], priorSameDow, targetDate) : null;
+    const sameDowDemArr = (countryData[priorSameDow]) ? (_getEngineField(countryData[priorSameDow], 'demand', priorSameDow, targetDate) || countryData[priorSameDow].demand || []) : [];
+    const ccgtT = refGasSrmc('DE_LU', ttfPrice, euaPrice) || ((ttfPrice + 0.40) / 0.55 + (euaPrice * 0.202) / 0.55 + 2.5);
+    const fCurve = getDeDynamicMeritCurve(targetDate, ccgtT);
 
     function nb(c, ref, h) {
         const cd = hist[c] && hist[c][ref];
@@ -18196,30 +18363,16 @@ function solveDEForecast(targetDate) {
 
         const dRes = resDE - prevRes;
 
-        // Hub anchor. DE is structurally the CHEAPEST CORE zone (large renewables),
-        // so own prior persistence dominates and the coupled-neighbour basket only
-        // partially pulls the level; the neighbour levels are premium-adjusted.
-        // Weights sum to 1.0.
-        let pEff = p;
-        let psEff = ps;
-        let coreEff = coreAdj;
-        if (dRes < -3500) {
-            const reliefFrac = Math.min(0.90, (-dRes - 3500) / 12000.0);
-            if (p > 200.0) pEff = p - (p - 200.0) * reliefFrac;
-            if (ps > 200.0) psEff = ps - (ps - 200.0) * reliefFrac;
-            if (coreAdj > 200.0) coreEff = coreAdj - (coreAdj - 200.0) * reliefFrac;
-        }
-        let anchor = 0.52 * pEff + 0.18 * psEff + 0.18 * coreEff + 0.06 * eastAdj + 0.06 * chAdj;
-        // Residual-shift elasticity: responsive to large wind/RES deltas
-        anchor += dRes * ((h >= 7 && h <= 22) ? 0.0035 : 0.0022);
-        const rhoDE = demDE > 0 ? (resDE / demDE) : 0.5;
-        if (rhoDE < 0.30) {
-            const windDrop = (targetDOW === 0 ? 0.35 : 1.0) * Math.min(35.0, (0.30 - rhoDE) * demDE * 0.0018);
-            anchor -= windDrop;
-        } else if (rhoDE > 0.68 && dRes > -2500) {
-            const scarcityAdd = Math.min(65.0, (rhoDE - 0.68) * demDE * 0.0035);
-            anchor += scarcityAdd;
-        }
+        // Continuous walk-forward empirical merit-curve transition anchored on prior hub clearing.
+        const prevDem = (prevDemArr && prevDemArr[h] && prevDemArr[h] > 0) ? prevDemArr[h] : demDE;
+        const sameDowRes = (sameDowResArr && sameDowResArr[h] !== undefined && sameDowResArr[h] !== null) ? sameDowResArr[h] : prevRes;
+        const sameDowDem = (sameDowDemArr && sameDowDemArr[h] && sameDowDemArr[h] > 0) ? sameDowDemArr[h] : demDE;
+        const fToday = fCurve(resDE, demDE, h, isWeekend);
+        const fPrior = fCurve(prevRes, prevDem, h, isWeekend);
+        const fSameDow = fCurve(sameDowRes, sameDowDem, h, isWeekend);
+        const psAligned = ps + (fPrior - fSameDow);
+        const priorHub = 0.52 * p + 0.18 * psAligned + 0.18 * coreAdj + 0.06 * eastAdj + 0.06 * chAdj;
+        let anchor = fToday + 0.55 * (priorHub - fPrior);
         anchor += dEua * 0.30 + dTtf * 0.15;
         const deShock = getGermanResidualShock(hist, targetDate, priorImm, targetDOW, h, 'DE_LU');
         anchor = Math.max(-60.0, anchor + deShock);
