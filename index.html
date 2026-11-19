@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 11:17</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 13:10</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-19 11:17
+                Last DB Audit: 2026-11-19 13:10
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -5681,6 +5681,7 @@ function applySourceResidualShiftDamping(gross, start, h, targetDate, matchDate,
             let forecastCapacitiesData = {};
             let residualBiasData = {};
             let generationMixData = {};
+            let mlForecastsData = {};
             const countries = ["DE_LU", "FR", "IT", "AT", "CH", "BE", "CZ", "HU", "RO", "BG", "GR", "SK", "SI", "RS", "MK"];
                         const FLAG_MAP = {
                 'DE_LU': '🇩🇪 Germany', 'DE': '🇩🇪 Germany', 'FR': '🇫🇷 France', 'IT': '🇮🇹 Italy',
@@ -13348,7 +13349,7 @@ async function initDashboardData() {
                     const t = cacheBust;
 
                     // Fire all requests simultaneously
-                    const [hist, out, cab, cabL, cabO, fcap, stratStats, genMix, grkEmp, pSpecs] = await Promise.all([
+                    const [hist, out, cab, cabL, cabO, fcap, stratStats, genMix, grkEmp, pSpecs, mlFc] = await Promise.all([
                         fetchJSON(`data/historical.json.gz?t=${t}`).then(d  => { tick('historical');         return d || {};  }),
                         fetchJSON(`data/outages.json?t=${t}`).then(d     => { tick('outages');            return d || [];  }),
                         fetchJSON(`data/cables.json.gz?t=${t}`).then(d      => { tick('cables daily');       return d || [];  }),
@@ -13358,7 +13359,8 @@ async function initDashboardData() {
                         fetchJSON(`data/strategy_rolling_stats.json.gz?t=${t}`).then(d => { tick('strategy stats'); return d || null; }),
                         fetchJSON(`data/generation_mix.json.gz?t=${t}`).then(d => { tick('generation mix'); return d || {}; }),
                         fetchJSON(`data/greek_fleet_empirical.json.gz?t=${t}`).then(d => { tick('fleet empirical'); return d || null; }),
-                        fetchJSON(`data/plant_specs_reference.json?t=${t}`).then(d => { tick('plant fleet'); return d || null; })
+                        fetchJSON(`data/plant_specs_reference.json?t=${t}`).then(d => { tick('plant fleet'); return d || null; }),
+                        fetchJSON(`data/ml_forecasts.json.gz?t=${t}`).then(d => { return d || {}; })
                     ]);
 
                     if (hist && hist.residual_bias) {
@@ -13374,6 +13376,7 @@ async function initDashboardData() {
                     window.strategyRollingStats   = stratStats || window.strategyRollingStats || null;
                     window.generationMixData      = generationMixData = genMix || {};
                     window.greekFleetEmpirical    = grkEmp || null;
+                    window.mlForecastsData        = mlForecastsData = mlFc || {};
                     if (pSpecs && pSpecs.plants) { window.plantSpecsData = plantSpecsData = pSpecs; window._plantSpecsLoaded = true; }
 
                     // Fresh data invalidates the optimizer's cached ex-ante daily levels
@@ -13455,7 +13458,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-19 11:17";
+                const currentBuildTime = "2026-11-19 13:10";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -15081,6 +15084,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
 
 
     if (shift === 0.0) {
+        applyDualTreeMlBlend(hourly, zone, targetDate);
         applyEarlyClearingCoupling(hourly, zone, targetDate);
         applyCableAuctionCoupling(hourly, zone, targetDate);
         return hourly;
@@ -15158,12 +15162,66 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
         const a = h[dkey];
         h[pkey] = (a !== null && a !== undefined) ? (h[key] - a) : null;
     });
-// 7) Pre-gate early clearing auction integration (RS, MK, ME, CH)
+// 7) Walk-Forward DualTree ML Ensemble (pure fundamentals `no_early` — runs BEFORE live early-clearing & cable toggles)
+    applyDualTreeMlBlend(hourly, zone, targetDate);
+
+    // 8) Pre-gate early clearing auction integration (RS, MK, ME, CH)
     applyEarlyClearingCoupling(hourly, zone, targetDate);
 
-    // 8) Pre-gate daily explicit cable auction integration (GR, CH, IT)
+    // 9) Pre-gate daily explicit cable auction integration (GR, CH, IT)
     applyCableAuctionCoupling(hourly, zone, targetDate);
 
+    return hourly;
+}
+
+// ── Walk-Forward DualTree ML Ensemble Blend ────────────────────────────────
+// Blends the physical merit-order engine with strictly ex-ante walk-forward
+// DualTree ML fundamentals (`no_early` curve, pre-computed in train_xgb_forecasts.py)
+// BEFORE live early-clearing and cable auction coupling run, so live pasted
+// ME/MK/RS/CH prices and UI toggles always shift the ensemble cleanly in the right direction.
+function applyDualTreeMlBlend(hourly, zone, targetDate) {
+    if (!hourly || !hourly.length) return hourly;
+    if (window._engineMlSkip) return hourly;
+    const mlAll = window.mlForecastsData;
+    if (!mlAll || !mlAll[zone] || !mlAll[zone][targetDate]) return hourly;
+
+    const entry = mlAll[zone][targetDate];
+    const ML_WEIGHTS = {
+        DE_LU: 0.50, FR: 0.50, HU: 0.50, GR: 0.50,
+        RO: 0.50, BG: 0.50, IT: 0.50, AT: 0.00
+    };
+    const wMl = ML_WEIGHTS[zone];
+    if (!wMl) return hourly;
+
+    const hist = window.historicalData || {};
+    const mlArr = (entry.no_early && entry.no_early.length >= 24) ? entry.no_early : null;
+    if (!mlArr) return hourly;
+
+    // Optional user custom TTF override shift (keeps live TTF slider responsive)
+    let ttfShift = 0.0;
+    if (typeof window._customTtfOverride === 'number' && !isNaN(window._customTtfOverride) && window._customTtfOverride > 0) {
+        const baseTtf = (hist[zone] && hist[zone][targetDate] && hist[zone][targetDate].ttf_price) ? hist[zone][targetDate].ttf_price : null;
+        if (baseTtf !== null && baseTtf > 0) {
+            ttfShift = 0.75 * ((window._customTtfOverride - baseTtf) / 0.55);
+        }
+    }
+
+    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : zone === 'FR' ? 'fr' : 'gr';
+    const key = 'model_price_' + sfx, dkey = 'actual_price_' + sfx, pkey = 'price_delta_' + sfx;
+    const mkey = 'marginal_type_' + sfx;
+
+    for (let h = 0; h < 24 && h < hourly.length; h++) {
+        const curP = hourly[h][key];
+        const mlP = mlArr[h];
+        if (curP === null || curP === undefined || isNaN(curP) || mlP === null || mlP === undefined || isNaN(mlP)) continue;
+        // Preserve physically curtailed zero floors
+        if (curP <= 0.05 && (hourly[h][mkey] === 'res_surplus' || hourly[h][mkey] === 'min_load_floor' || hourly[h][mkey] === 'must_run_floor')) continue;
+        const blended = (1.0 - wMl) * curP + wMl * (mlP + ttfShift);
+        const finalP = Math.round(Math.max(-20.0, Math.min(600.0, blended)) * 100) / 100;
+        hourly[h][key] = finalP;
+        const act = hourly[h][dkey];
+        hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (finalP - act) : null;
+    }
     return hourly;
 }
 
@@ -17947,14 +18005,14 @@ function _computeGRForecast(targetDate) {
         // 2) Destination sink (Bulgaria) is already flooded/zeroed (bgBaseline <= 45.0) and Greece is in surplus or congested
         // 3) Generation after exports cannot absorb mandatory must-run base (effReqAfterTrade <= 0)
         // 4) Greek net residual is low (< mustRunBaseTotal * 1.2) while exporting, or raw resGR < 400 MW in midday
-        const isFloorSurplus = isSolarMidday && (isAcuteSEEOutageGR ? (resGR <= -totExportCap || (resGR < -250 && isExportCongested)) : (
+        const isFloorSurplus = isSolarMidday && (isAcuteSEEOutageGR ? (resGR <= -totExportCap || (resGR < -250 && isExportCongested && bgBaseline <= 60.0)) : (
             (resGR <= -totExportCap) ||
             (bgBaseline <= 45.0 && (resGR <= 500 || isExportCongested)) ||
             (resGR < -1200 && isExportCongested)
         ));
 
         const _grWindH = (grEntry.wind && grEntry.wind[h]) || 0;
-        const _isWindSolarFlood = isSolarMidday && (h >= 10 && h <= 15) && (_grWindH >= 2800 && (grResiduals[h] || 0) < 300);
+        const _isWindSolarFlood = isSolarMidday && (h >= 10 && h <= 15) && (_grWindH >= 2800 && (grResiduals[h] || 0) < 300 && bgBaseline <= 60.0);
         const decoupleExport = isSolarMidday && (isFloorSurplus || _isWindSolarFlood || (isExportCongested && ((resGR < 300 && !_bgMidSurge) || isWeekend)));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
