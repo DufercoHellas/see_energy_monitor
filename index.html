@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 09:29</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 10:04</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-19 09:29
+                Last DB Audit: 2026-11-19 10:04
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13441,7 +13441,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-19 09:29";
+                const currentBuildTime = "2026-11-19 10:04";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -15331,6 +15331,11 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
         }
         const hasDirCable = cabAlpha > 0 && ((impCab && impCab.some(v => v > 0)) || (expCab && expCab.some(v => v > 0)));
 
+        // Zero-parameter Core-Confirmed Floor for HU: when both live CH early clearing and DE Core model
+        // sit above RS, the Core-Balkan corridor is congested and HU's early reference cannot drop below min(CH, DE).
+        const _huChArr = (zone === 'HU' && ec === 'RS' && hist.CH && hist.CH[targetDate] && hist.CH[targetDate].prices) ? hist.CH[targetDate].prices : null;
+        const _huDeSolved = (zone === 'HU' && ec === 'RS' && _huChArr && typeof solveDEForecast === 'function') ? solveDEForecast(targetDate) : null;
+
         for (let h = 0; h < 24; h++) {
             const ep = ecTargetPrices[h];
             if (ep !== null && ep !== undefined && !isNaN(ep)) {
@@ -15339,7 +15344,16 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
                     const dirCabSp = ((impCab && impCab[h]) || 0) - ((expCab && expCab[h]) || 0);
                     effSpread = (1.0 - cabAlpha) * histSpread + cabAlpha * dirCabSp;
                 }
-                earlyHourly[h] += ep + effSpread;
+                let earlyRef = ep + effSpread;
+                if (_huChArr && _huDeSolved && _huDeSolved.hourly && _huDeSolved.hourly[h]) {
+                    const chH = _huChArr[h];
+                    const deH = _huDeSolved.hourly[h].model_price_de;
+                    if (chH !== null && chH !== undefined && !isNaN(chH) && deH !== null && deH !== undefined && !isNaN(deH)) {
+                        const coreFloor = Math.min(chH, deH);
+                        if (earlyRef < coreFloor) earlyRef = coreFloor;
+                    }
+                }
+                earlyHourly[h] += earlyRef;
             }
         }
         earlyCount++;
@@ -15922,9 +15936,17 @@ function solveHUForecast(targetDate, skipSplitting) {
             deSpreadShift = (deToday - dePriorP) * 0.45;
         }
         anchor = Math.max(0, anchor + deSpreadShift + (h >= 6 ? nucReturnRelief : nucReturnRelief * 0.3) + ceePeakRelief);
-        // Only blend pre-gate RS when it doesn't drag down an un-anchored Monday jump day (like Oct 5)
+        // Only blend pre-gate RS when it doesn't drag down an un-anchored Monday jump day (like Oct 5).
+        // Zero-parameter Core-Confirmed Floor: when both live CH early clearing and DE Core model sit above RS,
+        // the Core-Balkan corridor is congested and cheap RS cannot drag HU's anchor below Core.
         if (rsKnown !== null && (targetDOW !== 1 || rsKnown >= anchor) && (!isAcuteSEEOutage || rsKnown >= anchor || dRes <= 150)) {
-            anchor = 0.65 * anchor + 0.35 * rsKnown;
+            const chKnown = nbPrice('CH', targetDate, h);
+            let rsEff = rsKnown;
+            if (chKnown !== null && deToday !== null) {
+                const coreFloor = Math.min(chKnown, deToday);
+                if (coreFloor > rsEff) rsEff = coreFloor;
+            }
+            anchor = 0.65 * anchor + 0.35 * rsEff;
         }
         const maxNeighbour = Math.max(atP, skP, ro, rs, bg);
         if (maxNeighbour > 0) anchor = Math.min(anchor, maxNeighbour + 45.0);
