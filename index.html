@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 13:10</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-19 15:42</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-19 13:10
+                Last DB Audit: 2026-11-19 15:42
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13458,7 +13458,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-19 13:10";
+                const currentBuildTime = "2026-11-19 15:42";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -16420,7 +16420,7 @@ function _computeROForecast(targetDate) {
         // Dynamic cable capacities (RO borders)
         const huExportCap = huCap(dayFcaps, 'RO-HU', h, isWeekend);
         const huImportCap = huCap(dayFcaps, 'HU-RO', h, isWeekend);
-        const hAtcExportHU = huExportCap !== null ? huExportCap : 1500.0;
+        const hAtcExportHU = huExportCap !== null ? huExportCap : 720.0;
         const hAtcImportHU = huImportCap !== null ? huImportCap : 1400.0;
         const hAtcExportBG = (dayFcaps && dayFcaps['RO-BG'] && dayFcaps['RO-BG'][h] !== null) ? dayFcaps['RO-BG'][h] : 2190.0;
         const hAtcImportBG = (dayFcaps && dayFcaps['BG-RO'] && dayFcaps['BG-RO'][h] !== null) ? dayFcaps['BG-RO'][h] : 2500.0;
@@ -16479,7 +16479,18 @@ function _computeROForecast(targetDate) {
         const refResBG = (hist.BG && hist.BG[refDate] && _getEngineResiduals(hist.BG[refDate], refDate, targetDate));
         const prevResBG = (refResBG && refResBG[h] !== undefined) ? refResBG[h] : resBG;
         const dResBG = resBG - prevResBG;
-        const pSouth = Math.max(0.0, prevBgP + euaDelta + (dResBG * 0.010));
+        let pSouth = Math.max(0.0, prevBgP + euaDelta + (dResBG * 0.010));
+        const bgMlArr = (typeof window !== 'undefined' && window.mlForecastsData && window.mlForecastsData.BG && window.mlForecastsData.BG[targetDate] && window.mlForecastsData.BG[targetDate].no_early) ? window.mlForecastsData.BG[targetDate].no_early : null;
+        if (bgMlArr && bgMlArr[h] !== undefined && !isNaN(bgMlArr[h])) {
+            pSouth = 0.50 * pSouth + 0.50 * bgMlArr[h];
+        }
+        const rsLiveH = (hist.RS && hist.RS[targetDate] && hist.RS[targetDate].prices && hist.RS[targetDate].prices[h] !== null && hist.RS[targetDate].prices[h] !== undefined && !isNaN(hist.RS[targetDate].prices[h]) && Math.abs(hist.RS[targetDate].prices[h]) > 0.5) ? hist.RS[targetDate].prices[h] : null;
+        const mkLiveH = (hist.MK && hist.MK[targetDate] && hist.MK[targetDate].prices && hist.MK[targetDate].prices[h] !== null && hist.MK[targetDate].prices[h] !== undefined && !isNaN(hist.MK[targetDate].prices[h]) && Math.abs(hist.MK[targetDate].prices[h]) > 0.5) ? hist.MK[targetDate].prices[h] : null;
+        if (rsLiveH !== null && mkLiveH !== null) {
+            pSouth = 0.50 * pSouth + 0.50 * (0.5 * (rsLiveH + mkLiveH));
+        } else if (rsLiveH !== null) {
+            pSouth = 0.50 * pSouth + 0.50 * rsLiveH;
+        }
 
         // 3. Serbia (South-West) & Ukraine / Moldova
         const pBorder = regionalAnchor;
@@ -16494,7 +16505,7 @@ function _computeROForecast(targetDate) {
         for (let iter = 0; iter < 2; iter++) {
             flowHU = Math.min(hAtcImportHU, Math.max(-hAtcExportHU, (pEstimate - pWest) * 35.0));
             flowBG = Math.min(hAtcImportBG, Math.max(-hAtcExportBG, (pEstimate - pSouth) * 20.0));
-            flowRS = Math.min(hAtcImportRS, Math.max(-hAtcExportRS, (pEstimate - pBorder) * 10.0));
+            flowRS = Math.min(hAtcImportRS, Math.max(-hAtcExportRS, (pEstimate - (rsLiveH !== null ? rsLiveH : pBorder)) * 15.0));
             flowUA = Math.min(hAtcImportUA, Math.max(-hAtcExportUA, (pEstimate - pBorder) * 10.0));
             netImport = flowHU + flowBG + flowRS + flowUA;
             const maxFleetRO = activeFleetRO.reduce((a, b) => a + b.avail_mw, 0);
@@ -16526,8 +16537,7 @@ function _computeROForecast(targetDate) {
             const midRoRef = 0.5 * (pImm + pSame);
             let midNbGap = Math.max(-50.0, Math.min(50.0, midRegPrev - midRoRef));
             modelP += 0.45 * midNbGap;
-            const minClusterP = Math.min(pSouth, pWest);
-            if (minClusterP > 80.0) modelP = Math.max(modelP, minClusterP * 0.85);
+            // Physical flow balance determines RO midday price (removed hardcoded 0.85 cluster floor)
         } else if (h === 8) {
             // H09 local: solar onset
             if (cleanSolarRO > 800 || (resRO < 2200 && isWeekend)) {
