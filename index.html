@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-20 09:57</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-20 10:18</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-critical" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-20 09:57
+                Last DB Audit: 2026-11-20 10:18
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13476,7 +13476,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-20 09:57";
+                const currentBuildTime = "2026-11-20 10:18";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -15104,6 +15104,7 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     if (shift === 0.0) {
         applyDualTreeMlBlend(hourly, zone, targetDate);
         applyEarlyClearingCoupling(hourly, zone, targetDate);
+        applySrmcWithEarlyMlBlend(hourly, zone, targetDate);
         applyCableAuctionCoupling(hourly, zone, targetDate);
         return hourly;
     }
@@ -15180,11 +15181,14 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
         const a = h[dkey];
         h[pkey] = (a !== null && a !== undefined) ? (h[key] - a) : null;
     });
-// 7) Walk-Forward DualTree ML Ensemble (pure fundamentals `no_early` — runs BEFORE live early-clearing & cable toggles)
+    // 7) Walk-Forward DualTree ML Ensemble (pure fundamentals `no_early` — skipped when live `with_early_srmc` runs at Step 8b)
     applyDualTreeMlBlend(hourly, zone, targetDate);
 
     // 8) Pre-gate early clearing auction integration (RS, MK, ME, CH)
     applyEarlyClearingCoupling(hourly, zone, targetDate);
+
+    // 8b) Gas-SRMC Normalized DualTree ML Ensemble (`with_early_srmc` — runs when live early markets are active)
+    applySrmcWithEarlyMlBlend(hourly, zone, targetDate);
 
     // 9) Pre-gate daily explicit cable auction integration (GR, CH, IT)
     applyCableAuctionCoupling(hourly, zone, targetDate);
@@ -15192,14 +15196,43 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     return hourly;
 }
 
-// ── Walk-Forward DualTree ML Ensemble Blend ────────────────────────────────
-// Blends the physical merit-order engine with strictly ex-ante walk-forward
-// DualTree ML fundamentals (`no_early` curve, pre-computed in train_xgb_forecasts.py)
-// BEFORE live early-clearing and cable auction coupling run, so live pasted
-// ME/MK/RS/CH prices and UI toggles always shift the ensemble cleanly in the right direction.
+const _SRMC_WE_WEIGHTS = {
+    DE_LU: 0.50, FR: 0.50, HU: 0.55, GR: 0.00,
+    RO: 0.55, BG: 0.55, IT: 0.65, AT: 0.25
+};
+
+function _resolveActiveSrmcWithEarly(zone, targetDate) {
+    if (window._engineMlSkip) return null;
+    const w = _SRMC_WE_WEIGHTS[zone];
+    if (!w) return null;
+    // 1. Highest priority: live-scored SRMC with_early from Desktop Price Predictor (exact toggled ME/MK/RS/CH)
+    const liveRec = window._liveMlWithEarly && window._liveMlWithEarly[zone] && window._liveMlWithEarly[zone][targetDate];
+    if (liveRec && liveRec.with_early_srmc && liveRec.with_early_srmc.length >= 24) {
+        return { arr: liveRec.with_early_srmc, weight: w, isLiveScored: true };
+    }
+    // 2. Pre-computed walk-forward SRMC with_early — ONLY if every early zone it used is currently active in historicalData
+    const mlAll = window.mlForecastsData;
+    const entry = mlAll && mlAll[zone] && mlAll[zone][targetDate];
+    if (!entry || !entry.with_early_srmc || entry.with_early_srmc.length < 24 || !entry.early_zones || !entry.early_zones.length) {
+        return null;
+    }
+    const hist = window.historicalData || {};
+    for (let i = 0; i < entry.early_zones.length; i++) {
+        const ez = entry.early_zones[i];
+        const e = hist[ez] && hist[ez][targetDate];
+        if (!e || !e.prices || !e.prices.some(x => x !== null && Math.abs(x) > 0.5)) {
+            return null; // Early zone toggled OFF or absent -> fall back cleanly to no_early
+        }
+    }
+    return { arr: entry.with_early_srmc, weight: w, isLiveScored: false };
+}
+
+// ── Walk-Forward DualTree ML Ensemble Blend (no_early fallback) ─────────────
 function applyDualTreeMlBlend(hourly, zone, targetDate) {
     if (!hourly || !hourly.length) return hourly;
     if (window._engineMlSkip) return hourly;
+    // Skip pre-early no_early blend if post-early SRMC with_early will run for this zone/date
+    if (_resolveActiveSrmcWithEarly(zone, targetDate)) return hourly;
     const mlAll = window.mlForecastsData;
     if (!mlAll || !mlAll[zone] || !mlAll[zone][targetDate]) return hourly;
 
@@ -15235,6 +15268,46 @@ function applyDualTreeMlBlend(hourly, zone, targetDate) {
         // Preserve physically curtailed zero floors
         if (curP <= 0.05 && (hourly[h][mkey] === 'res_surplus' || hourly[h][mkey] === 'min_load_floor' || hourly[h][mkey] === 'must_run_floor')) continue;
         const blended = (1.0 - wMl) * curP + wMl * (mlP + ttfShift);
+        const finalP = Math.round(Math.max(-20.0, Math.min(600.0, blended)) * 100) / 100;
+        hourly[h][key] = finalP;
+        const act = hourly[h][dkey];
+        hourly[h][pkey] = (act !== null && act !== undefined && !isNaN(act)) ? (finalP - act) : null;
+    }
+    return hourly;
+}
+
+// ── Gas-SRMC Normalized DualTree ML Blend (with_early_srmc) ─────────────────
+function applySrmcWithEarlyMlBlend(hourly, zone, targetDate) {
+    if (!hourly || !hourly.length) return hourly;
+    const resolved = _resolveActiveSrmcWithEarly(zone, targetDate);
+    if (!resolved) return hourly;
+
+    const wMl = resolved.weight;
+    const mlArr = resolved.arr;
+    const hist = window.historicalData || {};
+
+    // Apply proportional TTF scaling if user overrides TTF slider (and not already live-scored with that TTF)
+    let ttfScale = 1.0;
+    if (!resolved.isLiveScored && typeof window._customTtfOverride === 'number' && !isNaN(window._customTtfOverride) && window._customTtfOverride > 0) {
+        const baseTtf = (hist[zone] && hist[zone][targetDate] && hist[zone][targetDate].ttf_price) ? hist[zone][targetDate].ttf_price : null;
+        const baseEua = (hist[zone] && hist[zone][targetDate] && hist[zone][targetDate].eua_price) ? hist[zone][targetDate].eua_price : 80.0;
+        if (baseTtf !== null && baseTtf > 5) {
+            const srmcBase = (baseTtf / 0.55) + (0.37 * baseEua) + 3.0;
+            const srmcNew = (window._customTtfOverride / 0.55) + (0.37 * baseEua) + 3.0;
+            if (srmcBase > 10) ttfScale = srmcNew / srmcBase;
+        }
+    }
+
+    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : zone === 'FR' ? 'fr' : 'gr';
+    const key = 'model_price_' + sfx, dkey = 'actual_price_' + sfx, pkey = 'price_delta_' + sfx;
+    const mkey = 'marginal_type_' + sfx;
+
+    for (let h = 0; h < 24 && h < hourly.length; h++) {
+        const curP = hourly[h][key];
+        const mlP = mlArr[h];
+        if (curP === null || curP === undefined || isNaN(curP) || mlP === null || mlP === undefined || isNaN(mlP)) continue;
+        if (curP <= 0.05 && (hourly[h][mkey] === 'res_surplus' || hourly[h][mkey] === 'min_load_floor' || hourly[h][mkey] === 'must_run_floor')) continue;
+        const blended = (1.0 - wMl) * curP + wMl * (mlP * ttfScale);
         const finalP = Math.round(Math.max(-20.0, Math.min(600.0, blended)) * 100) / 100;
         hourly[h][key] = finalP;
         const act = hourly[h][dkey];
@@ -16642,10 +16715,22 @@ function _computeROForecast(targetDate) {
     // Bounds: RO cannot clear more than 15 EUR below HU (export arbitrage)
     // or more than 12 EUR above HU (import relief).
     if (huFcArr && huFcArr.length === 24) {
+        const _rsArr = hist.RS && hist.RS[targetDate] && hist.RS[targetDate].prices;
+        const _rRO = hist.RO && hist.RO[targetDate] ? _getEngineResiduals(hist.RO[targetDate], targetDate, targetDate) : null;
+        const _rBG = hist.BG && hist.BG[targetDate] ? _getEngineResiduals(hist.BG[targetDate], targetDate, targetDate) : null;
+        const _rGR = hist.GR && hist.GR[targetDate] ? _getEngineResiduals(hist.GR[targetDate], targetDate, targetDate) : null;
         for (let h = 0; h < 24; h++) {
             const huP = huFcArr[h];
             let roP = hourlyResults[h].model_price_ro;
-            const maxHuRoGap = (isAcuteSEEOutageRO && (hourlyResults[h].ro_residual || 0) > 4200) ? -4.0 : 15.0;
+            let maxHuRoGap = (isAcuteSEEOutageRO && (hourlyResults[h].ro_residual || 0) > 4200) ? -4.0 : 15.0;
+            // Smooth physical SEE corridor surplus gate: when RO+BG+GR is in RES surplus and RS clears below HU,
+            // RO->HU FBMC export congestion smoothly opens the HU-RO congestion rent up to HU - RS.
+            if (_rsArr && _rsArr[h] != null && !isNaN(_rsArr[h]) && _rRO && _rBG && _rGR && !isAcuteSEEOutageRO) {
+                const seeResH = (_rRO[h] || 0) + (_rBG[h] || 0) + (_rGR[h] || 0);
+                const sigSurplus = 1.0 / (1.0 + Math.exp((seeResH - 5500.0) / 1500.0));
+                const rsGap = Math.max(0.0, huP - _rsArr[h]);
+                maxHuRoGap = Math.max(maxHuRoGap, 15.0 + sigSurplus * Math.max(0.0, rsGap - 15.0));
+            }
             if (huP - roP > maxHuRoGap) roP = huP - maxHuRoGap;
             else if (roP - huP > 12.0 && (hourlyResults[h].ro_residual || 0) < 5000) roP = huP + 12.0;
             hourlyResults[h].model_price_ro = Math.round(roP * 100) / 100;
