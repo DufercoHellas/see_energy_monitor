@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-23 09:20</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-23 17:44</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-23 09:20
+                Last DB Audit: 2026-11-23 17:44
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13521,7 +13521,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-23 09:20";
+                const currentBuildTime = "2026-11-23 17:44";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -15034,17 +15034,22 @@ function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     const brPrior = _broadResMean(_priorPricedDate(zone, targetDate), targetDate);
     // Summer heatwave scarcity hinge (8,200 MW) only applies during summer (June-August)
     const hingeThr = (targetM >= 6 && targetM <= 8) ? TIGHTNESS_HINGE_THR : 9500.0;
+    // Physical nuclear outage gate for SEE scarcity hinge:
+    // Outside summer heatwaves, macro broad residual > 9,500 MW only triggers acute SEE
+    // scarcity pricing when Cernavoda (RO) or Kozloduy (BG) baseload nuclear capacity is offline.
+    const seeNucOutageScale = (targetM >= 6 && targetM <= 8) ? 1.0 : Math.min(1.0, (roOutage + bgOutage) / 1000.0);
     if (th && br !== null) {
         // Guard: only apply the scarcity hinge when tightness is not rapidly
         // easing (dBr < 0). Prevents over-pricing the day after a peak.
-        const thEff = (brPrior !== null && (br - brPrior) < -100) ? th * 0.3 : th;
+        let thEff = (brPrior !== null && (br - brPrior) < -100) ? th * 0.3 : th;
+        if (['HU', 'RO', 'BG', 'GR'].includes(zone)) thEff *= seeNucOutageScale;
         const priorHingeExcess = (brPrior !== null && brPrior > hingeThr && physDaily > 330.0) ? (brPrior - hingeThr) * ((br > 11000 && br > brPrior) ? 0.45 : 0.85) : 0.0;
         shift += thEff * Math.max(0, (br - hingeThr) - priorHingeExcess);
     }
     // 2b) tightness-easing reversion: when the region loosens vs the prior day,
     // the level tends to fall. Ex-ante.
     if ((zone === 'BG' || zone === 'RO' || zone === 'HU') && br !== null && br > 10800 && (brPrior === null || (br - brPrior) > 1500)) {
-        const extK = zone === 'RO' ? 0.065 : (zone === 'BG' ? 0.045 : 0.030);
+        const extK = (zone === 'RO' ? 0.065 : (zone === 'BG' ? 0.045 : 0.030)) * seeNucOutageScale;
         shift += extK * (br - 10800);
     }
     const ea = EASING_ALPHA[zone];
@@ -15463,7 +15468,7 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
         RO: { basket: ['RS'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
         HU: { basket: ['RS'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
         AT: { basket: ['CH'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 },
-        IT: { basket: ['CH', 'ME'],             denom: 2, weight: 0.40, spreadDecay: 1.0 }
+        IT: { basket: ['CH'],                   denom: 1, weight: 0.50, spreadDecay: 0.5 }
     };
 
     const cfg = EARLY_CONFIG[zone];
@@ -15580,7 +15585,9 @@ function applyEarlyClearingCoupling(hourly, zone, targetDate) {
         if (currentP === null || currentP === undefined || isNaN(currentP)) continue;
 
         // Guard: do not override curtailed solar floors (0.01 €) with positive early prices
-        if (currentP <= 0.05 && hourly[h]['marginal_type_' + sfx] === 'res_surplus') continue;
+        // unless Greece's midday residual has recovered by >= 1,200 MW back inside northern export ATC (-950 MW) and early clearing confirms >= 45 EUR
+        const _grCanEvac = (zone === 'GR' && (hourly[h].gr_residual || 0) > -950 && earlyHourly[h] >= 45.0 && priorDate && hist.GR && hist.GR[priorDate] && ((hourly[h].gr_residual || 0) - ((_getEngineResiduals(hist.GR[priorDate], priorDate, targetDate) || [])[h] || 0)) >= 1200);
+        if (currentP <= 0.05 && hourly[h]['marginal_type_' + sfx] === 'res_surplus' && !_grCanEvac) continue;
 
         let effW = effectiveWeight;
         if ((zone === 'HU' || zone === 'RO' || zone === 'BG') && earlyHourly[h] < currentP) {
@@ -17948,7 +17955,8 @@ function _computeGRForecast(targetDate) {
             const refResGR = (histGR[refDate] && _getEngineResiduals(histGR[refDate], refDate, targetDate));
             const prevResGR = (refResGR && refResGR[h] !== undefined) ? refResGR[h] : resGR;
             const dResBG = resBG - prevResBG;
-            _bgMidSurge = (resBG >= 1800 && dResBG > 400 && resGR > -300);
+            const _mkLiveMid = (hist.MK && hist.MK[targetDate] && hist.MK[targetDate].prices) ? hist.MK[targetDate].prices[h] : null;
+            _bgMidSurge = (resBG >= 1800 && ((dResBG > 400 && resGR > -300) || ((resGR - prevResGR) >= 1400 && resGR > -1000 && (_mkLiveMid === null || _mkLiveMid >= 50.0))));
             const dResGR = resGR - prevResGR;
 
             // Dynamic Physical Operating State: Net Demand Ratio rhoGR
@@ -18033,7 +18041,8 @@ function _computeGRForecast(targetDate) {
                     const midBg = (histBG[refDate].prices[10] + histBG[refDate].prices[11] + histBG[refDate].prices[12]) / 3.0;
                     if (midBg > 0) prevBgP = Math.min(prevBgP, midBg);
                 }
-                const bgPriceFloor = Math.max(0, prevBgP * 0.75);
+                const _evacScale = (resGR > 500 || dResBG > 400) ? 0.75 : (0.50 * Math.max(0.25, Math.min(1.0, (resGR + 1100.0) / 1100.0)));
+                const bgPriceFloor = Math.max(0, prevBgP * _evacScale);
                 bgBaseline = Math.max(bgBaseline, bgPriceFloor);
             }
 
@@ -18174,7 +18183,7 @@ function _computeGRForecast(targetDate) {
         const decoupleExport = isSolarMidday && (isFloorSurplus || _isWindSolarFlood || (isExportCongested && ((resGR < 300 && !_bgMidSurge) || isWeekend)));
         const decoupleImport = isImportCongested && (resGR > 4500);
         if (decoupleExport) {
-            if (isFloorSurplus || _isWindSolarFlood || (effReqAfterTrade <= 0) || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 45.0)) {
+            if (isFloorSurplus || _isWindSolarFlood || (effReqAfterTrade <= 0 && !_bgMidSurge) || (isWeekend && resGR < -300) || ((h >= 10 && h <= 14 ? resGR < 500 : resGR <= 200) && bgBaseline <= 45.0)) {
                 bestP = 0.01;
                 bestUnit = 'RES Surplus (Curtailment Floor) (Decoupled Export)';
                 bestMarginalType = 'res_surplus';
