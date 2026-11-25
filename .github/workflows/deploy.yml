@@ -23,11 +23,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        id: upload
+        uses: actions/upload-pages-artifact@v5
         with:
-          path: '.' # Change this to your build directory (e.g., 'dist' or 'build') if your frontend has a build step
+          path: '.'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+        with:
+          artifact_name: github-pages
