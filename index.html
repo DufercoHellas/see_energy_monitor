@@ -2378,7 +2378,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
                 <span
                     style="display: inline-block; width: 6px; height: 6px; background-color: #10b981; border-radius: 50%;"></span>
                 <span style="color: var(--text-muted); font-weight: 500;">Run:</span>
-                <span style="font-weight: 700; color: var(--text-primary);">2026-11-27 09:16</span>
+                <span style="font-weight: 700; color: var(--text-primary);">2026-11-27 10:25</span>
             </div>
 
             <button type="button" class="health-status-badge health-pill-warning" onclick="openDataHealthModal()"
@@ -2499,7 +2499,7 @@ body.dark-mode .btn-wiggle-quick.secondary:hover {
 
         <div class="health-modal-footer">
             <div style="font-size: 11px; color: #94a3b8;" id="health_modal_footer_time">
-                Last DB Audit: 2026-11-27 09:16
+                Last DB Audit: 2026-11-27 10:25
             </div>
             <button class="btn-modal-close-action" onclick="closeDataHealthModal()">Close</button>
         </div>
@@ -13572,7 +13572,7 @@ async function initDashboardData() {
 
             // ── Auto-Deploy Watcher: Notifies when a new build is available ──
             function startAutoUpdateWatcher(pollIntervalMs = 60000) {
-                const currentBuildTime = "2026-11-27 09:16";
+                const currentBuildTime = "2026-11-27 10:25";
                 let isNotified = false;
 
                 setInterval(async function() {
@@ -15097,7 +15097,7 @@ window._engineBaseDailyCache = window._engineBaseDailyCache || {};
 
 function applyDailyLevelEnsemble(hourly, zone, targetDate, ttfPrice, euaPrice) {
     if (!hourly || !hourly.length) return hourly;
-    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : 'gr';
+    const sfx = zone === 'BG' ? 'bg' : zone === 'RO' ? 'ro' : zone === 'HU' ? 'hu' : (zone === 'DE_LU' || zone === 'DE') ? 'de' : zone === 'AT' ? 'at' : zone === 'CH' ? 'ch' : zone === 'IT' ? 'it' : zone === 'FR' ? 'fr' : 'gr';
     const key = 'model_price_' + sfx, dkey = 'actual_price_' + sfx, pkey = 'price_delta_' + sfx;
     let s = 0, n = 0;
     hourly.forEach(h => { const v = h[key]; if (v !== null && v !== undefined && !isNaN(v)) { s += v; n++; } });
@@ -20196,6 +20196,10 @@ function solveFRForecast(targetDate) {
         const act = hourlyResults[h].actual_price_fr;
         hourlyResults[h].price_delta_fr = act !== null ? (finalP - act) : null;
     }
+
+    applyDualTreeMlBlend(hourlyResults, 'FR', targetDate);
+    applyEarlyClearingCoupling(hourlyResults, 'FR', targetDate);
+    applySrmcWithEarlyMlBlend(hourlyResults, 'FR', targetDate);
 
     const frOptResult = {
         date: targetDate,
